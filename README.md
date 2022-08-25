@@ -8,14 +8,19 @@
 
 Use two terminals for backend and frontend. 
 The commands will watch file modifications and restart automatically.
-For the backend:
 
+For the backend you have to start a mongodb instance once. You can use 
+docker:
+```
+docker-compose up -d
+```
+
+Then start the server:
 ```
 npm run server
 ```
 
-For the frontend:
-
+Finally, in another terminal, start the frontend:
 ```
 npm start
 ```
@@ -27,6 +32,8 @@ insert this line in `.env`:
 ```
 DANGEROUSLY_DISABLE_HOST_CHECK=true  
 ```
+
+Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
 
 ## deployment
 

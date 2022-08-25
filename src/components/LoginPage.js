@@ -12,9 +12,24 @@ const prepend_style = {
     border: "0 !important"
 }
 
-function LoginPage({ callback }) {
+function LoginPage({ api, setUser }) {
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
+    const [ waiting, setWaiting ] = useState(false)
+    const [ error, setError ] = useState(null)
+
+    async function login(email, password) {
+        setError(null)
+        try {
+            const user = await api.login(email, password)
+            setUser(user)
+        } catch(error) {
+          console.error(error)
+          setError(`Login error: ${error}`)
+          setWaiting(false)
+        }
+      }
+        
     return (
         <Container>
             <div className="d-flex justify-content-center h-100">
@@ -24,6 +39,9 @@ function LoginPage({ callback }) {
                     </Card.Header>
                     <Card.Body>
                     <form>
+                        <div className={`alert alert-danger${error?"":" collapse"}`} role="alert">
+                          { error }
+                        </div>
                         <div>
                             <input value={ email } onChange={ evt => setEmail(evt.target.value) } type="email" id="email" className="form-control" />
                             <label className="form-label" htmlFor="email">Email address</label>
@@ -34,7 +52,12 @@ function LoginPage({ callback }) {
                             <label className="form-label" htmlFor="password">Password</label>
                         </div>
 
-                        <button onClick={ () => callback(email, password) } type="button" className="btn btn-primary btn-block mb-4">Login</button>
+                        <button 
+                            onClick={() => login(email, password)} 
+                            disabled={waiting} 
+                            type="button" 
+                            className="btn btn-primary btn-block mb-4">Login
+                        </button>
 
                         </form>                        
                     </Card.Body>

@@ -1,12 +1,14 @@
-import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
-import Button from 'react-bootstrap/Button';
+import Container from 'react-bootstrap/Container'
+import Nav from 'react-bootstrap/Nav'
+import Navbar from 'react-bootstrap/Navbar'
+import NavDropdown from 'react-bootstrap/NavDropdown'
+import Button from 'react-bootstrap/Button'
 import LoginPage from './components/LoginPage.js'
-import { OAuth2Popup, OAuthPopup, useOAuth2 } from "@tasoskakour/react-use-oauth2";
-import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom";
+import { OAuth2Popup, OAuthPopup, useOAuth2 } from "@tasoskakour/react-use-oauth2"
+import { BrowserRouter, Routes, Route, Link, NavLink } from "react-router-dom"
+import { useState, useEffect } from 'react'
 
+import Api from './api'
 
 function MyNavBar() {
   return (
@@ -36,14 +38,15 @@ function MyNavBar() {
   );
 }
 
-function Home() {
+function Home({ api }) {
+  const config = api.config
   const { data, loading, error, getAuth } = useOAuth2({
-    authorizeUrl: "https://iam.unipi.it/oauth2/authorize",
-    clientId: "R1K1DyQmplAQJHW77jO4WHMvnuca",
+    authorizeUrl: config.AUTHORIZE_URL,
+    clientId: config.CLIENT_ID,
     redirectUri: `${document.location.origin}/callback`,
     scope: "",
     responseType: "code",
-    exchangeCodeForTokenServerURL: "http://localhost:8000/token",
+    exchangeCodeForTokenServerURL: `${config.SERVER_URL}/token`,
     exchangeCodeForTokenMethod: "POST",
     onSuccess: (payload) => console.log("Success", payload),
     onError: (error_) => console.log("Error", error_)
@@ -63,31 +66,44 @@ function Home() {
     return <pre>{JSON.stringify(data)}</pre>;
   }
 
-  return (
+  return (<>
     <Button style={{ margin: "24px" }} type="button" onClick={() => getAuth()}>
       test oauth2
     </Button>
+    <p>config: {`${JSON.stringify(config)}`}</p>
+    </>
   );
 
 
 }
 
 function App() {
-  const logged_in = false
+  const [ api, setApi ] = useState(null)
+  const [ user, setUser ] = useState(null)
+  const loggedIn = ( user !== null )
+  const connected = ( api !== null )
   
-  function login(email, password) {
-    console.log(`email: ${ email }, password: ${ password }`)
+  useEffect(() => {    (async () => {
+        const api = new Api()
+        await api.getConfig()
+        setApi(api)        
+    })().catch(console.error)
+  }, [])
+
+  if (!connected) {
+    return <p>Connecting...</p>
   }
 
-  if (!logged_in) {
-    return <LoginPage callback={ login }/>
+  if (!loggedIn) {
+    return <LoginPage api={ api } setUser={ setUser }/>
   }
+
   return <div>
   <MyNavBar />
   <BrowserRouter>
     <Routes>  
       <Route element={<OAuthPopup />} path="/callback" />
-      <Route element={<Home />} path="/" />
+      <Route element={<Home api={api} />} path="/" />
     </Routes>
   </BrowserRouter>
 </div>
