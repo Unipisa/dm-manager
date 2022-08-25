@@ -10,6 +10,7 @@ function LoginPage({ api, setUser }) {
 
     async function login(email, password) {
         setError(null)
+        setWaiting(true)
         try {
             const { user } = await api.login(email, password)
             setUser(user)
@@ -20,6 +21,17 @@ function LoginPage({ api, setUser }) {
         }
       }
         
+    async function start_oauth2() {
+        setError(null)
+        setWaiting(true)
+        try {
+            await api.start_oauth2()
+        } catch(error) {
+            console.error(error)
+            setWaiting(false)
+        }
+    }
+
     return (
         <Container>
             <div className="d-flex justify-content-center h-100">
@@ -47,6 +59,11 @@ function LoginPage({ api, setUser }) {
                             disabled={waiting} 
                             type="button" 
                             className="btn btn-primary btn-block mb-4">Login
+                        </button>
+                        <div className="mb-4" />
+                        <button onClick={() => start_oauth2()}
+                        className="btn btn-primary btn-block mb-4">
+                            UNIPI login
                         </button>
 
                         </form>                        

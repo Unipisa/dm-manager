@@ -5,6 +5,7 @@ const session = require('express-session')
 const passport = require('passport')
 const mongoose = require('mongoose')
 const LocalStrategy = require('passport-local')
+const OAuth2Strategy = require('passport-oauth2')
 
 const User = require('./models/User')
 const config = require('./config')
@@ -12,6 +13,27 @@ const config = require('./config')
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
+
+if (!config.OAUTH2_CLIENT_SECRET) {
+  console.log("provide OAUTH2_CLIENT_SECRET")
+  process.exit(2)
+}
+
+passport.use(new OAuth2Strategy({
+  authorizationURL: config.OAUTH2_AUTHORIZE_URL,
+  tokenURL: config.OAUTH2_TOKEN_URL,
+  clientID: config.OAUTH2_CLIENT_ID,
+  clientSecret: config.OAUTH2_CLIENT_SECRET,
+  callbackURL: `${config.SERVER_URL}/login/oauth2/callback`
+},
+function(accessToken, refreshToken, profile, cb) {
+  console.log(`oauth2 verify: ${JSON.stringify(profile)}`)
+  User.findOrCreate({ username: profile[config.OAUTH2_USERNAME_FIELD] }, 
+    function (err, user) {
+      return cb(err, user)
+    })
+  }
+))
 
 const app = express()
 
@@ -51,6 +73,18 @@ app.post('/login/password',
     console.log(`login ${JSON.stringify(user)}`)
     res.send({ user })
   })
+
+app.get('/login/oauth2',
+  passport.authenticate('oauth2'))
+
+app.get('/login/oauth2/callback',
+  passport.authenticate('oauth2'),
+  function(req, res) {
+    const user = req.user.toObject()
+    console.log(`login ${JSON.stringify(user)}`)
+    res.redirect(`/oauth2`)
+  }
+)
 
 app.post('/logout', function(req, res){
   req.logout(function(err) {
@@ -92,7 +126,7 @@ async function create_admin_user() {
     if (password) {
         await admin.setPassword(password)
         await admin.save()
-        console.log(`Set password "${password}" for user "${admin.username}"`)
+        console.log(`Set password for user "${admin.username}"`)
     } else {
       console.log(`Password not provided (set ADMIN_PASSWORD)`)
     }
@@ -105,7 +139,8 @@ async function create_admin_user() {
 
 async function start() {
   console.log("options (configure using environment variables or .env file):")
-  for(const [key, val] of Object.entries(config)) {
+  for(let [key, val] of Object.entries(config)) {
+    if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
     console.log(`  ${key}: ${val}`)
   }
   console.log(`connecting to database: ${config.MONGO_URI}`)

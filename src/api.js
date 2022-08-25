@@ -38,4 +38,9 @@ export default class Api {
         console.log(`user logged: ${JSON.stringify(this.user)}`)
         return this.user
     }
+
+    async start_oauth2() {
+        let response = this.get('/login/oauth2')
+        console.log(`oauth2 response: ${JSON.stringify(response)}`)
+    }
 }
