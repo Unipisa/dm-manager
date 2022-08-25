@@ -6,8 +6,8 @@ export default class Api {
 
     async fetch(url, options) {
         const response = await fetch(url, options)
-        if (response.status === 401) throw "invalid credentials"
-        if (response.status !== 200) throw "server error"
+        if (response.status === 401) throw new Error("invalid credentials")
+        if (response.status !== 200) throw new Error("server error")
         const data = await response.json()
         return data
     }

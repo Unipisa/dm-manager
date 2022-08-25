@@ -1,16 +1,6 @@
 import { useState } from 'react'
 import { Container } from 'react-bootstrap'
 import Card from 'react-bootstrap/Card'
-import { faUser } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-//import CardHeader from 'react-bootstrap/CardHeader'
-
-const prepend_style = {
-    width: "50px",
-    backgroundColor: "#FFC312",
-    color: "black",
-    border: "0 !important"
-}
 
 function LoginPage({ api, setUser }) {
     const [ email, setEmail ] = useState("")
@@ -21,11 +11,11 @@ function LoginPage({ api, setUser }) {
     async function login(email, password) {
         setError(null)
         try {
-            const user = await api.login(email, password)
+            const { user } = await api.login(email, password)
             setUser(user)
         } catch(error) {
           console.error(error)
-          setError(`Login error: ${error}`)
+          setError(`Login error: ${error.message}`)
           setWaiting(false)
         }
       }

@@ -1,6 +1,7 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
+const session = require('express-session')
 const passport = require('passport')
 const mongoose = require('mongoose')
 const LocalStrategy = require('passport-local')
@@ -13,6 +14,7 @@ passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
 const app = express()
+
 app.use(cors(
   {
     origin: config.CORS_ORIGIN,
@@ -20,23 +22,32 @@ app.use(cors(
   }))
 
 app.use(morgan('tiny')) // access log
+
 app.use(express.static('build'))
+
 app.use(express.json()) // parse request data into req.body
+
+app.use(session({
+  secret: config.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false
+}))
 
 app.get('/config', (req, res) => {
   res.send({
     VERSION: config.VERSION,
     AUTHORIZE_URL: config.AUTHORIZE_URL,
     CLIENT_ID: config.CLIENT_ID,
-    EXCHANGE_CODE_FOR_TOKEN_SERVER_URL: config.EXCHANGE_CODE_FOR_TOKEN_SERVER_URL,
+    SERVER_URL: config.SERVER_URL,
   })
 })
 
 app.post('/login/password',
   passport.authenticate('local'),
   function(req, res) {
-    console.log(`login ${JSON.stringify(req.body)}`)
-    res.status(500).send({error: "not yet implemented"})
+    const user = req.user.toObject()
+    console.log(`login ${JSON.stringify(user)}`)
+    res.send({ user })
   })
 
 app.get('/hello', (req, res) => {
@@ -65,19 +76,19 @@ async function create_admin_user() {
   if (username) {
     let admin = await User.findOne({ username })
     if (!admin) {
-      admin = User.create({ username })
+      admin = await User.create({ username })
       console.log(`create User "${admin.username}"`)
     }
     if (password) {
         await admin.setPassword(password)
         await admin.save()
-        console.log(`obj: ${JSON.stringify(admin)}`)
         console.log(`Set password "${password}" for user "${admin.username}"`)
     } else {
       console.log(`Password not provided (set ADMIN_PASSWORD)`)
     }
   }
-  if (User.countDocuments({}) === 0) {
+  const n = await User.countDocuments({})
+  if ( n == 0) {
     console.log(`No users in database. Create one by setting ADMIN_USER and ADMIN_PASSWORD`)
   }
 }

@@ -1,9 +1,11 @@
 require('dotenv').config() // read environment variabiles from .env
+const { randomUUID } = require('crypto')
 
 class Options {
     constructor() {
         const options = {
-            JWT_SECRET: `${Math.random()}`,
+            SESSION_SECRET: randomUUID(),
+            JWT_SECRET: randomUUID(),
             CORS_ORIGIN: "http://localhost:3000",
             PORT: "8000",
             AUTHORIZE_URL: "https://iam.unipi.it/oauth2/authorize",

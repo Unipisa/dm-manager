@@ -12,4 +12,16 @@ const userSchema = new Schema({
 
 userSchema.plugin(passportLocalMongoose)
 
+// specify the transform schema option
+if (!userSchema.options.toObject) userSchema.options.toObject = {};
+userSchema.options.toObject.transform = function (doc, ret, options) {
+  ret.id = ret._id.toString()
+  delete ret._id
+  delete ret.__v
+  delete ret.hash
+  delete ret.salt
+  return ret;
+}
+
+
 module.exports = mongoose.model('User', userSchema);
