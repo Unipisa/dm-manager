@@ -15,6 +15,12 @@ docker:
 docker-compose up -d
 ```
 
+If the database is empty you need to let the server create the first user:
+```
+export ADMIN_USER=admin
+export ADMIN_PASSWORD=secret
+```
+
 Then start the server:
 ```
 npm run server

@@ -5,7 +5,7 @@ const passport = require('passport')
 const mongoose = require('mongoose')
 const LocalStrategy = require('passport-local')
 
-const User = require('./models/user').User
+const User = require('./models/User')
 const config = require('./config')
 
 passport.use(User.createStrategy())
@@ -58,6 +58,30 @@ app.use((err, req, res, next) => {
   console.error(err)
 })
 
+async function create_admin_user() {
+  const username = config.ADMIN_USER
+  const password = config.ADMIN_PASSWORD
+
+  if (username) {
+    let admin = await User.findOne({ username })
+    if (!admin) {
+      admin = User.create({ username })
+      console.log(`create User "${admin.username}"`)
+    }
+    if (password) {
+        await admin.setPassword(password)
+        await admin.save()
+        console.log(`obj: ${JSON.stringify(admin)}`)
+        console.log(`Set password "${password}" for user "${admin.username}"`)
+    } else {
+      console.log(`Password not provided (set ADMIN_PASSWORD)`)
+    }
+  }
+  if (User.countDocuments({}) === 0) {
+    console.log(`No users in database. Create one by setting ADMIN_USER and ADMIN_PASSWORD`)
+  }
+}
+
 async function start() {
   console.log("options (configure using environment variables or .env file):")
   for(const [key, val] of Object.entries(config)) {
@@ -71,6 +95,9 @@ async function start() {
     process.exit(1)
   }
   console.log('MongoDB is connected')
+
+  create_admin_user()
+
   app.listen(parseInt(config.PORT), () => {
     console.log(`server started: ${config.SERVER_URL}`)
   })
