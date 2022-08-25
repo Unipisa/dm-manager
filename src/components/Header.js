@@ -3,7 +3,7 @@ import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 
-export default function Header({ user }) {
+export default function Header({ user, logout }) {
     return (
       <Navbar bg="light" expand="lg">
         <Container>
@@ -27,9 +27,9 @@ export default function Header({ user }) {
             </Nav>
           </Navbar.Collapse>
           <Nav className="right">
-            <b>
-                { user ? user.username : "not logged in"}
-            </b>
+            <NavDropdown title={ user ? user.username : "user"}>
+                <NavDropdown.Item onClick={ logout }>logout</NavDropdown.Item>
+            </NavDropdown>
          </Nav>
         </Container>
       </Navbar>

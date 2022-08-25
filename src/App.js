@@ -67,8 +67,13 @@ function App() {
     return <LoginPage api={ api } setUser={ setUser }/>
   }
 
+  function logout() {
+    api.post("/logout")
+    setUser(null)
+  }
+
   return <div>
-  <Header user={user} />
+  <Header user={user} logout={logout}/>
   <BrowserRouter>
     <Routes>  
       <Route element={<OAuthPopup />} path="/callback" />

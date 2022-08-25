@@ -33,6 +33,8 @@ app.use(session({
   saveUninitialized: false
 }))
 
+app.use(passport.authenticate('session'));
+
 app.get('/config', (req, res) => {
   res.send({
     VERSION: config.VERSION,
@@ -49,6 +51,14 @@ app.post('/login/password',
     console.log(`login ${JSON.stringify(user)}`)
     res.send({ user })
   })
+
+app.post('/logout', function(req, res){
+  req.logout(function(err) {
+    if (err) { return next(err) }
+    // res.redict('/login')
+    res.send({ "user": null })
+  });
+});
 
 app.get('/hello', (req, res) => {
   res.send('Hello World!')
