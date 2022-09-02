@@ -1,11 +1,12 @@
 export default class Api {
-    constructor() {
+    constructor(url) {
+        this.base_url = url || "http://localhost:8000"
         this.config = null
         this.user = null
     }
 
     async fetch(url, options) {
-        const response = await fetch(url, options)
+        const response = await fetch(this.base_url + url, options)
         if (response.status === 401) throw new Error("invalid credentials")
         if (response.status !== 200) throw new Error("server error")
         const data = await response.json()
@@ -34,13 +35,15 @@ export default class Api {
     }
 
     async login(username, password) {
+        console.log(`login POST: /login/password`)
         this.user = await this.post('/login/password', {username, password})
         console.log(`user logged: ${JSON.stringify(this.user)}`)
         return this.user
     }
 
-    async start_oauth2() {
-        let response = this.get('/login/oauth2')
-        console.log(`oauth2 response: ${JSON.stringify(response)}`)
+    start_oauth2() {
+        let url = this.base_url + '/login/oauth2'
+        console.log(`start_oauth2: redirecting to ${url}`)
+        window.location.href = url
     }
 }

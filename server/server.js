@@ -27,8 +27,14 @@ passport.use(new OAuth2Strategy({
   callbackURL: `${config.SERVER_URL}/login/oauth2/callback`
 },
 function(accessToken, refreshToken, profile, cb) {
-  console.log(`oauth2 verify: ${JSON.stringify(profile)}`)
-  User.findOrCreate({ username: profile[config.OAUTH2_USERNAME_FIELD] }, 
+  console.log(`oauth2 verify: accessToken ${accessToken} refreshToken: ${refreshToken} profile: ${profile}`)
+  console.log(`profile: ${JSON.stringify(profile)}`)
+  const username = profile[config.OAUTH2_USERNAME_FIELD]
+  console.log(`username: ${username}`)
+
+  if (!username) throw new Error("invalid username")
+
+  User.findOrCreate({ username }, 
     function (err, user) {
       return cb(err, user)
     })
@@ -60,8 +66,8 @@ app.use(passport.authenticate('session'));
 app.get('/config', (req, res) => {
   res.send({
     VERSION: config.VERSION,
-    AUTHORIZE_URL: config.AUTHORIZE_URL,
-    CLIENT_ID: config.CLIENT_ID,
+    OAUTH2_AUTHORIZE_URL: config.AUTHORIZE_URL,
+    OAUTH2_CLIENT_ID: config.CLIENT_ID,
     SERVER_URL: config.SERVER_URL,
   })
 })
@@ -121,12 +127,12 @@ async function create_admin_user() {
     let admin = await User.findOne({ username })
     if (!admin) {
       admin = await User.create({ username })
-      console.log(`create User "${admin.username}"`)
+      console.log(`Create user "${admin.username}"`)
     }
     if (password) {
         await admin.setPassword(password)
         await admin.save()
-        console.log(`Set password for user "${admin.username}"`)
+        console.log(`Password reset for user "${admin.username}"`)
     } else {
       console.log(`Password not provided (set ADMIN_PASSWORD)`)
     }

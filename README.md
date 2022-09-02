@@ -7,7 +7,6 @@
 ## development
 
 Use two terminals for backend and frontend. 
-The commands will watch file modifications and restart automatically.
 
 For the backend you have to start a mongodb instance once. You can use 
 docker:
@@ -15,7 +14,7 @@ docker:
 docker-compose up -d
 ```
 
-If the database is empty you need to let the server create the first user:
+If the database is empty you need to instruct the server to create the first user (if the user already exists the password for that user is set):
 ```
 export ADMIN_USER=admin
 export ADMIN_PASSWORD=secret

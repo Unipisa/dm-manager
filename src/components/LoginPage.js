@@ -21,17 +21,6 @@ function LoginPage({ api, setUser }) {
         }
       }
         
-    async function start_oauth2() {
-        setError(null)
-        setWaiting(true)
-        try {
-            await api.start_oauth2()
-        } catch(error) {
-            console.error(error)
-            setWaiting(false)
-        }
-    }
-
     return (
         <Container>
             <div className="d-flex justify-content-center h-100">
@@ -40,17 +29,32 @@ function LoginPage({ api, setUser }) {
                         <h3>Sign In</h3>
                     </Card.Header>
                     <Card.Body>
-                    <form>
+                    <form onSubmit={ (event) => {
+                        login(email,password)
+                        event.preventDefault()
+                        }}
+                    >
                         <div className={`alert alert-danger${error?"":" collapse"}`} role="alert">
                           { error }
                         </div>
                         <div>
-                            <input value={ email } onChange={ evt => setEmail(evt.target.value) } type="email" id="email" className="form-control" />
+                            <input value={ email } onChange={ evt => setEmail(evt.target.value) } id="email" className="form-control" />
                             <label className="form-label" htmlFor="email">Email address</label>
                         </div>
 
                         <div className="form-outline mb-4">
-                            <input value={ password } onChange={ evt => setPassword(evt.target.value) } type="password" id="password" className="form-control" />
+                            <input 
+                                value={ password } 
+                                onChange={ evt => setPassword(evt.target.value) } 
+                                type="password" 
+                                id="password" 
+                                className="form-control" 
+                                onKeyPress={ (event) => {
+                                    if (event.key === "Enter") {                     
+                                        login(email, password)
+                                    }
+                                }}
+                                />
                             <label className="form-label" htmlFor="password">Password</label>
                         </div>
 
@@ -60,13 +64,12 @@ function LoginPage({ api, setUser }) {
                             type="button" 
                             className="btn btn-primary btn-block mb-4">Login
                         </button>
+                        </form>
                         <div className="mb-4" />
-                        <button onClick={() => start_oauth2()}
+                        <button onClick={() => api.start_oauth2()}
                         className="btn btn-primary btn-block mb-4">
                             UNIPI login
                         </button>
-
-                        </form>                        
                     </Card.Body>
                 </Card>
             </div>

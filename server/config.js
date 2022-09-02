@@ -10,7 +10,7 @@ class Options {
             PORT: "8000",
             OAUTH2_AUTHORIZE_URL: "https://iam.unipi.it/oauth2/authorize",
             OAUTH2_TOKEN_URL: "https://iam.unipi.it/oauth2/token",
-            OAUTH2_CLIENT_ID: "R1K1DyQmplAQJHW77jO4WHMvnuca",
+            OAUTH2_CLIENT_ID: null,
             OAUTH2_CLIENT_SECRET: null,
             OAUTH2_USERNAME_FIELD: "unipiUser",
             MONGO_URI: "mongodb://localhost:27017/dm-manager",
