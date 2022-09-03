@@ -26,12 +26,26 @@ function oauth2_verify(accessToken, refreshToken, params, profile, cb) {
   const username = profile[config.OAUTH2_USERNAME_FIELD]
   console.log(`username: ${username}`)
 
-  if (!username) throw new Error("invalid username")
+  if (! username) throw new Error("invalid username")
 
-  User.findOrCreate({ username }, 
-    function (err, user) {
-      return cb(err, user)
-    })
+  console.log({
+    username: username, 
+    firstName: profile['first_name'],
+    lastName: profile['last_name']
+  })
+
+  User.findOneAndUpdate({ username: username }, {
+    $set: {
+      username: username, 
+      firstName: profile['given_name'],
+      lastName: profile['family_name']
+    }
+  }, {
+    upsert: true
+  }, function (err, user) {
+    return cb(err, user)
+  })
+
   }
 
 let oauth2_strategy = new OAuth2Strategy({
@@ -39,7 +53,8 @@ let oauth2_strategy = new OAuth2Strategy({
   tokenURL: config.OAUTH2_TOKEN_URL,
   clientID: config.OAUTH2_CLIENT_ID,
   clientSecret: config.OAUTH2_CLIENT_SECRET,
-  callbackURL: `${config.SERVER_URL}/login/oauth2/callback`
+  callbackURL: `${config.SERVER_URL}/login/oauth2/callback`,
+  scope: "openid"
 }, oauth2_verify )
 
 oauth2_strategy.userProfile = function (accesstoken, done) {
@@ -65,10 +80,13 @@ passport.use(oauth2_strategy)
 
 const app = express()
 
+console.log(config.CORS_ORIGIN)
+
 app.use(cors(
   {
     origin: config.CORS_ORIGIN,
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    credentials: true // Needed for the client to handle session
   }))
 
 app.use(morgan('tiny')) // access log
@@ -94,6 +112,15 @@ app.get('/config', (req, res) => {
   })
 })
 
+app.get('/login', function(req, res) {
+  if (req.user) {
+    res.send(JSON.stringify(req.user));
+  }
+  else {
+    res.send(JSON.stringify(null))
+  }
+});
+
 app.post('/login/password',
   passport.authenticate('local'),
   function(req, res) {
@@ -110,7 +137,7 @@ app.get('/login/oauth2/callback',
   function(req, res) {
     const user = req.user.toObject()
     console.log(`login ${JSON.stringify(user)}`)
-    res.redirect(`/oauth2`)
+    res.redirect(`http://localhost:3000`)
   }
 )
 
