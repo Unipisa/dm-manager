@@ -6,6 +6,7 @@ export default class Api {
     }
 
     async fetch(url, options) {
+        options = {credentials: 'include', ...options}
         const response = await fetch(this.base_url + url, options)
         if (response.status === 401) throw new Error("invalid credentials")
         if (response.status !== 200) throw new Error("server error")

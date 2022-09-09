@@ -13,7 +13,7 @@ class Options {
             OAUTH2_USERINFO_URL: "https://iam.unipi.it/oauth2/userinfo",
             OAUTH2_CLIENT_ID: null,
             OAUTH2_CLIENT_SECRET: null,
-            OAUTH2_USERNAME_FIELD: "unipiUser",
+            OAUTH2_USERNAME_FIELD: "email",
             MONGO_URI: "mongodb://localhost:27017/dm-manager",
             ADMIN_USER: null,
             ADMIN_PASSWORD: null,

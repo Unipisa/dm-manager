@@ -30,8 +30,8 @@ function oauth2_verify(accessToken, refreshToken, params, profile, cb) {
 
   console.log({
     username: username, 
-    firstName: profile['first_name'],
-    lastName: profile['last_name']
+    firstName: profile['given_name'],
+    lastName: profile['family_name']
   })
 
   User.findOneAndUpdate({ username: username }, {
@@ -112,18 +112,19 @@ app.get('/config', (req, res) => {
   })
 })
 
-app.get('/login', function(req, res) {
+app.all('/login', function(req, res) {
   if (req.user) {
-    res.send(JSON.stringify(req.user));
+    res.send(req.user)
   }
   else {
-    res.send(JSON.stringify(null))
+    res.send(null)
   }
-});
+})
 
 app.post('/login/password',
   passport.authenticate('local'),
   function(req, res) {
+    console.log(`login/password body: ${req.body}`)
     const user = req.user.toObject()
     console.log(`login ${JSON.stringify(user)}`)
     res.send({ user })
@@ -141,7 +142,7 @@ app.get('/login/oauth2/callback',
   }
 )
 
-app.post('/logout', function(req, res){
+app.all('/logout', function(req, res){
   req.logout(function(err) {
     if (err) { return next(err) }
     // res.redict('/login')
