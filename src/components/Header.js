@@ -3,8 +3,9 @@ import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 
-export default function Header({ user, logout }) {
-    return (
+export default function Header({ api, setApi }) {
+  const user = api.user()
+  return (
       <Navbar bg="light" expand="lg">
         <Container>
           <Navbar.Brand href="#home">dm-manager</Navbar.Brand>
@@ -28,7 +29,7 @@ export default function Header({ user, logout }) {
           </Navbar.Collapse>
           <Nav className="right">
             <NavDropdown title={ user ? user.username : "user"}>
-                <NavDropdown.Item onClick={ logout }>logout</NavDropdown.Item>
+                <NavDropdown.Item onClick={ () => { api.logout() ; setApi(api.sync())} }>logout</NavDropdown.Item>
             </NavDropdown>
          </Nav>
         </Container>

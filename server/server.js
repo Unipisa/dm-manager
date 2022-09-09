@@ -5,78 +5,18 @@ const session = require('express-session')
 const passport = require('passport')
 const mongoose = require('mongoose')
 const LocalStrategy = require('passport-local')
-const OAuth2Strategy = require('passport-oauth2')
 
 const User = require('./models/User')
 const config = require('./config')
+const unipiAuth = require('./unipiAuth')
 
+// local password authentication
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
-if (!config.OAUTH2_CLIENT_SECRET) {
-  console.log("provide OAUTH2_CLIENT_SECRET")
-  process.exit(2)
-}
-
-function oauth2_verify(accessToken, refreshToken, params, profile, cb) {
-  console.log(`oauth2 verify: accessToken ${accessToken} refreshToken: ${refreshToken} profile: ${profile} params: ${params}`)
-  console.log(`params: ${JSON.stringify(params)}`)
-  console.log(`profile: ${JSON.stringify(profile)}`)
-  const username = profile[config.OAUTH2_USERNAME_FIELD]
-  console.log(`username: ${username}`)
-
-  if (! username) throw new Error("invalid username")
-
-  console.log({
-    username: username, 
-    firstName: profile['given_name'],
-    lastName: profile['family_name']
-  })
-
-  User.findOneAndUpdate({ username: username }, {
-    $set: {
-      username: username, 
-      firstName: profile['given_name'],
-      lastName: profile['family_name']
-    }
-  }, {
-    upsert: true
-  }, function (err, user) {
-    return cb(err, user)
-  })
-
-  }
-
-let oauth2_strategy = new OAuth2Strategy({
-  authorizationURL: config.OAUTH2_AUTHORIZE_URL,
-  tokenURL: config.OAUTH2_TOKEN_URL,
-  clientID: config.OAUTH2_CLIENT_ID,
-  clientSecret: config.OAUTH2_CLIENT_SECRET,
-  callbackURL: `${config.SERVER_URL}/login/oauth2/callback`,
-  scope: "openid"
-}, oauth2_verify )
-
-oauth2_strategy.userProfile = function (accesstoken, done) {
-  // abilita questo se vuoi vedere lo "scope" del token.
-  if (false) return done(null, {}) 
-
-  console.log(`accesstoken: ${accesstoken}`)
-  // choose your own adventure, or use the Strategy's oauth client
-  this._oauth2._request("GET", "https://iam.unipi.it/oauth2/userinfo", null, null, accesstoken, (err, data) => {
-    if (err) { return done(err); }
-    console.log("DATA: ${data}")
-    try {
-        data = JSON.parse( data );
-    }
-    catch(e) {
-      return done(e);
-    }
-    done(null, data);
-  });
-};
-
-passport.use(oauth2_strategy)
+// unipi oauth2 authentication
+passport.use(unipiAuth)
 
 const app = express()
 
@@ -91,7 +31,7 @@ app.use(cors(
 
 app.use(morgan('tiny')) // access log
 
-app.use(express.static('build'))
+app.use(express.static('public'))
 
 app.use(express.json()) // parse request data into req.body
 
@@ -112,14 +52,12 @@ app.get('/config', (req, res) => {
   })
 })
 
-app.all('/login', function(req, res) {
-  if (req.user) {
-    res.send(req.user)
-  }
-  else {
-    res.send(null)
-  }
-})
+app.post('/login', function(req, res) {
+  const
+    user = req.user || null,
+    token = req.user ? "qui ci mettiamo il token?" : null
+  res.send({ user, token });
+});
 
 app.post('/login/password',
   passport.authenticate('local'),
@@ -142,7 +80,8 @@ app.get('/login/oauth2/callback',
   }
 )
 
-app.all('/logout', function(req, res){
+app.post('/logout', function(req, res){
+  console.log(`LOGOUT ${req.logout}`)
   req.logout(function(err) {
     if (err) { return next(err) }
     // res.redict('/login')
@@ -151,10 +90,13 @@ app.all('/logout', function(req, res){
 });
 
 app.get('/hello', (req, res) => {
+  console.log(`params: ${JSON.stringify(req.params)}`)
+  console.log(`query: ${JSON.stringify(req.query)}`)
+  console.log(`body: ${JSON.stringify(req.body)}`)
+  console.log(`session: ${JSON.stringify(req.session)}`)
+  console.log(`user: ${JSON.stringify(req.user)}`)
+  console.log(`isAuthenticated: ${req.isAuthenticated()}`)
   res.send('Hello World!')
-})
-
-app.post('/token', (req, res) => {
 })
 
 //The 404 Route (ALWAYS Keep this as the last route)
@@ -193,7 +135,7 @@ async function create_admin_user() {
   }
 }
 
-async function start() {
+async function main() {
   console.log("options (configure using environment variables or .env file):")
   for(let [key, val] of Object.entries(config)) {
     if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
@@ -215,4 +157,4 @@ async function start() {
   })
 }
 
-start()
+main()
