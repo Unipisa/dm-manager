@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { Container } from 'react-bootstrap'
 import Card from 'react-bootstrap/Card'
 
-function LoginPage({ api, setApi }) {
+import Click from './Click'
+
+function LoginPage({ api }) {
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
@@ -13,7 +15,6 @@ function LoginPage({ api, setApi }) {
         setWaiting(true)
         try {
             await api.login(email, password)
-            setApi(api.sync())
         } catch(error) {
           console.error(error)
           setError(`Login error: ${error.message}`)
@@ -73,6 +74,7 @@ function LoginPage({ api, setApi }) {
                     </Card.Body>
                 </Card>
             </div>
+            <Click api={api} />
         </Container>
     )
 }

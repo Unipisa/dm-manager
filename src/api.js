@@ -1,14 +1,25 @@
+import { useState } from 'react'
+
 let common_state = {
     base_url: "http://localhost:8000",
     config: null,
     user: null,
-    token: null,
+    counter: 0
 }
 
-export function getApi(state) {
-    state = state || common_state
+export function useApi(initial_state) {
+    const [state, setState_] = useState(initial_state || common_state)
+    
+    console.log(`initial state ${JSON.stringify(state)}`)
 
-    function init(base_url) { state.base_url = base_url }
+    function setState(f) {
+        console.log(`old state ${JSON.stringify(state)} -> ${JSON.stringify(f(state))}`)
+        setState_(f)
+    }
+
+    function init(base_url) {
+        setState(s => ({...s, base_url })) 
+    }
 
     async function api_fetch(url, options) {
         options = {credentials: 'include', ...options}
@@ -36,9 +47,10 @@ export function getApi(state) {
 
     async function connect() {
         try {
-            state.config = await get('/config')
-            console.log(`config read: ${JSON.stringify(state.config)}`)
-            return state.config
+            const config = await get('/config')
+            setState(s => ({...s, config}))
+            console.log(`config read: ${JSON.stringify(config)}`)
+            return config
         } catch(err) {
             console.error(err)
             return null
@@ -56,10 +68,9 @@ export function getApi(state) {
             ? ['/login/password', {username, password}]
             : ['/login', {}]
         console.log(`login POST: ${url}`)
-        const { user, token } = await post(url, payload)
-        console.log(`user: ${JSON.stringify(user)}, token; ${token}`)
-        state.user = user 
-        state.token = token
+        const { user } = await post(url, payload)
+        console.log(`user: ${JSON.stringify(user)}`)
+        setState(s => ({...s, user}))
     }
 
     function start_oauth2() {
@@ -70,7 +81,7 @@ export function getApi(state) {
 
     async function logout() {
         await post("/logout")
-        state.user = null
+        setState(s => ({...s, user}))
         return true
     }
 
@@ -78,11 +89,18 @@ export function getApi(state) {
 
     function user() { return state.user }
 
-    function sync() { return getApi(state) }
+    function click() { 
+        setState( s => { 
+            console.log(`click ${s.counter} -> ${s.counter+1}`)
+            return {
+                ...s, counter: s.counter+1
+            }})
+    }
 
     return { 
-        init, sync, get, post, connect, connected, 
+        init, get, post, connect, connected, 
         login, loggedIn, user, logout, start_oauth2,
+        click,
         _state: state
     }
 

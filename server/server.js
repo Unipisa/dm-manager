@@ -54,10 +54,9 @@ app.get('/config', (req, res) => {
 
 app.post('/login', function(req, res) {
   const
-    user = req.user || null,
-    token = req.user ? "qui ci mettiamo il token?" : null
-  res.send({ user, token });
-});
+    user = req.user || null
+    res.send({ user })
+})
 
 app.post('/login/password',
   passport.authenticate('local'),
