@@ -4,7 +4,8 @@ let common_state = {
     base_url: "http://localhost:8000",
     config: null,
     user: null,
-    counter: 0
+    counter: 0,
+    messages: []
 }
 
 export function useApi(initial_state) {
@@ -13,7 +14,7 @@ export function useApi(initial_state) {
     console.log(`initial state ${JSON.stringify(state)}`)
 
     function setState(f) {
-        console.log(`old state ${JSON.stringify(state)} -> ${JSON.stringify(f(state))}`)
+        console.log(`setState ${JSON.stringify(state)} -> ${JSON.stringify(f(state))}`)
         setState_(f)
     }
 
@@ -33,6 +34,17 @@ export function useApi(initial_state) {
     async function post(url, data) {
         return await api_fetch(url, {
             method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    }
+
+    async function put(url, data) {
+        return await api_fetch(url, {
+            method: 'PUT',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -97,11 +109,40 @@ export function useApi(initial_state) {
             }})
     }
 
+    function addMessage(message, type='error') {
+        setState( s => ({
+            ...s,
+            messages: [...s.messages, [type, message]]
+        }))
+    }
+
+    function messages() {
+        return state.messages
+    }
+
+    function clearMessages() {
+        setState( s => ({
+            ...s,
+            messages: []
+        }))
+    }
+
+    async function putVisit(payload) {
+        try {
+            const r = await put("/api/v0/visit/", payload)
+            return r
+        } catch(err) {
+            addMessage(err.message, 'error')
+            return null
+        }
+    }
+
     return { 
         init, get, post, connect, connected, 
         login, loggedIn, user, logout, start_oauth2,
         click,
+        addMessage, messages, clearMessages,
+        putVisit,
         _state: state
     }
-
 }

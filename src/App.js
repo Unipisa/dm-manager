@@ -11,6 +11,7 @@ import VisitPage from './components/VisitPage'
 import NotFound from './components/NotFound'
 import Click from './components/Click'
 import Home from './components/Home'
+import Messages from './components/Messages'
 
 console.log("dm-manager (app starting)")
 
@@ -28,6 +29,7 @@ export default function App() {
   return <div>
   <BrowserRouter>
     <Header api={api} />
+    <Messages api={api} />
     <Routes>  
       <Route path="/" element={<Home api={api} />} />
       <Route path="/visits/:id" element={<VisitPage api={api} />} />
@@ -35,7 +37,5 @@ export default function App() {
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>
-  <p>footer</p>
-  <Click api={api} />
 </div>
 }

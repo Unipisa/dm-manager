@@ -16,4 +16,4 @@ const visitSchema = new Schema({
      timestamps: true // adds fields: createdAt, updatedAt
  })
 
- module.exports = mongoose.model('User', userSchema)
+ module.exports = mongoose.model('Visit', visitSchema)

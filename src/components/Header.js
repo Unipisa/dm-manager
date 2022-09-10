@@ -13,9 +13,9 @@ export default function Header({ api }) {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <NavLink to="/">Home</NavLink>
-              <NavLink to="/visits">Visite</NavLink>
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
+              <NavLink to="/" className="nav-link">Home</NavLink>
+              <NavLink to="/visits" className="nav-link">Visitatori</NavLink>
+              {/*<NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">
                   Another action
@@ -25,7 +25,8 @@ export default function Header({ api }) {
                 <NavDropdown.Item href="#action/3.4">
                   Separated link
                 </NavDropdown.Item>
-              </NavDropdown>
+                </NavDropdown>
+              */} 
             </Nav>
           </Navbar.Collapse>
           <Nav className="right">

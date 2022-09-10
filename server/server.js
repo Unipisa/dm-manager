@@ -9,6 +9,7 @@ const LocalStrategy = require('passport-local')
 const User = require('./models/User')
 const config = require('./config')
 const unipiAuth = require('./unipiAuth')
+const api = require('./api')
 
 // local password authentication
 passport.use(User.createStrategy())
@@ -41,21 +42,24 @@ app.use(session({
   saveUninitialized: false
 }))
 
-app.use(passport.authenticate('session'));
+app.use(passport.authenticate('session'))
+
+app.use('/api/v0', api)
 
 app.get('/config', (req, res) => {
+  const user = req.user || null
   res.send({
     VERSION: config.VERSION,
     OAUTH2_AUTHORIZE_URL: config.AUTHORIZE_URL,
     OAUTH2_CLIENT_ID: config.CLIENT_ID,
     SERVER_URL: config.SERVER_URL,
+    user
   })
 })
 
 app.post('/login', function(req, res) {
-  const
-    user = req.user || null
-    res.send({ user })
+  const user = req.user || null
+  res.send({ user })
 })
 
 app.post('/login/password',

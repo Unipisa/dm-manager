@@ -7,7 +7,15 @@ import MyInput from './MyInput'
 export default function VisitPage({ api }) {
     const { id } = useParams()
     const create = (id === 'new')
-    const [ visit, setVisit ] = useState({})
+    const [ visit, setVisit ] = useState({
+        lastName: "",
+        firstName: "",
+        email: "",
+        startDate: "",
+        endDate: "",
+        building: "",
+        roomNumber: "",
+    })
 
     const change = (evt) => {
         const { name, value } = evt.target
@@ -16,6 +24,10 @@ export default function VisitPage({ api }) {
             visit[name] = value
             return visit
         })
+    }
+
+    const submit = async (evt) => {
+        api.putVisit(visit)
     }
 
     return <Card>
@@ -28,7 +40,6 @@ export default function VisitPage({ api }) {
             event.preventDefault()
             }}
         >
-            <div>
                 <MyInput name="firstName" label="nome" store={ visit } onChange={ change } /> 
                 <MyInput name="lastName" label="cognome" store={ visit } onChange={ change } />
                 <MyInput name="email" label="email" store={ visit } onChange={ change } />
@@ -36,9 +47,8 @@ export default function VisitPage({ api }) {
                 <MyInput name="endDate" label="fine" store={ visit } onChange={ change } type="Date" />
                 <MyInput name="building" label="edificio" store={ visit } onChange={ change } />
                 <MyInput name="roomNumber" label="stanza" store={ visit } onChange={ change } />
-            </div>
-
-
+                <br />
+                <input onClick={ submit } className="btn btn-primary" type="submit" value="aggiungi visitatore" />
             </form>
         </Card.Body>
     </Card>
