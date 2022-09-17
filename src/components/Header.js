@@ -4,8 +4,8 @@ import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import { NavLink } from 'react-router-dom'
 
-export default function Header({ engine }) {
-  const user = engine.user()
+export default function Header({ api}) {
+  const user = api.user()
   return (
       <Navbar bg="light" expand="lg">
         <Container>
@@ -31,7 +31,7 @@ export default function Header({ engine }) {
           </Navbar.Collapse>
           <Nav className="right">
             <NavDropdown title={ user ? user.username : "user"}>
-                <NavDropdown.Item onClick={ engine.logout }>logout</NavDropdown.Item>
+                <NavDropdown.Item onClick={ () => api.logout() }>logout</NavDropdown.Item>
             </NavDropdown>
          </Nav>
         </Container>

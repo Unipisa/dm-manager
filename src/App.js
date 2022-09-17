@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import useEngine from './Engine'
+import useApi from './Api'
 import Connecting from './components/Connecting'
 import LoginPage from './components/LoginPage'
 import Header from './components/Header'
@@ -14,23 +15,24 @@ console.log("dm-manager (app starting)")
 
 export default function App() {
   const engine = useEngine()
+  const api = useApi()
   
-  if (! engine.connected()) {
-    return <Connecting engine={ engine } />
+  if (! api.connected()) {
+    return <Connecting api={ api }/>
   }
 
-  if (! engine.loggedIn()) {
-    return <LoginPage engine={ engine } />
+  if (! api.loggedIn()) {
+    return <LoginPage api={ api }/>
   }
 
   return <div>
   <BrowserRouter>
-    <Header engine={engine} />
+    <Header api={api}/>
     <Messages engine={engine} />
     <Routes>  
-      <Route path="/" element={<Home engine={engine} />} />
-      <Route path="/visits/:id" element={<VisitPage engine={engine} />} />
-      <Route path="/visits" element={<VisitsPage engine={engine} />} />
+      <Route path="/" element={<Home api={api} />} />
+      <Route path="/visits/:id" element={<VisitPage engine={engine} api={api} />} />
+      <Route path="/visits" element={<VisitsPage engine={engine} api={api}/>} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>

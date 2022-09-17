@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
 
-export default function VisitPage({ engine }) {
+export default function VisitPage({ engine, api }) {
     const { id } = useParams()
     const create = (id === 'new')
     const [ visit, setVisit ] = useState({
@@ -19,6 +19,12 @@ export default function VisitPage({ engine }) {
     })
     const [done, setDone ] = useState(false)
 
+    useEffect(() => {(async () => {
+        if (create) return;
+        const visit = await api.getVisit(id)
+        setVisit(v => ({...v, ...visit}))
+    })()}, [create, api, id])
+
     const change = (evt) => {
         const { name, value } = evt.target
         setVisit(visit => {
@@ -29,12 +35,19 @@ export default function VisitPage({ engine }) {
     }
     
     const submit = async (evt) => {
-        engine.putVisit(visit)
-        engine.addInfoMessage(create?"Nuova visita inserita":"visita modificata")
+        if (visit._id) {
+            await api.postVisit(visit)
+            await engine.addInfoMessage("visita modificata")
+        } else {
+            await api.putVisit(visit)
+            await engine.addInfoMessage("Nuova visita inserita")
+        }
         setDone(true)
     }
 
     if (done) return <Navigate to="/visits" />
+
+    // console.log(`visit: ${JSON.stringify(visit)}`)
 
     return <Card>
         <Card.Header>
@@ -46,16 +59,27 @@ export default function VisitPage({ engine }) {
             event.preventDefault()
             }}
         >
-                <MyInput name="firstName" label="nome" store={ visit } onChange={ change } /> 
-                <MyInput name="lastName" label="cognome" store={ visit } onChange={ change } />
-                <MyInput name="affiliation" label="affiliazione" store={ visit } onChange={ change } />
-                <MyInput name="email" label="email" store={ visit } onChange={ change } />
-                <MyInput name="startDate" label="inizio" store={ visit } onChange={ change } type="Date" />
-                <MyInput name="endDate" label="fine" store={ visit } onChange={ change } type="Date" />
-                <MyInput name="building" label="edificio" store={ visit } onChange={ change } />
-                <MyInput name="roomNumber" label="stanza" store={ visit } onChange={ change } />
-                <br />
-                <input onClick={ submit } className="btn btn-primary" type="submit" value="aggiungi visitatore" />
+            <table>
+                <tbody>
+                    <MyInput name="firstName" label="nome" store={ visit } onChange={ change } /> 
+                    <MyInput name="lastName" label="cognome" store={ visit } onChange={ change } />
+                    <MyInput name="affiliation" label="affiliazione" store={ visit } onChange={ change } />
+                    <MyInput name="email" label="email" store={ visit } onChange={ change } />
+                    <MyInput name="startDate" label="inizio" store={ visit } onChange={ change } type="Date" />
+                    <MyInput name="endDate" label="fine" store={ visit } onChange={ change } type="Date" />
+                    <MyInput name="building" label="edificio" store={ visit } onChange={ change } />
+                    <MyInput name="roomNumber" label="stanza" store={ visit } onChange={ change } />
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td>
+                            <input 
+                                onClick={ submit } className="btn btn-primary" type="submit" 
+                                value={create?"aggiungi visita":"aggiorna visita"} />
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
             </form>
         </Card.Body>
     </Card>
