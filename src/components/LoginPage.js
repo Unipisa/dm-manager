@@ -4,7 +4,7 @@ import Card from 'react-bootstrap/Card'
 
 import Click from './Click'
 
-function LoginPage({ api }) {
+function LoginPage({ engine }) {
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
@@ -14,7 +14,7 @@ function LoginPage({ api }) {
         setError(null)
         setWaiting(true)
         try {
-            await api.login(email, password)
+            await engine.login(email, password)
         } catch(error) {
           console.error(error)
           setError(`Login error: ${error.message}`)
@@ -67,14 +67,14 @@ function LoginPage({ api }) {
                         </button>
                         </form>
                         <div className="mb-4" />
-                        <button onClick={ api.start_oauth2 }
+                        <button onClick={ engine.start_oauth2 }
                         className="btn btn-primary btn-block mb-4">
                             UNIPI login
                         </button>
                     </Card.Body>
                 </Card>
             </div>
-            <Click api={api} />
+            <Click engine={engine} />
         </Container>
     )
 }

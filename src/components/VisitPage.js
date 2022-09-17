@@ -1,21 +1,23 @@
 import { useState } from 'react'
 import { Card } from 'react-bootstrap'
-import { useParams } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
 
-export default function VisitPage({ api }) {
+export default function VisitPage({ engine }) {
     const { id } = useParams()
     const create = (id === 'new')
     const [ visit, setVisit ] = useState({
         lastName: "",
         firstName: "",
+        affiliation: "",
         email: "",
         startDate: "",
         endDate: "",
         building: "",
         roomNumber: "",
     })
+    const [done, setDone ] = useState(false)
 
     const change = (evt) => {
         const { name, value } = evt.target
@@ -25,10 +27,14 @@ export default function VisitPage({ api }) {
             return visit
         })
     }
-
+    
     const submit = async (evt) => {
-        api.putVisit(visit)
+        engine.putVisit(visit)
+        engine.addInfoMessage(create?"Nuova visita inserita":"visita modificata")
+        setDone(true)
     }
+
+    if (done) return <Navigate to="/visits" />
 
     return <Card>
         <Card.Header>
@@ -42,6 +48,7 @@ export default function VisitPage({ api }) {
         >
                 <MyInput name="firstName" label="nome" store={ visit } onChange={ change } /> 
                 <MyInput name="lastName" label="cognome" store={ visit } onChange={ change } />
+                <MyInput name="affiliation" label="affiliazione" store={ visit } onChange={ change } />
                 <MyInput name="email" label="email" store={ visit } onChange={ change } />
                 <MyInput name="startDate" label="inizio" store={ visit } onChange={ change } type="Date" />
                 <MyInput name="endDate" label="fine" store={ visit } onChange={ change } type="Date" />

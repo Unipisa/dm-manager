@@ -1,6 +1,6 @@
-export default function Home({ api }) {
+export default function Home({ engine }) {
     return (<>
-      <p>user: {`${JSON.stringify(api.user())}`}</p>
+      <p>user: {`${JSON.stringify(engine.user())}`}</p>
       </>
     );
   }

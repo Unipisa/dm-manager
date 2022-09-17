@@ -7,6 +7,7 @@ const visitSchema = new Schema({
     endDate: Date,
     firstName: String,
     lastName: String,
+    Affiliation: String,
     email: String,
     roomNumber: String,
     building: String,

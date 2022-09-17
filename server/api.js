@@ -6,9 +6,14 @@ const Visit = require('./models/Visit')
  
 var router = express.Router()
    
-router.put('/visit', function (req, res, next) {
+router.get('/visit', async function (req, res) {
+    let visits = await Visit.find()
+    res.send({visits})
+})
+
+router.put('/visit', async function (req, res) {
     console.log(`req.body: ${req.body}`)
-    Visit.create(req.body)
+    await Visit.create(req.body)
     res.send({})
 })
 
