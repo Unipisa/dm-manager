@@ -7,22 +7,32 @@ import MyInput from './MyInput'
 export default function VisitPage({ engine, api }) {
     const { id } = useParams()
     const create = (id === 'new')
-    const [ visit, setVisit ] = useState({
-        lastName: "",
-        firstName: "",
-        affiliation: "",
-        email: "",
-        startDate: "",
-        endDate: "",
-        building: "",
-        roomNumber: "",
-    })
-    const [done, setDone ] = useState(false)
+    const [ original, setOriginal ] = useState(null)
+    const [ visit, setVisit ] = useState(original)
+    const [ done, setDone ] = useState(false)
+    const changed = original===null 
+        ? null 
+        : Object.entries(visit).some(([key, val])=>{
+            return val !== original[key]})
 
     useEffect(() => {(async () => {
-        if (create) return;
-        const visit = await api.getVisit(id)
+        let visit = null
+        if (create) {
+            visit = {
+                lastName: "",
+                firstName: "",
+                affiliation: "",
+                email: "",
+                startDate: "",
+                endDate: "",
+                building: "",
+                roomNumber: "",
+            }
+        } else {
+            visit = await api.getVisit(id)
+        }
         setVisit(v => ({...v, ...visit}))
+        setOriginal(v => ({...v, ...visit}))
     })()}, [create, api, id])
 
     const change = (evt) => {
@@ -36,16 +46,29 @@ export default function VisitPage({ engine, api }) {
     
     const submit = async (evt) => {
         if (visit._id) {
-            await api.postVisit(visit)
-            await engine.addInfoMessage("visita modificata")
+            let payload = Object.fromEntries(Object.entries(visit)
+                .filter(([key, val]) => (original[key]!==val)))
+            try {
+                await api.patchVisit(visit._id, payload)
+                await engine.addInfoMessage("visita modificata")
+                setDone(true)
+            } catch(err) {
+                await engine.addErrorMessage(err.message)
+            }
         } else {
-            await api.putVisit(visit)
-            await engine.addInfoMessage("Nuova visita inserita")
+            try {
+                await api.putVisit(visit)
+                await engine.addInfoMessage("Nuova visita inserita")
+                setDone(true)
+            } catch(err) {
+                await engine.addErrorMessage(err.message)
+            }
         }
-        setDone(true)
     }
 
     if (done) return <Navigate to="/visits" />
+
+    if (visit === null) return <div>loading...</div>
 
     // console.log(`visit: ${JSON.stringify(visit)}`)
 
@@ -75,6 +98,7 @@ export default function VisitPage({ engine, api }) {
                         <td>
                             <input 
                                 onClick={ submit } className="btn btn-primary" type="submit" 
+                                disabled= { !changed }
                                 value={create?"aggiungi visita":"aggiorna visita"} />
                         </td>
                     </tr>

@@ -11,7 +11,7 @@ export default function Messages({ engine }) {
             <p>{ msg }</p>
         </Alert>)} 
         { engine.messages().length > 0 
-        && <Button onClick={engine.clearMessages}>visto</Button>
+        && <Button onClick={() => engine.clearMessages()}>visto</Button>
         }
         </>
 }

@@ -16,6 +16,10 @@ class Api {
         options = {credentials: 'include', ...options}
         const response = await fetch(this.state.base_url + url, options)
         if (response.status === 401) throw new Error("invalid credentials")
+        if (response.status === 400) {
+            const data = await response.json()
+            throw new Error(`Server error: ${data.error}`)
+        }
         if (response.status !== 200) throw new Error("server error")
         const data = await response.json()
         return data
@@ -35,6 +39,17 @@ class Api {
     async put(url, data) {
         return await this.api_fetch(url, {
             method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    }
+
+    async patch(url, data) {
+        return await this.api_fetch(url, {
+            method: 'PATCH',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
@@ -102,6 +117,11 @@ class Api {
 
     async putVisit(payload) {
         const r = await this.put("/api/v0/visit/", payload)
+        return r
+    }
+
+    async patchVisit(id, payload) {
+        const r = await this.patch(`/api/v0/visit/${id}`, payload)
         return r
     }
 }
