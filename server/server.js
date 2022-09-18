@@ -5,6 +5,7 @@ const session = require('express-session')
 const passport = require('passport')
 const mongoose = require('mongoose')
 const LocalStrategy = require('passport-local')
+const fs = require('fs')
 
 const User = require('./models/User')
 const config = require('./config')
@@ -28,7 +29,7 @@ if (config.OAUTH2_CLIENT_ID) {
   }))
 } else {
   console.log("OAUTH2 authentication disabled")
-  console.log("no")
+  console.log("set OAUTH2_CLIEND_ID to enable")
 }
 
 const app = express()
@@ -42,6 +43,11 @@ app.use(cors(
 
 app.use(morgan('tiny')) // access log
 
+const test_filename = `${config.STATIC_FILES_PATH}/manifest.json`
+if (!fs.existsSync(test_filename)) {
+  console.log(`WARNING: cannot stat ${test_filename}`)
+  console.log(`cwd: ${process.cwd()}`)
+}
 app.use(express.static(config.STATIC_FILES_PATH))
 
 app.use(express.json()) // parse request data into req.body

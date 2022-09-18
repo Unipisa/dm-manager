@@ -1,0 +1,31 @@
+version: "2.1"
+
+services:
+  dm-manager:
+    image: paolini/dm-manager:latest
+    restart: unless-stopped
+    volumes:
+      - ./logs:/logs
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
+      STATIC_FILES_PATH: "build"
+#    networks:
+#      - backend
+    ports:
+      - 8000:8000
+
+  mongodb:
+    image: mongo
+    environment:
+      - PUID=1000
+      - PGID=1000
+    volumes:
+      - ./database:/data/db
+    ports:
+      - 27017:27017
+    restart: unless-stopped
+
+#networks:
+#  backend:
+#  web:
+#    external: true
