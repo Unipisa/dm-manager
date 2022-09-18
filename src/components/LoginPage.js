@@ -65,10 +65,13 @@ function LoginPage({ api}) {
                         </button>
                         </form>
                         <div className="mb-4" />
-                        <button onClick={ api.start_oauth2 }
-                        className="btn btn-primary btn-block mb-4">
-                            UNIPI login
-                        </button>
+                        {
+                            api.config().OAUTH2_ENABLED &&
+                            <button onClick={ () => api.start_oauth2() }
+                            className="btn btn-primary btn-block mb-4">
+                                UNIPI login
+                            </button>
+                        }
                     </Card.Body>
                 </Card>
             </div>

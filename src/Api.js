@@ -76,6 +76,8 @@ class Api {
 
     connected() { return this.state.config !== null }
 
+    config() { return this.state.config }
+
     async login(username, password) {
         /**
          * if username and password are provided use credentials

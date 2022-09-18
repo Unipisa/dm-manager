@@ -45,5 +45,5 @@ Configuration is being read from `.env` and by environment variables. See `serve
 Build
 ```
 npm run build
-node server/server.js`
+STATIC_FILES_PATH=build node server/server.js
 ```

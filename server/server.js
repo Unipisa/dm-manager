@@ -8,7 +8,7 @@ const LocalStrategy = require('passport-local')
 
 const User = require('./models/User')
 const config = require('./config')
-const unipiAuth = require('./unipiAuth')
+const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
 
 // local password authentication
@@ -17,11 +17,21 @@ passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
 // unipi oauth2 authentication
-passport.use(unipiAuth)
+if (config.OAUTH2_CLIENT_ID) {
+  passport.use(new UnipiAuthStrategy({
+    authorizationURL: config.OAUTH2_AUTHORIZE_URL,
+    tokenURL: config.OAUTH2_TOKEN_URL,
+    clientID: config.OAUTH2_CLIENT_ID,
+    clientSecret: config.OAUTH2_CLIENT_SECRET,
+    callbackURL: `${config.SERVER_URL}/login/oauth2/callback`,
+    usernameField: config.OAUTH2_USERNAME_FIELD,
+  }))
+} else {
+  console.log("OAUTH2 authentication disabled")
+  console.log("no")
+}
 
 const app = express()
-
-console.log(config.CORS_ORIGIN)
 
 app.use(cors(
   {
@@ -32,7 +42,7 @@ app.use(cors(
 
 app.use(morgan('tiny')) // access log
 
-app.use(express.static('public'))
+app.use(express.static(config.STATIC_FILES_PATH))
 
 app.use(express.json()) // parse request data into req.body
 
@@ -50,9 +60,8 @@ app.get('/config', (req, res) => {
   const user = req.user || null
   res.send({
     VERSION: config.VERSION,
-    OAUTH2_AUTHORIZE_URL: config.AUTHORIZE_URL,
-    OAUTH2_CLIENT_ID: config.CLIENT_ID,
     SERVER_URL: config.SERVER_URL,
+    OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
     user
   })
 })
@@ -71,8 +80,10 @@ app.post('/login/password',
     res.send({ user })
   })
 
-app.get('/login/oauth2',
-  passport.authenticate('oauth2'))
+if (config.OAUTH2_CLIENT_ID) {
+  app.get('/login/oauth2',
+    passport.authenticate('oauth2'))
+}
 
 app.get('/login/oauth2/callback',
   passport.authenticate('oauth2'),

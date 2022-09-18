@@ -4,6 +4,7 @@ const { randomUUID } = require('crypto')
 class Options {
     constructor() {
         const options = {
+            STATIC_FILES_PATH: 'public',
             SESSION_SECRET: randomUUID(),
             JWT_SECRET: randomUUID(),
             CORS_ORIGIN: "http://localhost:3000",
