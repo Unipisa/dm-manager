@@ -47,3 +47,20 @@ Build
 npm run build
 STATIC_FILES_PATH=build node server/server.js
 ```
+
+Build docker image:
+```
+VERSION=$( node -e "console.log(require('./package.json').version)" )
+docker build . -t paolini/dm-manager:$VERSION
+docker tag paolini/dm-manager:$VERSION paolini/dm-manager:latest
+```
+ 
+To run the image:
+```
+docker-compose -f docker-compose-production.yml up
+```
+
+To push the image:
+```
+docker push paolini/dm-manager
+```
