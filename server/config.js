@@ -4,7 +4,7 @@ const { randomUUID } = require('crypto')
 class Options {
     constructor() {
         const options = {
-            STATIC_FILES_PATH: 'public',
+            STATIC_FILES_PATH: (process.env.NODE_ENV === 'production' ? 'build' : 'public'),
             SESSION_SECRET: randomUUID(),
             JWT_SECRET: randomUUID(),
             CORS_ORIGIN: "http://localhost:3000",
@@ -26,7 +26,8 @@ class Options {
             this[key] = process.env[key] || val
         })
         this.VERSION = require('../package.json').version
-        if (!this.SERVER_URL) this.SERVER_URL = `http://localhost:${this.PORT}`
+        if (this.SERVER_URL === null) this.SERVER_URL = `http://localhost:${this.PORT}`
+        if (this.REACT_APP_SERVER_URL === undefined) process.env.REACT_APP_SERVER_URL = SERVER_URL
     }
 }
 

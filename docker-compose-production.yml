@@ -9,8 +9,20 @@ services:
     environment:
       MONGO_URI: "mongodb://mongodb:27017/dm-manager"
       STATIC_FILES_PATH: "build"
-#    networks:
-#      - backend
+      # ADMIN_USER: "admin"
+      # ADMIN_PASSWORD: "secret"
+      # SESSION_SECRET: "1234567890"
+      # JWT_SECRET: "1234567890"
+      # CORS_ORIGIN: "http://localhost:3000"
+      # PORT: "8000"
+      OAUTH2_AUTHORIZE_URL: "https://iam.unipi.it/oauth2/authorize"
+      OAUTH2_TOKEN_URL: "https://iam.unipi.it/oauth2/token"
+      OAUTH2_USERINFO_URL: "https://iam.unipi.it/oauth2/userinfo"
+      OAUTH2_LOGOUT_URL: "https://iam.unipi.it/oidc/logout"
+      # OAUTH2_CLIENT_ID: 1234567890
+      # OAUTH2_CLIENT_SECRET: "1234567890"
+      # OAUTH2_USERNAME_FIELD: "email"
+      REACT_APP_SERVER_URL: ""
     ports:
       - 8000:8000
 
@@ -24,8 +36,3 @@ services:
     ports:
       - 27017:27017
     restart: unless-stopped
-
-#networks:
-#  backend:
-#  web:
-#    external: true

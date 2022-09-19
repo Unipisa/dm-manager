@@ -66,7 +66,6 @@ app.get('/config', (req, res) => {
   const user = req.user || null
   res.send({
     VERSION: config.VERSION,
-    SERVER_URL: config.SERVER_URL,
     OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
     user
   })

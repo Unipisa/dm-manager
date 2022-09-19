@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 let common_state = {
-    base_url: "http://localhost:8000",
+    base_url: process.env.REACT_APP_SERVER_URL || "",
     config: null,
     user: null,
 }
@@ -11,7 +11,7 @@ class Api {
         this.state = state
         this.setState = setState
     }
-    
+
     async api_fetch(url, options) {
         options = {credentials: 'include', ...options}
         const response = await fetch(this.state.base_url + url, options)
@@ -61,7 +61,7 @@ class Api {
     async get(url, data) {
         return await this.api_fetch(url + new URLSearchParams(data))
     }
-
+    
     async connect() {
         try {
             const config = await this.get('/config')
