@@ -95,7 +95,7 @@ app.get('/login/oauth2/callback',
   function(req, res) {
     const user = req.user.toObject()
     console.log(`login ${JSON.stringify(user)}`)
-    res.redirect(`http://localhost:3000`)
+    res.redirect(config.SERVER_URL || `http://localhost:3000`)
   }
 )
 

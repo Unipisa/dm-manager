@@ -90,6 +90,7 @@ export default function VisitPage({ engine, api }) {
                     <MyInput name="lastName" label="cognome" store={ visit } onChange={ change } />
                     <MyInput name="affiliation" label="affiliazione" store={ visit } onChange={ change } />
                     <MyInput name="email" label="email" store={ visit } onChange={ change } />
+                    <MyInput name="invitedBy" label="referente" store={ visit } onChange={ change } />
                     <MyInput name="startDate" label="inizio" store={ visit } onChange={ change } type="Date" />
                     <MyInput name="endDate" label="fine" store={ visit } onChange={ change } type="Date" />
                     <MyInput name="building" label="edificio" store={ visit } onChange={ change } />

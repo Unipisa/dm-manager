@@ -41,6 +41,12 @@ variable `SERVER_URL`.
 
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
 
+Alternative configuration:
+```
+SERVER_URL="http://localhost:3000"
+REACT_APP_SERVER_URL="http://localhost:8000"
+```
+
 ## deployment
 
 Build
