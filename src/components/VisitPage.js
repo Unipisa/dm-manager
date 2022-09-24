@@ -27,6 +27,8 @@ export default function VisitPage({ engine, api }) {
                 endDate: "",
                 building: "",
                 roomNumber: "",
+                invitedBy: "",
+                notes: "",
             }
         } else {
             visit = await api.getVisit(id)

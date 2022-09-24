@@ -27,7 +27,7 @@ class Options {
         })
         this.VERSION = require('../package.json').version
         if (this.SERVER_URL === null) this.SERVER_URL = `http://localhost:${this.PORT}`
-        if (this.REACT_APP_SERVER_URL === undefined) process.env.REACT_APP_SERVER_URL = SERVER_URL
+        if (this.REACT_APP_SERVER_URL === undefined) process.env.REACT_APP_SERVER_URL = this.SERVER_URL
     }
 }
 

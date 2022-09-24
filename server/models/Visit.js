@@ -11,6 +11,8 @@ const visitSchema = new Schema({
     email: String,
     roomNumber: String,
     building: String,
+    invitedBy: String,
+    notes: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
  }, {
