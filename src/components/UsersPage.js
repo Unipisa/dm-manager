@@ -7,10 +7,14 @@ import engine from '../engine'
 export default function UsersPage() {
     const [objects, setObjects ] = useState(null)
 
+    console.log(`Users Page ${objects}`)
+
     useEffect(() => {
         (async () => {
             try {
-                setObjects(await engine.getUsers())
+                let objs = await engine.getUsers()
+                console.log(`Set objs ${objs}`)
+                setObjects(objs)
             } catch(err) {
                 engine.addErrorMessage(err.message)
             }

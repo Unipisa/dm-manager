@@ -142,8 +142,8 @@ class Engine {
     user() { return this.state.user }
 
     async getVisits() {
-        const { objs } = await this.get("/api/v0/visit/")
-        return objs
+        const { visits } = await this.get("/api/v0/visit/")
+        return visits
     }
 
     async getVisit(id) {
@@ -161,8 +161,8 @@ class Engine {
     }
 
     async getUsers() {
-        const { objs } = await this.get("/api/v0/user/")
-        return objs
+        const { users } = await this.get("/api/v0/user/")
+        return users
     }
 
     async getUser(id) {
