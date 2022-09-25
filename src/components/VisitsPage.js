@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react'
 import { Container } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
-export default function VisitsPage({ engine, api }) {
+import engine from '../engine'
+
+export default function VisitsPage() {
     const [visits, setVisits ] = useState(null)
 
     useEffect(() => {
         (async () => {
-        setVisits(await api.getVisits())
+        setVisits(await engine.getVisits())
         })()
-    }, [api, setVisits])
+    }, [setVisits])
 
     return <Container>
         {

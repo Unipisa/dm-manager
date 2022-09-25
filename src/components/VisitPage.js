@@ -3,8 +3,9 @@ import { Card } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
+import engine from '../engine'
 
-export default function VisitPage({ engine, api }) {
+export default function VisitPage() {
     const { id } = useParams()
     const create = (id === 'new')
     const [ original, setOriginal ] = useState(null)
@@ -31,11 +32,11 @@ export default function VisitPage({ engine, api }) {
                 notes: "",
             }
         } else {
-            visit = await api.getVisit(id)
+            visit = await engine.getVisit(id)
         }
         setVisit(v => ({...v, ...visit}))
         setOriginal(v => ({...v, ...visit}))
-    })()}, [create, api, id])
+    })()}, [create, id])
 
     const change = (evt) => {
         const { name, value } = evt.target
@@ -51,7 +52,7 @@ export default function VisitPage({ engine, api }) {
             let payload = Object.fromEntries(Object.entries(visit)
                 .filter(([key, val]) => (original[key]!==val)))
             try {
-                await api.patchVisit(visit._id, payload)
+                await engine.patchVisit(visit._id, payload)
                 await engine.addInfoMessage("visita modificata")
                 setDone(true)
             } catch(err) {
@@ -59,7 +60,7 @@ export default function VisitPage({ engine, api }) {
             }
         } else {
             try {
-                await api.putVisit(visit)
+                await engine.putVisit(visit)
                 await engine.addInfoMessage("Nuova visita inserita")
                 setDone(true)
             } catch(err) {

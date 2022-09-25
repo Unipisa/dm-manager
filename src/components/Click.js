@@ -1,5 +1,5 @@
 import { Button } from 'react-bootstrap'
 
-export default function Click({ engine }) {
-    return <Button onClick={engine.click}>click {engine.state.counter}</Button>
+export default function Click({ counter, click }) {
+    return <Button onClick={ click }>click { counter }</Button>
 }

@@ -1,15 +1,48 @@
-import { useState } from 'react'
+class Engine {
+    constructor() {
+        this.state = {
+            counter: 0,
+            messages: [],
+            base_url: process.env.REACT_APP_SERVER_URL || "",
+            config: null,
+            user: null,
+        }
+        this.setState = null // need to call sync
+    }
 
-let common_state = {
-    base_url: process.env.REACT_APP_SERVER_URL || "",
-    config: null,
-    user: null,
-}
+    sync(pair) {
+        this.state = pair[0] 
+        this.setState = pair[1]
+    }
 
-class Api {
-    constructor(state, setState) {
-        this.state = state
-        this.setState = setState
+    click() { 
+        this.setState( s => { 
+            console.log(`click ${s.counter} -> ${s.counter+1}`)
+            return {
+                ...s, counter: s.counter+1
+            }})
+    }
+
+    addMessage(message, type='error') {
+        this.setState( s => ({
+            ...s,
+            messages: [...s.messages, [type, message]]
+        }))
+    }
+
+    addErrorMessage(message) { this.addMessage(message, 'error')}
+    addInfoMessage(message) { this.addMessage(message, 'info' )}
+    addWarningMessage(message) { this.addMessage(message, 'warning' )}
+
+    messages() {
+        return this.state.messages
+    }
+
+    clearMessages() {
+        this.setState( s => ({
+            ...s,
+            messages: []
+        }))
     }
 
     async api_fetch(url, options) {
@@ -109,8 +142,8 @@ class Api {
     user() { return this.state.user }
 
     async getVisits() {
-        const {visits} = await this.get("/api/v0/visit/")
-        return visits
+        const { objs } = await this.get("/api/v0/visit/")
+        return objs
     }
 
     async getVisit(id) {
@@ -126,8 +159,27 @@ class Api {
         const r = await this.patch(`/api/v0/visit/${id}`, payload)
         return r
     }
+
+    async getUsers() {
+        const { objs } = await this.get("/api/v0/user/")
+        return objs
+    }
+
+    async getUser(id) {
+        return await this.get(`/api/v0/user/${id}`)
+    }
+
+    async putUser(payload) {
+        const r = await this.put("/api/v0/user/", payload)
+        return r
+    }
+
+    async patchUser(id, payload) {
+        const r = await this.patch(`/api/v0/user/${id}`, payload)
+        return r
+    }
 }
 
-export default function useApi(initial_state) {
-    return new Api(...useState(initial_state || common_state))
-}
+const engine = new Engine()
+
+export default engine

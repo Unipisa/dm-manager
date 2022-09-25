@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react'
 
-async function connect(api, setMsg) {
+import engine from '../engine'
+
+async function connect(setMsg) {
     setMsg(null)
     try {
-        await api.connect()
-        await api.login()
+        await engine.connect()
+        await engine.login()
     } catch(err) {
         console.error(err)
         setMsg(err.message)
     }
 }
 
-export default function Connecting({ api }) {
+export default function Connecting() {
     const [ msg, setMsg ] = useState(null)
 
     useEffect(() => {         
-        connect(api, setMsg) }, [api, setMsg])
+        connect(setMsg) }, [setMsg])
 
     if (msg) return <p>
         Errore di connessione: { msg } 
-            <button onClick={ () => connect(api, setMsg) }>riprova</button>
+            <button onClick={ () => connect(setMsg) }>riprova</button>
         </p>
 
     return <p>Connessione in corso...</p>

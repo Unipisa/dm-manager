@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { Container } from 'react-bootstrap'
 import Card from 'react-bootstrap/Card'
 
-function LoginPage({ api}) {
+import engine from '../engine'
+
+function LoginPage() {
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
@@ -12,7 +14,7 @@ function LoginPage({ api}) {
         setError(null)
         setWaiting(true)
         try {
-            await api.login(email, password)
+            await engine.login(email, password)
         } catch(error) {
           console.error(error)
           setError(`Login error: ${error.message}`)
@@ -66,8 +68,8 @@ function LoginPage({ api}) {
                         </form>
                         <div className="mb-4" />
                         {
-                            api.config().OAUTH2_ENABLED &&
-                            <button onClick={ () => api.start_oauth2() }
+                            engine.config().OAUTH2_ENABLED &&
+                            <button onClick={ () => engine.start_oauth2() }
                             className="btn btn-primary btn-block mb-4">
                                 UNIPI login
                             </button>

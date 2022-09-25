@@ -1,8 +1,8 @@
 import { Alert, Button } from 'react-bootstrap'
 
-export default function Messages({ engine }) {
+export default function Messages({ messages, acknowledge }) {
     return <>
-        { engine.messages().map(([type, msg], i) => 
+        { messages.map(([type, msg], i) => 
         <Alert key={ i } className={{
             'error': 'alert-danger',
             'warning': 'alert-warning',
@@ -10,8 +10,8 @@ export default function Messages({ engine }) {
         }[type]}>
             <p>{ msg }</p>
         </Alert>)} 
-        { engine.messages().length > 0 
-        && <Button onClick={() => engine.clearMessages()}>visto</Button>
+        { messages.length > 0 
+        && <Button onClick={ acknowledge }>visto</Button>
         }
         </>
 }

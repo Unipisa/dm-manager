@@ -1,38 +1,41 @@
+import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import useEngine from './Engine'
-import useApi from './Api'
+import engine from './engine'
 import Connecting from './components/Connecting'
-import LoginPage from './components/LoginPage'
+import Messages from './components/Messages'
+import NotFound from './components/NotFound'
 import Header from './components/Header'
+import LoginPage from './components/LoginPage'
+import Home from './components/Home'
 import VisitsPage from './components/VisitsPage'
 import VisitPage from './components/VisitPage'
-import NotFound from './components/NotFound'
-import Home from './components/Home'
-import Messages from './components/Messages'
+import UsersPage from './components/UsersPage'
+import UserPage from './components/UserPage'
 
 console.log("dm-manager (app starting)")
 
 export default function App() {
-  const engine = useEngine()
-  const api = useApi()
+  engine.sync(useState(engine.state))
   
-  if (! api.connected()) {
-    return <Connecting api={ api }/>
+  if (! engine.connected()) {
+    return <Connecting />
   }
 
-  if (! api.loggedIn()) {
-    return <LoginPage api={ api }/>
+  if (! engine.loggedIn()) {
+    return <LoginPage />
   }
 
   return <div>
   <BrowserRouter>
-    <Header api={api}/>
-    <Messages engine={engine} />
+    <Header user = { engine.user() }/>
+    <Messages messages={ engine.messages() } acknowledge={ () => engine.clearMessages() } />
     <Routes>  
-      <Route path="/" element={<Home api={api} />} />
-      <Route path="/visits/:id" element={<VisitPage engine={engine} api={api} />} />
-      <Route path="/visits" element={<VisitsPage engine={engine} api={api}/>} />
+      <Route path="/" element={<Home user={ engine.user() } />} />
+      <Route path="/visits/:id" element={<VisitPage />} />
+      <Route path="/visits" element={<VisitsPage />} />
+      <Route path="/users/:id" element={<UserPage />} />
+      <Route path="/users" element={<UsersPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>
