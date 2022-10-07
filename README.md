@@ -51,7 +51,7 @@ REACT_APP_SERVER_URL="http://localhost:8000"
 
 Build
 ```
-npm run build
+REACT_APP_SERVER_URL="" npm run build
 STATIC_FILES_PATH=build node server/server.js
 ```
 
@@ -70,4 +70,5 @@ docker-compose -f docker-compose-production.yml up
 To push the image:
 ```
 docker push paolini/dm-manager
+docker push paolini/dm-manager:$VERSION
 ```
