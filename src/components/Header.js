@@ -15,8 +15,8 @@ export default function Header({ user }) {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>
-              <NavLink to="/visits" className="nav-link">Visitatori</NavLink>
-              <NavLink to="/users" className="nav-link">Utenti</NavLink>
+              {user.hasRole('visit-manager') && <NavLink to="/visits" className="nav-link">Visitatori</NavLink>}
+              {user.hasRole('admin') && <NavLink to="/users" className="nav-link">Utenti</NavLink>}
               {/*<NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">

@@ -1,4 +1,4 @@
-export default function MyInput({ name, label, store, setStore, value }) {
+export default function ListInput({ name, label, store, setStore, value }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
     const id = `myinput-${name}`
@@ -11,11 +11,14 @@ export default function MyInput({ name, label, store, setStore, value }) {
             <input 
                 id={ id } 
                 name={ name } 
-                value={ value || "" } 
+                value={ value.join(',') || "" } 
                 onChange={ (evt) => {
+                        const val = evt.target.value
+                            .split(',')
+                            .map( x => x.trim())
                         setStore(obj => {
                             obj = {...obj}
-                            obj[name] = evt.target.value
+                            obj[name] = val
                             return obj
                         }) 
                     } 

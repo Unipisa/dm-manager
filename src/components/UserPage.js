@@ -3,6 +3,7 @@ import { Card } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
+import ListInput from './ListInput'
 import engine from '../engine'
 
 export default function UserPage() {
@@ -32,21 +33,12 @@ export default function UserPage() {
         setOriginal(v => ({...v, ...user}))
     })()}, [create, id])
 
-    const change = (evt) => {
-        const { name, value } = evt.target
-        setUser(user => {
-            user = {...user}
-            user[name] = value
-            return user
-        })
-    }
-    
     const submit = async (evt) => {
         if (user._id) {
             let payload = Object.fromEntries(Object.entries(user)
                 .filter(([key, val]) => (original[key]!==val)))
             try {
-                await engine.patchVisit(user._id, payload)
+                await engine.patchUser(user._id, payload)
                 await engine.addInfoMessage("utente modificato")
                 setDone(true)
             } catch(err) {
@@ -54,7 +46,7 @@ export default function UserPage() {
             }
         } else {
             try {
-                await engine.putVisit(user)
+                await engine.putUser(user)
                 await engine.addInfoMessage("Nuovo utente inserito")
                 setDone(true)
             } catch(err) {
@@ -81,10 +73,11 @@ export default function UserPage() {
         >
             <table>
                 <tbody>
-                    <MyInput name="username" label="username" store={ user } onChange={ change } />
-                    <MyInput name="email" label="email" store={ user } onChange={ change } />
-                    <MyInput name="firstName" label="nome" store={ user} onChange={ change } /> 
-                    <MyInput name="lastName" label="cognome" store={ user } onChange={ change } />
+                    <MyInput name="username" label="username" store={ user } setStore={ setUser } />
+                    <MyInput name="email" label="email" store={ user } setStore={ setUser } />
+                    <MyInput name="firstName" label="nome" store={ user} setStore={ setUser } />
+                    <MyInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
+                    <ListInput name="roles" lable="ruoli" store={ user } setStore={ setUser } />
                 </tbody>
                 <tfoot>
                     <tr>

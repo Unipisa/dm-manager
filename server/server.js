@@ -133,11 +133,16 @@ app.use((err, req, res, next) => {
 async function create_admin_user() {
   const username = config.ADMIN_USER
   const password = config.ADMIN_PASSWORD
-
+  
   if (username) {
     let admin = await User.findOne({ username })
     if (!admin) {
-      admin = await User.create({ username })
+      admin = await User.create({ 
+        username, 
+        lastName: "Admin",
+        firstName: "Admin",
+        roles: ['admin'] 
+      })
       console.log(`Create user "${admin.username}"`)
     }
     if (password) {
@@ -146,6 +151,15 @@ async function create_admin_user() {
         console.log(`Password reset for user "${admin.username}"`)
     } else {
       console.log(`Password not provided (set ADMIN_PASSWORD)`)
+    }
+    if (!admin.roles || !admin.roles.includes('admin')) {
+      admin.roles.push('admin')
+      await admin.save()
+    }
+    if (!admin.lastName) {
+      admin.lastName = "Admin"
+      admin.firstName = "Admin"
+      await admin.save()
     }
   }
   const n = await User.countDocuments({})

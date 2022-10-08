@@ -37,15 +37,6 @@ export default function VisitPage() {
         setVisit(v => ({...v, ...visit}))
         setOriginal(v => ({...v, ...visit}))
     })()}, [create, id])
-
-    const change = (evt) => {
-        const { name, value } = evt.target
-        setVisit(visit => {
-            visit = {...visit}
-            visit[name] = value
-            return visit
-        })
-    }
     
     const submit = async (evt) => {
         if (visit._id) {
@@ -87,15 +78,15 @@ export default function VisitPage() {
         >
             <table>
                 <tbody>
-                    <MyInput name="firstName" label="nome" store={ visit } onChange={ change } /> 
-                    <MyInput name="lastName" label="cognome" store={ visit } onChange={ change } />
-                    <MyInput name="affiliation" label="affiliazione" store={ visit } onChange={ change } />
-                    <MyInput name="email" label="email" store={ visit } onChange={ change } />
-                    <MyInput name="invitedBy" label="referente" store={ visit } onChange={ change } />
-                    <MyInput name="startDate" label="inizio" store={ visit } onChange={ change } type="Date" />
-                    <MyInput name="endDate" label="fine" store={ visit } onChange={ change } type="Date" />
-                    <MyInput name="building" label="edificio" store={ visit } onChange={ change } />
-                    <MyInput name="roomNumber" label="stanza" store={ visit } onChange={ change } />
+                    <MyInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
+                    <MyInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
+                    <MyInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
+                    <MyInput name="email" label="email" store={ visit } setStore={ setVisit } />
+                    <MyInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
+                    <MyInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
+                    <MyInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
+                    <MyInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
+                    <MyInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
                 </tbody>
                 <tfoot>
                     <tr>

@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
@@ -16,6 +16,7 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.5.2",
+    "mongoose-permissions": "^1.0.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.19",
     "passport": "^0.6.0",

@@ -81,6 +81,7 @@ class Engine {
     }
 
     async patch(url, data) {
+        console.log(`PATCH ${url} ${JSON.stringify(data)}`)
         return await this.api_fetch(url, {
             method: 'PATCH',
             headers: {
@@ -122,6 +123,10 @@ class Engine {
         console.log(`login POST: ${url}`)
         const { user } = await this.post(url, payload)
         console.log(`user: ${JSON.stringify(user)}`)
+        if (user !== null) {
+            // inject functionality into user object
+            user.hasRole = role => (user.roles?.includes('admin') || user.roles?.includes(role))
+        }
         this.setState(s => ({...s, user}))
     }
 
