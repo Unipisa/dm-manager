@@ -3,6 +3,7 @@ import { Card } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
+import DateInput from './DateInput'
 import engine from '../engine'
 
 export default function VisitPage() {
@@ -83,8 +84,8 @@ export default function VisitPage() {
                     <MyInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
                     <MyInput name="email" label="email" store={ visit } setStore={ setVisit } />
                     <MyInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
-                    <MyInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
-                    <MyInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
+                    <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
+                    <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
                     <MyInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
                     <MyInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
                 </tbody>

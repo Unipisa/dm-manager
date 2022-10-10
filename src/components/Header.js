@@ -5,12 +5,13 @@ import NavDropdown from 'react-bootstrap/NavDropdown'
 import { NavLink } from 'react-router-dom'
 
 import engine from '../engine'
+import package_json from '../../package.json'
 
 export default function Header({ user }) {
   return (
       <Navbar bg="light" expand="lg">
         <Container>
-          <Navbar.Brand href="/">dm-manager</Navbar.Brand>
+          <Navbar.Brand href="/">dm-manager { package_json.version }</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">

@@ -1,8 +1,13 @@
+import moment from 'moment'
 import { useState, useEffect } from 'react'
 import { Container } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 import engine from '../engine'
+
+function myDateFormat(date) {
+    return date ? moment(date).format('D.MM.YYYY') : "---"
+}
 
 export default function VisitsPage() {
     const [visits, setVisits ] = useState(null)
@@ -20,8 +25,8 @@ export default function VisitsPage() {
                 <table>
                     <thead>
                         <tr>
-                            <th>da</th>
-                            <th>a</th>
+                            <th>dal</th>
+                            <th>al</th>
                             <th>cognome</th>
                             <th>nome</th>    
                         </tr>
@@ -30,8 +35,8 @@ export default function VisitsPage() {
                         { 
                         visits.map(visit =>
                             <tr key={visit._id}>
-                                <td>{ visit.startDate }</td>
-                                <td>{ visit.endDate }</td>
+                                <td>{ myDateFormat(visit.startDate) }</td>
+                                <td>{ myDateFormat(visit.endDate) }</td>
                                 <td><Link to={`/visits/${visit._id}`}>{ visit.lastName }</Link></td>
                                 <td><Link to={`/visits/${visit._id}`}>{ visit.firstName }</Link></td>
                             </tr>) 

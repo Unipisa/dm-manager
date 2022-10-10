@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
@@ -15,6 +15,7 @@
     "cors": "^2.8.5",
     "express-session": "^1.17.3",
     "jsonwebtoken": "^8.5.1",
+    "moment": "^2.29.4",
     "mongoose": "^6.5.2",
     "mongoose-permissions": "^1.0.0",
     "morgan": "^1.10.0",
@@ -25,6 +26,7 @@
     "passport-oauth2": "^1.6.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.5.0",
+    "react-datepicker": "^4.8.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
