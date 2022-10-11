@@ -4,6 +4,7 @@ import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
 import DateInput from './DateInput'
+import TextInput from './TextInput'
 import engine from '../engine'
 
 export default function VisitPage() {
@@ -88,6 +89,7 @@ export default function VisitPage() {
                     <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
                     <MyInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
                     <MyInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
+                    <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
                 </tbody>
                 <tfoot>
                     <tr>
