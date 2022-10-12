@@ -22,8 +22,10 @@ jobs:
       run: npm ci
     - name: Build Js bundle
       run: REACT_APP_SERVER_URL="" npm run build
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag paolini/dm-manager:$( node -e "console.log(require('./package.json').version)" )
+    - name: Extract version number
+      run: echo "VERSION=$( node -e "console.log(require('./package.json').version )" >> $GITHUB_ENV
+    - name: Build the Docker image    
+      run: docker build . --file Dockerfile --tag paolini/dm-manager:${VERSION}" )
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
@@ -31,4 +33,4 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
         registry: registry.cs.dm.unipi.it
     - name: Push to docker hub
-      run: docker push registry.cs.dm.unipi.it/dm/dm-manager:$( node -e "console.log(require('./package.json').version)" )
+      run: docker push registry.cs.dm.unipi.it/dm/dm-manager:${VERSION}"
