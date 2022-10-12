@@ -29,5 +29,6 @@ jobs:
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
+        registry: registry.cs.dm.unipi.it
     - name: Push to docker hub
-      run: docker push paolini/dm-manager:$( node -e "console.log(require('./package.json').version)" )
+      run: docker push registry.cs.dm.unipi.it/dm/dm-manager:$( node -e "console.log(require('./package.json').version)" )
