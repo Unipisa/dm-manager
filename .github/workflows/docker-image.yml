@@ -37,7 +37,7 @@ jobs:
     - name: Push to docker hub
       run: |
           docker push registry.cs.dm.unipi.it/dm/dm-manager:${VERSION}
-          docker push registry.cs.dm.unipi.it/dm/dm-manager:latest
+          docker push registry.cs.dm.unipi.it/dm/dm-manager
     - name: Trigger update on Watchtower
       if: ${{ github.event_name != 'pull_request' }}
       run: |
