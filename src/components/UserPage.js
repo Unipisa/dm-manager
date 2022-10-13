@@ -77,7 +77,7 @@ export default function UserPage() {
                     <MyInput name="email" label="email" store={ user } setStore={ setUser } />
                     <MyInput name="firstName" label="nome" store={ user} setStore={ setUser } />
                     <MyInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
-                    <ListInput name="roles" lable="ruoli" store={ user } setStore={ setUser } />
+                    <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } />
                 </tbody>
                 <tfoot>
                     <tr>
