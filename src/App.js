@@ -13,6 +13,7 @@ import VisitPage from './components/VisitPage'
 import UsersPage from './components/UsersPage'
 import UserPage from './components/UserPage'
 import TokensPage from './components/TokensPage'
+import CardPage from './components/CardPage'
 
 console.log("dm-manager (app starting)")
 
@@ -38,6 +39,7 @@ export default function App() {
       <Route path="/users/:id" element={<UserPage />} />
       <Route path="/users" element={<UsersPage />} />
       <Route path="/tokens" element={<TokensPage />} />
+      <Route path="/card" element={<CardPage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>

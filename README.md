@@ -40,6 +40,7 @@ or give a correct value to the configuration
 variable `SERVER_URL`.
 
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
+For security reasons if you don't set the variable `SESSION_SECRET` the session secret is randomly generated.
 
 Alternative configuration:
 ```
