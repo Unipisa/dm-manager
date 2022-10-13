@@ -18,6 +18,7 @@ export default function Header({ user }) {
               <NavLink to="/" className="nav-link">Home</NavLink>
               {user.hasRole('visit-manager') && <NavLink to="/visits" className="nav-link">Visitatori</NavLink>}
               {user.hasRole('admin') && <NavLink to="/users" className="nav-link">Utenti</NavLink>}
+              {user.hasRole('admin') && <NavLink to="/tokens" className="nav-link">Tokens</NavLink>}
               {/*<NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">

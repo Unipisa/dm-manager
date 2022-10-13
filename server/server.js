@@ -100,7 +100,6 @@ app.get('/login/oauth2/callback',
 )
 
 app.post('/logout', function(req, res){
-  console.log(`LOGOUT ${req.logout}`)
   req.logout(function(err) {
     if (err) { return next(err) }
     // res.redict('/login')

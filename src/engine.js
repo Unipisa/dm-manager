@@ -96,6 +96,13 @@ class Engine {
         return await this.api_fetch(url + new URLSearchParams(data))
     }
     
+    async delete(url) {
+        return await this.api_fetch(url,
+            {
+                method: 'DELETE'
+            })
+    }
+
     async connect() {
         try {
             const config = await this.get('/config')
@@ -182,6 +189,21 @@ class Engine {
     async patchUser(id, payload) {
         const r = await this.patch(`/api/v0/user/${id}`, payload)
         return r
+    }
+
+    async getTokens() {
+        const { tokens } = await this.get("/api/v0/token/")
+        return tokens
+    }
+
+    async putToken(payload) {
+        const { token } = await this.put("/api/v0/token/", payload)
+        console.log(`putToken: ${JSON.stringify(token)}`)
+        return token
+    }
+
+    async deleteToken(token_id) {
+        await this.delete(`/api/v0/token/${token_id}`)
     }
 }
 
