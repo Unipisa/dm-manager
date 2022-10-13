@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card } from 'react-bootstrap'
+import { Card, Table } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
@@ -63,7 +63,7 @@ export default function UserPage() {
 
     return <Card>
         <Card.Header>
-            <h3>{ create ? `nuovo utente` : `utente ${id}` }</h3>
+            <h3>{ create ? `nuovo utente` : `utente ${user.firstName} ${user.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
         <form onSubmit={ (event) => {
@@ -71,7 +71,7 @@ export default function UserPage() {
             event.preventDefault()
             }}
         >
-            <table>
+            <Table border>
                 <tbody>
                     <MyInput name="username" label="username" store={ user } setStore={ setUser } />
                     <MyInput name="email" label="email" store={ user } setStore={ setUser } />
@@ -89,7 +89,7 @@ export default function UserPage() {
                         </td>
                     </tr>
                 </tfoot>
-            </table>
+            </Table>
             </form>
         </Card.Body>
     </Card>

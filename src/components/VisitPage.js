@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Card } from 'react-bootstrap'
+import { Card, Table } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
@@ -78,7 +78,7 @@ export default function VisitPage() {
             event.preventDefault()
             }}
         >
-            <table>
+            <Table>
                 <tbody>
                     <MyInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
                     <MyInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
@@ -101,7 +101,7 @@ export default function VisitPage() {
                         </td>
                     </tr>
                 </tfoot>
-            </table>
+            </Table>
             </form>
         </Card.Body>
     </Card>

@@ -12,6 +12,7 @@ export default function DateInput({ name, label, store, setStore, value }) {
         </td>
         <td>
             <ReactDatePicker 
+                className="form-control"
                 selected={ value ? new Date(value) : null }  
                 dateFormat="d.MM.yyyy"
                 onChange={ date => {

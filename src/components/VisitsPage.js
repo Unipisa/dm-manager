@@ -1,7 +1,7 @@
 import moment from 'moment'
-import { useState, useEffect } from 'react'
-import { Container } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
+import { Container, Table } from 'react-bootstrap'
+import { Link, useNavigate } from 'react-router-dom'
 
 import engine from '../engine'
 
@@ -11,6 +11,9 @@ function myDateFormat(date) {
 
 export default function VisitsPage() {
     const [visits, setVisits ] = useState(null)
+    const navigate = useNavigate()
+    const navigateTo = useCallback((visit) => navigate(
+        `/visits/${visit._id}`, {replace: true}), [navigate])
 
     useEffect(() => {
         (async () => {
@@ -22,7 +25,7 @@ export default function VisitsPage() {
         {
             (visits === null) ? <span>loading...</span>: 
             <div>
-                <table>
+                <Table bordered hover>
                     <thead>
                         <tr>
                             <th>dal</th>
@@ -34,15 +37,15 @@ export default function VisitsPage() {
                     <tbody>
                         { 
                         visits.map(visit =>
-                            <tr key={visit._id}>
+                            <tr key={visit._id} onClick={()=>navigateTo(visit)}>
                                 <td>{ myDateFormat(visit.startDate) }</td>
                                 <td>{ myDateFormat(visit.endDate) }</td>
-                                <td><Link to={`/visits/${visit._id}`}>{ visit.lastName }</Link></td>
-                                <td><Link to={`/visits/${visit._id}`}>{ visit.firstName }</Link></td>
+                                <td>{ visit.lastName }</td>
+                                <td>{ visit.firstName }</td>
                             </tr>) 
                         }
                     </tbody>
-                </table>
+                </Table>
             </div>
         }
         <Link to="/visits/new">aggiungi visitatore</Link>

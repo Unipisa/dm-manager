@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react'
-import { Container } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
+import { Container, Table } from 'react-bootstrap'
+import { Link, useNavigate } from 'react-router-dom'
 
 import engine from '../engine'
 
 export default function UsersPage() {
     const [objects, setObjects ] = useState(null)
+    const navigate = useNavigate()
+    const navigateTo = useCallback((user) => navigate(
+        `/users/${user._id}`, {replace: true}), [navigate])
 
     console.log(`Users Page ${objects}`)
 
@@ -25,7 +28,7 @@ export default function UsersPage() {
         {
             (objects === null) ? <span>loading...</span>: 
             <div>
-                <table>
+                <Table bordered hover>
                     <thead>
                         <tr>
                             <th>username</th>
@@ -37,15 +40,15 @@ export default function UsersPage() {
                     <tbody>
                         { 
                         objects.map(user =>
-                            <tr key={ user._id}>
+                            <tr key={ user._id} onClick={()=>navigateTo(user)}>
                                 <td>{ user.username }</td>
                                 <td>{ user.email }</td>
-                                <td><Link to={`/users/${user._id}`}>{ user.lastName }</Link></td>
-                                <td><Link to={`/users/${user._id}`}>{ user.firstName }</Link></td>
+                                <td>{ user.lastName }</td>
+                                <td>{ user.firstName }</td>
                             </tr>) 
                         }
                     </tbody>
-                </table>
+                </Table>
             </div>
         }
         <Link to="/users/new">aggiungi utente</Link>
