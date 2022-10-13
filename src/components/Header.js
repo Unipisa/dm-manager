@@ -1,15 +1,15 @@
-import Container from 'react-bootstrap/Container'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import { NavLink } from 'react-router-dom'
+import { Container } from 'react-bootstrap'
 
 import engine from '../engine'
 import package_json from '../../package.json'
 
 export default function Header({ user }) {
   return (
-      <Navbar bg="light" expand="lg">
+      <Navbar bg="light" expand="lg" className="mb-4">
         <Container>
           <Navbar.Brand href="/">dm-manager { package_json.version }</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />

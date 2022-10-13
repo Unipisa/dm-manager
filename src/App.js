@@ -14,6 +14,7 @@ import UsersPage from './components/UsersPage'
 import UserPage from './components/UserPage'
 import TokensPage from './components/TokensPage'
 import CardPage from './components/CardPage'
+import { Container } from 'react-bootstrap'
 
 console.log("dm-manager (app starting)")
 
@@ -32,16 +33,18 @@ export default function App() {
   <BrowserRouter>
     <Header user = { engine.user() }/>
     <Messages messages={ engine.messages() } acknowledge={ () => engine.clearMessages() } />
-    <Routes>  
-      <Route path="/" element={<Home user={ engine.user() } />} />
-      <Route path="/visits/:id" element={<VisitPage />} />
-      <Route path="/visits" element={<VisitsPage />} />
-      <Route path="/users/:id" element={<UserPage />} />
-      <Route path="/users" element={<UsersPage />} />
-      <Route path="/tokens" element={<TokensPage />} />
-      <Route path="/card" element={<CardPage />} />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <Container>
+      <Routes>  
+        <Route path="/" element={<Home user={ engine.user() } />} />
+        <Route path="/visits/:id" element={<VisitPage />} />
+        <Route path="/visits" element={<VisitsPage />} />
+        <Route path="/users/:id" element={<UserPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/tokens" element={<TokensPage />} />
+        <Route path="/card" element={<CardPage />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Container>
   </BrowserRouter>
 </div>
 }

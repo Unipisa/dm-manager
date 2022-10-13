@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Container, Table } from 'react-bootstrap'
+import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
 import engine from '../engine'
@@ -24,7 +24,7 @@ export default function UsersPage() {
         })()
     }, [setObjects])
 
-    return <Container>
+    return <>
         {
             (objects === null) ? <span>loading...</span>: 
             <div>
@@ -52,6 +52,6 @@ export default function UsersPage() {
             </div>
         }
         <Link to="/users/new">aggiungi utente</Link>
-    </Container>
+    </>
 }
 

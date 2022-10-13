@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container, Table } from 'react-bootstrap'
+import { Table } from 'react-bootstrap'
 import ListInput from './ListInput'
 
 import engine from '../engine'
@@ -36,7 +36,7 @@ export default function TokensPage() {
 
     if (objects === null) return <span>loading....</span>
 
-    return <Container>
+    return <>
         <div>
             <Table bordered>
                 <thead>
@@ -81,6 +81,6 @@ export default function TokensPage() {
                 </tr>
             </tfoot>
         </Table>
-    </Container>
+    </>
 }
 

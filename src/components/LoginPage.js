@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { Container } from 'react-bootstrap'
 import Card from 'react-bootstrap/Card'
 
 import engine from '../engine'
@@ -23,7 +22,7 @@ function LoginPage() {
       }
         
     return (
-        <Container>
+        <>
             <div className="d-flex justify-content-center h-100">
                 <Card>
                     <Card.Header>
@@ -77,7 +76,7 @@ function LoginPage() {
                     </Card.Body>
                 </Card>
             </div>
-        </Container>
+        </>
     )
 }
 

@@ -6,7 +6,7 @@ function is(user, role) {
 
 export default function Home({ user }) {
     return (<>
-      <p>{user.firstName}, puoi:
+      <p>{user.firstName}, puoi:</p>
         <ul>
           <li><Link to="/card">elaborare un cartellino con i nominativi per le stanze</Link></li>
           { is(user, "visit-manager") && 
@@ -19,7 +19,6 @@ export default function Home({ user }) {
             <li><Link to="/tokens">gestire i token</Link></li>
           }
         </ul>
-      </p>
       </>
     );
   }

@@ -1,6 +1,6 @@
 import moment from 'moment'
 import { useState, useEffect, useCallback } from 'react'
-import { Container, Table } from 'react-bootstrap'
+import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
 import engine from '../engine'
@@ -21,7 +21,7 @@ export default function VisitsPage() {
         })()
     }, [setVisits])
 
-    return <Container>
+    return <>
         {
             (visits === null) ? <span>loading...</span>: 
             <div>
@@ -49,6 +49,6 @@ export default function VisitsPage() {
             </div>
         }
         <Link to="/visits/new">aggiungi visitatore</Link>
-    </Container>
+    </>
 }
 

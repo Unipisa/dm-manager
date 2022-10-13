@@ -33,7 +33,9 @@ jobs:
         password: ${{ secrets.DOCKERHUB_PASSWORD }}
         registry: registry.cs.dm.unipi.it
     - name: Push to docker hub
-      run: docker push registry.cs.dm.unipi.it/dm/dm-manager:${VERSION}
+      run: |
+          docker push registry.cs.dm.unipi.it/dm/dm-manager:${VERSION}
+          docker push registry.cs.dm.unipi.it/dm/dm-manager:latest
     - name: Trigger update on Watchtower
       if: ${{ github.event_name != 'pull_request' }}
       run: |
