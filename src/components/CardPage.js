@@ -32,7 +32,7 @@ function Display({room, names}) {
             marginTop: "-1cm",
             marginRight: "0.5cm"
         }}>
-        <div alt="" contentEditable="true" style={{
+        <div contentEditable="true" style={{
             backgroundColor: blue,
             color: "white",
             width: "3cm",
@@ -44,7 +44,7 @@ function Display({room, names}) {
             marginTop: "2cm",
             float: "left"
         }}>{room}</div>
-        <img style={{
+        <img alt="" style={{
             height: "5cm",
             position: "relative",
             float: "right",
