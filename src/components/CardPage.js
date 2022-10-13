@@ -1,5 +1,3 @@
-import { Card, Table } from 'react-bootstrap'
-
 function Display({room, names}) {
     const blue = "#08467b"
     return <div style={{
@@ -12,7 +10,7 @@ function Display({room, names}) {
         position: "absolute",
         WebkitPrintColorAdjust: "exact", 
     }}>
-        <img style={{
+        <img alt="" style={{
             height: "3cm",
             opacity: "0.8",
             marginTop: "0.2cm",
@@ -34,7 +32,7 @@ function Display({room, names}) {
             marginTop: "-1cm",
             marginRight: "0.5cm"
         }}>
-        <div contentEditable="true" style={{
+        <div alt="" contentEditable="true" style={{
             backgroundColor: blue,
             color: "white",
             width: "3cm",
@@ -60,6 +58,7 @@ function Display({room, names}) {
 
 export default function CardPage() {
     return <>
+    <p>Puoi modificare il nome e il numero di stanza.</p>
         <Display room="123" names={[
             "Nome Cognome"
             ]} />

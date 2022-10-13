@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Container } from 'react-bootstrap'
+import { Container, Table } from 'react-bootstrap'
 import ListInput from './ListInput'
 
 import engine from '../engine'
@@ -38,7 +38,7 @@ export default function TokensPage() {
 
     return <Container>
         <div>
-            <table>
+            <Table bordered>
                 <thead>
                     <tr>
                         <th>createdBy</th>
@@ -65,9 +65,9 @@ export default function TokensPage() {
                         </tr>) 
                     }
                 </tbody>
-            </table>
+            </Table>
         </div>
-        <table>
+        <Table bordered>
             <tbody>
                 <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } />
             </tbody>
@@ -80,7 +80,7 @@ export default function TokensPage() {
                     </td>
                 </tr>
             </tfoot>
-        </table>
+        </Table>
     </Container>
 }
 
