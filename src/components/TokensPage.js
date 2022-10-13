@@ -21,7 +21,7 @@ export default function TokensPage() {
     console.log(`objects: ${JSON.stringify(objects)}`)
     async function submit() {
         try {
-            const new_token = await engine.putToken(token)
+            await engine.putToken(token)
             engine.addInfoMessage(`token aggiunto`)
             reload(setObjects)
         } catch(err) {
