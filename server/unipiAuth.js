@@ -22,7 +22,8 @@ class UnipiAuthStrategy extends OAuth2Strategy {
             email: profile['email'],
           }
         }, {
-          upsert: true
+          upsert: true,
+          new: true
         }, function (err, user) {
           user.oauth2 = {accessToken, refreshToken}
           return cb(err, user)
