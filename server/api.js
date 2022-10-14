@@ -41,20 +41,22 @@ const requireRoles = (req, res, next) => {
     }
 }
 
-const hasRole = (req, role) => (req.roles.includes(role) || req.roles.includes('admin'))
+const hasSomeRole = (req, ...roles) => {
+    return roles.some(role => req.roles.includes(role))
+}
 
-const requireRole = role => ((req, res, next) => {
+const requireSomeRole = (...roles) => ((req, res, next) => {
     requireRoles(req, res, () => {
-        if (hasRole(req, role)) {
+        if (hasSomeRole(req, ...roles)) {
             next()
         } else {
             res.status(403)
-            res.send({error: `not authorized (role "${role}" required)`})
+            res.send({error: `not authorized (some role in ${roles.join(", ")} required, your roles: ${req.roles.join(", ")})`})
         }
     }
 )})
 
-router.get('/visit/:id', requireRole('visit-manager'), async function(req, res) {
+router.get('/visit/:id', requireSomeRole('visit-manager','visit-supervisor','supervisor','admin'), async function(req, res) {
     try {
         let visit = await Visit.findById(req.params.id)
         res.send(visit)
@@ -64,7 +66,7 @@ router.get('/visit/:id', requireRole('visit-manager'), async function(req, res) 
     }
 })
 
-router.patch('/visit/:id', requireRole('visit-manager'), async (req, res) => {
+router.patch('/visit/:id', requireSomeRole('visit-manager','admin'), async (req, res) => {
     const payload = {...req.body,
         updatedBy: req.user._id
     }
@@ -81,12 +83,12 @@ router.patch('/visit/:id', requireRole('visit-manager'), async (req, res) => {
     }
 })
 
-router.get('/visit', requireRole('visit-manager'), async (req, res) => {
+router.get('/visit', requireSomeRole('visit-manager','visit-supervisor','supervisor','admin'), async (req, res) => {
     let visits = await Visit.find()
     res.send({visits})
 })
 
-router.put('/visit', requireRole('visit-manager'), async (req, res) => {
+router.put('/visit', requireSomeRole('visit-manager','admin'), async (req, res) => {
     let payload = {
         ...req.body,
         createdBy: req.user._id,
@@ -104,7 +106,7 @@ router.put('/visit', requireRole('visit-manager'), async (req, res) => {
     }
 })
 
-router.get('/user/:id', requireRole('admin'), async function(req, res) {
+router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(req, res) {
     try {
         let user = await User.findById(req.params.id)
         res.send(user)
@@ -114,7 +116,7 @@ router.get('/user/:id', requireRole('admin'), async function(req, res) {
     }
 })
 
-router.patch('/user/:id', requireRole('admin'), async (req, res) => {
+router.patch('/user/:id', requireSomeRole('admin'), async (req, res) => {
     const payload = {...req.body,
         updatedBy: req.user._id
     }
@@ -131,12 +133,12 @@ router.patch('/user/:id', requireRole('admin'), async (req, res) => {
     }
 })
 
-router.get('/user', requireRole('admin'), async (req, res) => {
+router.get('/user', requireSomeRole('supervisor', 'admin'), async (req, res) => {
     let users = await User.find()
     res.send({ users })
 })
 
-router.put('/user', requireRole('admin'), async (req, res) => {
+router.put('/user', requireSomeRole('admin'), async (req, res) => {
     let payload = { ...req.body,
         createdBy: req.user._id,
         updatedBy: req.user._id
@@ -153,7 +155,7 @@ router.put('/user', requireRole('admin'), async (req, res) => {
     }
 })
 
-router.delete('/user/:id', requireRole('admin'), async (req, res) => {
+router.delete('/user/:id', requireSomeRole('admin'), async (req, res) => {
     try {
         await User.deleteOne({_id: req.params.id})
         res.send({})
@@ -198,7 +200,7 @@ router.get('/token', requireUser, async (req, res) => {
 router.delete('/token/', requireUser, async (req, res) => {
     console.log("token DELETE")
     let token = await Token.findById(req.params.id)
-    if (token && (hasRole(req, 'admin') || token.createdBy === req.user._id)) {
+    if (token && (hasSomeRole(req, 'admin') || token.createdBy === req.user._id)) {
         token.delete()
         res.send({})
     } else {

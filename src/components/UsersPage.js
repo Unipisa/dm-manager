@@ -51,7 +51,7 @@ export default function UsersPage() {
                 </Table>
             </div>
         }
-        <Link className="btn btn-primary" to="/users/new">aggiungi utente</Link>
+        {engine.user().hasSomeRole('admin') && <Link className="btn btn-primary" to="/users/new">aggiungi utente</Link>}
     </>
 }
 

@@ -17,9 +17,9 @@ export default function Header({ user }) {
             <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>
               <NavLink to="/card" className="nav-link">Cartellino Stanze</NavLink>
-              {user.hasRole('visit-manager') && <NavLink to="/visits" className="nav-link">Visitatori</NavLink>}
-              {user.hasRole('admin') && <NavLink to="/users" className="nav-link">Utenti</NavLink>}
-              {user.hasRole('admin') && <NavLink to="/tokens" className="nav-link">Tokens</NavLink>}
+              {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') && <NavLink to="/visits" className="nav-link">Visitatori</NavLink>}
+              {user.hasSomeRole('supervisor','admin') && <NavLink to="/users" className="nav-link">Utenti</NavLink>}
+              {user.hasSomeRole('supervisor','admin') && <NavLink to="/tokens" className="nav-link">Tokens</NavLink>}
               {/*<NavDropdown title="Dropdown" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">
@@ -37,6 +37,8 @@ export default function Header({ user }) {
           <Nav className="right">
             <NavDropdown title={ user ? user.username : "user"}>
                 <NavDropdown.Item onClick={ () => engine.logout() }>logout</NavDropdown.Item>
+                {user.hasSomeRole('disguised-admin') && <NavDropdown.Item onClick={ () => engine.impersonate_role('admin') }>ritorna admin</NavDropdown.Item>}
+                {user.hasSomeRole('admin', 'disguised-admin') && ['supervisor', 'visit-manager', 'visit-supervisor'].map(role => <NavDropdown.Item key={role} onClick={ () => engine.impersonate_role(role) }>impersona {role}</NavDropdown.Item>)}
             </NavDropdown>
          </Nav>
         </Container>

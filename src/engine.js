@@ -1,3 +1,13 @@
+function new_user(json) {
+    let user = {
+        roles: [],
+        ...json
+    }
+    // inject functionality into user object:
+    user.hasSomeRole = (...roles) => roles.some(role => user.roles.includes(role))
+    return user
+}
+
 class Engine {
     constructor() {
         this.state = {
@@ -128,11 +138,10 @@ class Engine {
             ? ['/login/password', {username, password}]
             : ['/login', {}]
         console.log(`login POST: ${url}`)
-        const { user } = await this.post(url, payload)
+        let { user } = await this.post(url, payload)
         console.log(`user: ${JSON.stringify(user)}`)
         if (user !== null) {
-            // inject functionality into user object
-            user.hasRole = role => (user.roles?.includes('admin') || user.roles?.includes(role))
+            user = new_user(user)
         }
         this.setState(s => ({...s, user}))
     }
@@ -152,6 +161,11 @@ class Engine {
     loggedIn() { return this.state.user !== null }
 
     user() { return this.state.user }
+
+    async impersonate_role(role) {
+        let user = new_user(await this.post("/impersonate", { role }))
+        this.setState(s => ({...s, user}))
+    }
 
     async getVisits() {
         const { visits } = await this.get("/api/v0/visit/")

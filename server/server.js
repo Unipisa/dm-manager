@@ -104,8 +104,34 @@ app.post('/logout', function(req, res){
     if (err) { return next(err) }
     // res.redict('/login')
     res.send({ "user": null })
-  });
-});
+  })
+})
+
+app.post('/impersonate', function(req, res) {
+  const role = req.body.role
+  if (role) {
+    if (req.user && req.user.roles && (req.user.roles.includes('admin') || req.user.roles.includes('disguised-admin'))) {
+      const roles = role === 'admin' ? [role] : [role, 'disguised-admin']
+      User.findByIdAndUpdate(req.user._id, { roles }, (err, result) => {
+        if (err) {
+          res.status('500')
+          res.send({error: err.message})
+          console.error(err)
+        } else {
+          console.log(`user disguised as ${role}`)
+          req.user = result
+          res.send(req.user.toObject())
+        }
+      })
+    } else {
+      res.status("403")
+      res.send({error: "'admin' or 'disguised-admin' role needed for this operation"})
+    }
+  } else {
+    res.status("300")
+    res.send({error: "specify 'role' in json request body"})
+  }
+})
 
 app.get('/hello', (req, res) => {
   console.log(`params: ${JSON.stringify(req.params)}`)

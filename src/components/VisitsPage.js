@@ -48,7 +48,7 @@ export default function VisitsPage() {
                 </Table>
             </div>
         }
-        <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link>
+        { engine.user().hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
     </>
 }
 
