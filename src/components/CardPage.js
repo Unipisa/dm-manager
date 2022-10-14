@@ -17,19 +17,25 @@ function Display({room, names}) {
             marginLeft: "0.2cm",
             marginBottom: "-0.2cm"
             }} src="/img/matematica_dx.svg" />
-        <div contentEditable="true" style={{
-            color: blue,
-            textAlign: "center",
-            fontSize: "1cm",
-            height: "8cm",
-            paddingTop: "1cm"
+        <div style={{
+            height:"13cm",
+            marginTop:"-2cm"
         }}>
-            { names.map(name=>
-                <div key={name} style={{
-                    }}>{name}</div>)}
+            <div contentEditable="true" style={{
+                color: blue,
+                textAlign: "center",
+                fontSize: "1cm",
+                position: "relative",
+                top: "50%",
+                transform: "translateY(-50%)"
+            }}>
+                { names.map(name=>
+                    <div key={name} style={{
+                        }}>{name}</div>)}
+            </div>
         </div>
         <div style={{
-            marginTop: "-1cm",
+            marginTop: "-4cm",
             marginRight: "0.5cm"
         }}>
         <div contentEditable="true" style={{
