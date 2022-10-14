@@ -51,7 +51,7 @@ export default function UsersPage() {
                 </Table>
             </div>
         }
-        <Link to="/users/new">aggiungi utente</Link>
+        <Link className="btn btn-primary" to="/users/new">aggiungi utente</Link>
     </>
 }
 

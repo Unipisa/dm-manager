@@ -48,7 +48,7 @@ export default function VisitsPage() {
                 </Table>
             </div>
         }
-        <Link to="/visits/new">aggiungi visitatore</Link>
+        <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link>
     </>
 }
 

@@ -28,6 +28,7 @@ export default function UserPage() {
                 email: "",
                 lastName: "",
                 firstName: "",
+                roles: []
             }
         } else {
             user = await engine.getUser(id)
