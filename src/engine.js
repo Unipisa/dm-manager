@@ -191,6 +191,11 @@ class Engine {
         return r
     }
 
+    async deleteUser(id) {
+        await this.delete(`/api/v0/user/${id}`)
+    }
+
+
     async getTokens() {
         const { tokens } = await this.get("/api/v0/token/")
         return tokens

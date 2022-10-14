@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Card, Table } from 'react-bootstrap'
-import { useParams, Navigate } from 'react-router-dom'
+import { useParams, Navigate, useNavigate } from 'react-router-dom'
 
 import MyInput from './MyInput'
 import ListInput from './ListInput'
@@ -16,6 +16,9 @@ export default function UserPage() {
         ? null 
         : Object.entries(user).some(([key, val])=>{
             return val !== original[key]})
+    const navigate = useNavigate()
+    const navigateTo = useCallback((user) => navigate(
+        `/users/${user._id}`, {replace: true}), [navigate])
 
     useEffect(() => {(async () => {
         let user = null
@@ -55,6 +58,16 @@ export default function UserPage() {
         }
     }
 
+    const remove = async () => {
+        try {
+            await engine.deleteUser(user._id)
+            await engine.addInfoMessage(`utente ${user.firstName} ${user.lastName} cancellato`)
+            navigateTo("/users")
+        } catch(err) {
+            await engine.addErrorMessage(err.message)
+        }
+    }
+
     if (done) return <Navigate to="/users" />
 
     if (user === null) return <div>loading...</div>
@@ -71,7 +84,7 @@ export default function UserPage() {
             event.preventDefault()
             }}
         >
-            <Table border>
+            <Table bordered>
                 <tbody>
                     <MyInput name="username" label="username" store={ user } setStore={ setUser } />
                     <MyInput name="email" label="email" store={ user } setStore={ setUser } />
@@ -81,11 +94,18 @@ export default function UserPage() {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>
-                            <input 
-                                onClick={ submit } className="btn btn-primary" type="submit" 
-                                disabled= { !changed }
-                                value={create?"aggiungi utente":"aggiorna utente"} />
+                        <td colSpan="2">
+                            <button 
+                                onClick={ submit } 
+                                className="btn btn-primary" 
+                                disabled= { !changed }>
+                                {create?"aggiungi utente":"aggiorna utente"}
+                            </button>
+                            <button
+                                onClick={ remove }
+                                className="btn btn-warning pull-right">
+                                    elimina utente
+                            </button>
                         </td>
                     </tr>
                 </tfoot>

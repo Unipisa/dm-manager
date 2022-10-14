@@ -153,6 +153,16 @@ router.put('/user', requireRole('admin'), async (req, res) => {
     }
 })
 
+router.delete('/user/:id', requireRole('admin'), async (req, res) => {
+    try {
+        await User.deleteOne({_id: req.params.id})
+        res.send({})
+    } catch(err) {
+        console.error(err)
+        res.status(400).send({ error: err.message })
+    }
+})
+
 router.put('/token', requireUser, async (req, res) => {
     let payload = {
         roles: [], 
