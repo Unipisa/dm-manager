@@ -202,7 +202,7 @@ router.put('/token', requireUser, async (req, res) => {
 
     try {
         payload.roles.forEach(role => {
-            if (!hasSomeRole(req, role)) {
+            if (!hasSomeRole(req, 'admin', role)) {
                 res.status(403).send({ error: `cannot create Token with role "${role}" which you don't have`})
                 return
             }

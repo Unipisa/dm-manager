@@ -56,7 +56,7 @@ export default function TokensPage() {
                             <td><Button onClick={() => {
                                 navigator.clipboard.writeText(token.token)
                             }}>{token.token.slice(0,8)}...</Button></td>
-                            <td><Button onClick={async () => {
+                            <td><Button className="btn-danger" onClick={async () => {
                                 try {
                                     await engine.deleteToken(token)
                                     reload(setObjects)
@@ -71,7 +71,7 @@ export default function TokensPage() {
         </div>
         <Table bordered>
             <tbody>
-                <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } />
+                <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
             </tbody>
             <tfoot>
                 <tr>
