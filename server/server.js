@@ -36,7 +36,7 @@ const app = express()
 
 app.use(cors(
   {
-    origin: config.CORS_ORIGIN,
+    origin: config.CORS_ORIGIN.split(","),
     optionsSuccessStatus: 200,
     credentials: true // Needed for the client to handle session
   }))
