@@ -1,9 +1,5 @@
 import { Link } from 'react-router-dom'
 
-function is(user, role) {
-  return user.roles.includes(role) || user.roles.includes('admin')
-}
-
 export default function Home({ user }) {
     return (<>
       <p>{user.firstName} [{user.roles.join(', ')}], puoi:</p>
