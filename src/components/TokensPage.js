@@ -51,7 +51,7 @@ export default function TokensPage() {
                     { 
                     objects.map(token =>
                         <tr key={ token._id}>
-                            <td>{ token.createdBy.username }</td>
+                            <td>{ token.createdBy?.username }</td>
                             <td>{ token.roles.join(" ") }</td>
                             <td><Button onClick={() => {
                                 navigator.clipboard.writeText(token.token)
