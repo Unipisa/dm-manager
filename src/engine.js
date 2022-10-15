@@ -205,8 +205,8 @@ class Engine {
         return r
     }
 
-    async deleteUser(id) {
-        await this.delete(`/api/v0/user/${id}`)
+    async deleteUser(user) {
+        await this.delete(`/api/v0/user/${user._id}`)
     }
 
 
@@ -221,8 +221,8 @@ class Engine {
         return token
     }
 
-    async deleteToken(token_id) {
-        await this.delete(`/api/v0/token/${token_id}`)
+    async deleteToken(token) {
+        await this.delete(`/api/v0/token/${token._id}`)
     }
 }
 

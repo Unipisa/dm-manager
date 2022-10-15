@@ -202,7 +202,7 @@ router.put('/token', requireUser, async (req, res) => {
 
     try {
         payload.roles.forEach(role => {
-            if (!hasRole(req, role)) {
+            if (!hasSomeRole(req, role)) {
                 res.status(403).send({ error: `cannot create Token with role "${role}" which you don't have`})
                 return
             }
@@ -216,12 +216,12 @@ router.put('/token', requireUser, async (req, res) => {
 })
 
 router.get('/token', requireUser, async (req, res) => {
-    let filter = hasRole(req, 'admin') ? {} : { createdBy: req.user }
-    let tokens = await Token.find(filter)
+    let filter = hasSomeRole(req, 'admin') ? {} : { createdBy: req.user }
+    let tokens = await Token.find(filter).populate({path: 'createdBy', select: 'username'})
     res.send({ tokens })
 })
 
-router.delete('/token/', requireUser, async (req, res) => {
+router.delete('/token/:id', requireUser, async (req, res) => {
     console.log("token DELETE")
     let token = await Token.findById(req.params.id)
     if (token && (hasSomeRole(req, 'admin') || token.createdBy === req.user._id)) {

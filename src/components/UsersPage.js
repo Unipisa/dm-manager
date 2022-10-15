@@ -31,20 +31,22 @@ export default function UsersPage() {
                 <Table bordered hover>
                     <thead>
                         <tr>
-                            <th>username</th>
-                            <th>email</th>
                             <th>cognome</th>
                             <th>nome</th>    
+                            <th>username</th>
+                            <th>email</th>
+                            <th>ruoli</th>
                         </tr>
                     </thead>
                     <tbody>
                         { 
                         objects.map(user =>
                             <tr key={ user._id} onClick={()=>navigateTo(user)}>
-                                <td>{ user.username }</td>
-                                <td>{ user.email }</td>
                                 <td>{ user.lastName }</td>
                                 <td>{ user.firstName }</td>
+                                <td>{ user.username }</td>
+                                <td>{ user.email }</td>
+                                <td>{ user.roles.join(" ")}</td>
                             </tr>) 
                         }
                     </tbody>

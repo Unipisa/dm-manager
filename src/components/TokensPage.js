@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Table } from 'react-bootstrap'
+import { Table, Button } from 'react-bootstrap'
 import ListInput from './ListInput'
 
 import engine from '../engine'
@@ -43,25 +43,27 @@ export default function TokensPage() {
                     <tr>
                         <th>createdBy</th>
                         <th>roles</th>
-                        <th>token</th>
-                        <th></th>
+                        <th>copy</th>
+                        <th>delete</th>
                     </tr>
                 </thead>
                 <tbody>
                     { 
                     objects.map(token =>
                         <tr key={ token._id}>
-                            <td>{ token.createdBy }</td>
-                            <td>{ token.roles }</td>
-                            <td>{ token.token }</td>
-                            <td><button onClick={async () => {
+                            <td>{ token.createdBy.username }</td>
+                            <td>{ token.roles.join(" ") }</td>
+                            <td><Button onClick={() => {
+                                navigator.clipboard.writeText(token.token)
+                            }}>{token.token.slice(0,8)}...</Button></td>
+                            <td><Button onClick={async () => {
                                 try {
-                                    await engine.deleteToken(token._id)
+                                    await engine.deleteToken(token)
                                     reload(setObjects)
                                 } catch(err) {
                                     engine.addErrorMessage(err.message)
                                 }
-                                }}><i class="bi bi-trash"></i></button></td>
+                                }}>remove</Button></td>
                         </tr>) 
                     }
                 </tbody>
