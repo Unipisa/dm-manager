@@ -88,6 +88,30 @@ router.get('/visit', requireSomeRole('visit-manager','visit-supervisor','supervi
     res.send({visits})
 })
 
+router.get('/public/visit/', async (req, res) => {
+    try {
+        let today = new Date()
+        let tomorrow = today
+        tomorrow.setDate(today.getDate() + 1)
+        let visits = await Visit.find({
+            startDate: {$lte: tomorrow},
+            endDate: {$gte: today}
+        })
+        res.send({visits: visits.map(visit => ({
+            startDate: visit.startDate,
+            endDate: visit.endDate,
+            firstName: visit.firstName,
+            lastName: visit.lastName,
+            affiliation: visit.affiliation,
+            roomNumber: visit.roomNumber,
+            building: visit.building,               
+        }))})
+    } catch(err) {
+        res.status("500")
+        res.send({ error: err.message })
+    }
+})
+
 router.put('/visit', requireSomeRole('visit-manager','admin'), async (req, res) => {
     let payload = {
         ...req.body,
