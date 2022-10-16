@@ -1,6 +1,7 @@
 
 var express = require('express')
 
+const Log = require('./models/Log')
 const Visit = require('./models/Visit')
 const User = require('./models/User')
 const Token = require('./models/Token')
@@ -14,6 +15,7 @@ const requireUser = (req, res, next) => {
         res.send({ error: `not logged in` })
     } else {
         req.roles = req.user.roles
+        req.log_who = req.user.username
         next()
     }
 }
@@ -29,11 +31,13 @@ const requireRoles = (req, res, next) => {
                 res.send({error: "invalid token"})
             } else {
                 req.roles = token.roles
+                req.log_who = token.name ? token.name : token.token
                 next()
             }
         })
     } else if (req.user) {
         req.roles = req.user.roles
+        req.log_who = req.user.username
         next()
     } else {
         res.status(401)
@@ -56,6 +60,16 @@ const requireSomeRole = (...roles) => ((req, res, next) => {
     }
 )})
 
+const log = (req, was, will) => {
+    Log.create({
+        who: req.log_who,
+        when: new Date(),
+        what: req.method,
+        where: req.path,
+        was,
+        will})
+}
+
 router.get('/visit/:id', requireSomeRole('visit-manager','visit-supervisor','supervisor','admin'), async function(req, res) {
     try {
         let visit = await Visit.findById(req.params.id)
@@ -63,23 +77,6 @@ router.get('/visit/:id', requireSomeRole('visit-manager','visit-supervisor','sup
     } catch(error) {
         console.error(error)
         res.status(404).send({error: error.message})
-    }
-})
-
-router.patch('/visit/:id', requireSomeRole('visit-manager','admin'), async (req, res) => {
-    const payload = {...req.body,
-        updatedBy: req.user._id
-    }
-    delete payload.createdBy
-    delete payload.createdAt
-    delete payload.updatedAt
-
-    try {
-        const visit = await Visit.findByIdAndUpdate(req.params.id, payload)
-        res.send(visit)
-    } catch(error) {
-        console.error(error)
-        res.status(400).send({error: err.message})
     }
 })
 
@@ -122,11 +119,31 @@ router.put('/visit', requireSomeRole('visit-manager','admin'), async (req, res) 
     delete payload.updatedAt
 
     try {
+        log(req, {}, payload)
         await Visit.create(payload)
         res.send({})
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
+    }
+})
+
+router.patch('/visit/:id', requireSomeRole('visit-manager','admin'), async (req, res) => {
+    const payload = {...req.body,
+        updatedBy: req.user._id
+    }
+    delete payload.createdBy
+    delete payload.createdAt
+    delete payload.updatedAt
+
+    try {
+        const was = await Visit.findById(req.params.id)
+        log(req, was, payload)
+        const visit = await Visit.findByIdAndUpdate(req.params.id, payload)
+        res.send(visit)
+    } catch(error) {
+        console.error(error)
+        res.status(400).send({error: err.message})
     }
 })
 
@@ -137,23 +154,6 @@ router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(r
     } catch(err) {
         console.error(err)
         res.status(404)
-    }
-})
-
-router.patch('/user/:id', requireSomeRole('admin'), async (req, res) => {
-    const payload = {...req.body,
-        updatedBy: req.user._id
-    }
-    delete payload.createdBy
-    delete payload.createdAt
-    delete payload.updatedAt
-
-    try {
-        const user = await User.findByIdAndUpdate(req.params.id, payload)
-        res.send(user)
-    } catch(err) {
-        console.error(err)
-        res.status(400).send({error: err.message})
     }
 })
 
@@ -171,6 +171,7 @@ router.put('/user', requireSomeRole('admin'), async (req, res) => {
     delete payload.updatedAt
 
     try {
+        log(req, {}, payload)
         await User.create(payload)
         res.send({})
     } catch(err) {
@@ -179,9 +180,31 @@ router.put('/user', requireSomeRole('admin'), async (req, res) => {
     }
 })
 
+router.patch('/user/:id', requireSomeRole('admin'), async (req, res) => {
+    const payload = {...req.body,
+        updatedBy: req.user._id
+    }
+    delete payload.createdBy
+    delete payload.createdAt
+    delete payload.updatedAt
+
+    try {
+        const was = await User.findById(req.params.id)
+        log(req, was, payload)
+        const user = await User.findByIdAndUpdate(req.params.id, payload)
+        res.send(user)
+    } catch(err) {
+        console.error(err)
+        res.status(400).send({error: err.message})
+    }
+})
+
 router.delete('/user/:id', requireSomeRole('admin'), async (req, res) => {
     try {
-        await User.deleteOne({_id: req.params.id})
+        const user = await User.findById(req.params.id)
+        log(req, user, {})
+        // await User.deleteOne({_id: req.params.id})
+        user.delete()
         res.send({})
     } catch(err) {
         console.error(err)
@@ -207,6 +230,7 @@ router.put('/token', requireUser, async (req, res) => {
                 return
             }
         })
+        log(req, {}, payload)
         const token = await Token.create(payload)
         res.send({ token })
     } catch(err) {
@@ -225,6 +249,7 @@ router.delete('/token/:id', requireUser, async (req, res) => {
     console.log("token DELETE")
     let token = await Token.findById(req.params.id)
     if (token && (hasSomeRole(req, 'admin') || token.createdBy === req.user._id)) {
+        log(req, token, {})
         token.delete()
         res.send({})
     } else {

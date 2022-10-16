@@ -102,11 +102,11 @@ export default function UserPage() {
                                 disabled= { !changed }>
                                 {create?"aggiungi utente":"aggiorna utente"}
                             </button>
-                            <button
+                            {!create && <button
                                 onClick={ remove }
                                 className="btn btn-warning pull-right">
                                     elimina utente
-                            </button>
+                            </button>}
                         </td>
                     </tr>
                 </tfoot>
