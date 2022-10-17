@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import engine from './engine'
+import {useEngine, EngineProvider} from './Engine'
 import Connecting from './components/Connecting'
 import Messages from './components/Messages'
 import NotFound from './components/NotFound'
@@ -15,36 +15,41 @@ import UserPage from './components/UserPage'
 import TokensPage from './components/TokensPage'
 import CardPage from './components/CardPage'
 import { Container } from 'react-bootstrap'
+import {QueryClient, QueryClientProvider } from 'react-query'
 
 console.log("dm-manager (app starting)")
 
+const queryClient = new QueryClient()
+
 export default function App() {
-  engine.sync(useState(engine.state))
-  
-  if (! engine.connected()) {
-    return <Connecting />
+  const engine = useEngine()
+
+  if (!engine.connected) {
+    return <Connecting engine={engine}/>
   }
 
-  if (! engine.loggedIn()) {
-    return <LoginPage />
+  if (!engine.loggedIn) {
+    return <LoginPage engine={engine}/>
   }
 
-  return <div>
-  <BrowserRouter>
-    <Header user = { engine.user() }/>
-    <Messages messages={ engine.messages() } acknowledge={ () => engine.clearMessages() } />
-    <Container>
-      <Routes>  
-        <Route path="/" element={<Home user={ engine.user() } />} />
-        <Route path="/visits/:id" element={<VisitPage />} />
-        <Route path="/visits" element={<VisitsPage />} />
-        <Route path="/users/:id" element={<UserPage />} />
-        <Route path="/users" element={<UsersPage />} />
-        <Route path="/tokens" element={<TokensPage />} />
-        <Route path="/card" element={<CardPage />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </Container>
-  </BrowserRouter>
-</div>
+  return <EngineProvider value={engine}>
+    <QueryClientProvider client={queryClient}>
+     <BrowserRouter>
+      <Header user = { engine.user() }/>
+      <Messages messages={ engine.messages() } acknowledge={ () => engine.clearMessages() } />
+      <Container>
+        <Routes>  
+          <Route path="/" element={<Home user={ engine.user() } />} />
+          <Route path="/visits/:id" element={<VisitPage />} />
+          <Route path="/visits" element={<VisitsPage />} />
+          <Route path="/users/:id" element={<UserPage />} />
+          <Route path="/users" element={<UsersPage />} />
+          <Route path="/tokens" element={<TokensPage />} />
+          <Route path="/card" element={<CardPage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Container>
+     </BrowserRouter>    
+    </QueryClientProvider>    
+  </EngineProvider>
 }

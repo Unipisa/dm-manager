@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import Card from 'react-bootstrap/Card'
 
-import engine from '../engine'
-
-function LoginPage() {
+function LoginPage({ engine }) {
     const [ email, setEmail ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
@@ -67,7 +65,7 @@ function LoginPage() {
                         </form>
                         <div className="mb-4" />
                         {
-                            engine.config().OAUTH2_ENABLED &&
+                            engine.config.OAUTH2_ENABLED &&
                             <button onClick={ () => engine.start_oauth2() }
                             className="btn btn-primary btn-block mb-4">
                                 UNIPI login

@@ -4,6 +4,7 @@ const crypto = require('crypto')
 const Schema = mongoose.Schema
 
 const tokenSchema = new Schema({
+    name: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     token: {

@@ -168,8 +168,8 @@ class Engine {
     }
 
     async getVisits() {
-        const { visits } = await this.get("/api/v0/visit/")
-        return visits
+        const { data } = await this.get("/api/v0/visit/")
+        return data
     }
 
     async getVisit(id) {
@@ -187,8 +187,8 @@ class Engine {
     }
 
     async getUsers() {
-        const { users } = await this.get("/api/v0/user/")
-        return users
+        const { data } = await this.get("/api/v0/user/")
+        return data
     }
 
     async getUser(id) {
@@ -211,8 +211,8 @@ class Engine {
 
 
     async getTokens() {
-        const { tokens } = await this.get("/api/v0/token/")
-        return tokens
+        const { data } = await this.get("/api/v0/token/")
+        return data
     }
 
     async putToken(payload) {

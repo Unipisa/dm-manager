@@ -1,69 +1,62 @@
-import { useState, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { Table, Button } from 'react-bootstrap'
+import {useQueryClient, useQuery, useMutation} from 'react-query'
 import ListInput from './ListInput'
+import MyInput from './MyInput'
 
-import engine from '../engine'
-
-async function reload(setObjects) {
-    try {
-        const objs = await engine.getTokens()
-        setObjects(objs)
-    } catch(err) {
-        engine.addErrorMessage(err.message)
-    }
-
-} 
+import { EngineProvider } from '../Engine'
 
 export default function TokensPage() {
-    const [objects, setObjects ] = useState(null)
-    const [token, setToken ] = useState({roles: engine.user().roles})
+    const [token, setToken ] = useState({roles: engine.user.roles})
+    const engine = useContext(EngineProvider)
+    const query = useQuery(['token'], () => engine.getObjects("token"))
+    const queryClient = useQueryClient()
 
-    console.log(`objects: ${JSON.stringify(objects)}`)
+    const putToken = useMutation((token) => engine.putObject("token", token), {
+        onSuccess: () => {
+            queryClient.invalidateQueries(['token'])
+        }
+    }).mutate
+
+    const deleteToken = useMutation((token) => engine.deleteObject("token", token), {
+        onSuccess: () => {
+            queryClient.invalidateQueries(['token'])
+        }
+    }).mutate
+
     async function submit() {
         try {
-            await engine.putToken(token)
+            await putToken(token)
             engine.addInfoMessage(`token aggiunto`)
-            reload(setObjects)
         } catch(err) {
             engine.addErrorMessage(err.message)
             return
         }
     }
 
-    useEffect(() => {
-        reload(setObjects)
-    }, [setObjects])
-
-    if (objects === null) return <span>loading....</span>
+    if (query.isLoading) return <span>loading....</span>
 
     return <>
         <div>
             <Table bordered>
                 <thead>
                     <tr>
-                        <th>createdBy</th>
-                        <th>roles</th>
-                        <th>copy</th>
-                        <th>delete</th>
+                        <th>nome</th>
+                        <th>ruoli</th>
+                        <th>copia</th>
+                        <th>elimina</th>
                     </tr>
                 </thead>
                 <tbody>
                     { 
-                    objects.map(token =>
+                    query.data.map(token =>
                         <tr key={ token._id}>
-                            <td>{ token.createdBy?.username }</td>
+                            <td>{ token.name }</td>
                             <td>{ token.roles.join(" ") }</td>
                             <td><Button onClick={() => {
                                 navigator.clipboard.writeText(token.token)
                             }}>{token.token.slice(0,8)}...</Button></td>
-                            <td><Button className="btn-danger" onClick={async () => {
-                                try {
-                                    await engine.deleteToken(token)
-                                    reload(setObjects)
-                                } catch(err) {
-                                    engine.addErrorMessage(err.message)
-                                }
-                                }}>remove</Button></td>
+                            <td><Button className="btn-danger" onClick={() => deleteToken(token)}>remove</Button></td>
                         </tr>) 
                     }
                 </tbody>
@@ -71,6 +64,7 @@ export default function TokensPage() {
         </div>
         <Table bordered>
             <tbody>
+                <MyInput name="name" label="nome" store={token} setStore={ setToken }/>
                 <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
             </tbody>
             <tfoot>

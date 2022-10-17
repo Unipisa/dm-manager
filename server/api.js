@@ -81,8 +81,8 @@ router.get('/visit/:id', requireSomeRole('visit-manager','visit-supervisor','sup
 })
 
 router.get('/visit', requireSomeRole('visit-manager','visit-supervisor','supervisor','admin'), async (req, res) => {
-    let visits = await Visit.find()
-    res.send({visits})
+    let data = await Visit.find()
+    res.send({data})
 })
 
 router.get('/public/visit/', async (req, res) => {
@@ -158,8 +158,8 @@ router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(r
 })
 
 router.get('/user', requireSomeRole('supervisor', 'admin'), async (req, res) => {
-    let users = await User.find()
-    res.send({ users })
+    let data = await User.find()
+    res.send({ data })
 })
 
 router.put('/user', requireSomeRole('admin'), async (req, res) => {
@@ -215,6 +215,7 @@ router.delete('/user/:id', requireSomeRole('admin'), async (req, res) => {
 router.put('/token', requireUser, async (req, res) => {
     let payload = {
         roles: [], 
+        name: "no-name",
         ...req.body,
         createdBy: req.user._id,
         updatedBy: req.user._id
@@ -241,8 +242,8 @@ router.put('/token', requireUser, async (req, res) => {
 
 router.get('/token', requireUser, async (req, res) => {
     let filter = hasSomeRole(req, 'admin') ? {} : { createdBy: req.user }
-    let tokens = await Token.find(filter).populate({path: 'createdBy', select: 'username'})
-    res.send({ tokens })
+    let data = await Token.find(filter).populate({path: 'createdBy', select: 'username'})
+    res.send({ data })
 })
 
 router.delete('/token/:id', requireUser, async (req, res) => {
