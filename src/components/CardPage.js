@@ -51,12 +51,12 @@ function Display({room, names}) {
             float: "left"
         }}>{room}</div>
         <img alt="" style={{
-            height: "5cm",
+            height: "8cm",
             position: "relative",
             float: "right",
-            opacity: "0.5",
-            marginTop: "-0.2cm",
-            marginRight: "-0.3cm"
+            opacity: "0.15",
+            marginTop: "-3.2cm",
+            marginRight: "-0.4cm"
             }} src="/img/cherubino_pant541.png" />
         </div>
     </div>
