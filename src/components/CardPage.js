@@ -9,6 +9,7 @@ function Display({room, names}) {
         margin:"5px",
         position: "absolute",
         WebkitPrintColorAdjust: "exact", 
+        printColorAdjust: "exact"
     }}>
         <img alt="" style={{
             height: "3cm",
@@ -56,7 +57,8 @@ function Display({room, names}) {
             float: "right",
             opacity: "0.15",
             marginTop: "-3.2cm",
-            marginRight: "-0.4cm"
+            marginRight: "-0.4cm",
+            pointerEvents: "none"
             }} src="/img/cherubino_pant541.png" />
         </div>
     </div>
