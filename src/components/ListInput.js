@@ -1,6 +1,7 @@
-export default function ListInput({ name, label, store, setStore, value }) {
+export default function ListInput({ name, label, store, setStore, value, separator }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
+    if (separator === undefined) separator = ','
     const id = `myinput-${name}`
     return <>
     <tr>
@@ -11,10 +12,10 @@ export default function ListInput({ name, label, store, setStore, value }) {
             <input 
                 id={ id } 
                 name={ name } 
-                value={ value.join(',') || "" } 
+                value={ value.join(separator) || "" } 
                 onChange={ (evt) => {
                         const val = evt.target.value
-                            .split(',')
+                            .split(separator)
                             .map( x => x.trim())
                         setStore(obj => {
                             obj = {...obj}

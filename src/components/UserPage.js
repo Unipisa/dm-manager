@@ -61,7 +61,7 @@ export default function UserPage() {
 
     const remove = async () => {
         try {
-            await engine.deleteUser(user._id)
+            await engine.deleteUser(user)
             await engine.addInfoMessage(`utente ${user.firstName} ${user.lastName} cancellato`)
             navigateTo("/users")
         } catch(err) {
@@ -91,7 +91,7 @@ export default function UserPage() {
                     <MyInput name="email" label="email" store={ user } setStore={ setUser } />
                     <MyInput name="firstName" label="nome" store={ user} setStore={ setUser } />
                     <MyInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
-                    <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } />
+                    <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" "/>
                 </tbody>
                 <tfoot>
                     <tr>
@@ -102,11 +102,11 @@ export default function UserPage() {
                                 disabled= { !changed }>
                                 {create?"aggiungi utente":"aggiorna utente"}
                             </button>
-                            <button
+                            {!create && <button
                                 onClick={ remove }
                                 className="btn btn-warning pull-right">
                                     elimina utente
-                            </button>
+                            </button>}
                         </td>
                     </tr>
                 </tfoot>
