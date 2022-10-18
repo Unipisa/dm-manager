@@ -56,10 +56,6 @@ export default function UserPage() {
         }
     }
 
-    const remove = async () => {
-        deleteUser(user)
-    }
-
     if (redirect !== null) return <Navigate to={redirect} />
 
     return <Card>
@@ -95,7 +91,7 @@ export default function UserPage() {
                                 { changed ? "annulla modifiche" : "torna all'elenco"}
                             </button>
                             {!create && <button
-                                onClick={ remove }
+                                onClick={ () => deleteUser(user) }
                                 className="btn btn-warning pull-right">
                                     elimina utente
                             </button>}

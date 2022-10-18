@@ -151,6 +151,19 @@ router.patch('/visit/:id', requireSomeRole('visit-manager','admin'), async (req,
     }
 })
 
+router.delete('/visit/:id', requireSomeRole('visit-manager','admin'), async (req, res) => {
+    try {
+        const visit = await Visit.findById(req.params.id)
+        log(req, visit, {})
+        // await User.deleteOne({_id: req.params.id})
+        visit.delete()
+        res.send({})
+    } catch(err) {
+        console.error(err)
+        res.status(400).send({ error: err.message })
+    }
+})
+
 router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(req, res) {
     try {
         let user = await User.findById(req.params.id)

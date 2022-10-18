@@ -17,9 +17,9 @@ export default function VisitsPage() {
         `/visits/${visit._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
-    if (query.)
+    if (query.isError) engine.addErrorMessage(query.error)
 
-    const data = query.data.data
+    const data = query.isError? [] : query.data.data
 
     return <>
             <div>
@@ -45,7 +45,7 @@ export default function VisitsPage() {
                     </tbody>
                 </Table>
             </div>
-        { engine.user().hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
+        { engine.user.hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
     </>
 }
 
