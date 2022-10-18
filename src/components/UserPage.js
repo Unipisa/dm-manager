@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { Card, Table } from 'react-bootstrap'
-import { useParams, Navigate, useNavigate } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import { EngineContext } from '../Engine'
 import MyInput from './MyInput'
