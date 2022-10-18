@@ -11,20 +11,17 @@ function myDateFormat(date) {
 
 export default function VisitsPage() {
     const engine = useContext(EngineContext)
-    const [visits, setVisits ] = useState(null)
+    const query = engine.useIndex('visit')
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
         `/visits/${visit._id}`, {replace: true}), [navigate])
 
-    useEffect(() => {
-        (async () => {
-        setVisits(await engine.getVisits())
-        })()
-    }, [setVisits])
+    if (query.isLoading) return <span>loading...</span>
+    if (query.)
+
+    const data = query.data.data
 
     return <>
-        {
-            (visits === null) ? <span>loading...</span>: 
             <div>
                 <Table bordered hover>
                     <thead>
@@ -37,7 +34,7 @@ export default function VisitsPage() {
                     </thead>
                     <tbody>
                         { 
-                        visits.map(visit =>
+                        data.map(visit =>
                             <tr key={visit._id} onClick={()=>navigateTo(visit)}>
                                 <td>{ myDateFormat(visit.startDate) }</td>
                                 <td>{ myDateFormat(visit.endDate) }</td>
@@ -48,7 +45,6 @@ export default function VisitsPage() {
                     </tbody>
                 </Table>
             </div>
-        }
         { engine.user().hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
     </>
 }
