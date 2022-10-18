@@ -1,10 +1,15 @@
-import { useState, createContext } from 'react'
+import { useState, createContext, useContext } from 'react'
+import { useQuery, useQueryClient, useMutation } from 'react-query'
 
 export const EngineContext = createContext(null)
 
 export const EngineProvider = EngineContext.Provider
   
 export function useEngine() {
+    return useContext(EngineContext)
+}
+
+export function useCreateEngine() {
     const [state,setState] = useState({
         counter: 0,
         messages: [],
@@ -12,6 +17,8 @@ export function useEngine() {
         config: null,
         user: null,
     })
+
+    const queryClient=useQueryClient()
 
     function new_user(json) {
         let user = {
@@ -88,11 +95,11 @@ export function useEngine() {
 
         addErrorMessage: (message) => addMessage(message, 'error'),
         
-        addInfoMessage: (message) => addMessage(message, 'info' ),
+        addInfoMessage: (message) => addMessage(message, 'info'),
 
-        addWarningMessage: (message) => addMessage(message, 'warning' ),
+        addWarningMessage: (message) => addMessage(message, 'warning'),
 
-        messages: () => state.messages,
+        messages: state.messages,
 
         clearMessages: () => {
             setState( s => ({
@@ -153,18 +160,61 @@ export function useEngine() {
             setState(s => ({...s, user}))
         },
 
-        getObjects: async (path) => {
-            console.assert(['visit'].includes(path))
-            const { data } = await get(`/api/v0/${path}/`)
-            return data
+        useIndex: (path) => {
+            console.assert(['visit','token','user'].includes(path), `invalid path ${path}`)
+            const query = useQuery([path], () => get(`/api/v0/${path}`))
+            return query
         },
 
-        getObject: async (path,id) => get(`/api/v0/${path}/${id}`),
+        useGet: (path,id) => {
+            console.assert(['visit', 'user'].includes(path), `invalid path ${path}`)
+            const query = useQuery([path, id], () => get(`/api/v0/${path}/${id}`))
+            return query
+        },
 
-        putObject: async (path,payload) => put(`/api/v0/${path}/`, payload),
+        usePut: (path, cb) => {
+            const mutation = useMutation(payload => put(`/api/v0/${path}/`, payload))
+            return async (object) => {
+                mutation.mutate(object, {
+                    onSuccess: (result) => {
+                        queryClient.invalidateQueries([path])
+                        if (cb) cb(result)
+                    },
+                    onError: (err) => {
+                        addMessage(err.message, 'error')
+                    }
+                })
+            }
+        },
 
-        patchObject: async (path, id, payload) => patch(`/api/v0/${path}/${id}`, payload),
+        usePatch: (path, cb) => {
+            const mutation = useMutation(payload => patch(`/api/v0/${path}/${payload._id}`, payload))
+            return async (object) => {
+                mutation.mutate(object, {
+                    onSuccess: (result, object) => {
+                        queryClient.invalidateQueries([path])
+                        if (cb) cb(result, object)
+                    },
+                    onError: (err) => {
+                        addMessage(err.message, 'error')
+                    }
+                })
+            }
+        },
 
-        deleteObject: async (path, object) => del(`/api/v0/${path}/${object._id}`),
+        useDelete: (path, cb) => { 
+            const mutation = useMutation(async (object) => del(`/api/v0/${path}/${object._id}`))
+            return async (object) => {
+                mutation.mutate(object, {
+                    onSuccess: (result, object) => {
+                        queryClient.invalidateQueries([path])
+                        if (cb) cb(result, object)
+                    },
+                    onError: (err) => {
+                        addMessage(err.message, 'error')
+                    }
+                })
+            }
+        },
     }
 }

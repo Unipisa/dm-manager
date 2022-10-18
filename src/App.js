@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import {useState} from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
-import {useEngine, EngineProvider} from './Engine'
+import {useCreateEngine, EngineProvider} from './Engine'
 import Connecting from './components/Connecting'
 import Messages from './components/Messages'
 import NotFound from './components/NotFound'
@@ -21,25 +21,24 @@ console.log("dm-manager (app starting)")
 
 const queryClient = new QueryClient()
 
-export default function App() {
-  const engine = useEngine()
-
+function Internal() {
+  const engine = useCreateEngine()
+  
   if (!engine.connected) {
     return <Connecting engine={engine}/>
   }
-
+  
   if (!engine.loggedIn) {
     return <LoginPage engine={engine}/>
   }
 
   return <EngineProvider value={engine}>
-    <QueryClientProvider client={queryClient}>
      <BrowserRouter>
-      <Header user = { engine.user() }/>
-      <Messages messages={ engine.messages() } acknowledge={ () => engine.clearMessages() } />
+      <Header/>
+      <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
       <Container>
         <Routes>  
-          <Route path="/" element={<Home user={ engine.user() } />} />
+          <Route path="/" element={<Home user={ engine.user } />} />
           <Route path="/visits/:id" element={<VisitPage />} />
           <Route path="/visits" element={<VisitsPage />} />
           <Route path="/users/:id" element={<UserPage />} />
@@ -50,6 +49,11 @@ export default function App() {
         </Routes>
       </Container>
      </BrowserRouter>    
-    </QueryClientProvider>    
-  </EngineProvider>
+    </EngineProvider>
+}  
+
+export default function App() {
+  return <QueryClientProvider client={queryClient}>
+    <Internal />
+  </QueryClientProvider>    
 }

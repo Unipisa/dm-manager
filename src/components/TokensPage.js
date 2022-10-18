@@ -1,40 +1,20 @@
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
-import {useQueryClient, useQuery, useMutation} from 'react-query'
 import ListInput from './ListInput'
 import MyInput from './MyInput'
 
-import { EngineProvider } from '../Engine'
+import { useEngine } from '../Engine'
 
 export default function TokensPage() {
+    const engine = useEngine()
     const [token, setToken ] = useState({roles: engine.user.roles})
-    const engine = useContext(EngineProvider)
-    const query = useQuery(['token'], () => engine.getObjects("token"))
-    const queryClient = useQueryClient()
-
-    const putToken = useMutation((token) => engine.putObject("token", token), {
-        onSuccess: () => {
-            queryClient.invalidateQueries(['token'])
-        }
-    }).mutate
-
-    const deleteToken = useMutation((token) => engine.deleteObject("token", token), {
-        onSuccess: () => {
-            queryClient.invalidateQueries(['token'])
-        }
-    }).mutate
-
-    async function submit() {
-        try {
-            await putToken(token)
-            engine.addInfoMessage(`token aggiunto`)
-        } catch(err) {
-            engine.addErrorMessage(err.message)
-            return
-        }
-    }
+    const query = engine.useIndex('token')
+    const deleteToken = engine.useDelete('token', (response, token) => engine.addInfoMessage(`token ${token.name} rimosso`))
+    const putToken = engine.usePut('token', (response) => engine.addInfoMessage(`token ${response.token.name} creato`))
 
     if (query.isLoading) return <span>loading....</span>
+
+    const data = query.data.data
 
     return <>
         <div>
@@ -49,14 +29,14 @@ export default function TokensPage() {
                 </thead>
                 <tbody>
                     { 
-                    query.data.map(token =>
+                    data.map(token =>
                         <tr key={ token._id}>
                             <td>{ token.name }</td>
                             <td>{ token.roles.join(" ") }</td>
                             <td><Button onClick={() => {
                                 navigator.clipboard.writeText(token.token)
                             }}>{token.token.slice(0,8)}...</Button></td>
-                            <td><Button className="btn-danger" onClick={() => deleteToken(token)}>remove</Button></td>
+                            <td><Button className="btn-danger" onClick={() => deleteToken(token, `token cancellato`)}>remove</Button></td>
                         </tr>) 
                     }
                 </tbody>
@@ -70,9 +50,9 @@ export default function TokensPage() {
             <tfoot>
                 <tr>
                     <td>
-                        <input 
-                            onClick={ submit } className="btn btn-primary" type="submit" 
-                            value="nuovo token" />
+                        <button onClick={ () => putToken(token) } className="btn btn-primary">
+                            crea token
+                        </button>
                     </td>
                 </tr>
             </tfoot>

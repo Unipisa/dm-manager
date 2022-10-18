@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useContext } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import engine from '../engine'
+import { EngineContext } from '../Engine'
 
 export default function UsersPage() {
+    const engine = useContext(EngineContext)
     const [objects, setObjects ] = useState(null)
     const navigate = useNavigate()
     const navigateTo = useCallback((user) => navigate(
