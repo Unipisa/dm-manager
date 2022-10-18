@@ -29,7 +29,8 @@ export default function VisitsPage() {
                             <th>dal</th>
                             <th>al</th>
                             <th>cognome</th>
-                            <th>nome</th>    
+                            <th>nome</th>
+                            <th>referente</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,6 +41,7 @@ export default function VisitsPage() {
                                 <td>{ myDateFormat(visit.endDate) }</td>
                                 <td>{ visit.lastName }</td>
                                 <td>{ visit.firstName }</td>
+                                <td>{ visit.invitedBy }</td>
                             </tr>) 
                         }
                     </tbody>

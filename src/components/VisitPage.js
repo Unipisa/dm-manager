@@ -21,6 +21,7 @@ export default function VisitPage() {
         building: "",
         roomNumber: "",
         invitedBy: "",
+        SSD: "",
         notes: "",
     }
     const [ visit, setVisit ] = useState(null)
@@ -81,6 +82,7 @@ export default function VisitPage() {
                     <MyInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
                     <MyInput name="email" label="email" store={ visit } setStore={ setVisit } />
                     <MyInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
+                    <MyInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } />
                     <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
                     <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
                     <MyInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
