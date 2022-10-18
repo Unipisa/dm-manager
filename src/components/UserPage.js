@@ -10,71 +10,57 @@ export default function UserPage() {
     const engine = useContext(EngineContext)
     const { id } = useParams()
     const create = (id === 'new')
-    const [ original, setOriginal ] = useState(null)
-    const [ user, setUser ] = useState(original)
-    const [ done, setDone ] = useState(false)
-    const changed = original===null 
-        ? null 
-        : Object.entries(user).some(([key, val])=>{
-            return val !== original[key]})
-    const navigate = useNavigate()
-    const navigateTo = useCallback((user) => navigate(
-        `/users/${user._id}`, {replace: true}), [navigate])
+    const empty = { 
+        username: "",
+        email: "",
+        lastName: "",
+        firstName: "",
+        roles: []
+    }
+    const [ user, setUser ] = useState(null)
+    const [ redirect, setRedirect ] = useState(null)
+    const query = create ? {data: empty, isLoading: false} : engine.useGet('user', id)
+    const putUser = engine.usePut('user', (user) => {
+        engine.addInfoMessage(`utente ${user.username} creato`)
+        setRedirect('/users')
+    })
+    const patchUser = engine.usePatch('user', (response) => {
+        engine.addInfoMessage(`utente ${user.username} modificato`)
+        setRedirect('/users')
+    })
+    const deleteUser = engine.useDelete('user', (response, user) => {
+        engine.addWarningMessage(`utente ${user.username} eliminato`)
+        setRedirect('/users')
+    })
+        
+    if (user === null) {
+        if (!query.isLoading) {
+            setUser(query.data)
+        }        
+        return <div>loading...</div>
+    }
 
-    useEffect(() => {(async () => {
-        let user = null
-        if (create) {
-            user = {
-                username: "",
-                email: "",
-                lastName: "",
-                firstName: "",
-                roles: []
-            }
-        } else {
-            user = await engine.getUser(id)
-        }
-        setUser(v => ({...v, ...user}))
-        setOriginal(v => ({...v, ...user}))
-    })()}, [create, id])
+    const original = query.data
+
+    const changed = Object.entries(user).some(([key, val])=>{
+            return val !== original[key]})
 
     const submit = async (evt) => {
         if (user._id) {
             let payload = Object.fromEntries(Object.entries(user)
                 .filter(([key, val]) => (original[key]!==val)))
-            try {
-                await engine.patchUser(user._id, payload)
-                await engine.addInfoMessage("utente modificato")
-                setDone(true)
-            } catch(err) {
-                await engine.addErrorMessage(err.message)
-            }
+            payload._id = user._id
+            patchUser(payload)
         } else {
-            try {
-                await engine.putUser(user)
-                await engine.addInfoMessage("Nuovo utente inserito")
-                setDone(true)
-            } catch(err) {
-                await engine.addErrorMessage(err.message)
-            }
+            putUser(user)
         }
     }
 
     const remove = async () => {
-        try {
-            await engine.deleteUser(user)
-            await engine.addInfoMessage(`utente ${user.firstName} ${user.lastName} cancellato`)
-            navigateTo("/users")
-        } catch(err) {
-            await engine.addErrorMessage(err.message)
-        }
+        deleteUser(user)
     }
 
-    if (done) return <Navigate to="/users" />
-
-    if (user === null) return <div>loading...</div>
-
-    // console.log(`visit: ${JSON.stringify(visit)}`)
+    if (redirect !== null) return <Navigate to={redirect} />
 
     return <Card>
         <Card.Header>
@@ -102,6 +88,11 @@ export default function UserPage() {
                                 className="btn btn-primary" 
                                 disabled= { !changed }>
                                 {create?"aggiungi utente":"aggiorna utente"}
+                            </button>
+                            <button 
+                                onClick={ () => setRedirect('/users')}
+                                className="btn btn-secondary">
+                                { changed ? "annulla modifiche" : "torna all'elenco"}
                             </button>
                             {!create && <button
                                 onClick={ remove }

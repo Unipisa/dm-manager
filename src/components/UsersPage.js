@@ -6,28 +6,18 @@ import { EngineContext } from '../Engine'
 
 export default function UsersPage() {
     const engine = useContext(EngineContext)
-    const [objects, setObjects ] = useState(null)
+    const query = engine.useIndex('user')
     const navigate = useNavigate()
     const navigateTo = useCallback((user) => navigate(
         `/users/${user._id}`, {replace: true}), [navigate])
 
-    console.log(`Users Page ${objects}`)
+    console.log(`Users Page ${query}`)
 
-    useEffect(() => {
-        (async () => {
-            try {
-                let objs = await engine.getUsers()
-                console.log(`Set objs ${objs}`)
-                setObjects(objs)
-            } catch(err) {
-                engine.addErrorMessage(err.message)
-            }
-        })()
-    }, [setObjects])
+    if (query.isLoading) return <span>loading...</span>
+
+    const data = query.data.data
 
     return <>
-        {
-            (objects === null) ? <span>loading...</span>: 
             <div>
                 <Table bordered hover>
                     <thead>
@@ -41,7 +31,7 @@ export default function UsersPage() {
                     </thead>
                     <tbody>
                         { 
-                        objects.map(user =>
+                        data.map(user =>
                             <tr key={ user._id} onClick={()=>navigateTo(user)}>
                                 <td>{ user.lastName }</td>
                                 <td>{ user.firstName }</td>
@@ -53,8 +43,7 @@ export default function UsersPage() {
                     </tbody>
                 </Table>
             </div>
-        }
-        {engine.user().hasSomeRole('admin') && <Link className="btn btn-primary" to="/users/new">aggiungi utente</Link>}
+        {engine.user.hasSomeRole('admin') && <Link className="btn btn-primary" to="/users/new">aggiungi utente</Link>}
     </>
 }
 

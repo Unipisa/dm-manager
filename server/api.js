@@ -94,7 +94,7 @@ router.get('/public/visit/', async (req, res) => {
             startDate: {$lte: tomorrow},
             endDate: {$gte: today}
         })
-        res.send({visits: visits.map(visit => ({
+        const data = visits.map(visit => ({
             startDate: visit.startDate,
             endDate: visit.endDate,
             firstName: visit.firstName,
@@ -102,7 +102,11 @@ router.get('/public/visit/', async (req, res) => {
             affiliation: visit.affiliation,
             roomNumber: visit.roomNumber,
             building: visit.building,               
-        }))})
+        }))
+        res.send({
+            data,
+            visits: data // backward compatibility
+        })
     } catch(err) {
         res.status("500")
         res.send({ error: err.message })
@@ -120,8 +124,8 @@ router.put('/visit', requireSomeRole('visit-manager','admin'), async (req, res) 
 
     try {
         log(req, {}, payload)
-        await Visit.create(payload)
-        res.send({})
+        const visit = await Visit.create(payload)
+        res.send(visit)
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
@@ -159,7 +163,7 @@ router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(r
 
 router.get('/user', requireSomeRole('supervisor', 'admin'), async (req, res) => {
     let data = await User.find()
-    res.send({ data })
+    res.send({data})
 })
 
 router.put('/user', requireSomeRole('admin'), async (req, res) => {
@@ -172,8 +176,8 @@ router.put('/user', requireSomeRole('admin'), async (req, res) => {
 
     try {
         log(req, {}, payload)
-        await User.create(payload)
-        res.send({})
+        const user = await User.create(payload)
+        res.send(user)
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
@@ -233,7 +237,7 @@ router.put('/token', requireUser, async (req, res) => {
         })
         log(req, {}, payload)
         const token = await Token.create(payload)
-        res.send({ token })
+        res.send(token)
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
