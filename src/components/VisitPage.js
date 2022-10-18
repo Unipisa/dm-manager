@@ -1,76 +1,72 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Card, Table } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
+import { EngineContext } from '../Engine'
 import MyInput from './MyInput'
 import DateInput from './DateInput'
 import TextInput from './TextInput'
-import engine from '../engine'
 
 export default function VisitPage() {
+    const engine = useContext(EngineContext)
     const { id } = useParams()
     const create = (id === 'new')
-    const [ original, setOriginal ] = useState(null)
-    const [ visit, setVisit ] = useState(original)
-    const [ done, setDone ] = useState(false)
-    const changed = original===null 
-        ? null 
-        : Object.entries(visit).some(([key, val])=>{
+    const empty = {
+        lastName: "",
+        firstName: "",
+        affiliation: "",
+        email: "",
+        startDate: "",
+        endDate: "",
+        building: "",
+        roomNumber: "",
+        invitedBy: "",
+        notes: "",
+    }
+    const [ visit, setVisit ] = useState(null)
+    const [ redirect, setRedirect ] = useState(null)
+    const query = create ? {data: empty, isLoading: false} : engine.useGet('visit', id)
+    const putVisit = engine.usePut('visit', (visit) => {
+        engine.addInfoMessage(`nuova visita ${visit.lastName} inserita`)
+        setRedirect('/visits')
+    })
+    const patchVisit = engine.usePatch('visit', (response) => {
+        engine.addInfoMessage(`visita ${visit.lastName} modificata`)
+        setRedirect('/visits')
+    })
+    const deleteVisit = engine.useDelete('visit', (response, visit) => {
+        engine.addWarningMessage(`visita ${visit.lastName} eliminata`)
+        setRedirect('/visits')
+    })
+
+    if (visit === null) {
+        if (!query.isLoading) {
+            setVisit(query.data)
+        }
+        return <div>loading...</div>
+    }
+
+    const original = query.data
+
+    const changed = Object.entries(visit).some(([key, val])=>{
             return val !== original[key]})
 
-    useEffect(() => {(async () => {
-        let visit = null
-        if (create) {
-            visit = {
-                lastName: "",
-                firstName: "",
-                affiliation: "",
-                email: "",
-                startDate: "",
-                endDate: "",
-                building: "",
-                roomNumber: "",
-                invitedBy: "",
-                notes: "",
-            }
-        } else {
-            visit = await engine.getVisit(id)
-        }
-        setVisit(v => ({...v, ...visit}))
-        setOriginal(v => ({...v, ...visit}))
-    })()}, [create, id])
-    
     const submit = async (evt) => {
         if (visit._id) {
             let payload = Object.fromEntries(Object.entries(visit)
                 .filter(([key, val]) => (original[key]!==val)))
-            try {
-                await engine.patchVisit(visit._id, payload)
-                await engine.addInfoMessage("visita modificata")
-                setDone(true)
-            } catch(err) {
-                await engine.addErrorMessage(err.message)
-            }
+            payload._id = visit._id
+            patchVisit(payload)
         } else {
-            try {
-                await engine.putVisit(visit)
-                await engine.addInfoMessage("Nuova visita inserita")
-                setDone(true)
-            } catch(err) {
-                await engine.addErrorMessage(err.message)
-            }
+            putVisit(visit)
         }
     }
 
-    if (done) return <Navigate to="/visits" />
-
-    if (visit === null) return <div>loading...</div>
-
-    // console.log(`visit: ${JSON.stringify(visit)}`)
+    if (redirect !== null) return <Navigate to={redirect} />
 
     return <Card>
         <Card.Header>
-            <h3>{ create ? `nuovo visitatore` : `visita ${id}` }</h3>
+            <h3>{ create ? `nuovo visitatore` : `visita ${visit?.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
         <form onSubmit={ (event) => {
@@ -78,7 +74,7 @@ export default function VisitPage() {
             event.preventDefault()
             }}
         >
-            <Table>
+            <Table bordered>
                 <tbody>
                     <MyInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
                     <MyInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
@@ -93,11 +89,23 @@ export default function VisitPage() {
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td>
-                            <input 
-                                onClick={ submit } className="btn btn-primary" type="submit" 
-                                disabled= { !changed }
-                                value={create?"aggiungi visita":"aggiorna visita"} />
+                        <td colSpan="2">
+                            <button 
+                                onClick={ submit } 
+                                className="btn btn-primary"
+                                disabled= { !changed }>
+                                {create?"aggiungi visita":"aggiorna visita"}
+                            </button>
+                            <button 
+                                onClick={ () => setRedirect('/visits')}
+                                className="btn btn-secondary">
+                                { changed ? "annulla modifiche" : "torna all'elenco"}
+                            </button>
+                            {!create && <button
+                                onClick={ () => deleteVisit(visit) }
+                                className="btn btn-warning pull-right">
+                                    elimina visita
+                            </button>}
                         </td>
                     </tr>
                 </tfoot>

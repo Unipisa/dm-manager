@@ -81,8 +81,8 @@ router.get('/visit/:id', requireSomeRole('visit-manager','visit-supervisor','sup
 })
 
 router.get('/visit', requireSomeRole('visit-manager','visit-supervisor','supervisor','admin'), async (req, res) => {
-    let visits = await Visit.find()
-    res.send({visits})
+    let data = await Visit.find()
+    res.send({data})
 })
 
 router.get('/public/visit/', async (req, res) => {
@@ -94,7 +94,7 @@ router.get('/public/visit/', async (req, res) => {
             startDate: {$lte: tomorrow},
             endDate: {$gte: today}
         })
-        res.send({visits: visits.map(visit => ({
+        const data = visits.map(visit => ({
             startDate: visit.startDate,
             endDate: visit.endDate,
             firstName: visit.firstName,
@@ -102,7 +102,11 @@ router.get('/public/visit/', async (req, res) => {
             affiliation: visit.affiliation,
             roomNumber: visit.roomNumber,
             building: visit.building,               
-        }))})
+        }))
+        res.send({
+            data,
+            visits: data // backward compatibility
+        })
     } catch(err) {
         res.status("500")
         res.send({ error: err.message })
@@ -120,8 +124,8 @@ router.put('/visit', requireSomeRole('visit-manager','admin'), async (req, res) 
 
     try {
         log(req, {}, payload)
-        await Visit.create(payload)
-        res.send({})
+        const visit = await Visit.create(payload)
+        res.send(visit)
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
@@ -147,6 +151,19 @@ router.patch('/visit/:id', requireSomeRole('visit-manager','admin'), async (req,
     }
 })
 
+router.delete('/visit/:id', requireSomeRole('visit-manager','admin'), async (req, res) => {
+    try {
+        const visit = await Visit.findById(req.params.id)
+        log(req, visit, {})
+        // await User.deleteOne({_id: req.params.id})
+        visit.delete()
+        res.send({})
+    } catch(err) {
+        console.error(err)
+        res.status(400).send({ error: err.message })
+    }
+})
+
 router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(req, res) {
     try {
         let user = await User.findById(req.params.id)
@@ -158,8 +175,8 @@ router.get('/user/:id', requireSomeRole('supervisor', 'admin'), async function(r
 })
 
 router.get('/user', requireSomeRole('supervisor', 'admin'), async (req, res) => {
-    let users = await User.find()
-    res.send({ users })
+    let data = await User.find()
+    res.send({data})
 })
 
 router.put('/user', requireSomeRole('admin'), async (req, res) => {
@@ -172,8 +189,8 @@ router.put('/user', requireSomeRole('admin'), async (req, res) => {
 
     try {
         log(req, {}, payload)
-        await User.create(payload)
-        res.send({})
+        const user = await User.create(payload)
+        res.send(user)
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
@@ -215,6 +232,7 @@ router.delete('/user/:id', requireSomeRole('admin'), async (req, res) => {
 router.put('/token', requireUser, async (req, res) => {
     let payload = {
         roles: [], 
+        name: "no-name",
         ...req.body,
         createdBy: req.user._id,
         updatedBy: req.user._id
@@ -232,7 +250,7 @@ router.put('/token', requireUser, async (req, res) => {
         })
         log(req, {}, payload)
         const token = await Token.create(payload)
-        res.send({ token })
+        res.send(token)
     } catch(err) {
         console.error(err)
         res.status(400).send({ error: err.message })
@@ -241,8 +259,8 @@ router.put('/token', requireUser, async (req, res) => {
 
 router.get('/token', requireUser, async (req, res) => {
     let filter = hasSomeRole(req, 'admin') ? {} : { createdBy: req.user }
-    let tokens = await Token.find(filter).populate({path: 'createdBy', select: 'username'})
-    res.send({ tokens })
+    let data = await Token.find(filter).populate({path: 'createdBy', select: 'username'})
+    res.send({ data })
 })
 
 router.delete('/token/:id', requireUser, async (req, res) => {

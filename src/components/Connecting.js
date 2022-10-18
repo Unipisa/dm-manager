@@ -1,8 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-import engine from '../engine'
-
-async function connect(setMsg) {
+async function connect(engine, setMsg) {
     setMsg(null)
     try {
         await engine.connect()
@@ -13,15 +11,18 @@ async function connect(setMsg) {
     }
 }
 
-export default function Connecting() {
+export default function Connecting({engine}) {
+    const [ retry, setRetry ] = useState(true)
     const [ msg, setMsg ] = useState(null)
 
-    useEffect(() => {         
-        connect(setMsg) }, [setMsg])
+    if (engine && retry) {
+        setRetry(false)
+        connect(engine, setMsg)
+    }
 
     if (msg) return <p>
         Errore di connessione: { msg } 
-            <button onClick={ () => connect(setMsg) }>riprova</button>
+            <button onClick={ () => setRetry(true) }>riprova</button>
         </p>
 
     return <p>Connessione in corso...</p>

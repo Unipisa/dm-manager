@@ -1,69 +1,42 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import ListInput from './ListInput'
+import MyInput from './MyInput'
 
-import engine from '../engine'
-
-async function reload(setObjects) {
-    try {
-        const objs = await engine.getTokens()
-        setObjects(objs)
-    } catch(err) {
-        engine.addErrorMessage(err.message)
-    }
-
-} 
+import { useEngine } from '../Engine'
 
 export default function TokensPage() {
-    const [objects, setObjects ] = useState(null)
-    const [token, setToken ] = useState({roles: engine.user().roles})
+    const engine = useEngine()
+    const [token, setToken ] = useState({roles: engine.user.roles})
+    const query = engine.useIndex('token')
+    const deleteToken = engine.useDelete('token', (response, token) => engine.addInfoMessage(`token ${token.name} rimosso`))
+    const putToken = engine.usePut('token', (token) => engine.addInfoMessage(`token ${token.name} creato`))
 
-    console.log(`objects: ${JSON.stringify(objects)}`)
-    async function submit() {
-        try {
-            await engine.putToken(token)
-            engine.addInfoMessage(`token aggiunto`)
-            reload(setObjects)
-        } catch(err) {
-            engine.addErrorMessage(err.message)
-            return
-        }
-    }
+    if (query.isLoading) return <span>loading....</span>
 
-    useEffect(() => {
-        reload(setObjects)
-    }, [setObjects])
-
-    if (objects === null) return <span>loading....</span>
+    const data = query.data.data
 
     return <>
         <div>
             <Table bordered>
                 <thead>
                     <tr>
-                        <th>createdBy</th>
-                        <th>roles</th>
-                        <th>copy</th>
-                        <th>delete</th>
+                        <th>nome</th>
+                        <th>ruoli</th>
+                        <th>copia</th>
+                        <th>elimina</th>
                     </tr>
                 </thead>
                 <tbody>
                     { 
-                    objects.map(token =>
+                    data.map(token =>
                         <tr key={ token._id}>
-                            <td>{ token.createdBy?.username }</td>
+                            <td>{ token.name }</td>
                             <td>{ token.roles.join(" ") }</td>
                             <td><Button onClick={() => {
                                 navigator.clipboard.writeText(token.token)
                             }}>{token.token.slice(0,8)}...</Button></td>
-                            <td><Button className="btn-danger" onClick={async () => {
-                                try {
-                                    await engine.deleteToken(token)
-                                    reload(setObjects)
-                                } catch(err) {
-                                    engine.addErrorMessage(err.message)
-                                }
-                                }}>remove</Button></td>
+                            <td><Button className="btn-danger" onClick={() => deleteToken(token, `token cancellato`)}>remove</Button></td>
                         </tr>) 
                     }
                 </tbody>
@@ -71,14 +44,15 @@ export default function TokensPage() {
         </div>
         <Table bordered>
             <tbody>
+                <MyInput name="name" label="nome" store={token} setStore={ setToken }/>
                 <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
             </tbody>
             <tfoot>
                 <tr>
                     <td>
-                        <input 
-                            onClick={ submit } className="btn btn-primary" type="submit" 
-                            value="nuovo token" />
+                        <button onClick={ () => putToken(token) } className="btn btn-primary">
+                            crea token
+                        </button>
                     </td>
                 </tr>
             </tfoot>

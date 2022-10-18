@@ -1,29 +1,27 @@
 import moment from 'moment'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useContext } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import engine from '../engine'
+import { EngineContext } from '../Engine'
 
 function myDateFormat(date) {
     return date ? moment(date).format('D.MM.YYYY') : "---"
 }
 
 export default function VisitsPage() {
-    const [visits, setVisits ] = useState(null)
+    const engine = useContext(EngineContext)
+    const query = engine.useIndex('visit')
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
         `/visits/${visit._id}`, {replace: true}), [navigate])
 
-    useEffect(() => {
-        (async () => {
-        setVisits(await engine.getVisits())
-        })()
-    }, [setVisits])
+    if (query.isLoading) return <span>loading...</span>
+    if (query.isError) engine.addErrorMessage(query.error)
+
+    const data = query.isError? [] : query.data.data
 
     return <>
-        {
-            (visits === null) ? <span>loading...</span>: 
             <div>
                 <Table bordered hover>
                     <thead>
@@ -36,7 +34,7 @@ export default function VisitsPage() {
                     </thead>
                     <tbody>
                         { 
-                        visits.map(visit =>
+                        data.map(visit =>
                             <tr key={visit._id} onClick={()=>navigateTo(visit)}>
                                 <td>{ myDateFormat(visit.startDate) }</td>
                                 <td>{ myDateFormat(visit.endDate) }</td>
@@ -47,8 +45,7 @@ export default function VisitsPage() {
                     </tbody>
                 </Table>
             </div>
-        }
-        { engine.user().hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
+        { engine.user.hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
     </>
 }
 
