@@ -5,7 +5,7 @@ export default function Home() {
   const engine = useEngine()
   const user = engine.user
   return (<>
-      <p>{user.firstName} [{user.roles.join(', ')}], puoi:</p>
+      <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
         <ul>
           <li><Link to="/roomLabels">elaborare un cartellino con i nominativi per le stanze</Link></li>
           { user.hasSomeRole('visit-manager','admin') && 
