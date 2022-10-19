@@ -1,14 +1,14 @@
-import { useState, useContext } from 'react'
+import { useState } from 'react'
 import { Card, Table } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
-import { EngineContext } from '../Engine'
+import { useEngine } from '../Engine'
 import MyInput from './MyInput'
 import DateInput from './DateInput'
 import TextInput from './TextInput'
 
 export default function VisitPage() {
-    const engine = useContext(EngineContext)
+    const engine = useEngine()
     const { id } = useParams()
     const create = (id === 'new')
     const empty = {
