@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useState, useContext } from 'react'
 import { Card, Table } from 'react-bootstrap'
-import { useParams, Navigate, useNavigate } from 'react-router-dom'
+import { useParams, Navigate } from 'react-router-dom'
 
 import { EngineContext } from '../Engine'
 import MyInput from './MyInput'
@@ -56,10 +56,6 @@ export default function UserPage() {
         }
     }
 
-    const remove = async () => {
-        deleteUser(user)
-    }
-
     if (redirect !== null) return <Navigate to={redirect} />
 
     return <Card>
@@ -95,7 +91,7 @@ export default function UserPage() {
                                 { changed ? "annulla modifiche" : "torna all'elenco"}
                             </button>
                             {!create && <button
-                                onClick={ remove }
+                                onClick={ () => deleteUser(user) }
                                 className="btn btn-warning pull-right">
                                     elimina utente
                             </button>}

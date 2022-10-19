@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useCallback, useContext } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -17,9 +17,9 @@ export default function VisitsPage() {
         `/visits/${visit._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
-    if (query.)
+    if (query.isError) engine.addErrorMessage(query.error)
 
-    const data = query.data.data
+    const data = query.isError? [] : query.data.data
 
     return <>
             <div>
@@ -29,7 +29,8 @@ export default function VisitsPage() {
                             <th>dal</th>
                             <th>al</th>
                             <th>cognome</th>
-                            <th>nome</th>    
+                            <th>nome</th>
+                            <th>referente</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,12 +41,13 @@ export default function VisitsPage() {
                                 <td>{ myDateFormat(visit.endDate) }</td>
                                 <td>{ visit.lastName }</td>
                                 <td>{ visit.firstName }</td>
+                                <td>{ visit.invitedBy }</td>
                             </tr>) 
                         }
                     </tbody>
                 </Table>
             </div>
-        { engine.user().hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
+        { engine.user.hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
     </>
 }
 
