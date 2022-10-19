@@ -161,7 +161,7 @@ export function useCreateEngine() {
         },
 
         useIndex: (path) => {
-            console.assert(['visit','token','user'].includes(path), `invalid path ${path}`)
+            console.assert(['visit','token','user','roomLabel'].includes(path), `invalid path ${path}`)
             const query = useQuery([path], () => get(`/api/v0/${path}`))
             return query
         },

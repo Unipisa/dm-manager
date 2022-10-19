@@ -1,15 +1,14 @@
-import { useContext } from 'react'
 import Nav from 'react-bootstrap/Nav'
 import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import { NavLink } from 'react-router-dom'
 import { Container } from 'react-bootstrap'
 
-import { EngineContext } from '../Engine'
+import { useEngine } from '../Engine'
 import package_json from '../../package.json'
 
 export default function Header() {
-  const engine = useContext(EngineContext)
+  const engine = useEngine()
   const user = engine.user
   return (
       <Navbar bg="light" expand="lg" className="mb-4">
@@ -19,7 +18,7 @@ export default function Header() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>
-              <NavLink to="/card" className="nav-link">Cartellino Stanze</NavLink>
+              <NavLink to="/roomLabels" className="nav-link">Cartellino Stanze</NavLink>
               {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') && <NavLink to="/visits" className="nav-link">Visitatori</NavLink>}
               {user.hasSomeRole('supervisor','admin') && <NavLink to="/users" className="nav-link">Utenti</NavLink>}
               {user.hasSomeRole('supervisor','admin') && <NavLink to="/tokens" className="nav-link">Tokens</NavLink>}

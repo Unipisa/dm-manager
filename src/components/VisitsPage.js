@@ -1,16 +1,16 @@
 import moment from 'moment'
-import { useCallback, useContext } from 'react'
+import { useCallback } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { EngineContext } from '../Engine'
+import { useEngine } from '../Engine'
 
 function myDateFormat(date) {
     return date ? moment(date).format('D.MM.YYYY') : "---"
 }
 
 export default function VisitsPage() {
-    const engine = useContext(EngineContext)
+    const engine = useEngine()
     const query = engine.useIndex('visit')
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
