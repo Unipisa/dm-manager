@@ -43,6 +43,7 @@ class Controller {
     }
 
     async patch(req, res, id, payload) {    
+        console.log(`***PATCH ${id} ${JSON.stringify(payload)}`)
         try {
             const was = await this.Model.findById(id)
             log(req, was, payload)
@@ -84,6 +85,7 @@ class Controller {
         router.patch(`/${this.path}/:id`, 
             requireSomeRole(...this.managerRoles), 
             (req, res) => {
+                console.log("BUH")
                 const payload = {...req.body,
                     updatedBy: req.user._id
                 }
