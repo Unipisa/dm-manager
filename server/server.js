@@ -143,10 +143,11 @@ app.get('/hello', (req, res) => {
   res.send('Hello World!')
 })
 
-//The 404 Route (ALWAYS Keep this as the last route)
-app.all('*', function(req, res){
-  res.status(404).send({error: "not found"});
-});
+// all unhandled requests are sent to the react application
+app.all('*', function(req, res) {
+  res.sendFile(`${config.STATIC_FILES_PATH}/index.html`, { 
+    root: `${__dirname}/../` })
+})
 
 // gestisci errori
 app.use((err, req, res, next) => {
