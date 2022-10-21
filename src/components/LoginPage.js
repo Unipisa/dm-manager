@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Card from 'react-bootstrap/Card'
+import { Card, Button } from 'react-bootstrap'
 
 function LoginPage({ engine }) {
     const [ email, setEmail ] = useState("")
@@ -27,6 +27,16 @@ function LoginPage({ engine }) {
                         <h3>Sign In</h3>
                     </Card.Header>
                     <Card.Body>
+                        {
+                            engine.config.OAUTH2_ENABLED &&
+                            <Button 
+                                onClick={ () => engine.start_oauth2() }
+                                className="btn-primary btn-lg btn-block">
+                                Usa credenziali UNIPI
+                            </Button>
+                        }
+                        <hr />
+                    <div className="mb-4" />
                     <form onSubmit={ (event) => {
                         login(email,password)
                         event.preventDefault()
@@ -56,21 +66,13 @@ function LoginPage({ engine }) {
                             <label className="form-label" htmlFor="password">Password</label>
                         </div>
 
-                        <button 
+                        <Button 
                             onClick={() => login(email, password)} 
                             disabled={waiting} 
                             type="button" 
                             className="btn btn-primary btn-block mb-4">Login
-                        </button>
+                        </Button>
                         </form>
-                        <div className="mb-4" />
-                        {
-                            engine.config.OAUTH2_ENABLED &&
-                            <button onClick={ () => engine.start_oauth2() }
-                            className="btn btn-primary btn-block mb-4">
-                                UNIPI login
-                            </button>
-                        }
                     </Card.Body>
                 </Card>
             </div>
