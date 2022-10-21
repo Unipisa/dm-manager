@@ -3,9 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
-import MyInput from './MyInput'
-import DateInput from './DateInput'
-import TextInput from './TextInput'
+import { StringInput, DateInput, TextInput } from './Input'
 
 export default function VisitPage() {
     const engine = useEngine()
@@ -75,16 +73,16 @@ export default function VisitPage() {
             event.preventDefault()
             }}
         >
-            <MyInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
-            <MyInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
-            <MyInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
-            <MyInput name="email" label="email" store={ visit } setStore={ setVisit } />
-            <MyInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
-            <MyInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } />
+            <StringInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
+            <StringInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
+            <StringInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
+            <StringInput name="email" label="email" store={ visit } setStore={ setVisit } />
+            <StringInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
+            <StringInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } />
             <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
             <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
-            <MyInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
-            <MyInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
+            <StringInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
+            <StringInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
             <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
                 <ButtonGroup>
                     <Button 

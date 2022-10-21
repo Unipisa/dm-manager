@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
-import ListInput from './ListInput'
-import MyInput from './MyInput'
+import { ListInput, StringInput } from './Input'
 
 import { useEngine } from '../Engine'
 
@@ -44,7 +43,7 @@ export default function TokensPage() {
         </div>
         <Table bordered>
             <tbody>
-                <MyInput name="name" label="nome" store={token} setStore={ setToken }/>
+                <StringInput name="name" label="nome" store={token} setStore={ setToken }/>
                 <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
             </tbody>
             <tfoot>

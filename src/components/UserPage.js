@@ -3,8 +3,7 @@ import { Card, Table } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
-import MyInput from './MyInput'
-import ListInput from './ListInput'
+import { StringInput, ListInput} from './Input'
 
 export default function UserPage() {
     const engine = useEngine()
@@ -70,10 +69,10 @@ export default function UserPage() {
         >
             <Table bordered>
                 <tbody>
-                    <MyInput name="username" label="username" store={ user } setStore={ setUser } />
-                    <MyInput name="email" label="email" store={ user } setStore={ setUser } />
-                    <MyInput name="firstName" label="nome" store={ user} setStore={ setUser } />
-                    <MyInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
+                    <StringInput name="username" label="username" store={ user } setStore={ setUser } />
+                    <StringInput name="email" label="email" store={ user } setStore={ setUser } />
+                    <StringInput name="firstName" label="nome" store={ user} setStore={ setUser } />
+                    <StringInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
                     <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" "/>
                 </tbody>
                 <tfoot>
