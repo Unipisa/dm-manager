@@ -1,5 +1,5 @@
 import {useState,useRef} from 'react'
-import {Table, Button, Badge} from 'react-bootstrap'
+import {Table, Button, Badge, ButtonGroup} from 'react-bootstrap'
 import ReactToPrint from 'react-to-print'
 import {useEngine} from '../Engine'
 
@@ -79,69 +79,63 @@ function Display({names, number, onSave}) {
                 }} src="/img/cherubino_pant541.png" />
             </div>
         </div>
-    { printRef && <ReactToPrint 
-        trigger={() => <Button>stampa cartellino</Button>}
-        content={() => printRef.current}
-        />}
-        &nbsp;
-    { onSave && namesRef && 
-        <Button onClick={() => {
-            const names = [...namesRef.current.children].map(child => child.textContent)
-            const number = numberRef.current.textContent
-            onSave({names,number})
-        }}>salva cartellino</Button> }
+        <ButtonGroup>
+        { printRef && <ReactToPrint 
+            trigger={() => <Button>stampa cartellino</Button>}
+            content={() => printRef.current}
+            />}
+            &nbsp;
+        { onSave && namesRef && 
+            <Button onClick={() => {
+                const names = [...namesRef.current.children].map(child => child.textContent)
+                const number = numberRef.current.textContent
+                onSave({names,number})
+            }}>salva cartellino</Button> }
+        </ButtonGroup>
     </>
 }
 
 function RoomsTable({onClick, onDone, onDelete, data, label}) {
     const engine = useEngine()
-    const [showList, setShowList] = useState(false)
     // visibility of manager elements
     const visibility = engine.user.hasSomeRole('admin', 'room-manager') ? "visible" : "hidden"
 
-    if (data.length === 0) return <p>Non ci sono {label}</p>
+    if (data.length === 0) return <p>nessuno</p>
 
-    return <div>
-        <Button onClick={() => setShowList(v => !v)}>
-            {`${showList?"nascondi":"mostra"} ${label}`}
-        </Button>
-        { showList &&
-            <Table bordered hover>
-                <thead>
-                    <tr>
-                        <th>stanza</th>
-                        <th>nomi</th>
-                        <th>stato</th>
-                        <th style={{visibility}}>azioni</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    { 
-                    data.map(obj =>
-                        <tr key={obj._id} onClick={() => onClick(obj)}>
-                            <td>{obj.number}</td>
-                            <td>{obj.names.join(", ")}</td>
-                            <td>
-                                <Badge bg={{'submitted': 'danger', 'managed': 'success'}[obj.state]}>
-                                {{
-                                    'submitted': 'Da fare',
-                                    'managed': 'Fatto'
-                                }[obj.state]}
-                                </Badge>
-                            </td>
-                            <td style={{visibility}}>
-                                {
-                                obj.state === 'submitted' 
-                                && <Button className='btn-primary' onClick={() => onDone(obj)}>fatto</Button>
-                                }
-                                <Button className='btn-danger' onClick={() => onDelete(obj)}>elimina</Button>
-                            </td>
-                        </tr>) 
-                    }
-                </tbody>
-            </Table>
-        }
-    </div>
+    return <Table hover>
+        <thead>
+            <tr>
+                <th>stanza</th>
+                <th>nomi</th>
+                <th>stato</th>
+                <th style={{visibility}}>azioni</th>
+            </tr>
+        </thead>
+        <tbody>
+            { 
+            data.map(obj =>
+                <tr key={obj._id} onClick={() => onClick(obj)}>
+                    <td>{obj.number}</td>
+                    <td>{obj.names.join(", ")}</td>
+                    <td>
+                        <Badge bg={{'submitted': 'danger', 'managed': 'success'}[obj.state]}>
+                        {{
+                            'submitted': 'Da fare',
+                            'managed': 'Fatto'
+                        }[obj.state]}
+                        </Badge>
+                    </td>
+                    <td style={{visibility}}>
+                        {
+                        obj.state === 'submitted' 
+                        && <Button className='btn-primary' onClick={() => onDone(obj)}>fatto</Button>
+                        }
+                        <Button className='btn-danger' onClick={() => onDelete(obj)}>elimina</Button>
+                    </td>
+                </tr>) 
+            }
+        </tbody>
+    </Table>
 }
 
 function RoomLabels({onClick, onDone, onDelete}) {
@@ -157,6 +151,7 @@ function RoomLabels({onClick, onDone, onDelete}) {
     }
 
     return <>
+        <h3>cartellini richiesti</h3>
         <RoomsTable 
             onClick={onClick} 
             onDone={onDone}
@@ -164,6 +159,7 @@ function RoomLabels({onClick, onDone, onDelete}) {
             data={data.filter(obj => obj.state==='submitted')}
             label="cartellini richiesti"
         />
+        <h3>cartellini fatti</h3>
         <RoomsTable 
             onClick={onClick} 
             onDone={onDone}

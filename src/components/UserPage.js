@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import { Card, Table } from 'react-bootstrap'
+import { Card, ButtonGroup, Button, Form } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
-import MyInput from './MyInput'
-import ListInput from './ListInput'
+import { StringInput, ListInput} from './Input'
 
 export default function UserPage() {
     const engine = useEngine()
@@ -63,43 +62,35 @@ export default function UserPage() {
             <h3>{ create ? `nuovo utente` : `utente ${user.firstName} ${user.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
-        <form onSubmit={ (event) => {
+        <Form onSubmit={ (event) => {
             // login(email,password)
             event.preventDefault()
             }}
         >
-            <Table bordered>
-                <tbody>
-                    <MyInput name="username" label="username" store={ user } setStore={ setUser } />
-                    <MyInput name="email" label="email" store={ user } setStore={ setUser } />
-                    <MyInput name="firstName" label="nome" store={ user} setStore={ setUser } />
-                    <MyInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
-                    <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" "/>
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colSpan="2">
-                            <button 
-                                onClick={ submit } 
-                                className="btn btn-primary" 
-                                disabled= { !changed }>
-                                {create?"aggiungi utente":"aggiorna utente"}
-                            </button>
-                            <button 
-                                onClick={ () => setRedirect('/users')}
-                                className="btn btn-secondary">
-                                { changed ? "annulla modifiche" : "torna all'elenco"}
-                            </button>
-                            {!create && <button
-                                onClick={ () => deleteUser(user) }
-                                className="btn btn-warning pull-right">
-                                    elimina utente
-                            </button>}
-                        </td>
-                    </tr>
-                </tfoot>
-            </Table>
-            </form>
+            <StringInput name="username" label="username" store={ user } setStore={ setUser } />
+            <StringInput name="email" label="email" store={ user } setStore={ setUser } />
+            <StringInput name="firstName" label="nome" store={ user} setStore={ setUser } />
+            <StringInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
+            <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" "/>
+                <ButtonGroup>
+                    <Button 
+                        onClick={ submit } 
+                        className="btn btn-primary" 
+                        disabled= { !changed }>
+                        {create?"aggiungi utente":"aggiorna utente"}
+                    </Button>
+                    <Button 
+                        onClick={ () => setRedirect('/users')}
+                        className="btn btn-secondary">
+                        { changed ? "annulla modifiche" : "torna all'elenco"}
+                    </Button>
+                    {!create && <Button
+                        onClick={ () => deleteUser(user) }
+                        className="btn btn-warning pull-right">
+                            elimina utente
+                    </Button>}
+                </ButtonGroup>
+            </Form>
         </Card.Body>
     </Card>
 }
