@@ -17,7 +17,7 @@ export default function TokensPage() {
 
     return <>
         <div>
-            <Table bordered>
+            <Table>
                 <thead>
                     <tr>
                         <th>nome</th>
@@ -41,21 +41,11 @@ export default function TokensPage() {
                 </tbody>
             </Table>
         </div>
-        <Table bordered>
-            <tbody>
-                <StringInput name="name" label="nome" store={token} setStore={ setToken }/>
-                <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>
-                        <button onClick={ () => putToken(token) } className="btn btn-primary">
-                            crea token
-                        </button>
-                    </td>
-                </tr>
-            </tfoot>
-        </Table>
+        <StringInput name="name" label="nome" store={token} setStore={ setToken }/>
+        <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
+                <Button onClick={ () => putToken(token) } className="btn btn-primary">
+                    crea token
+                </Button>
     </>
 }
 

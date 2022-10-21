@@ -19,7 +19,7 @@ export default function UsersPage() {
 
     return <>
             <div>
-                <Table bordered hover>
+                <Table hover>
                     <thead>
                         <tr>
                             <th>cognome</th>

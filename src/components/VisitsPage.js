@@ -23,14 +23,14 @@ export default function VisitsPage() {
 
     return <>
             <div>
-                <Table bordered hover>
-                    <thead>
+                <Table hover>
+                    <thead className="thead-dark">
                         <tr>
-                            <th>dal</th>
-                            <th>al</th>
-                            <th>cognome</th>
-                            <th>nome</th>
-                            <th>referente</th>
+                            <th scope="col">dal</th>
+                            <th scope="col">al</th>
+                            <th scope="col">cognome</th>
+                            <th scope="col">nome</th>
+                            <th scope="col">referente</th>
                         </tr>
                     </thead>
                     <tbody>
