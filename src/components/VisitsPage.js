@@ -1,16 +1,16 @@
 import moment from 'moment'
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useCallback } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { EngineContext } from '../Engine'
+import { useEngine } from '../Engine'
 
 function myDateFormat(date) {
     return date ? moment(date).format('D.MM.YYYY') : "---"
 }
 
 export default function VisitsPage() {
-    const engine = useContext(EngineContext)
+    const engine = useEngine()
     const query = engine.useIndex('visit')
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
@@ -23,13 +23,14 @@ export default function VisitsPage() {
 
     return <>
             <div>
-                <Table bordered hover>
-                    <thead>
+                <Table hover>
+                    <thead className="thead-dark">
                         <tr>
-                            <th>dal</th>
-                            <th>al</th>
-                            <th>cognome</th>
-                            <th>nome</th>    
+                            <th scope="col">dal</th>
+                            <th scope="col">al</th>
+                            <th scope="col">cognome</th>
+                            <th scope="col">nome</th>
+                            <th scope="col">referente</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,6 +41,7 @@ export default function VisitsPage() {
                                 <td>{ myDateFormat(visit.endDate) }</td>
                                 <td>{ visit.lastName }</td>
                                 <td>{ visit.firstName }</td>
+                                <td>{ visit.invitedBy }</td>
                             </tr>) 
                         }
                     </tbody>

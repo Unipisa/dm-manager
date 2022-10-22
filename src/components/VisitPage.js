@@ -1,14 +1,12 @@
-import { useState, useEffect, useContext } from 'react'
-import { Card, Table } from 'react-bootstrap'
+import { useState } from 'react'
+import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
-import { EngineContext } from '../Engine'
-import MyInput from './MyInput'
-import DateInput from './DateInput'
-import TextInput from './TextInput'
+import { useEngine } from '../Engine'
+import { StringInput, DateInput, TextInput } from './Input'
 
 export default function VisitPage() {
-    const engine = useContext(EngineContext)
+    const engine = useEngine()
     const { id } = useParams()
     const create = (id === 'new')
     const empty = {
@@ -21,6 +19,7 @@ export default function VisitPage() {
         building: "",
         roomNumber: "",
         invitedBy: "",
+        SSD: "",
         notes: "",
     }
     const [ visit, setVisit ] = useState(null)
@@ -69,48 +68,41 @@ export default function VisitPage() {
             <h3>{ create ? `nuovo visitatore` : `visita ${visit?.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
-        <form onSubmit={ (event) => {
+        <Form onSubmit={ (event) => {
             // login(email,password)
             event.preventDefault()
             }}
         >
-            <Table bordered>
-                <tbody>
-                    <MyInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
-                    <MyInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
-                    <MyInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
-                    <MyInput name="email" label="email" store={ visit } setStore={ setVisit } />
-                    <MyInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
-                    <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
-                    <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
-                    <MyInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
-                    <MyInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
-                    <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colSpan="2">
-                            <button 
-                                onClick={ submit } 
-                                className="btn btn-primary"
-                                disabled= { !changed }>
-                                {create?"aggiungi visita":"aggiorna visita"}
-                            </button>
-                            <button 
-                                onClick={ () => setRedirect('/visits')}
-                                className="btn btn-secondary">
-                                { changed ? "annulla modifiche" : "torna all'elenco"}
-                            </button>
-                            {!create && <button
-                                onClick={ () => deleteVisit(visit) }
-                                className="btn btn-warning pull-right">
-                                    elimina visita
-                            </button>}
-                        </td>
-                    </tr>
-                </tfoot>
-            </Table>
-            </form>
+            <StringInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
+            <StringInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
+            <StringInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
+            <StringInput name="email" label="email" store={ visit } setStore={ setVisit } />
+            <StringInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
+            <StringInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } />
+            <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
+            <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
+            <StringInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
+            <StringInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
+            <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
+                <ButtonGroup>
+                    <Button 
+                        onClick={ submit } 
+                        className="btn-primary"
+                        disabled= { !changed }>
+                        {create?"aggiungi visita":"aggiorna visita"}
+                    </Button>
+                    <Button 
+                        onClick={ () => setRedirect('/visits')}
+                        className="btn btn-secondary">
+                        { changed ? "annulla modifiche" : "torna all'elenco"}
+                    </Button>
+                    {!create && <Button
+                        onClick={ () => deleteVisit(visit) }
+                        className="btn btn-danger pull-right">
+                            elimina visita
+                    </Button>}
+                </ButtonGroup>
+            </Form>
         </Card.Body>
     </Card>
 }

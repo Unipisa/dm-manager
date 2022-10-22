@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom'
+import { useEngine } from '../Engine'
 
-export default function Home({ user }) {
-    return (<>
-      <p>{user.firstName} [{user.roles.join(', ')}], puoi:</p>
+export default function Home() {
+  const engine = useEngine()
+  const user = engine.user
+  return (<>
+      <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
         <ul>
-          <li><Link to="/card">elaborare un cartellino con i nominativi per le stanze</Link></li>
+          <li><Link to="/roomLabels">elaborare un cartellino con i nominativi per le stanze</Link></li>
           { user.hasSomeRole('visit-manager','admin') && 
             <li><Link to="/visits">gestire i visitatori</Link></li>
           }

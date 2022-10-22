@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useContext } from 'react'
+import { useCallback } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { EngineContext } from '../Engine'
+import { useEngine } from '../Engine'
 
 export default function UsersPage() {
-    const engine = useContext(EngineContext)
+    const engine = useEngine()
     const query = engine.useIndex('user')
     const navigate = useNavigate()
     const navigateTo = useCallback((user) => navigate(
@@ -19,7 +19,7 @@ export default function UsersPage() {
 
     return <>
             <div>
-                <Table bordered hover>
+                <Table hover>
                     <thead>
                         <tr>
                             <th>cognome</th>

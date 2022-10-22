@@ -12,6 +12,7 @@ const visitSchema = new Schema({
     roomNumber: String,
     building: String,
     invitedBy: String,
+    SSD: String,
     notes: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
