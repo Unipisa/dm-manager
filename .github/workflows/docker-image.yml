@@ -31,7 +31,7 @@ jobs:
     - name: Login to docker Harbor
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.HARBOR_ROBOT_USERNAME
+        username: ${{ secrets.HARBOR_ROBOT_USERNAME }}
         password: ${{ secrets.HARBOR_ROBOT }}
         registry: harbor.cs.dm.unipi.it
     - name: Push to docker harbor
