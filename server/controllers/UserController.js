@@ -6,6 +6,7 @@ class UserController extends Controller {
         super()
         this.path = 'user'
         this.Model = User
+        this.populate_fields = []
     }
 }
 

@@ -6,11 +6,14 @@ class Controller {
         this.managerRoles = ['admin']
         this.supervisorRoles = ['admin', 'supervisor']
         this.Model = null
+        this.populate_fields = ['createdBy', 'updatedBy']
     }
 
     async get(req, res, id) {
         try {
-            let obj = await this.Model.findById(id)
+            let obj = await this.Model
+                .findById(id)
+                .populate(this.populate_fields)
             res.send(obj)
         } catch(error) {
             console.error(error)
