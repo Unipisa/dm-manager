@@ -33,7 +33,7 @@ export default function UserPage() {
     })
         
     if (user === null) {
-        if (!query.isLoading) {
+        if (query.isSuccess) {
             setUser(query.data)
         }        
         return <div>loading...</div>

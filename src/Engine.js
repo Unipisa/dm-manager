@@ -1,3 +1,4 @@
+import moment from 'moment'
 import { useState, createContext, useContext } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
@@ -77,11 +78,14 @@ export function useCreateEngine() {
             body: JSON.stringify(data)
         })
 
-    const get = async (url, data) => api_fetch(url + new URLSearchParams(data))
+    const get = async (url, data) => api_fetch(url + '?' + new URLSearchParams(data))
     
     // delete is a reserved word
     const del = async (url) => api_fetch(url, {method: 'DELETE'})
 
+    // questo oggetto è l'engine creato in App.js
+    // e reso disponibile in ogni componente
+    // grazie al context
     return {
         click: () => { 
             setState( s => { 
@@ -160,9 +164,12 @@ export function useCreateEngine() {
             setState(s => ({...s, user}))
         },
 
-        useIndex: (path) => {
+        useIndex: (path, filter={}) => {
             console.assert(['visit','token','user','roomLabel'].includes(path), `invalid path ${path}`)
-            const query = useQuery([path], () => get(`/api/v0/${path}`))
+            const query = useQuery([path, filter], () => get(`/api/v0/${path}`, filter), {
+                onError: (err) => { 
+                    addMessage(err.message, 'error') },
+                })
             return query
         },
 
@@ -218,3 +225,47 @@ export function useCreateEngine() {
         },
     }
 }
+
+export function useQueryFilter(initial) {
+    const [filter, setFilter] = useState(initial)
+    
+    function sortIcon(field) {
+        const sort = filter._sort
+        if (sort) {
+            if (sort === field || sort === `+${field}`) return '↓'
+            if (sort === `-${field}`) return '↑'
+        }
+        return ''
+    }
+
+    function onClick(field) {
+        const sort = filter._sort
+        if (sort === field || sort === `+${field}`) {
+            setFilter(filter => ({
+                ...filter,
+                _sort: `-${field}`
+            }))
+        } else {
+            setFilter(filter => ({
+                ...filter,
+                _sort: field
+            }))
+        }
+    }
+
+    return {
+        filter,
+        setFilter,
+        header: (field) => ({
+            sortIcon: sortIcon(field),
+            onClick: () => onClick(field),
+            }),
+        sortIcon,
+        onClick,
+    }
+}
+
+export function myDateFormat(date) {
+    return date ? moment(date).format('D.MM.YYYY') : "---"
+}
+
