@@ -81,10 +81,9 @@ function Display({names, number, onSave}) {
         </div>
         <ButtonGroup>
         { printRef && <ReactToPrint 
-            trigger={() => <Button>stampa cartellino</Button>}
+            trigger={() => <Button className="btn-warning">stampa cartellino</Button>}
             content={() => printRef.current}
             />}
-            &nbsp;
         { onSave && namesRef && 
             <Button onClick={() => {
                 const names = [...namesRef.current.children].map(child => child.textContent)
@@ -118,19 +117,21 @@ function RoomsTable({onClick, onDone, onDelete, data, label}) {
                     <td>{obj.number}</td>
                     <td>{obj.names.join(", ")}</td>
                     <td>
-                        <Badge bg={{'submitted': 'danger', 'managed': 'success'}[obj.state]}>
+                        <Badge bg={{'submitted': 'warning', 'managed': 'success'}[obj.state]}>
                         {{
-                            'submitted': 'Da fare',
-                            'managed': 'Fatto'
+                            'submitted': 'da fare',
+                            'managed': 'fatto'
                         }[obj.state]}
                         </Badge>
                     </td>
                     <td style={{visibility}}>
-                        {
-                        obj.state === 'submitted' 
-                        && <Button className='btn-primary' onClick={() => onDone(obj)}>fatto</Button>
-                        }
-                        <Button className='btn-danger' onClick={() => onDelete(obj)}>elimina</Button>
+                        <ButtonGroup>
+                            {
+                            obj.state === 'submitted' 
+                            && <Button className='btn-primary' onClick={() => onDone(obj)}>fatto</Button>
+                            }
+                            <Button className='btn-danger' onClick={() => onDelete(obj)}>elimina</Button>
+                        </ButtonGroup>
                     </td>
                 </tr>) 
             }
@@ -144,11 +145,7 @@ function RoomLabels({onClick, onDone, onDelete}) {
 
     let data = []
     if (query.isLoading) return <span>loading...</span>
-    if (query.isError) {
-        engine.addErrorMessage(query.error)
-    } else {
-        data = query.data.data
-    }
+    if (query.isSuccess) data = query.data.data
 
     return <>
         <h3>cartellini richiesti</h3>
