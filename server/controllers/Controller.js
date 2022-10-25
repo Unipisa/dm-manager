@@ -194,9 +194,10 @@ class Controller {
 
         // brief JSON description of path
         return {
-            path: `${method} ${path}`,
+            method: method.toUpperCase(),
+            path,
             roles,
-            Model: this.Model
+            approximative_object_keys: Object.keys(this.Model.schema.obj)
         }
     }
 

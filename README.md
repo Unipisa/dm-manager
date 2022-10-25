@@ -82,7 +82,7 @@ docker push register.cs.dm.unipi.it/dm/dm-manager
 
 Assume you have the server running:
 ```
-export SERVER_URL="https://manage.dm.unipi.it"
+export SERVER_URL="http://localhost:8000"
 export API=${SERVER_URL}/api/v0
 ```
 
@@ -90,7 +90,7 @@ Then you can check the API is responding with:
 ```
 curl ${API}
 ```
-
+(you can pipe the command throught `json_pp` to pretty print the resulting json)
 
 Create a Token from the web interface. Then try:
 ```
