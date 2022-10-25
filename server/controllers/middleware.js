@@ -1,3 +1,4 @@
+const Token = require('../models/Token')
 const Log = require('../models/Log')
 
 const log = (req, was, will) => {
@@ -31,13 +32,13 @@ const requireRoles = (req, res, next) => {
                 res.status(401)
                 res.send({error: "invalid token"})
             } else {
-                req.roles = token.roles
-                req.log_who = token.name ? token.name : token.token
+                req.roles = tok.roles || []
+                req.log_who = tok.name || tok.token
                 next()
             }
         })
     } else if (req.user) {
-        req.roles = req.user.roles
+        req.roles = req.user.roles || []
         req.log_who = req.user.username
         next()
     } else {
@@ -47,7 +48,7 @@ const requireRoles = (req, res, next) => {
 }
 
 const hasSomeRole = (req, ...roles) => {
-    return roles.some(role => req.roles.includes(role))
+    return roles.some(role => (req.roles && req.roles.includes(role)))
 }
 
 const requireSomeRole = (...roles) => ((req, res, next) => {
@@ -56,7 +57,7 @@ const requireSomeRole = (...roles) => ((req, res, next) => {
             next()
         } else {
             res.status(403)
-            res.send({error: `not authorized (some role in ${roles.join(", ")} required, your roles: ${req.roles.join(", ")})`})
+            res.send({error: `not authorized (some role in [${roles.join(", ")}] required, your roles: [${req.roles.join(", ")}])`})
         }
     }
 )})

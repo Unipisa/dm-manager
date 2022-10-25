@@ -5,13 +5,23 @@ const Schema = mongoose.Schema
 
 const tokenSchema = new Schema({
     name: String,
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    createdBy: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+    },
+    updatedBy: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+    },
     token: {
         type: String,
-        default: () => crypto.randomBytes(64).toString('hex')
+        default: () => crypto.randomBytes(64).toString('hex'),
+        required: true,
     },
-    roles: [String]
+    roles: {
+        type: [String],
+        required: true,
+    },
  }, {
     timestamps: true // adds fields: createdAt, updatedAt
  })
