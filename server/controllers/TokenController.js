@@ -14,6 +14,9 @@ class TokenController extends Controller {
         // 2. apart from the 'admin' role each user can only see and delete its own tokens
         // 3. apart from the 'admin' role each user can only create tokens with its own roles (or less)
 
+        let paths = []
+
+        paths.push(`put /${this.path}`)
         router.put(`/${this.path}`, 
             requireUser, 
             (req, res) => {
@@ -30,6 +33,7 @@ class TokenController extends Controller {
                 return this.put(req, res)
             })
 
+        paths.push(`get /${this.path}`)
         router.get(`/${this.path}`, requireUser, async (req, res) => {
             let filter = hasSomeRole(req, 'admin', 'supervisor') ? {} : { createdBy: req.user }
             let data = await this.Model.find(filter).populate({path: 'createdBy', select: 'username'})
@@ -45,6 +49,7 @@ class TokenController extends Controller {
             res.send({ data })
         })
 
+        paths.push(`delete /${this.path}/:id`)
         router.delete(`/${this.path}/:id`, 
             requireUser, 
             async (req, res) => {
@@ -56,6 +61,8 @@ class TokenController extends Controller {
                     res.send({ error: 'token not found'})
                 }
             })
+
+        return paths
     }
 }
 

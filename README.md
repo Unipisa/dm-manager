@@ -77,3 +77,35 @@ docker push paolini/dm-manager:$VERSION
 docker push register.cs.dm.unipi.it/dm/dm-manager:$VERSION
 docker push register.cs.dm.unipi.it/dm/dm-manager
 ```
+
+## API consumption
+
+Assume you have the server running:
+```
+export SERVER_URL="https://manage.dm.unipi.it"
+export API=${SERVER_URL}/api/v0
+```
+
+Then you can check the API is responding with:
+```
+curl ${API}
+```
+
+
+Create a Token from the web interface. Then try:
+```
+export TOKEN_SECRET="my-secret-token"
+
+```
+
+Assume the API server is available at `$REACT_APP_SERVER_URL`
+and that a token `$TOKEN_SECRET` has been inserted in the database.
+If you start a developmnet server as described above these condition 
+are met. 
+
+The following command will try to consume some API end points. 
+See the source file `api/test.js`. 
+
+```
+npm run test-api
+```

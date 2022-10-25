@@ -1,11 +1,14 @@
 var express = require('express')
 
+const config = require('./config')
 const RoomLabelController = require('./controllers/RoomLabelController')
 const VisitController = require('./controllers/VisitController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
 
 var router = express.Router()
+
+let paths = []
 
 ;[
     RoomLabelController, 
@@ -14,7 +17,18 @@ var router = express.Router()
     TokenController,
 ].forEach(Controller => {
     const controller = new Controller()
-    controller.register(router)
+    paths = [...paths, ...controller.register(router)]
+})
+
+router.get('/', (req, res) => {
+    const user = req.user || null
+    res.send({
+        service: 'dm-manager',
+        paths, // documentation
+        APP_VERSION: config.VERSION,
+        OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
+        user
+    })
 })
 
 module.exports = router

@@ -8,6 +8,7 @@ const LocalStrategy = require('passport-local')
 const fs = require('fs')
 
 const User = require('./models/User')
+const Token = require('./models/Token')
 const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
@@ -194,6 +195,30 @@ async function create_admin_user() {
   }
 }
 
+async function create_secret_token() {
+  const secret = config.TOKEN_SECRET
+  if (!secret) {
+    console.log(`No secret token created. Use web interface to create your first token or set SECRET_TOKEN`)
+    return
+  }
+  const name = 'automatic-secret-token'
+
+  let token = await Token.findOne({name})
+  if (token) {
+    token.token = secret 
+    token.roles = ['admin']
+    token.save()
+    console.log(`updated existing Token: "${name}" with provided TOKEN_SECRET`)
+  } else {
+    token = await Token.create({
+      name,
+      token: secret,
+      roles: ['admin'],
+    })
+    console.log(`create new Token: "${name}" with provided TOKEN_SECRET`)
+  }
+}
+
 async function main() {
   console.log("options (configure using environment variables or .env file):")
   for(let [key, val] of Object.entries(config)) {
@@ -210,6 +235,7 @@ async function main() {
   console.log('MongoDB is connected')
 
   create_admin_user()
+  create_secret_token()
 
   app.listen(parseInt(config.PORT), () => {
     console.log(`server started: ${config.SERVER_URL}`)

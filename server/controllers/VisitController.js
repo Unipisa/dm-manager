@@ -39,10 +39,12 @@ class VisitController extends Controller {
     }
 
     register(router) {
-        super.register(router)
+        let paths = super.register(router)
 
+        paths.push(`get /public/${this.path}`)
         router.get(`/public/${this.path}/`, 
-            (req, res) => this.public(req,res))       
+            (req, res) => this.public(req,res))
+        return paths
     }
 }
 

@@ -21,13 +21,18 @@ class Options {
             ADMIN_PASSWORD: null,
             SERVER_URL: null,
             EXCHANGE_CODE_FOR_TOKEN_SERVER_URL: null,
+            TOKEN_SECRET: null,
+            REACT_APP_SERVER_URL: null,
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
         })
         this.VERSION = require('../package.json').version
         if (this.SERVER_URL === null) this.SERVER_URL = `http://localhost:${this.PORT}`
-        if (this.REACT_APP_SERVER_URL === undefined) process.env.REACT_APP_SERVER_URL = this.SERVER_URL
+        if (this.REACT_APP_SERVER_URL === null) {
+            this.REACT_APP_SERVER_URL = this.SERVER_URL
+            process.env.REACT_APP_SERVER_URL = this.SERVER_URL
+        }
     }
 }
 

@@ -67,37 +67,49 @@ class Controller {
         }
     }
 
+    register_path(router, method, path, roles, callback) {
+        router[method](path, requireSomeRole(...roles), callback)
+
+        // brief JSON description of path
+        return {
+            path: `${method} ${path}`,
+            roles,
+            Model: this.Model
+        }
+    }
+
     register(router) {
-        router.get(`/${this.path}/:id`, 
-            requireSomeRole(...this.managerRoles), 
-            (req, res) => {
-                this.get(req, res, req.params.id)
-            })
-        
-        router.get(`/${this.path}`, 
-            requireSomeRole(...this.supervisorRoles), 
-            (req, res) => this.index(req, res))            
-            
-        router.put(`/${this.path}`, 
-            requireSomeRole(...this.managerRoles), 
-            (req, res) => this.put(req, res))
+        return [
+            this.register_path(router, 'get', `/${this.path}/:id`, 
+                this.managerRoles, 
+                (req, res) => this.get(req, res, req.params.id)),
 
-        router.patch(`/${this.path}/:id`, 
-            requireSomeRole(...this.managerRoles), 
-            (req, res) => {
-                console.log("BUH")
-                const payload = {...req.body,
-                    updatedBy: req.user._id
-                }
-                delete payload.createdBy
-                delete payload.createdAt
-                delete payload.updatedAt
-                this.patch(req, res, req.params.id, payload)
-            })
+            this.register_path(router, 'get', `/${this.path}`, 
+                this.supervisorRoles, 
+                (req, res) => this.index(req, res)),
 
-        router.delete(`/${this.path}/:id`, 
-            requireSomeRole(...this.managerRoles), 
-            (req, res) => this.delete(req, res, req.params.id))            
+            this.register_path(router, 'put', `/${this.path}`, 
+                this.managerRoles, 
+                (req, res) => this.put(req, res)),
+
+            this.register_path(router, 'patch', `/${this.path}/:id`, 
+                this.managerRoles, 
+                (req, res) => {
+                    console.log("BUH")
+                    const payload = {...req.body,
+                        updatedBy: req.user._id
+                    }
+                    delete payload.createdBy
+                    delete payload.createdAt
+                    delete payload.updatedAt
+                    this.patch(req, res, req.params.id, payload)
+                }),
+
+            this.register_path(router, 'delete', `/${this.path}/:id`, 
+                this.managerRoles, 
+                (req, res) => this.delete(req, res, req.params.id)),
+
+        ]
     }
 }
 
