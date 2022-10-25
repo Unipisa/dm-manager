@@ -33,7 +33,7 @@ export default function UserPage() {
     })
         
     if (user === null) {
-        if (!query.isLoading) {
+        if (query.isSuccess) {
             setUser(query.data)
         }        
         return <div>loading...</div>
@@ -41,13 +41,13 @@ export default function UserPage() {
 
     const original = query.data
 
-    const changed = Object.entries(user).some(([key, val])=>{
-            return val !== original[key]})
+    const changed = Object.keys(empty).some(key => user[key]!==original[key])
 
     const submit = async (evt) => {
         if (user._id) {
-            let payload = Object.fromEntries(Object.entries(user)
-                .filter(([key, val]) => (original[key]!==val)))
+            let payload = Object.fromEntries(Object.keys(empty))
+                .filter(key => user[key]!==original[key])
+                .map(key => ([key, user[key]]))
             payload._id = user._id
             patchUser(payload)
         } else {

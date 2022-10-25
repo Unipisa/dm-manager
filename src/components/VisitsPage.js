@@ -1,36 +1,33 @@
-import moment from 'moment'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { useEngine } from '../Engine'
-
-function myDateFormat(date) {
-    return date ? moment(date).format('D.MM.YYYY') : "---"
-}
+import { useEngine, myDateFormat } from '../Engine'
+import { useQueryFilter } from '../Engine'
+import { Th } from './Table'
 
 export default function VisitsPage() {
+    const filter = useQueryFilter({'_sort': 'startDate', '_limit': 100})
     const engine = useEngine()
-    const query = engine.useIndex('visit')
+    const query = engine.useIndex('visit', filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
         `/visits/${visit._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
-    if (query.isError) engine.addErrorMessage(query.error)
 
-    const data = query.isError? [] : query.data.data
+    const data = query.isSuccess ? query.data.data : []
 
     return <>
             <div>
                 <Table hover>
                     <thead className="thead-dark">
                         <tr>
-                            <th scope="col">dal</th>
-                            <th scope="col">al</th>
-                            <th scope="col">cognome</th>
-                            <th scope="col">nome</th>
-                            <th scope="col">referente</th>
+                            <Th filter={filter.header('startDate')}>dal</Th>
+                            <Th filter={filter.header('endDate')}>al</Th>
+                            <Th filter={filter.header('lastName')}>cognome</Th>
+                            <Th filter={filter.header('firstName')}>nome</Th>
+                            <Th filter={filter.header('invitedBy')}>referente</Th>
                         </tr>
                     </thead>
                     <tbody>

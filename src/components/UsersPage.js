@@ -2,11 +2,13 @@ import { useCallback } from 'react'
 import { Table } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { useEngine } from '../Engine'
+import { useEngine, useQueryFilter } from '../Engine'
+import { Th } from './Table'
 
 export default function UsersPage() {
+    const filter = useQueryFilter({ _sort: 'createdAt'})
     const engine = useEngine()
-    const query = engine.useIndex('user')
+    const query = engine.useIndex('user', filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((user) => navigate(
         `/users/${user._id}`, {replace: true}), [navigate])
@@ -22,10 +24,10 @@ export default function UsersPage() {
                 <Table hover>
                     <thead>
                         <tr>
-                            <th>cognome</th>
-                            <th>nome</th>    
-                            <th>username</th>
-                            <th>email</th>
+                            <Th filter={filter.header('lastName')}>cognome</Th>
+                            <Th filter={filter.header('firstName')}>nome</Th>    
+                            <Th filter={filter.header('username')}>username</Th>
+                            <Th filter={filter.header('email')}>email</Th>
                             <th>ruoli</th>
                         </tr>
                     </thead>

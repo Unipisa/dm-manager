@@ -8,6 +8,32 @@ class VisitController extends Controller {
         this.managerRoles.push('visit-manager')
         this.supervisorRoles.push('visit-manager', 'visit-supervisor')
         this.Model = Visit
+        this.fields = {
+            'startDate': {
+                can_sort: true,
+            },
+            'endDate': {
+                can_sort: true,
+            },
+            'lastName': {
+                can_sort: true,
+                can_filter: true,
+            },
+            'firstName': {
+                can_sort: true,
+                can_filter: true,
+            },
+            'invitedBy': {
+                can_sort: true,
+                can_filter: true,
+            },
+            'updatedAt': {
+                can_sort: true,
+            },
+            'createdAt': {
+                can_sort: true,
+            },
+        }
     }
 
     async public(req, res) {
