@@ -109,3 +109,16 @@ See the source file `api/test.js`.
 ```
 npm run test-api
 ```
+
+The api request path has the following form:
+* `GET /api/v0/<model>?_sort=[-]<sort_key>&_limit=<n_items>&filter_key=filter_val&...` to obtain a list of objects of the specified `model` filtered with given `filter_key`s sorted by `sort_key` (descending if a `-` is prepended). The result json object is something like:
+```
+{
+    data: [<objects>...]
+}
+```
+* `GET /api/v0/<model>/<object_id>` to get a single item
+* `PUT /api/v0/<model>` to create e new item
+* `PATCH /api/v0/<model>/<object_id>` to update
+an existing item
+* `DELETE /api/v0/<model>/<object_id>` to delete an existing item
