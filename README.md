@@ -46,6 +46,7 @@ Alternative configuration:
 ```
 SERVER_URL="http://localhost:3000"
 REACT_APP_SERVER_URL="http://localhost:8000"
+BASE_URL="http://localhost:3000"
 ```
 
 ## deployment
