@@ -6,7 +6,7 @@ export function StringInput({ name, label, store, setStore, value }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
     const id = `myinput-${name}`
-    return <FormGroup className="row">
+    return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
         <div className="col-sm-10">
@@ -30,7 +30,7 @@ export function DateInput({ name, label, store, setStore, value }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
     const id = `dateinput-${name}`
-    return <FormGroup className="row">
+    return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
         <div className="col-sm-10">
@@ -55,7 +55,7 @@ export function ListInput({ name, label, store, setStore, value, separator }) {
     if (label === undefined) label = name
     if (separator === undefined) separator = ','
     const id = `myinput-${name}`
-    return <FormGroup className="row">
+    return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>{ label }</FormLabel>
             <div className="col-sm-10">
                 <input 
@@ -83,7 +83,7 @@ export function TextInput({ name, label, store, setStore, value }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
     const id = `textinput-${name}`
-    return <FormGroup className="row">
+    return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
         <div className="col-sm-10">
