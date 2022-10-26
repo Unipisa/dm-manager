@@ -85,7 +85,7 @@ export default function VisitPage() {
             <StringInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
             <StringInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
             <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
-                <ButtonGroup>
+                <ButtonGroup className="mt-3">
                     <Button 
                         onClick={ submit } 
                         className="btn-primary"

@@ -16,7 +16,7 @@ class TokenController extends Controller {
 
         let paths = []
 
-        paths.push(`put /${this.path}`)
+        paths.push({method: 'PUT', path: `/${this.path}`})
         router.put(`/${this.path}`, 
             requireUser, 
             (req, res) => {
@@ -33,7 +33,7 @@ class TokenController extends Controller {
                 return this.put(req, res)
             })
 
-        paths.push(`get /${this.path}`)
+        paths.push({ method: 'GET', path: `/${this.path}`})
         router.get(`/${this.path}`, requireUser, async (req, res) => {
             let filter = hasSomeRole(req, 'admin', 'supervisor') ? {} : { createdBy: req.user }
             let data = await this.Model.find(filter).populate({path: 'createdBy', select: 'username'})
@@ -49,7 +49,7 @@ class TokenController extends Controller {
             res.send({ data })
         })
 
-        paths.push(`delete /${this.path}/:id`)
+        paths.push({ method: 'DELETE', path: `/${this.path}/:id`})
         router.delete(`/${this.path}/:id`, 
             requireUser, 
             async (req, res) => {

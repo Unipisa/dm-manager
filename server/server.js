@@ -96,7 +96,7 @@ app.get('/login/oauth2/callback',
   function(req, res) {
     const user = req.user.toObject()
     console.log(`login ${JSON.stringify(user)}`)
-    res.redirect(config.SERVER_URL || `http://localhost:3000`)
+    res.redirect(config.BASE_URL || `http://localhost:3000`)
   }
 )
 
@@ -234,8 +234,8 @@ async function main() {
   }
   console.log('MongoDB is connected')
 
-  create_admin_user()
-  create_secret_token()
+  await create_admin_user()
+  await create_secret_token()
 
   app.listen(parseInt(config.PORT), () => {
     console.log(`server started: ${config.SERVER_URL}`)

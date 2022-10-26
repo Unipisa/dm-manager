@@ -194,16 +194,17 @@ class Controller {
 
         // brief JSON description of path
         return {
-            path: `${method} ${path}`,
+            method: method.toUpperCase(),
+            path,
             roles,
-            Model: this.Model
+            approximative_object_keys: Object.keys(this.Model.schema.obj)
         }
     }
 
     register(router) {
         return [
             this.register_path(router, 'get', `/${this.path}/:id`, 
-                this.managerRoles, 
+                this.supervisorRoles, 
                 (req, res) => this.get(req, res, req.params.id)),
 
             this.register_path(router, 'get', `/${this.path}`, 

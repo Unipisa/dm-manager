@@ -21,8 +21,8 @@ function LoginPage({ engine }) {
         
     return (
         <>
-            <div className="d-flex justify-content-center h-100">
-                <Card>
+            <div className="d-flex justify-content-center h-100 mt-5">
+                <Card className="col-9 col-md-6 col-lg-3">
                     <Card.Header>
                         <h3>Sign In</h3>
                     </Card.Header>
@@ -31,8 +31,8 @@ function LoginPage({ engine }) {
                             engine.config.OAUTH2_ENABLED &&
                             <Button 
                                 onClick={ () => engine.start_oauth2() }
-                                className="btn-primary btn-lg btn-block">
-                                Usa credenziali UNIPI
+                                className="btn-primary btn-lg btn-block w-100">
+                                Credenziali UniPI
                             </Button>
                         }
                         <hr />
@@ -42,16 +42,17 @@ function LoginPage({ engine }) {
                         event.preventDefault()
                         }}
                     >
+                        <h4>Credenziali locali</h4>
                         <div className={`alert alert-danger${error?"":" collapse"}`} role="alert">
                           { error }
                         </div>
                         <div>
-                            <input value={ email } onChange={ evt => setEmail(evt.target.value) } id="email" className="form-control" />
-                            <label className="form-label" htmlFor="email">Email address</label>
+                            <input placeholder="Email address" value={ email } onChange={ evt => setEmail(evt.target.value) } id="email" className="form-control mb-2" ></input>
                         </div>
 
                         <div className="form-outline mb-4">
                             <input 
+                                placeholder="Password"
                                 value={ password } 
                                 onChange={ evt => setPassword(evt.target.value) } 
                                 type="password" 
@@ -63,14 +64,13 @@ function LoginPage({ engine }) {
                                     }
                                 }}
                                 />
-                            <label className="form-label" htmlFor="password">Password</label>
                         </div>
 
                         <Button 
                             onClick={() => login(email, password)} 
                             disabled={waiting} 
                             type="button" 
-                            className="btn btn-primary btn-block mb-4">Login
+                            className="btn btn-primary btn-block mb-2">Login
                         </Button>
                         </form>
                     </Card.Body>
