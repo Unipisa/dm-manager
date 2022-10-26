@@ -60,10 +60,8 @@ STATIC_FILES_PATH=build node server/server.js
 Build docker image:
 ```
 VERSION=$( node -e "console.log(require('./package.json').version)" )
-docker build . -t paolini/dm-manager:$VERSION
-docker tag paolini/dm-manager:$VERSION paolini/dm-manager:latest
-docker tag paolini/dm-manager:$VERSION register.cs.dm.unipi.it/dm/dm-manager:$VERSION
-docker tag paolini/dm-manager:$VERSION register.cs.dm.unipi.it/dm/dm-manager/:latest
+docker build . --file Dockerfile --tag harbor.cs.dm.unipi.it/dm-manager/dm-manager
+docker tag harbor.cs.dm.unipi.it/dm-manager/dm-manager harbor.cs.dm.unipi.it/dm-manager/dm-manager:${VERSION}
 ```
  
 To run the image:
@@ -73,10 +71,8 @@ docker-compose -f docker-compose-production.yml up
 
 To push the image:
 ```
-docker push paolini/dm-manager
-docker push paolini/dm-manager:$VERSION
-docker push register.cs.dm.unipi.it/dm/dm-manager:$VERSION
-docker push register.cs.dm.unipi.it/dm/dm-manager
+docker push harbor.cs.dm.unipi.it/dm-manager/dm-manager:${VERSION}
+docker push harbor.cs.dm.unipi.it/dm-manager/dm-manager
 ```
 
 ## API consumption
