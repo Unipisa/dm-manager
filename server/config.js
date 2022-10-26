@@ -23,6 +23,7 @@ class Options {
             EXCHANGE_CODE_FOR_TOKEN_SERVER_URL: null,
             TOKEN_SECRET: null,
             REACT_APP_SERVER_URL: null,
+            BASE_URL: "http://localhost:3000"
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
