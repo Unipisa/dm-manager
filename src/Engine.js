@@ -176,9 +176,13 @@ export function useCreateEngine() {
             return query
         },
 
-        useGet: (path,id) => {
+        useGet: (path, id) => {
             console.assert(['visit', 'user'].includes(path), `invalid path ${path}`)
-            const query = useQuery([path, id], () => get(`/api/v0/${path}/${id}`))
+            const query = useQuery(
+                [path, id], 
+                () => get(`/api/v0/${path}/${id}`), {
+                    enabled: id !== 'new'
+                })
             return query
         },
 
