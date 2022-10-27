@@ -9,6 +9,7 @@ export default function UserPage() {
     const engine = useEngine()
     const { id } = useParams()
     const create = (id === 'new')
+    const [ edit, setEdit ] = useState(false)
     const empty = { 
         username: "",
         email: "",
@@ -67,29 +68,36 @@ export default function UserPage() {
             event.preventDefault()
             }}
         >
-            <StringInput name="username" label="username" store={ user } setStore={ setUser } />
-            <StringInput name="email" label="email" store={ user } setStore={ setUser } />
-            <StringInput name="firstName" label="nome" store={ user} setStore={ setUser } />
-            <StringInput name="lastName" label="cognome" store={ user } setStore={ setUser } />
-            <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" "/>
-                <ButtonGroup>
-                    <Button 
-                        onClick={ submit } 
-                        className="btn btn-primary" 
-                        disabled= { !changed }>
-                        {create?"aggiungi utente":"aggiorna utente"}
+            <StringInput name="username" label="username" store={ user } setStore={ setUser } edit={ edit }/>
+            <StringInput name="email" label="email" store={ user } setStore={ setUser } edit={ edit }/>
+            <StringInput name="firstName" label="nome" store={ user} setStore={ setUser } edit={ edit }/>
+            <StringInput name="lastName" label="cognome" store={ user } setStore={ setUser } edit={ edit }/>
+            <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" " edit={ edit }/>
+                { edit 
+                ?   <ButtonGroup>
+                        <Button 
+                            onClick={ submit } 
+                            className="btn btn-primary" 
+                            disabled= { !changed }>
+                            {create?"aggiungi utente":"aggiorna utente"}
+                        </Button>
+                        <Button 
+                            onClick={ () => setRedirect('/users')}
+                            className="btn btn-secondary">
+                            { changed ? "annulla modifiche" : "torna all'elenco"}
+                        </Button>
+                        {!create && <Button
+                            onClick={ () => deleteUser(user) }
+                            className="btn btn-warning pull-right">
+                                elimina utente
+                        </Button>}
+                    </ButtonGroup>
+                :   <Button 
+                        onClick={ () => setEdit(true) }
+                        className="btn-primary">
+                        modifica
                     </Button>
-                    <Button 
-                        onClick={ () => setRedirect('/users')}
-                        className="btn btn-secondary">
-                        { changed ? "annulla modifiche" : "torna all'elenco"}
-                    </Button>
-                    {!create && <Button
-                        onClick={ () => deleteUser(user) }
-                        className="btn btn-warning pull-right">
-                            elimina utente
-                    </Button>}
-                </ButtonGroup>
+                }
             </Form>
         </Card.Body>
     </Card>

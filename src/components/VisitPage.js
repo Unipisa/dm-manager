@@ -9,6 +9,7 @@ export default function VisitPage() {
     const engine = useEngine()
     const { id } = useParams()
     const create = (id === 'new')
+    const [ edit, setEdit ] = useState(false)
     const empty = {
         lastName: "",
         firstName: "",
@@ -39,7 +40,7 @@ export default function VisitPage() {
     })
 
     if (visit === null) {
-        if (!query.isLoading) {
+        if (query.isSuccess) {
             setVisit(query.data)
         }
         return <div>loading...</div>
@@ -68,28 +69,26 @@ export default function VisitPage() {
             <h3>{ create ? `nuovo visitatore` : `visita ${visit?.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
-        <Form onSubmit={ (event) => {
-            // login(email,password)
-            event.preventDefault()
-            }}
+        <Form onSubmit={ (event) => event.preventDefault() }
         >
-            <StringInput name="firstName" label="nome" store={ visit } setStore={ setVisit } /> 
-            <StringInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } />
-            <StringInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } />
-            <StringInput name="email" label="email" store={ visit } setStore={ setVisit } />
-            <StringInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } />
-            <StringInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } />
-            <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } />
-            <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } />
-            <StringInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
-            <StringInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
-            <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
+            <StringInput name="firstName" label="nome" store={ visit } setStore={ setVisit } edit={ edit }/> 
+            <StringInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="email" label="email" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } edit={ edit }/>
+            <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="building" label="edificio" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } edit={ edit }/>
+            { edit ?
                 <ButtonGroup className="mt-3">
                     <Button 
                         onClick={ submit } 
                         className="btn-primary"
                         disabled= { !changed }>
-                        {create?"aggiungi visita":"aggiorna visita"}
+                        {create?"aggiungi visita":"salva modifiche"}
                     </Button>
                     <Button 
                         onClick={ () => setRedirect('/visits')}
@@ -102,6 +101,12 @@ export default function VisitPage() {
                             elimina visita
                     </Button>}
                 </ButtonGroup>
+            :   <Button 
+                    onClick={ () => setEdit(true) }
+                    className="btn-primary">
+                    modifica
+                </Button>
+            }
             </Form>
         <br />
         <p style={{align: "right"}}>
