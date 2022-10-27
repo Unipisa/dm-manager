@@ -3,7 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 import moment from 'moment'
 
-import { useEngine } from '../Engine'
+import { useEngine, myDateFormat } from '../Engine'
 import { StringInput, DateInput, TextInput } from './Input'
 
 export default function VisitPage() {
@@ -107,10 +107,10 @@ export default function VisitPage() {
         <br />
         <p style={{align: "right"}}>
             Creato da <b>{visit.createdBy?.username}</b> 
-            {' '}il <b>{moment(visit.createdAt).format('d.M.y h:m')}</b>
+            {' '}il <b>{myDateFormat(visit.createdAt)}</b>
         <br />
             Modificato da <b>{visit.updatedBy?.username}</b> 
-            {' '}il <b>{moment(visit.updatedAt).format('d.M.y h:m')}</b>
+            {' '}il <b>{myDateFormat(visit.updatedAt)}</b>
         </p>
         </Card.Body>
     </Card>

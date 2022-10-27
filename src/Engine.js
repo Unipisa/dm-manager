@@ -273,6 +273,6 @@ export function useQueryFilter(initial) {
 }
 
 export function myDateFormat(date) {
-    return date ? moment(date).format('D.MM.YYYY') : "---"
+    return date ? moment(date).format('D.M.YYYY') : "---"
 }
 
