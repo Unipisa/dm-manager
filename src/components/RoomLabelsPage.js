@@ -89,7 +89,7 @@ function Display({names, number, onSave}) {
                 const names = [...namesRef.current.children].map(child => child.textContent)
                 const number = numberRef.current.textContent
                 onSave({names,number})
-            }}>salva cartellino</Button> }
+            }}>aggiungi ai cartellini da fare</Button> }
         </ButtonGroup>
     </>
 }
@@ -174,12 +174,13 @@ export default function RoomLabelPage() {
     const putRoomLabel = engine.usePut('roomLabel')
     const patchRoomLabel = engine.usePatch('roomLabel')
     const onDelete = engine.useDelete('roomLabel')
+    const isSupervisor = engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor')
 
-    const onSave = ({names, number}) => {
+    const onSave = isSupervisor ? ({names, number}) => {
         setNames(names)
         setNumber(number)
         putRoomLabel({names, number})
-    }
+    } : null
 
     const onDone = (roomLabel) => {
         patchRoomLabel({_id: roomLabel._id, state: 'managed'})
