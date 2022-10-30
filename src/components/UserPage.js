@@ -6,10 +6,9 @@ import { useEngine } from '../Engine'
 import { StringInput, ListInput} from './Input'
 
 export default function UserPage() {
-    const engine = useEngine()
-    const { id } = useParams()
-    const create = (id === 'new')
-    const [ edit, setEdit ] = useState(false)
+    const objCode = 'user'
+    const objName = 'utente'
+    const indexUrl = '/users'
     const empty = { 
         username: "",
         email: "",
@@ -17,42 +16,47 @@ export default function UserPage() {
         firstName: "",
         roles: []
     }
-    const [ user, setUser ] = useState(create ? empty : null)
+
+    const engine = useEngine()
+    const { id } = useParams()
+    const create = (id === 'new')
+    const [ edit, setEdit ] = useState(create)
+    const [ obj, setObj ] = useState(create ? empty : null)
     const [ redirect, setRedirect ] = useState(null)
-    const query = engine.useGet('user', id)
-    const putUser = engine.usePut('user', (user) => {
-        engine.addInfoMessage(`utente ${user.username} creato`)
-        setRedirect('/users')
+    const query = engine.useGet(objCode, id)
+    const putObj = engine.usePut(objCode, (obj) => {
+        engine.addInfoMessage(`${objName} ${obj.username} creato`)
+        setRedirect(indexUrl)
     })
-    const patchUser = engine.usePatch('user', (response) => {
-        engine.addInfoMessage(`utente ${user.username} modificato`)
-        setRedirect('/users')
+    const patchObj = engine.usePatch(objCode, (response) => {
+        engine.addInfoMessage(`${objName} ${obj.username} modificato`)
+        setRedirect(indexUrl)
     })
-    const deleteUser = engine.useDelete('user', (response, user) => {
-        engine.addWarningMessage(`utente ${user.username} eliminato`)
-        setRedirect('/users')
+    const deleteObj = engine.useDelete(objCode, (response, user) => {
+        engine.addWarningMessage(`${objName} ${user.username} eliminato`)
+        setRedirect(indexUrl)
     })
         
-    if (user === null) {
+    if (obj === null) {
         if (query.isSuccess) {
-            setUser(query.data)
+            setObj(query.data)
         }        
-        return <div>loading...</div>
+        return <div>caricamento...</div>
     }
 
     const original = create ? empty : query.data
 
-    const changed = Object.keys(empty).some(key => user[key]!==original[key])
+    const changed = Object.keys(empty).some(key => obj[key]!==original[key])
 
     const submit = async (evt) => {
-        if (user._id) {
+        if (obj._id) {
             let payload = Object.fromEntries(Object.keys(empty))
-                .filter(key => user[key]!==original[key])
-                .map(key => ([key, user[key]]))
-            payload._id = user._id
-            patchUser(payload)
+                .filter(key => obj[key]!==original[key])
+                .map(key => ([key, obj[key]]))
+            payload._id = obj._id
+            patchObj(payload)
         } else {
-            putUser(user)
+            putObj(obj)
         }
     }
 
@@ -60,7 +64,7 @@ export default function UserPage() {
 
     return <Card>
         <Card.Header>
-            <h3>{ create ? `nuovo utente` : `utente ${user.firstName} ${user.lastName}` }</h3>
+            <h3>{ create ? `nuovo ${objName}` : `${objName} ${obj.firstName} ${obj.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
         <Form onSubmit={ (event) => {
@@ -68,35 +72,42 @@ export default function UserPage() {
             event.preventDefault()
             }}
         >
-            <StringInput name="username" label="username" store={ user } setStore={ setUser } edit={ edit }/>
-            <StringInput name="email" label="email" store={ user } setStore={ setUser } edit={ edit }/>
-            <StringInput name="firstName" label="nome" store={ user} setStore={ setUser } edit={ edit }/>
-            <StringInput name="lastName" label="cognome" store={ user } setStore={ setUser } edit={ edit }/>
-            <ListInput name="roles" label="ruoli" store={ user } setStore={ setUser } separator=" " edit={ edit }/>
+            <StringInput name="username" label="username" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput name="email" label="email" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput name="firstName" label="nome" store={ obj} setStore={ setObj } edit={ edit }/>
+            <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
+            <ListInput name="roles" label="ruoli" store={ obj } setStore={ setObj } separator=" " edit={ edit }/>
                 { edit 
                 ?   <ButtonGroup>
                         <Button 
                             onClick={ submit } 
                             className="btn btn-primary" 
                             disabled= { !changed }>
-                            {create?"aggiungi utente":"aggiorna utente"}
+                            {create?`aggiungi ${objName}`: `aggiorna ${objName}`}
                         </Button>
                         <Button 
-                            onClick={ () => setRedirect('/users')}
+                            onClick={ () => setRedirect(indexUrl)}
                             className="btn btn-secondary">
                             { changed ? "annulla modifiche" : "torna all'elenco"}
                         </Button>
                         {!create && <Button
-                            onClick={ () => deleteUser(user) }
+                            onClick={ () => deleteObj(obj) }
                             className="btn btn-warning pull-right">
-                                elimina utente
+                                {`elimina ${objName}`}
                         </Button>}
                     </ButtonGroup>
-                :   <Button 
-                        onClick={ () => setEdit(true) }
-                        className="btn-primary">
-                        modifica
-                    </Button>
+                :   <ButtonGroup>
+                        <Button 
+                            onClick={ () => setEdit(true) }
+                            className="btn-warning">
+                                modifica
+                        </Button>
+                        <Button 
+                            onClick={ () => setRedirect(indexUrl)}
+                            className="btn btn-secondary">
+                                torna all'elenco
+                        </Button>
+                    </ButtonGroup>
                 }
             </Form>
         </Card.Body>

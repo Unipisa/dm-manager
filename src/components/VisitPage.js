@@ -6,10 +6,12 @@ import { useEngine, myDateFormat } from '../Engine'
 import { StringInput, DateInput, TextInput } from './Input'
 
 export default function VisitPage() {
+    const indexUrl = '/visits'
+
     const engine = useEngine()
     const { id } = useParams()
     const create = (id === 'new')
-    const [ edit, setEdit ] = useState(false)
+    const [ edit, setEdit ] = useState(create)
     const empty = {
         lastName: "",
         firstName: "",
@@ -23,20 +25,20 @@ export default function VisitPage() {
         SSD: "",
         notes: "",
     }
-    const [ visit, setVisit ] = useState(null)
+    const [ visit, setVisit ] = useState(create ? empty : null)
     const [ redirect, setRedirect ] = useState(null)
     const query = create ? {data: empty, isLoading: false} : engine.useGet('visit', id)
     const putVisit = engine.usePut('visit', (visit) => {
         engine.addInfoMessage(`nuova visita ${visit.lastName} inserita`)
-        setRedirect('/visits')
+        setRedirect(indexUrl)
     })
     const patchVisit = engine.usePatch('visit', (response) => {
         engine.addInfoMessage(`visita ${visit.lastName} modificata`)
-        setRedirect('/visits')
+        setRedirect(indexUrl)
     })
     const deleteVisit = engine.useDelete('visit', (response, visit) => {
         engine.addWarningMessage(`visita ${visit.lastName} eliminata`)
-        setRedirect('/visits')
+        setRedirect(indexUrl)
     })
 
     if (visit === null) {
@@ -91,7 +93,7 @@ export default function VisitPage() {
                         {create?"aggiungi visita":"salva modifiche"}
                     </Button>
                     <Button 
-                        onClick={ () => setRedirect('/visits')}
+                        onClick={ () => setRedirect(indexUrl)}
                         className="btn btn-secondary">
                         { changed ? "annulla modifiche" : "torna all'elenco"}
                     </Button>
@@ -101,11 +103,18 @@ export default function VisitPage() {
                             elimina visita
                     </Button>}
                 </ButtonGroup>
-            :   <Button 
+            : <ButtonGroup>
+                <Button 
                     onClick={ () => setEdit(true) }
-                    className="btn-primary">
+                    className="btn-warning">
                     modifica
                 </Button>
+                <Button 
+                    onClick={ () => setRedirect(indexUrl)}
+                    className="btn btn-secondary">
+                        torna all'elenco
+                </Button>
+            </ButtonGroup>
             }
             </Form>
         <br />

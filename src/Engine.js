@@ -260,6 +260,13 @@ export function useQueryFilter(initial) {
         }
     }
 
+    function extendLimit() {
+        setFilter(filter => ({
+            ...filter,
+            _limit: 2* filter._limit
+        }))
+    }
+
     return {
         filter,
         setFilter,
@@ -269,6 +276,7 @@ export function useQueryFilter(initial) {
             }),
         sortIcon,
         onClick,
+        extendLimit,
     }
 }
 

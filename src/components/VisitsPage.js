@@ -1,5 +1,5 @@
-import { useCallback } from 'react'
-import { Table } from 'react-bootstrap'
+import { useCallback, useState } from 'react'
+import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
@@ -7,7 +7,7 @@ import { useQueryFilter } from '../Engine'
 import { Th } from './Table'
 
 export default function VisitsPage() {
-    const filter = useQueryFilter({'_sort': 'startDate', '_limit': 100})
+    const filter = useQueryFilter({'_sort': 'startDate', '_limit': 10})
     const engine = useEngine()
     const query = engine.useIndex('visit', filter.filter)
     const navigate = useNavigate()
@@ -20,6 +20,7 @@ export default function VisitsPage() {
 
     return <>
             <div>
+                { engine.user.hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
                 <Table hover>
                     <thead className="thead-dark">
                         <tr>
@@ -43,8 +44,11 @@ export default function VisitsPage() {
                         }
                     </tbody>
                 </Table>
+                <p>Visualizzate {data.length}/{query.data.total} visite.</p>
+                { query.data.limit < query.data.total
+                  && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
+                }
             </div>
-        { engine.user.hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
     </>
 }
 
