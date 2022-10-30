@@ -5,6 +5,7 @@ const RoomLabelController = require('./controllers/RoomLabelController')
 const VisitController = require('./controllers/VisitController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
+const PersonController = require('./controllers/PersonController')
 
 var router = express.Router()
 
@@ -15,6 +16,7 @@ let paths = []
     VisitController, 
     UserController,
     TokenController,
+    PersonController,
 ].forEach(Controller => {
     const controller = new Controller()
     paths = [...paths, ...controller.register(router)]

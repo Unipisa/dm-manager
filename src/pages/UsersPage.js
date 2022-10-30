@@ -3,7 +3,7 @@ import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useEngine, useQueryFilter } from '../Engine'
-import { Th } from './Table'
+import { Th } from '../components/Table'
 
 export default function UsersPage() {
     const filter = useQueryFilter({ _sort: 'createdAt', _limit: 10 })

@@ -1,10 +1,10 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
 import { useQueryFilter } from '../Engine'
-import { Th } from './Table'
+import { Th } from '../components/Table'
 
 export default function VisitsPage() {
     const filter = useQueryFilter({'_sort': 'startDate', '_limit': 10})

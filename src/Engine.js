@@ -87,14 +87,6 @@ export function useCreateEngine() {
     // e reso disponibile in ogni componente
     // grazie al context
     return {
-        click: () => { 
-            setState( s => { 
-                console.log(`click ${s.counter} -> ${s.counter+1}`)
-                return {
-                    ...s, counter: s.counter+1
-                }})
-        },
-
         addMessage,
 
         addErrorMessage: (message) => addMessage(message, 'error'),
@@ -168,7 +160,6 @@ export function useCreateEngine() {
         },
 
         useIndex: (path, filter={}) => {
-            console.assert(['visit','token','user','roomLabel'].includes(path), `invalid path ${path}`)
             const query = useQuery([path, filter], () => get(`/api/v0/${path}`, filter), {
                 onError: (err) => { 
                     addMessage(err.message, 'error') },
@@ -177,7 +168,6 @@ export function useCreateEngine() {
         },
 
         useGet: (path, id) => {
-            console.assert(['visit', 'user'].includes(path), `invalid path ${path}`)
             const query = useQuery(
                 [path, id], 
                 () => get(`/api/v0/${path}/${id}`), {

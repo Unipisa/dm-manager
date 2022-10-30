@@ -5,15 +5,17 @@ import Connecting from './components/Connecting'
 import Messages from './components/Messages'
 import NotFound from './components/NotFound'
 import Header from './components/Header'
-import LoginPage from './components/LoginPage'
 
-import Home from './components/Home'
-import VisitsPage from './components/VisitsPage'
-import VisitPage from './components/VisitPage'
-import UsersPage from './components/UsersPage'
-import UserPage from './components/UserPage'
-import TokensPage from './components/TokensPage'
-import RoomLabelsPage from './components/RoomLabelsPage'
+import Home from './pages/Home'
+import LoginPage from './pages/LoginPage'
+import VisitsPage from './pages/VisitsPage'
+import VisitPage from './pages/VisitPage'
+import PersonsPage from './pages/PersonsPage'
+import PersonPage from './pages/PersonPage'
+import UsersPage from './pages/UsersPage'
+import UserPage from './pages/UserPage'
+import TokensPage from './pages/TokensPage'
+import RoomLabelsPage from './pages/RoomLabelsPage'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
 
@@ -42,6 +44,8 @@ function Internal() {
           <Route path="/roomLabels" element={<RoomLabelsPage />} />
           <Route path="/visits/:id" element={<VisitPage />} />
           <Route path="/visits" element={<VisitsPage />} />
+          <Route path="/persons/:id" element={<PersonPage />} />
+          <Route path="/persons" element={<PersonsPage />} />
           <Route path="/users/:id" element={<UserPage />} />
           <Route path="/users" element={<UsersPage />} />
           <Route path="/tokens" element={<TokensPage />} />

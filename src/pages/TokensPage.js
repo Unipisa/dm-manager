@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
-import { ListInput, StringInput } from './Input'
+import { ListInput, StringInput } from '../components/Input'
 
 import { useEngine } from '../Engine'
 

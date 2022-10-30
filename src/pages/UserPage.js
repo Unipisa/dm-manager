@@ -3,7 +3,7 @@ import { Card, ButtonGroup, Button, Form } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
-import { StringInput, ListInput} from './Input'
+import { StringInput, ListInput} from '../components/Input'
 
 export default function UserPage() {
     const objCode = 'user'
