@@ -11,7 +11,7 @@ export function useEngine() {
 }
 
 export function useCreateEngine() {
-    const [state,setState] = useState({
+    const [state, setState] = useState({
         counter: 0,
         messages: [],
         base_url: process.env.REACT_APP_SERVER_URL || "",
@@ -19,7 +19,7 @@ export function useCreateEngine() {
         user: null,
     })
 
-    const queryClient=useQueryClient()
+    const queryClient = useQueryClient()
 
     function new_user(json) {
         let user = {
@@ -113,7 +113,14 @@ export function useCreateEngine() {
         connect: async () => {
             try {
                 const config = await get('/config')
-                setState(s => ({...s, config}))
+                let { user } = await post('/login');
+
+                if (user != null) {
+                    user = new_user(user);
+                }
+
+                setState(s => ({...s, config, user}))
+
                 console.log(`config read: ${JSON.stringify(config)}`)
                 return config
             } catch(err) {
@@ -131,12 +138,8 @@ export function useCreateEngine() {
              * if username and password are provided use credentials
              * otherwise check for existing session
              */
-            const [url, payload] = username 
-                ? ['/login/password', {username, password}]
-                : ['/login', {}]
-            console.log(`login POST: ${url}`)
-            let { user } = await post(url, payload)
-            console.log(`user: ${JSON.stringify(user)}`)
+            let { user } = await post('/login/password', {username, password})
+            // console.log(`user: ${JSON.stringify(user)}`)
             if (user !== null) {
                 user = new_user(user)
             }
@@ -173,9 +176,13 @@ export function useCreateEngine() {
             return query
         },
 
-        useGet: (path,id) => {
+        useGet: (path, id) => {
             console.assert(['visit', 'user'].includes(path), `invalid path ${path}`)
-            const query = useQuery([path, id], () => get(`/api/v0/${path}/${id}`))
+            const query = useQuery(
+                [path, id], 
+                () => get(`/api/v0/${path}/${id}`), {
+                    enabled: id !== 'new'
+                })
             return query
         },
 
@@ -266,6 +273,6 @@ export function useQueryFilter(initial) {
 }
 
 export function myDateFormat(date) {
-    return date ? moment(date).format('D.MM.YYYY') : "---"
+    return date ? moment(date).format('D.M.YYYY') : "---"
 }
 

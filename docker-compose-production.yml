@@ -2,7 +2,7 @@ version: "2.1"
 
 services:
   dm-manager:
-    image: paolini/dm-manager:latest
+    image: harbor.cs.dm.unipi.it/dm-manager/dm-manager
     restart: unless-stopped
     volumes:
       - ./logs:/logs
@@ -25,6 +25,8 @@ services:
       REACT_APP_SERVER_URL: ""
     ports:
       - 8000:8000
+    networks:
+      - backend
 
   mongodb:
     image: mongo
@@ -33,6 +35,11 @@ services:
       - PGID=1000
     volumes:
       - ./database:/data/db
-    ports:
-      - 27017:27017
+#    ports:
+#      - 27017:27017
+    networks:
+      - backend
     restart: unless-stopped
+
+networks:
+  backend:

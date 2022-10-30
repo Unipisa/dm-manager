@@ -46,6 +46,7 @@ Alternative configuration:
 ```
 SERVER_URL="http://localhost:3000"
 REACT_APP_SERVER_URL="http://localhost:8000"
+BASE_URL="http://localhost:3000"
 ```
 
 ## deployment
@@ -59,10 +60,8 @@ STATIC_FILES_PATH=build node server/server.js
 Build docker image:
 ```
 VERSION=$( node -e "console.log(require('./package.json').version)" )
-docker build . -t paolini/dm-manager:$VERSION
-docker tag paolini/dm-manager:$VERSION paolini/dm-manager:latest
-docker tag paolini/dm-manager:$VERSION register.cs.dm.unipi.it/dm/dm-manager:$VERSION
-docker tag paolini/dm-manager:$VERSION register.cs.dm.unipi.it/dm/dm-manager/:latest
+docker build . --file Dockerfile --tag harbor.cs.dm.unipi.it/dm-manager/dm-manager
+docker tag harbor.cs.dm.unipi.it/dm-manager/dm-manager harbor.cs.dm.unipi.it/dm-manager/dm-manager:${VERSION}
 ```
  
 To run the image:
@@ -72,10 +71,8 @@ docker-compose -f docker-compose-production.yml up
 
 To push the image:
 ```
-docker push paolini/dm-manager
-docker push paolini/dm-manager:$VERSION
-docker push register.cs.dm.unipi.it/dm/dm-manager:$VERSION
-docker push register.cs.dm.unipi.it/dm/dm-manager
+docker push harbor.cs.dm.unipi.it/dm-manager/dm-manager:${VERSION}
+docker push harbor.cs.dm.unipi.it/dm-manager/dm-manager
 ```
 
 ## API consumption
@@ -109,3 +106,16 @@ See the source file `api/test.js`.
 ```
 npm run test-api
 ```
+
+The api request path has the following form:
+* `GET /api/v0/<model>?_sort=[-]<sort_key>&_limit=<n_items>&filter_key=filter_val&...` to obtain a list of objects of the specified `model` filtered with given `filter_key`s sorted by `sort_key` (descending if a `-` is prepended). The result json object is something like:
+```
+{
+    data: [<objects>...]
+}
+```
+* `GET /api/v0/<model>/<object_id>` to get a single item
+* `PUT /api/v0/<model>` to create e new item
+* `PATCH /api/v0/<model>/<object_id>` to update
+an existing item
+* `DELETE /api/v0/<model>/<object_id>` to delete an existing item

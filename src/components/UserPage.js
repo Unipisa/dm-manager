@@ -16,9 +16,9 @@ export default function UserPage() {
         firstName: "",
         roles: []
     }
-    const [ user, setUser ] = useState(null)
+    const [ user, setUser ] = useState(create ? empty : null)
     const [ redirect, setRedirect ] = useState(null)
-    const query = create ? {data: empty, isLoading: false} : engine.useGet('user', id)
+    const query = engine.useGet('user', id)
     const putUser = engine.usePut('user', (user) => {
         engine.addInfoMessage(`utente ${user.username} creato`)
         setRedirect('/users')
@@ -39,7 +39,7 @@ export default function UserPage() {
         return <div>loading...</div>
     }
 
-    const original = query.data
+    const original = create ? empty : query.data
 
     const changed = Object.keys(empty).some(key => user[key]!==original[key])
 

@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
-import moment from 'moment'
 
-import { useEngine } from '../Engine'
+import { useEngine, myDateFormat } from '../Engine'
 import { StringInput, DateInput, TextInput } from './Input'
 
 export default function VisitPage() {
@@ -85,7 +84,7 @@ export default function VisitPage() {
             <StringInput name="building" label="edificio" store={ visit } setStore={ setVisit } />
             <StringInput name="roomNumber" label="stanza" store={ visit } setStore={ setVisit } />
             <TextInput name="notes" label="note" store={ visit } setStore={ setVisit } />
-                <ButtonGroup>
+                <ButtonGroup className="mt-3">
                     <Button 
                         onClick={ submit } 
                         className="btn-primary"
@@ -107,10 +106,10 @@ export default function VisitPage() {
         <br />
         <p style={{align: "right"}}>
             Creato da <b>{visit.createdBy?.username}</b> 
-            {' '}il <b>{moment(visit.createdAt).format('d.M.y h:m')}</b>
+            {' '}il <b>{myDateFormat(visit.createdAt)}</b>
         <br />
             Modificato da <b>{visit.updatedBy?.username}</b> 
-            {' '}il <b>{moment(visit.updatedAt).format('d.M.y h:m')}</b>
+            {' '}il <b>{myDateFormat(visit.updatedAt)}</b>
         </p>
         </Card.Body>
     </Card>
