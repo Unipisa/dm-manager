@@ -16,6 +16,9 @@ class Controller {
         // roles which have read access
         this.supervisorRoles = ['admin', 'supervisor']
 
+        // roles which can make a simple search on this model
+        this.searchRoles = ['admin', 'supervisor']
+
         // the mongoose Model of the managed objects
         this.Model = null
 
@@ -47,7 +50,16 @@ class Controller {
         }
     }
 
+    async search(req, res) {
+        const $search = req.query.q || ''
+        const $text = { $search }
+        const data = await this.Model.find({$text}).limit(10)
+        return res.send({ data })
+    }
+
     async index (req, res) {
+        console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
+
         let $match = {}
         let filter = {}
         let sort = "_id"
@@ -112,8 +124,7 @@ class Controller {
 
         if (direction < 0) sort = `-${sort}`
 
-        const result = await this.Model.aggregate(
-            [
+        const result = await this.Model.aggregate([
                 {$match},
                 {$sort},
                 {$facet:{
@@ -125,7 +136,7 @@ class Controller {
                     total: "$counting.count",
                     data: "$limiting"
                 }}
-            ]);
+            ])
 
         if (result.length === 0) {
             total = 0;
@@ -203,6 +214,10 @@ class Controller {
 
     register(router) {
         return [
+            this.register_path(router, 'get', `/${this.path}/search/`,
+                this.searchRoles,
+                (req, res) => this.search(req, res)),
+
             this.register_path(router, 'get', `/${this.path}/:id`, 
                 this.supervisorRoles, 
                 (req, res) => this.get(req, res, req.params.id)),
