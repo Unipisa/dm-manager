@@ -7,7 +7,7 @@ import { useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
 export default function VisitsPage() {
-    const filter = useQueryFilter({'_sort': 'startDate', '_limit': 10})
+    const filter = useQueryFilter({'_sort': '-startDate', '_limit': 10})
     const engine = useEngine()
     const query = engine.useIndex('visit', filter.filter)
     const navigate = useNavigate()
