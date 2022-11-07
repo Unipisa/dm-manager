@@ -59,7 +59,7 @@ app.use(session({
   saveUninitialized: false
 }))
 
-app.use(passport.authenticate('session'))
+app.use(passport.session())
 
 app.use('/api/v0', api)
 

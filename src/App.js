@@ -26,11 +26,12 @@ const queryClient = new QueryClient()
 function Internal() {
   const engine = useCreateEngine()
   
-  if (!engine.connected) {
+  if (! engine.connected) {
     return <Connecting engine={engine}/>
   }
   
-  if (!engine.loggedIn) {
+  if (! engine.loggedIn) {
+    console.log("user is not logged in");
     return <LoginPage engine={engine}/>
   }
 
