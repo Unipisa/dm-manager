@@ -2,10 +2,13 @@ import { FormGroup, FormLabel } from 'react-bootstrap'
 import ReactDatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 
-export function StringInput({ name, label, store, setStore, value }) {
+import { myDateFormat } from '../Engine'
+
+export function StringInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
     const id = `myinput-${name}`
+    if (!edit) return <p><b>{label}:</b> {value}</p>
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
@@ -26,10 +29,11 @@ export function StringInput({ name, label, store, setStore, value }) {
     </FormGroup>
 }
 
-export function DateInput({ name, label, store, setStore, value }) {
+export function DateInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
     const id = `dateinput-${name}`
+    if (!edit) return <p><b>{label}:</b> {myDateFormat(value)}</p>
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
@@ -50,10 +54,13 @@ export function DateInput({ name, label, store, setStore, value }) {
     </FormGroup>
 }
 
-export function ListInput({ name, label, store, setStore, value, separator }) {
+export function ListInput({ name, label, store, setStore, value, separator, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
-    if (separator === undefined) separator = ','
+    if (separator === undefined) separator = ','    
+
+    if (!edit) return <p><b>{label}:</b> {value.join(', ')}</p>
+
     const id = `myinput-${name}`
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>{ label }</FormLabel>
@@ -79,9 +86,10 @@ export function ListInput({ name, label, store, setStore, value, separator }) {
     </FormGroup>
 }
 
-export function TextInput({ name, label, store, setStore, value }) {
+export function TextInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
+    if (!edit) return <p><b>{label}:</b> {value}</p>
     const id = `textinput-${name}`
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>

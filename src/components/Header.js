@@ -18,10 +18,21 @@ export default function Header() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>
-              <NavLink to="/roomLabels" className="nav-link">Cartellino Stanze</NavLink>
-              {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') && <NavLink to="/visits" className="nav-link">Visitatori</NavLink>}
-              {user.hasSomeRole('supervisor','admin') && <NavLink to="/users" className="nav-link">Utenti</NavLink>}
-              {user.hasSomeRole('supervisor','admin') && <NavLink to="/tokens" className="nav-link">Tokens</NavLink>}
+              <NavLink to="/roomLabels" className="nav-link">
+                Cartellino Stanze</NavLink>
+              {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') 
+                && <NavLink to="/visits" className="nav-link">
+                  Visitatori</NavLink>}
+              {user.hasSomeRole('supervisor', 'admin', 'person-supervisor', 'person-manager')
+                && <NavLink to="/persons" className="nav-link">
+                  Persone</NavLink>
+              }
+              {user.hasSomeRole('supervisor','admin') 
+                && <NavLink to="/users" className="nav-link">
+                  Utenti</NavLink>}
+              {user.hasSomeRole('supervisor','admin') 
+                && <NavLink to="/tokens" className="nav-link">
+                  Tokens</NavLink>}
              </Nav>
           </Navbar.Collapse>
           <Nav className="right">
