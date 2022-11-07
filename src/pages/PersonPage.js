@@ -55,8 +55,9 @@ export default function PersonPage() {
 
     const submit = async (evt) => {
         if (obj._id) {
-            let payload = Object.fromEntries(Object.entries(obj)
-                .filter(([key, val]) => (original[key]!==val)))
+            let payload = Object.fromEntries(Object.keys(empty)
+                .filter(key => obj[key]!==original[key])
+                .map(key => ([key, obj[key]])))
             payload._id = obj._id
             patchObj(payload)
         } else {
