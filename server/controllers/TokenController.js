@@ -7,6 +7,7 @@ class TokenController extends Controller {
         super()
         this.path = 'token'
         this.Model = Token
+        this.populate_fields = ['createdBy', 'updatedBy']
     }
 
     register(router) {
