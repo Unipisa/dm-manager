@@ -11,9 +11,13 @@ class VisitController extends Controller {
         this.fields = {
             'startDate': {
                 can_sort: true,
+                can_filter: true,
+                match_date: true,
             },
             'endDate': {
                 can_sort: true,
+                can_filter: true,
+                match_date: true,
             },
             'lastName': {
                 can_sort: true,

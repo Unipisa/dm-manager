@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "0.7.4",
+  "version": "0.7.8",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
@@ -35,7 +35,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "server": "nodemon server/server.js",
+    "server": "nodemon --watch server server/server.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test-api": "node server/test.js",

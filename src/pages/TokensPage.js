@@ -41,8 +41,8 @@ export default function TokensPage() {
                 </tbody>
             </Table>
         </div>
-        <StringInput name="name" label="nome" store={token} setStore={ setToken }/>
-        <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" "/>
+        <StringInput name="name" label="nome" store={token} setStore={ setToken } edit={true}/>
+        <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" " edit={true}/>
                 <Button onClick={ () => putToken(token) } className="btn btn-primary">
                     crea token
                 </Button>
