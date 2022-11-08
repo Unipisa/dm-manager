@@ -119,10 +119,13 @@ class Controller {
                     } else if (key_parts.length === 2) {
                         const modifier = {
                             'lt': '$lt',
-                            'gt': '$gt'
+                            'gt': '$gt',
+                            'gte': '$gte',
+                            'lte': '$lte',
                         }[key_parts[1]]
                         if (!modifier) return sendBadRequest(res, `invalid field modifier '${key_parts[1]}'`)
-                        $match[key0] = { [modifier]: date_value }
+                        if (!$match[key0]) $match[key0] = {}
+                        $match[key0][modifier] = date_value
                     } else {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
