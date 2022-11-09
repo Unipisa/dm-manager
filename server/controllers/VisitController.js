@@ -31,6 +31,18 @@ class VisitController extends Controller {
                 can_sort: true,
                 can_filter: true,
             },
+            'affiliation': {
+                can_sort: true,
+                can_filter: true,
+            },
+            'building': {
+                can_sort: true,
+                can_filter: true,
+            },
+            'roomNumber': {
+                can_sort: true,
+                can_filter: true,
+            },
             'updatedAt': {
                 can_sort: true,
             },
