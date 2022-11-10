@@ -24,6 +24,8 @@ export default function VisitPage() {
         invitedBy: "",
         SSD: "",
         notes: "",
+        country: "",
+        fundingAgency: "",
     }
     const [ visit, setVisit ] = useState(create ? empty : null)
     const [ redirect, setRedirect ] = useState(null)
@@ -76,8 +78,10 @@ export default function VisitPage() {
             <StringInput name="firstName" label="nome" store={ visit } setStore={ setVisit } edit={ edit }/> 
             <StringInput name="lastName" label="cognome" store={ visit } setStore={ setVisit } edit={ edit }/>
             <StringInput name="affiliation" label="affiliazione" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="country" label="nazione" store={ visit } setStore={ setVisit } edit={ edit }/>
             <StringInput name="email" label="email" store={ visit } setStore={ setVisit } edit={ edit }/>
             <StringInput name="invitedBy" label="referente" store={ visit } setStore={ setVisit } edit={ edit }/>
+            <StringInput name="fundingAgency" label="fondo" store={ visit } setStore={ setVisit } edit={ edit }/>
             <StringInput name="SSD" label="SSD" store={ visit } setStore= { setVisit } edit={ edit }/>
             <DateInput name="startDate" label="inizio" store={ visit } setStore={ setVisit } edit={ edit }/>
             <DateInput name="endDate" label="fine" store={ visit } setStore={ setVisit } edit={ edit }/>
