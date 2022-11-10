@@ -44,7 +44,7 @@ For security reasons if you don't set the variable `SESSION_SECRET` the session 
 
 Alternative configuration:
 ```
-SERVER_URL="http://localhost:3000"
+SERVER_URL="http://localhost:8000"
 REACT_APP_SERVER_URL="http://localhost:8000"
 BASE_URL="http://localhost:3000"
 ```
