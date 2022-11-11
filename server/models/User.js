@@ -8,8 +8,8 @@ const userSchema = new Schema({
     lastName: String,
     email: String,
     username: String,
-    roles: [String]
- })
+    roles: [String],
+ }, { timestamps: true })
 
 userSchema.plugin(passportLocalMongoose)
 

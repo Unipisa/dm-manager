@@ -3,53 +3,10 @@ const Controller = require('./Controller')
 
 class VisitController extends Controller {
     constructor() {
-        super()
+        super(Visit)
         this.path = 'visit'
         this.managerRoles.push('visit-manager')
         this.supervisorRoles.push('visit-manager', 'visit-supervisor')
-        this.Model = Visit
-        this.fields = {
-            'startDate': {
-                can_sort: true,
-                can_filter: true,
-                match_date: true,
-            },
-            'endDate': {
-                can_sort: true,
-                can_filter: true,
-                match_date: true,
-            },
-            'lastName': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'firstName': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'invitedBy': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'affiliation': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'building': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'roomNumber': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'updatedAt': {
-                can_sort: true,
-            },
-            'createdAt': {
-                can_sort: true,
-            },
-        }
     }
 
     async public(req, res) {

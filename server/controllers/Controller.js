@@ -6,7 +6,7 @@ function sendBadRequest(res, message) {
 }
 
 class Controller {
-    constructor() {
+    constructor(Model=null) {
         // every controller must define a unique path
         this.path = null
 
@@ -17,24 +17,68 @@ class Controller {
         this.supervisorRoles = ['admin', 'supervisor']
 
         // the mongoose Model of the managed objects
-        this.Model = null
+        this.Model = Model
 
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
         this.populate_fields = ['createdBy', 'updatedBy']
 
-        // information of fields which can be used
-        // as filter and as sort keys. 
-        // maps: field_name => options
-        // options includes:
-        //  can_sort: true/false
-        //  can_filter: true/false
-        //  match_regex: use this regexp to match values
-        //  match_integer: integer expected
-        //  match_ids: comma separated list of mongo ids
-        //  match_date: true/false, enable special date comparisons
+        /***
+         * information of fields which can be used
+         * as filter and as sort keys. 
+         * maps: field_name => options
+         * options includes:
+         *  can_sort: true/false
+         *  can_filter: true/false
+         *  match_regex: use this regexp to match values
+         *  match_integer: integer expected
+         *  match_ids: comma separated list of mongo ids
+         *  match_date: true/false, enable special date comparisons
+         ***/
         this.fields = {}
+        if (this.Model) this.add_fields_from_model()
     }
+
+    add_fields_from_model() {
+        /***
+         * Try to construct the fields information structure
+         * needed by controller to build the queries
+         * by inspecting the Model.
+         * The derived class will have the ability 
+         * to ignore or override these settings
+         ***/
+        function field_from_model_info(info) {
+            if (typeof info !== 'object') {
+                info = {
+                    type: info,
+                }
+            }
+            switch(info.type) {
+                case String: return {
+                        can_sort: true,
+                        can_filter: true,
+                    }
+                case Date: return {
+                        can_sort: true,
+                        can_filter: true,
+                        match_date: true,
+                    }
+            }
+        }
+
+        Object.entries(this.Model.schema.obj)
+            .forEach(([field, info]) => {
+                if (field === 'updatedBy') return
+                if (field === 'createdBy') return
+                this.fields[field] = field_from_model_info(info)
+            })
+
+        if (this.Model.schema.options.timestamps) {
+            this.fields['updatedAt'] = { can_sort: true }
+            this.fields['createdAt'] = { can_sort: true }
+            }
+    
+        }
 
     async get(req, res, id) {
         try {
