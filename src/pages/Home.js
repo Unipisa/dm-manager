@@ -14,6 +14,12 @@ export default function Home() {
           { user.hasSomeRole('visit-supervisor','supervisor') && 
             <li><Link to="/visits">vedere i visitatori</Link></li>
           }
+          { user.hasSomeRole('grant-manager','admin') && 
+            <li><Link to="/grants">gestire i grants</Link></li>
+          }
+          { user.hasSomeRole('grant-supervisor','supervisor') && 
+            <li><Link to="/grants">vedere i visitatori</Link></li>
+          }
           { user.hasSomeRole('person-manager', 'admin') &&
             <li><Link to="/persons">gestire l'elenco delle persone</Link></li>
           }

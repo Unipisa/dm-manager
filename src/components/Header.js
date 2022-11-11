@@ -21,12 +21,14 @@ export default function Header() {
               <NavLink to="/roomLabels" className="nav-link">
                 Cartellino Stanze</NavLink>
               {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') 
-                && <NavLink to="/visits" className="nav-link">
-                  Visitatori</NavLink>}
+              && <NavLink to="/visits" className="nav-link">
+                Visitatori</NavLink>}
+              {user.hasSomeRole('grant-manager','grant-supervisor','supervisor','admin') 
+              && <NavLink to="/grants" className="nav-link">
+                Grants</NavLink>}              
               {user.hasSomeRole('supervisor', 'admin', 'person-supervisor', 'person-manager')
-                && <NavLink to="/persons" className="nav-link">
-                  Persone</NavLink>
-              }
+              && <NavLink to="/persons" className="nav-link">
+                Persone</NavLink>}
               {user.hasSomeRole('supervisor','admin') 
                 && <NavLink to="/users" className="nav-link">
                   Utenti</NavLink>}

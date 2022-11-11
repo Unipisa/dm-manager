@@ -3,53 +3,10 @@ const Controller = require('./Controller')
 
 class GrantController extends Controller {
     constructor() {
-        super()
+        super(Grant)
         this.path = 'grant'
         this.managerRoles.push('grant-manager')
         this.supervisorRoles.push('grant-manager', 'grant-supervisor')
-        this.Model = Grant
-        this.fields = {
-            'startDate': {
-                can_sort: true,
-                can_filter: true,
-                match_date: true,
-            },
-            'endDate': {
-                can_sort: true,
-                can_filter: true,
-                match_date: true,
-            },
-            'lastName': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'firstName': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'invitedBy': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'affiliation': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'building': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'roomNumber': {
-                can_sort: true,
-                can_filter: true,
-            },
-            'updatedAt': {
-                can_sort: true,
-            },
-            'createdAt': {
-                can_sort: true,
-            },
-        }
     }
 
     async public(req, res) {
@@ -90,4 +47,4 @@ class GrantController extends Controller {
     }
 }
 
-module.exports = VisitController
+module.exports = GrantController
