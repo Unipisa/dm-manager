@@ -146,3 +146,28 @@ export function PersonInput({ name, label, value, setStore }) {
         </div>
     </FormGroup>
 }
+export function SelectInput({ options, name, label, store, setStore, value, edit }) {
+    if (value === undefined && store!==undefined) value = store[name]
+    if (label === undefined) label = name
+    const id = `select-input-${name}`
+    if (!edit) return <p><b>{label}:</b> {value}</p>
+    return <FormGroup className="row my-2">
+        <FormLabel className="col-sm-2" htmlFor={ id }>
+            { label }</FormLabel>
+        <div className="col-sm-10">
+            <select className="form-control col-sm-10"
+                id={ id } 
+                name={ name } 
+                value={ value || "" } 
+                onChange={ (evt) => {
+                    setStore(obj => {
+                        obj = {...obj}
+                        obj[name] = evt.target.value
+                        return obj
+                    })} 
+                }>
+            { options.map(value => <option value={value}>{ value }</option>)}
+            </select>
+        </div>
+    </FormGroup>
+}

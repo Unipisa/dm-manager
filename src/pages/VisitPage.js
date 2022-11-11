@@ -22,6 +22,8 @@ export default function VisitPage() {
         SSD: "",
         notes: "",
         person: null,
+        country: "",
+        fundingAgency: "",
     }
 
     const engine = useEngine()
@@ -75,14 +77,14 @@ export default function VisitPage() {
             <h3>{ create ? `nuova ${objName}` : `${objName} ${obj?.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
-        <Form onSubmit={ (event) => event.preventDefault() }
-        >
-            <PersonInput label="Persona" name="person" value={obj.person} setStore={setObj}></PersonInput>
+        <Form onSubmit={ (event) => event.preventDefault() }>
             <StringInput name="firstName" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
             <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="affiliation" label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput name="country" label="nazione" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="email" label="email" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="invitedBy" label="referente" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput name="fundingAgency" label="fondo" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="SSD" label="SSD" store={ obj } setStore= { setObj } edit={ edit }/>
             <DateInput name="startDate" label="inizio" store={ obj } setStore={ setObj } edit={ edit }/>
             <DateInput name="endDate" label="fine" store={ obj } setStore={ setObj } edit={ edit }/>

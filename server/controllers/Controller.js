@@ -6,7 +6,7 @@ function sendBadRequest(res, message) {
 }
 
 class Controller {
-    constructor() {
+    constructor(Model=null) {
         // every controller must define a unique path
         this.path = null
 
@@ -17,23 +17,68 @@ class Controller {
         this.supervisorRoles = ['admin', 'supervisor']
 
         // the mongoose Model of the managed objects
-        this.Model = null
+        this.Model = Model
 
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
         this.populate_fields = ['createdBy', 'updatedBy']
 
-        // information of fields which can be used
-        // as filter and as sort keys. 
-        // maps: field_name => options
-        // options includes:
-        //  can_sort: true/false
-        //  can_filter: true/false
-        //  match_regex: use this regexp to match values
-        //  match_integer: integer expected
-        //  match_ids: comma separated list of mongo ids
+        /***
+         * information of fields which can be used
+         * as filter and as sort keys. 
+         * maps: field_name => options
+         * options includes:
+         *  can_sort: true/false
+         *  can_filter: true/false
+         *  match_regex: use this regexp to match values
+         *  match_integer: integer expected
+         *  match_ids: comma separated list of mongo ids
+         *  match_date: true/false, enable special date comparisons
+         ***/
         this.fields = {}
+        if (this.Model) this.add_fields_from_model()
     }
+
+    add_fields_from_model() {
+        /***
+         * Try to construct the fields information structure
+         * needed by controller to build the queries
+         * by inspecting the Model.
+         * The derived class will have the ability 
+         * to ignore or override these settings
+         ***/
+        function field_from_model_info(info) {
+            if (typeof info !== 'object') {
+                info = {
+                    type: info,
+                }
+            }
+            switch(info.type) {
+                case String: return {
+                        can_sort: true,
+                        can_filter: true,
+                    }
+                case Date: return {
+                        can_sort: true,
+                        can_filter: true,
+                        match_date: true,
+                    }
+            }
+        }
+
+        Object.entries(this.Model.schema.obj)
+            .forEach(([field, info]) => {
+                if (field === 'updatedBy') return
+                if (field === 'createdBy') return
+                this.fields[field] = field_from_model_info(info)
+            })
+
+        if (this.Model.schema.options.timestamps) {
+            this.fields['updatedAt'] = { can_sort: true }
+            this.fields['createdAt'] = { can_sort: true }
+            }
+    
+        }
 
     async get(req, res, id) {
         try {
@@ -58,6 +103,9 @@ class Controller {
 
         for (let key in req.query) {
             let value = req.query[key];
+            const key_parts = key.split('__')
+            const key0 = key_parts[0]
+
             if (key == '_direction') {
                 if (value=="1") direction = 1
                 else if (value=="-1") direction = -1
@@ -79,14 +127,14 @@ class Controller {
                     return sendBadRequest(res, `invalid _sort key ${value}. Fields: ${ JSON.stringify(fields) }`)
                 }
                 sort = value;
-            } else if (fields[key] && fields[key].can_filter) {
-                const field = fields[key];
+            } else if (fields[key0] && fields[key0].can_filter) {
+                const field = fields[key0];
                 filter[key] = value;
                 if (field.match_regex) {
-                    $match[key] = { $regex: field.match_regex(value) }
+                    $match[key0] = { $regex: field.match_regex(value) }
                 } else if (field.match_integer) {
                     try {
-                        $match[key] = parseInt(value);
+                        $match[key0] = parseInt(value);
                     } catch (err) {
                         return sendBadRequest(res, `integer expected but got string: "${value}"`)
                     }
@@ -98,13 +146,40 @@ class Controller {
                     } catch(err) {
                         return sendBadRequest(res, `comma separated list of mongo ids expected but got "${value}"`)
                     }
+                } else if (field.match_date) {
+                    let date_value = null
+                    if (value === 'today') {
+                        date_value = new Date()
+                    } else {
+                        try {
+                            date_value = new Date(value)
+                        } catch(err) {
+                            return sendBadRequest(res, `invalid date '${value}' for field '${key0}'`)
+                        }
+                    }
+                    console.log(`date_value: ${date_value}`)
+                    if (key_parts.length === 1) {
+                        $match[key0] = date_value
+                    } else if (key_parts.length === 2) {
+                        const modifier = {
+                            'lt': '$lt',
+                            'gt': '$gt',
+                            'gte': '$gte',
+                            'lte': '$lte',
+                        }[key_parts[1]]
+                        if (!modifier) return sendBadRequest(res, `invalid field modifier '${key_parts[1]}'`)
+                        if (!$match[key0]) $match[key0] = {}
+                        $match[key0][modifier] = date_value
+                    } else {
+                        return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
+                    }
                 } else {
-                    $match[key] = value;
+                    $match[key] = value
                 }
             }
         }
 
-        console.log(`match ${$match} requested in index`)
+        console.log(`match ${JSON.stringify($match)} requested in index`)
 
         let total, data;
         const $sort = {};

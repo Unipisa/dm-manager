@@ -3,9 +3,11 @@ var express = require('express')
 const config = require('./config')
 const RoomLabelController = require('./controllers/RoomLabelController')
 const VisitController = require('./controllers/VisitController')
+const GrantController = require('./controllers/GrantController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
 const PersonController = require('./controllers/PersonController')
+
 
 var router = express.Router()
 
@@ -14,6 +16,7 @@ let paths = []
 ;[
     RoomLabelController, 
     VisitController, 
+    GrantController,
     UserController,
     TokenController,
     PersonController,

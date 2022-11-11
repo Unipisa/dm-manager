@@ -4,9 +4,11 @@ const { hasSomeRole, requireSomeRole, requireUser } = require('./middleware')
 
 class TokenController extends Controller {
     constructor() {
-        super()
+        super(Token)
         this.path = 'token'
         this.Model = Token
+        this.populate_fields = ['createdBy', 'updatedBy']
+        this.fields = {} // disable queries on tokens
     }
 
     register(router) {
