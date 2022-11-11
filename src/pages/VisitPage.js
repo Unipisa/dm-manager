@@ -3,7 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { StringInput, DateInput, TextInput } from '../components/Input'
+import { StringInput, DateInput, PersonInput, TextInput } from '../components/Input'
 
 export default function VisitPage() {
     const objCode = 'visit'
@@ -21,6 +21,7 @@ export default function VisitPage() {
         invitedBy: "",
         SSD: "",
         notes: "",
+        person: null,
     }
 
     const engine = useEngine()
@@ -76,6 +77,7 @@ export default function VisitPage() {
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }
         >
+            <PersonInput label="Persona" name="person" value={obj.person} setStore={setObj}></PersonInput>
             <StringInput name="firstName" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
             <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="affiliation" label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>

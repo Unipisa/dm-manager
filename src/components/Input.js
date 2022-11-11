@@ -1,8 +1,10 @@
 import { FormGroup, FormLabel } from 'react-bootstrap'
 import ReactDatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import { Typeahead } from 'react-bootstrap-typeahead';
+import { useState } from 'react';
 
-import { myDateFormat } from '../Engine'
+import { myDateFormat, useEngine } from '../Engine'
 
 export function StringInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
@@ -109,6 +111,38 @@ export function TextInput({ name, label, store, setStore, value, edit }) {
                 }
                 className="form-control" 
             />
+        </div>
+    </FormGroup>
+}
+
+export function PersonInput({ name, label, value, setStore }) {
+    // const [options, setOptions] = useState([ "prova1", "prova2" ])
+    const engine = useEngine()
+
+    function onChangeHandler(evt) {
+        if (evt.length > 0) {
+            var obj = {...obj}
+            obj[name] = evt[0]
+            setStore(obj);
+        }
+    }
+
+    const options = engine.useIndex('person')
+    console.log(options.data)
+
+    return <FormGroup className="row">
+       <FormLabel className="col-sm-2">
+            { label }
+        </FormLabel>
+        <div className="col-sm-10">
+        <Typeahead
+          id={"typeahead-" + label}
+          labelKey="name"
+          options={options}
+          onChange={onChangeHandler}
+          placeholder="Choose a state..."
+          value={value}
+        />
         </div>
     </FormGroup>
 }

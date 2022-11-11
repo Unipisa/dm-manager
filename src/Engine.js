@@ -2,7 +2,7 @@ import moment from 'moment'
 import { useState, createContext, useContext } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
-export const EngineContext = createContext(null)
+export const EngineContext = createContext('dm-manager')
 
 export const EngineProvider = EngineContext.Provider
   
@@ -16,7 +16,7 @@ export function useCreateEngine() {
         messages: [],
         base_url: process.env.REACT_APP_SERVER_URL || "",
         config: null,
-        user: null,
+        user: null
     })
 
     const queryClient = useQueryClient()
@@ -135,6 +135,7 @@ export function useCreateEngine() {
             if (user !== null) {
                 user = new_user(user)
             }
+
             setState(s => ({...s, user}))
         },
 
