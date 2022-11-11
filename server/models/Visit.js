@@ -16,6 +16,8 @@ const visitSchema = new Schema({
     notes: String,
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    country: String,
+    fundingAgency: String,
  }, {
      timestamps: true // adds fields: createdAt, updatedAt
  })

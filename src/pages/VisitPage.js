@@ -21,6 +21,8 @@ export default function VisitPage() {
         invitedBy: "",
         SSD: "",
         notes: "",
+        country: "",
+        fundingAgency: "",
     }
 
     const engine = useEngine()
@@ -79,8 +81,10 @@ export default function VisitPage() {
             <StringInput name="firstName" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
             <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="affiliation" label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput name="country" label="nazione" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="email" label="email" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="invitedBy" label="referente" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput name="fundingAgency" label="fondo" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="SSD" label="SSD" store={ obj } setStore= { setObj } edit={ edit }/>
             <DateInput name="startDate" label="inizio" store={ obj } setStore={ setObj } edit={ edit }/>
             <DateInput name="endDate" label="fine" store={ obj } setStore={ setObj } edit={ edit }/>
