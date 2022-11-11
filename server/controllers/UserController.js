@@ -6,6 +6,7 @@ class UserController extends Controller {
         super(User)
         this.path = 'user'
         this.populate_fields = []
+        this.fields.lastName.match_regex = true
     }
 }
 

@@ -4,6 +4,7 @@ import { useEngine } from '../Engine'
 export default function Home() {
   const engine = useEngine()
   const user = engine.user
+
   return (<>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
         <ul>

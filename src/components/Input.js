@@ -1,10 +1,10 @@
 import { FormGroup, FormLabel } from 'react-bootstrap'
 import ReactDatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState } from 'react';
 
-import { myDateFormat, useEngine } from '../Engine'
+import { myDateFormat } from '../Engine'
 
 export function StringInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
@@ -115,9 +115,18 @@ export function TextInput({ name, label, store, setStore, value, edit }) {
     </FormGroup>
 }
 
-export function PersonInput({ name, label, value, setStore }) {
-    // const [options, setOptions] = useState([ "prova1", "prova2" ])
-    const engine = useEngine()
+//
+// How to use this input: insert something along the lines of 
+//
+//  <PersonInput name="prova" label="Persona" value={person} setStore={setPerson} edit={true}></PersonInput>
+//
+export function PersonInput({ name, label, value, setStore, edit }) {
+    const [options, setOptions] = useState([])
+    const [isLoading, setIsLoading] = useState(false)
+
+    if (! edit) {
+        return <p>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
+    }
 
     function onChangeHandler(evt) {
         if (evt.length > 0) {
@@ -127,21 +136,50 @@ export function PersonInput({ name, label, value, setStore }) {
         }
     }
 
-    const options = engine.useIndex('person')
-    console.log(options.data)
+    const handleSearch = (query) => {
+        setIsLoading(true)
+        const baseUrl = process.env.REACT_APP_SERVER_URL || ""
+
+        // Maybe this should be done through the Engine.useIndex() call?
+        fetch(baseUrl + '/api/v0/person?lastName__regex=.*' + query + ".*", {
+            credentials: 'include'
+        }).then((res) => {
+            res.json().then((data) => {
+                setOptions(data["data"].map(x => {
+                    return {
+                        // This is just for displaying something reasonable when the 
+                        // user selects the right person.
+                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
+                        ...x
+                    }
+                }))
+                setIsLoading(false);
+            })
+        })
+    }
+
+    const filterBy = () => true
 
     return <FormGroup className="row">
        <FormLabel className="col-sm-2">
             { label }
         </FormLabel>
         <div className="col-sm-10">
-        <Typeahead
+        <AsyncTypeahead
+          filterBy={filterBy}
+          isLoading={isLoading}
           id={"typeahead-" + label}
-          labelKey="name"
+          labelKey="display"
+          onSearch={handleSearch}
           options={options}
           onChange={onChangeHandler}
-          placeholder="Choose a state..."
+          placeholder="Seleziona una persona..."
           value={value}
+          renderMenuItemChildren={(option) => (
+            <>
+              <span>{option.firstName} {option.lastName} ({option.affiliation})</span>
+            </>
+          )}
         />
         </div>
     </FormGroup>

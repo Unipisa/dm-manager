@@ -56,7 +56,7 @@ class Controller {
             switch(info.type) {
                 case String: return {
                         can_sort: true,
-                        can_filter: true,
+                        can_filter: true
                     }
                 case Date: return {
                         can_sort: true,
@@ -130,9 +130,7 @@ class Controller {
             } else if (fields[key0] && fields[key0].can_filter) {
                 const field = fields[key0];
                 filter[key] = value;
-                if (field.match_regex) {
-                    $match[key0] = { $regex: field.match_regex(value) }
-                } else if (field.match_integer) {
+                if (field.match_integer) {
                     try {
                         $match[key0] = parseInt(value);
                     } catch (err) {
@@ -174,7 +172,18 @@ class Controller {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
                 } else {
-                    $match[key] = value
+                    if (key_parts.length === 1) {
+                        $match[key] = value
+                    }
+                    else {
+                        if (key_parts[1] == 'regex') {
+                            // We do case-insensitive regexp by default
+                            $match[key0] = { $regex: new RegExp(value, "i") }
+                        }
+                        else {
+                            return sendBadRequest(res, `Unsupported field modifier in '${key}'`)
+                        }
+                    }
                 }
             }
         }
