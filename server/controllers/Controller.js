@@ -208,7 +208,7 @@ class Controller {
 
         if (direction < 0) sort = `-${sort}`
 
-        const result = await this.Model.aggregate([
+        let result = await this.Model.aggregate([
                 {$match},
                 {$sort},
                 {$facet:{
@@ -221,6 +221,10 @@ class Controller {
                     data: "$limiting"
                 }}
             ])
+        
+        // questa riga dovrebbe aggiungere i dati di person a result
+        // ma non sembra funzionare!
+        result = await this.Model.populate(result, this.populate_fields)
 
         if (result.length === 0) {
             total = 0;

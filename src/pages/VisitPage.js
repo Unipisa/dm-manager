@@ -78,6 +78,7 @@ export default function VisitPage() {
         </Card.Header>
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }>
+            <PersonInput name="person" label="persona" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="firstName" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
             <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
             <StringInput name="affiliation" label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>
