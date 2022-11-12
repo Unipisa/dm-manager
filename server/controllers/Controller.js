@@ -6,7 +6,7 @@ function sendBadRequest(res, message) {
 }
 
 class Controller {
-    constructor() {
+    constructor(Model=null) {
         // every controller must define a unique path
         this.path = null
 
@@ -20,24 +20,68 @@ class Controller {
         this.searchRoles = ['admin', 'supervisor']
 
         // the mongoose Model of the managed objects
-        this.Model = null
+        this.Model = Model
 
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
         this.populate_fields = ['createdBy', 'updatedBy']
 
-        // information of fields which can be used
-        // as filter and as sort keys. 
-        // maps: field_name => options
-        // options includes:
-        //  can_sort: true/false
-        //  can_filter: true/false
-        //  match_regex: use this regexp to match values
-        //  match_integer: integer expected
-        //  match_ids: comma separated list of mongo ids
-        //  match_date: true/false, enable special date comparisons
+        /***
+         * information of fields which can be used
+         * as filter and as sort keys. 
+         * maps: field_name => options
+         * options includes:
+         *  can_sort: true/false
+         *  can_filter: true/false
+         *  match_regex: use this regexp to match values
+         *  match_integer: integer expected
+         *  match_ids: comma separated list of mongo ids
+         *  match_date: true/false, enable special date comparisons
+         ***/
         this.fields = {}
+        if (this.Model) this.add_fields_from_model()
     }
+
+    add_fields_from_model() {
+        /***
+         * Try to construct the fields information structure
+         * needed by controller to build the queries
+         * by inspecting the Model.
+         * The derived class will have the ability 
+         * to ignore or override these settings
+         ***/
+        function field_from_model_info(info) {
+            if (typeof info !== 'object') {
+                info = {
+                    type: info,
+                }
+            }
+            switch(info.type) {
+                case String: return {
+                        can_sort: true,
+                        can_filter: true
+                    }
+                case Date: return {
+                        can_sort: true,
+                        can_filter: true,
+                        match_date: true,
+                    }
+            }
+        }
+
+        Object.entries(this.Model.schema.obj)
+            .forEach(([field, info]) => {
+                if (field === 'updatedBy') return
+                if (field === 'createdBy') return
+                this.fields[field] = field_from_model_info(info)
+            })
+
+        if (this.Model.schema.options.timestamps) {
+            this.fields['updatedAt'] = { can_sort: true }
+            this.fields['createdAt'] = { can_sort: true }
+            }
+    
+        }
 
     async get(req, res, id) {
         try {
@@ -98,9 +142,7 @@ class Controller {
             } else if (fields[key0] && fields[key0].can_filter) {
                 const field = fields[key0];
                 filter[key] = value;
-                if (field.match_regex) {
-                    $match[key0] = { $regex: field.match_regex(value) }
-                } else if (field.match_integer) {
+                if (field.match_integer) {
                     try {
                         $match[key0] = parseInt(value);
                     } catch (err) {
@@ -142,7 +184,18 @@ class Controller {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
                 } else {
-                    $match[key] = value
+                    if (key_parts.length === 1) {
+                        $match[key] = value
+                    }
+                    else {
+                        if (key_parts[1] == 'regex') {
+                            // We do case-insensitive regexp by default
+                            $match[key0] = { $regex: new RegExp(value, "i") }
+                        }
+                        else {
+                            return sendBadRequest(res, `Unsupported field modifier in '${key}'`)
+                        }
+                    }
                 }
             }
         }

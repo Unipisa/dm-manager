@@ -29,6 +29,9 @@ export default function VisitsPage() {
                             <Th filter={filter.header('lastName')}>cognome</Th>
                             <Th filter={filter.header('firstName')}>nome</Th>
                             <Th filter={filter.header('invitedBy')}>referente</Th>
+                            <Th filter={filter.header('affiliation')}>affiliazione</Th>
+                            <Th filter={filter.header('building')}>edificio</Th>
+                            <Th filter={filter.header('roomNumber')}>stanza</Th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,6 +43,9 @@ export default function VisitsPage() {
                                 <td>{ visit.lastName }</td>
                                 <td>{ visit.firstName }</td>
                                 <td>{ visit.invitedBy }</td>
+                                <td>{ visit.affiliation }</td>
+                                <td>{ visit.building }</td>
+                                <td>{ visit.roomNumber }</td>
                             </tr>) 
                         }
                     </tbody>
