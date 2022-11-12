@@ -4,7 +4,7 @@ import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState } from 'react';
 
-import { myDateFormat } from '../Engine'
+import { myDateFormat, useEngine } from '../Engine'
 
 export function StringInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
@@ -120,11 +120,16 @@ export function TextInput({ name, label, store, setStore, value, edit }) {
 //
 //  <PersonInput name="prova" label="Persona" value={person} setStore={setPerson} edit={true}></PersonInput>
 //
-export function PersonInput({ name, label, value, setStore, edit }) {
+export function PersonInput({ name, label, value, store, setStore, edit }) {
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const engine = useEngine()
+
+    if (value === undefined && store!==undefined) value = store[name]
+    if (label === undefined) label = name
 
     if (! edit) {
+        if (!value) return <p>null</p>
         return <p>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
     }
 
@@ -140,21 +145,16 @@ export function PersonInput({ name, label, value, setStore, edit }) {
         setIsLoading(true)
         const baseUrl = process.env.REACT_APP_SERVER_URL || ""
 
-        // Maybe this should be done through the Engine.useIndex() call?
-        fetch(baseUrl + '/api/v0/person?lastName__regex=.*' + query + ".*", {
-            credentials: 'include'
-        }).then((res) => {
-            res.json().then((data) => {
-                setOptions(data["data"].map(x => {
-                    return {
-                        // This is just for displaying something reasonable when the 
-                        // user selects the right person.
-                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
-                        ...x
-                    }
-                }))
-                setIsLoading(false);
-            })
+        engine.get('/api/v0/person', {lastName__regex: `.*${query}.*`}).then((data) => {
+            setOptions(data["data"].map(x => {
+                return {
+                    // This is just for displaying something reasonable when the 
+                    // user selects the right person.
+                    display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
+                    ...x
+                }
+            }))
+            setIsLoading(false);
         })
     }
 
