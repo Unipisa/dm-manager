@@ -135,9 +135,10 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
 
     function onChangeHandler(evt) {
         if (evt.length > 0) {
-            var obj = {...obj}
-            obj[name] = evt[0]
-            setStore(obj);
+            setStore(obj => ({
+                ...obj,
+                [name]: evt[0]
+            }))
         }
     }
 
