@@ -1,10 +1,11 @@
 import { FormGroup, FormLabel, Modal, Button, Input, FormText } from 'react-bootstrap'
 import ReactDatePicker from "react-datepicker"
+import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState, useRef } from 'react';
 
-import { myDateFormat } from '../Engine'
+import { myDateFormat, useEngine } from '../Engine'
 
 export function StringInput({ name, label, store, setStore, value, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
@@ -40,7 +41,7 @@ export function DateInput({ name, label, store, setStore, value, edit }) {
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
         <div className="col-sm-10">
-            <ReactDatePicker 
+            <UtcDatePicker 
                 className="form-control"
                 selected={ value ? new Date(value) : null }  
                 dateFormat="d.MM.yyyy"
@@ -120,11 +121,10 @@ export function TextInput({ name, label, store, setStore, value, edit }) {
 //
 //  <PersonInput name="prova" label="Persona" value={person} setStore={setPerson} edit={true}></PersonInput>
 //
-export function PersonInput({ name, label, value, setStore, edit }) {
+export function PersonInput({ name, label, value, store, setStore, edit }) {
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false);
-
     const typeaheadref = useRef(null);
 
     // Data used for the new person create
@@ -134,7 +134,13 @@ export function PersonInput({ name, label, value, setStore, edit }) {
 
     const baseUrl = process.env.REACT_APP_SERVER_URL || ""
 
+    const engine = useEngine()
+
+    if (value === undefined && store!==undefined) value = store[name]
+    if (label === undefined) label = name
+
     if (! edit) {
+        if (!value) return <p>null</p>
         return <p>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
     }
 
@@ -150,10 +156,11 @@ export function PersonInput({ name, label, value, setStore, edit }) {
                 affiliation: newPersonAffiliation
             })
         }).then(res => {
-            res.json().then(data => {
-                var obj = {...value}; obj[name] = data
-                setStore(obj)
-                value = obj
+            res.json().then(data => {                
+                setStore(obj => ({
+                    ...obj, 
+                    [name]: data
+                }))
             })
         })
 
@@ -163,21 +170,27 @@ export function PersonInput({ name, label, value, setStore, edit }) {
     function onChangeHandler(evt) {
         if (evt.length > 0) {
             // This does not correctly update the typeahead component
-            var obj = {...value}; obj[name] = evt[0]
-            setStore(obj)
+            setStore(obj => ({
+                ...obj,
+                [name]: evt[0]
+            }))
         }
     }
 
     const handleSearch = (query) => {
         setIsLoading(true)
-        // Maybe this should be done through the Engine.useIndex() call?
-        fetch(baseUrl + '/api/v0/person?lastName__regex=.*' + query + ".*", {
-            credentials: 'include'
-        }).then((res) => {
-            res.json().then((data) => {
-                setOptions(data["data"])
-                setIsLoading(false)
-            })
+        const baseUrl = process.env.REACT_APP_SERVER_URL || ""
+
+        engine.get('/api/v0/person', {lastName__regex: `.*${query}.*`}).then((data) => {
+            setOptions(data["data"].map(x => {
+                return {
+                    // This is just for displaying something reasonable when the 
+                    // user selects the right person.
+                    display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
+                    ...x
+                }
+            }))
+            setIsLoading(false);
         })
     }
 

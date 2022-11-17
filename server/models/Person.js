@@ -18,4 +18,12 @@ const personSchema = new Schema({
      timestamps: true // adds fields: createdAt, updatedAt
  })
 
+ personSchema.index({
+     firstName: 'text', 
+     lastName: 'text',
+     email: 'text',
+     affiliation: 'text',
+    });
+
+
  module.exports = mongoose.model('Person', personSchema)

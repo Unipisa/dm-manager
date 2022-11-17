@@ -87,6 +87,8 @@ export function useCreateEngine() {
     // e reso disponibile in ogni componente
     // grazie al context
     return {
+        api_fetch, post, put, patch, get, del,
+
         addMessage,
 
         addErrorMessage: (message) => addMessage(message, 'error'),

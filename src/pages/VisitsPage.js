@@ -26,8 +26,7 @@ export default function VisitsPage() {
                         <tr>
                             <Th filter={filter.header('startDate')}>dal</Th>
                             <Th filter={filter.header('endDate')}>al</Th>
-                            <Th filter={filter.header('lastName')}>cognome</Th>
-                            <Th filter={filter.header('firstName')}>nome</Th>
+                            <Th filter={filter.header('person')}>persona</Th>
                             <Th filter={filter.header('invitedBy')}>referente</Th>
                             <Th filter={filter.header('affiliation')}>affiliazione</Th>
                             <Th filter={filter.header('building')}>edificio</Th>
@@ -40,8 +39,7 @@ export default function VisitsPage() {
                             <tr key={visit._id} onClick={()=>navigateTo(visit)}>
                                 <td>{ myDateFormat(visit.startDate) }</td>
                                 <td>{ myDateFormat(visit.endDate) }</td>
-                                <td>{ visit.lastName }</td>
-                                <td>{ visit.firstName }</td>
+                                <td>{ `${visit.person.lastName} ${visit.person.firstName}` }</td>
                                 <td>{ visit.invitedBy }</td>
                                 <td>{ visit.affiliation }</td>
                                 <td>{ visit.building }</td>
