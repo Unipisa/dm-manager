@@ -181,17 +181,36 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
         setIsLoading(true)
         const baseUrl = process.env.REACT_APP_SERVER_URL || ""
 
-        engine.get('/api/v0/person', {lastName__regex: `.*${query}.*`}).then((data) => {
-            setOptions(data["data"].map(x => {
-                return {
-                    // This is just for displaying something reasonable when the 
-                    // user selects the right person.
-                    display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
-                    ...x
-                }
-            }))
-            setIsLoading(false);
-        })
+        if (true) {
+            // regex search
+            // con: should escape regex reserved characters
+            // con: will not search on multiple fields
+            engine.get('/api/v0/person', {lastName__regex: `.*${query}.*`}).then((data) => {
+                setOptions(data["data"].map(x => {
+                    return {
+                        // This is just for displaying something reasonable when the 
+                        // user selects the right person.
+                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
+                        ...x
+                    }
+                }))
+                setIsLoading(false);
+            })
+        } else {
+            // textual search
+            // con: cannot perform partial text search
+            engine.get('/api/v0/person/search', {q: query}).then((data) => {
+                setOptions(data["data"].map(x => {
+                    return {
+                        // This is just for displaying something reasonable when the 
+                        // user selects the right person.
+                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
+                        ...x
+                    }
+                }))
+                setIsLoading(false);
+            })    
+        }
     }
 
     const labelDisplayFunction = x => {
@@ -237,7 +256,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
           ref={typeaheadref}
           onChange={onChangeHandler}
           placeholder="Seleziona una persona..."
-          selected={[value]}
+          selected={value?[value]:[]}
           renderMenuItemChildren={(option) => (
             <>
               <span>{option.firstName} {option.lastName} ({option.affiliation})</span>
