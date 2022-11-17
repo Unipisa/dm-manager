@@ -39,10 +39,33 @@ const migrations = {
             }
         }
 
-        // considera la migrazione non applicata
-        // cosi' la ripete ad libitum
-        return false 
-    }
+        return true // migrazione OK
+    },
+
+    adjust_visit_dates_to_UTC: async () => {
+        function adjusted(date) {
+            if (date === null) return date
+            const iso = date.toISOString()
+            // something like: "2022-09-30T22:00:00.000Z"
+            const hours = date.getUTCHours()
+            if (hours < 12) {
+                date.setUTCHours(0)
+            } else {
+                date.setUTCHours(24)
+            }
+            console.log(`${iso} --> ${date.toISOString()}`)
+            return date
+        }
+
+        for (const visit of await Visit.find({})) {
+            console.log(`visit ${visit.firstName} ${visit.lastName}`)
+            visit.startDate = adjusted(visit.startDate)
+            visit.endDate = adjusted(visit.endDate)
+            await visit.save()
+        }
+        
+        return true // migration OK!
+    },
 }
 
 async function migrate() {
@@ -55,7 +78,7 @@ async function migrate() {
     for (const [name, run] of Object.entries(migrations)) {
         if (config.migrations.includes(name)) {
             console.log(`= ${name}`)
-            return
+            continue
         }
         console.log(`+ ${name}`)
         if (await run()) {

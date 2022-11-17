@@ -1,5 +1,5 @@
 import { FormGroup, FormLabel } from 'react-bootstrap'
-import ReactDatePicker from "react-datepicker"
+import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState } from 'react';
@@ -40,7 +40,7 @@ export function DateInput({ name, label, store, setStore, value, edit }) {
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
         <div className="col-sm-10">
-            <ReactDatePicker 
+            <UtcDatePicker 
                 className="form-control"
                 selected={ value ? new Date(value) : null }  
                 dateFormat="d.MM.yyyy"
