@@ -1,8 +1,8 @@
-import { FormGroup, FormLabel } from 'react-bootstrap'
+import { FormGroup, FormLabel, Modal, Button, Input, FormText } from 'react-bootstrap'
 import ReactDatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import { myDateFormat } from '../Engine'
 
@@ -123,55 +123,105 @@ export function TextInput({ name, label, store, setStore, value, edit }) {
 export function PersonInput({ name, label, value, setStore, edit }) {
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
+    const [show, setShow] = useState(false);
+
+    const typeaheadref = useRef(null);
+
+    // Data used for the new person create
+    const [newPersonFirstName, setNewPersonFirstName] = useState("");
+    const [newPersonLastName, setNewPersonLastName] = useState("");
+    const [newPersonAffiliation, setNewPersonAffiliation] = useState("");
+
+    const baseUrl = process.env.REACT_APP_SERVER_URL || ""
 
     if (! edit) {
         return <p>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
     }
 
+    function handleClose() {
+        // Add a new person with the given data
+        fetch(baseUrl + "/api/v0/person", {
+            credentials: 'include', method: 'PUT', headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }, body: JSON.stringify({
+                firstName: newPersonFirstName, 
+                lastName: newPersonLastName, 
+                affiliation: newPersonAffiliation
+            })
+        }).then(res => {
+            res.json().then(data => {
+                var obj = {...value}; obj[name] = data
+                setStore(obj)
+                value = obj
+            })
+        })
+
+        setShow(false);
+    }
+
     function onChangeHandler(evt) {
         if (evt.length > 0) {
-            var obj = {...obj}
-            obj[name] = evt[0]
-            setStore(obj);
+            // This does not correctly update the typeahead component
+            var obj = {...value}; obj[name] = evt[0]
+            setStore(obj)
         }
     }
 
     const handleSearch = (query) => {
         setIsLoading(true)
-        const baseUrl = process.env.REACT_APP_SERVER_URL || ""
-
         // Maybe this should be done through the Engine.useIndex() call?
         fetch(baseUrl + '/api/v0/person?lastName__regex=.*' + query + ".*", {
             credentials: 'include'
         }).then((res) => {
             res.json().then((data) => {
-                setOptions(data["data"].map(x => {
-                    return {
-                        // This is just for displaying something reasonable when the 
-                        // user selects the right person.
-                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
-                        ...x
-                    }
-                }))
-                setIsLoading(false);
+                setOptions(data["data"])
+                setIsLoading(false)
             })
         })
+    }
+
+    const labelDisplayFunction = x => {
+        return `${x.firstName} ${x.lastName} (${x.affiliation})`        
+    }
+
+    const handleNewPersonClick = x => {
+        setShow(true);
     }
 
     const filterBy = () => true
 
     return <FormGroup className="row">
+       <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Crea una nuova persona</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <input className="mb-2 form-control" placeholder='Nome' value={newPersonFirstName} onChange={x => setNewPersonFirstName(x.target.value)}></input>
+            <input className="mb-2 form-control" placeholder='Cognome' value={newPersonLastName} onChange={x => setNewPersonLastName(x.target.value)}></input>
+            <input className="mb-2 form-control" placeholder='Affiliazione' value={newPersonAffiliation} onChange={x => setNewPersonAffiliation(x.target.value)}></input>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={x => setShow(false)}>
+            Annulla
+          </Button>
+          <Button variant="primary" onClick={handleClose}>
+            Salva
+          </Button>
+        </Modal.Footer>
+      </Modal>
        <FormLabel className="col-sm-2">
             { label }
         </FormLabel>
-        <div className="col-sm-10">
+        <div className="col-sm-8">
         <AsyncTypeahead
           filterBy={filterBy}
           isLoading={isLoading}
           id={"typeahead-" + label}
-          labelKey="display"
+          labelKey={labelDisplayFunction}
           onSearch={handleSearch}
           options={options}
+          ref={typeaheadref}
           onChange={onChangeHandler}
           placeholder="Seleziona una persona..."
           value={value}
@@ -181,6 +231,9 @@ export function PersonInput({ name, label, value, setStore, edit }) {
             </>
           )}
         />
+        </div>
+        <div className="col-sm-2">
+            <Button onClick={handleNewPersonClick}>Nuova persona</Button>
         </div>
     </FormGroup>
 }

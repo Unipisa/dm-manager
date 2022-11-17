@@ -1,9 +1,15 @@
 import { Link } from 'react-router-dom'
+import { PersonInput } from '../components/Input';
 import { useEngine } from '../Engine'
+import { useState } from 'react';
 
 export default function Home() {
   const engine = useEngine()
   const user = engine.user
+
+  const [obj, setObj] = useState({
+    person: null
+  })
 
   return (<>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
@@ -37,6 +43,7 @@ export default function Home() {
             <li><Link to="/tokens">gestire i token</Link></li>
           }
         </ul>
+        <PersonInput name="person" label="Persona" value={obj} setStore={setObj} edit={true}></PersonInput>
       </>
     );
   }
