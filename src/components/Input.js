@@ -237,7 +237,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
           ref={typeaheadref}
           onChange={onChangeHandler}
           placeholder="Seleziona una persona..."
-          value={value}
+          selected={[value]}
           renderMenuItemChildren={(option) => (
             <>
               <span>{option.firstName} {option.lastName} ({option.affiliation})</span>
