@@ -1,5 +1,4 @@
-import { FormGroup, FormLabel, Modal, Button, Input, FormText } from 'react-bootstrap'
-import ReactDatePicker from "react-datepicker"
+import { FormGroup, FormLabel, Modal, Button } from 'react-bootstrap'
 import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
@@ -179,7 +178,6 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
 
     const handleSearch = (query) => {
         setIsLoading(true)
-        const baseUrl = process.env.REACT_APP_SERVER_URL || ""
 
         if (true) {
             // regex search
