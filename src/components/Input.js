@@ -141,7 +141,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
 
     if (! edit) {
         if (!value) return <p>null</p>
-        return <p>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
+        return <p><strong>person: </strong>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
     }
 
     function handleClose() {
