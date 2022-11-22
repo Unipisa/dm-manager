@@ -222,15 +222,13 @@ class Controller {
                 }}
             ])
         
-        // questa riga dovrebbe aggiungere i dati di person a result
-        // ma non sembra funzionare!
-        result = await this.Model.populate(result, this.populate_fields)
-
+        
         if (result.length === 0) {
             total = 0;
             data = result;
         } else {
             [{ total, data }] = result;
+            data = await this.Model.populate(data, this.populate_fields)
         }
             
         console.log(`${data.length} / ${total} items collected`);
