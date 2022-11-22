@@ -26,6 +26,9 @@ class Controller {
         // are going to be expanded with the referred objects
         this.populate_fields = ['createdBy', 'updatedBy']
 
+        // Fields used in the search endpoint
+        this.searchFields = []
+
         /***
          * information of fields which can be used
          * as filter and as sort keys. 
@@ -97,8 +100,15 @@ class Controller {
 
     async search(req, res) {
         const $search = req.query.q || ''
-        const $text = { $search }
-        const data = await this.Model.find({$text}).limit(10)
+        const $escapedsearch = $search.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+
+        var data = []
+        for (var field of this.searchFields) {
+            data = [ ...data, 
+                ...await this.Model.find({ [field]: { $regex: new RegExp($escapedsearch, "i") }}).limit(10)
+            ]
+        }
+
         return res.send({ data })
     }
 

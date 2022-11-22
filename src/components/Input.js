@@ -198,11 +198,11 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
                     ...x
                 }
             })
-            var newoptions = [{
+            var newoptions = [{ 
                 noPersonSelected: true
             }, ...searchoptions ]
 
-            if (searchoptions.length == 0) {
+            if (searchoptions.length === 0) {
                 newoptions = [{
                     newPersonEntry: true,
                     query: query

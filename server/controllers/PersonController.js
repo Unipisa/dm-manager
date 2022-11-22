@@ -7,6 +7,7 @@ class PersonController extends Controller {
         this.path = 'person'
         this.managerRoles.push('person-manager')
         this.supervisorRoles.push('person-manager', 'person-supervisor')
+        this.searchFields = [ 'lastName', 'firstName', 'affiliation' ]
     }
 }
 
