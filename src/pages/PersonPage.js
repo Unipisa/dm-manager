@@ -3,7 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { StringInput, DateInput, TextInput } from '../components/Input'
+import { StringInput, TextInput } from '../components/Input'
 
 export default function PersonPage() {
     const objCode = 'person'
@@ -17,7 +17,6 @@ export default function PersonPage() {
         country: "", 
         email: "", 
         phone: "", 
-        notes: "",
         notes: "",
         }
 
