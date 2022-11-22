@@ -25,7 +25,7 @@ jobs:
       uses: docker/setup-buildx-action@v2
     - name: Docker meta
       id: meta
-      uses: crazy-max/ghaction-docker-meta@v2
+      uses: docker/metadata-action@v4
       with:
         images: harbor.cs.dm.unipi.it/dm-manager/dm-manager
         tags: |
