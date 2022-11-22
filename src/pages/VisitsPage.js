@@ -39,7 +39,7 @@ export default function VisitsPage() {
                             <tr key={visit._id} onClick={()=>navigateTo(visit)}>
                                 <td>{ myDateFormat(visit.startDate) }</td>
                                 <td>{ myDateFormat(visit.endDate) }</td>
-                                <td>{ `${visit.person.lastName} ${visit.person.firstName}` }</td>
+                                <td>{ `${visit.person ? visit.person.lastName : ""} ${visit.person ? visit.person.firstName : ""}` }</td>
                                 <td>{ visit.invitedBy }</td>
                                 <td>{ visit.affiliation }</td>
                                 <td>{ visit.building }</td>

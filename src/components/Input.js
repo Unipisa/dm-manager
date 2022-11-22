@@ -138,9 +138,11 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
     if (value === undefined && store!==undefined) value = store[name]
     if (label === undefined) label = name
 
+    const [selected, setSelected] = useState(value ? [value] : [])
+
     if (! edit) {
-        if (!value) return <p>null</p>
-        return <p><strong>person: </strong>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
+        if (!value) return <p><strong>persona: </strong>nessuna selezione</p>
+        return <p><strong>persona: </strong>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
     }
 
     function handleClose() {
@@ -160,6 +162,8 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
                     ...obj, 
                     [name]: data
                 }))
+                setSelected([ data ])
+                typeaheadref.current.blur()
             })
         })
 
@@ -167,8 +171,17 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
     }
 
     function onChangeHandler(evt) {
+        if (evt.length > 0 && evt[0].newPersonEntry) {
+            setNewPersonFirstName("")
+            setNewPersonLastName(evt[0].query)
+            setNewPersonAffiliation("")
+
+            setShow(true)
+            return;
+        }
+
+        setSelected(evt)
         if (evt.length > 0) {
-            // This does not correctly update the typeahead component
             setStore(obj => ({
                 ...obj,
                 [name]: evt[0]
@@ -178,45 +191,54 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
 
     const handleSearch = (query) => {
         setIsLoading(true)
-
-        if (true) {
-            // regex search
-            // con: should escape regex reserved characters
-            // con: will not search on multiple fields
-            engine.get('/api/v0/person', {lastName__regex: `.*${query}.*`}).then((data) => {
-                setOptions(data["data"].map(x => {
-                    return {
-                        // This is just for displaying something reasonable when the 
-                        // user selects the right person.
-                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
-                        ...x
-                    }
-                }))
-                setIsLoading(false);
+       
+        engine.get('/api/v0/person/search', {q: query}).then((data) => {
+            const searchoptions = data["data"].map(x => {
+                return {
+                    ...x
+                }
             })
-        } else {
-            // textual search
-            // con: cannot perform partial text search
-            engine.get('/api/v0/person/search', {q: query}).then((data) => {
-                setOptions(data["data"].map(x => {
-                    return {
-                        // This is just for displaying something reasonable when the 
-                        // user selects the right person.
-                        display: `${x.firstName} ${x.lastName} (${x.affiliation})`, 
-                        ...x
-                    }
-                }))
-                setIsLoading(false);
-            })    
-        }
+            var newoptions = [{
+                noPersonSelected: true
+            }, ...searchoptions ]
+
+            if (searchoptions.length == 0) {
+                newoptions = [{
+                    newPersonEntry: true,
+                    query: query
+                }, ...newoptions ]
+            }
+
+            setOptions(newoptions)
+            setIsLoading(false);
+        })   
     }
 
     const labelDisplayFunction = x => {
-        return `${x.firstName} ${x.lastName} (${x.affiliation})`        
+        if (x.noPersonSelected) {
+            return ""
+        }
+        return `${x.firstName} ${x.lastName} (${x.affiliation})`
     }
 
-    const handleNewPersonClick = x => {
-        setShow(true);
+    const menuRenderFunction = x => {
+        if (x.newPersonEntry) {
+            return <>
+                <span className="text-muted">Nuova persona</span> {x.query}
+            </>
+        }
+        if (x.noPersonSelected) {
+            return <span className="text-muted">Nessuna persona</span>
+        }
+        return <span>{labelDisplayFunction(x)}</span>
+    }
+
+    const onBlurHandler = x => {
+        setSelected(value ? [value] : [])
+
+        if (! value) {
+            typeaheadref.current.clear()
+        }
     }
 
     const filterBy = () => true
@@ -243,7 +265,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
        <FormLabel className="col-sm-2">
             { label }
         </FormLabel>
-        <div className="col-sm-8">
+        <div className="col-sm-10">
         <AsyncTypeahead
           filterBy={filterBy}
           isLoading={isLoading}
@@ -253,17 +275,11 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
           options={options}
           ref={typeaheadref}
           onChange={onChangeHandler}
+          onBlur={onBlurHandler}
           placeholder="Seleziona una persona..."
-          selected={value?[value]:[]}
-          renderMenuItemChildren={(option) => (
-            <>
-              <span>{option.firstName} {option.lastName} ({option.affiliation})</span>
-            </>
-          )}
+          selected={selected}
+          renderMenuItemChildren={menuRenderFunction}
         />
-        </div>
-        <div className="col-sm-2">
-            <Button onClick={handleNewPersonClick}>Nuova persona</Button>
         </div>
     </FormGroup>
 }
