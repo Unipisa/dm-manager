@@ -238,7 +238,10 @@ async function main() {
   await create_admin_user()
   await create_secret_token()
 
-  await migrations.migrate()
+  if (!await migrations.migrate(mongoose.connection.db)) {
+    console.log(`server aborting`)
+    process.exit(123)
+  }
 
   app.listen(parseInt(config.PORT), () => {
     console.log(`server started: ${config.SERVER_URL}`)

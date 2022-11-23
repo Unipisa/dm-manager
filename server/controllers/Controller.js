@@ -235,8 +235,6 @@ class Controller {
                     data: "$limiting"
                 }}
             ])
-        
-        
         if (result.length === 0) {
             total = 0;
             data = result;
