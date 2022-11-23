@@ -1,4 +1,4 @@
-import { FormGroup, FormLabel, Modal, Button } from 'react-bootstrap'
+import { Form, Modal, Button } from 'react-bootstrap'
 import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
@@ -9,9 +9,9 @@ import { myDateFormat, useEngine } from '../Engine'
 export function StringInput({ label, value, setValue, edit }) {
     const id = useId()
     if (!edit) return <p><b>{label}:</b> {value}</p>
-    return <FormGroup className="row my-2">
-        <FormLabel className="col-sm-2" htmlFor={ id }>
-            { label }</FormLabel>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
         <div className="col-sm-10">
             <input className="form-control col-sm-10"
                 id={ id } 
@@ -19,15 +19,15 @@ export function StringInput({ label, value, setValue, edit }) {
                 onChange={ (evt) => {setValue(evt.target.value)} }
             />                 
         </div>
-    </FormGroup>
+    </Form.Group>
 }
 
 export function DateInput({ label, value, setValue, edit }) {
     const id = useId()
     if (!edit) return <p><b>{label}:</b> {myDateFormat(value)}</p>
-    return <FormGroup className="row my-2">
-        <FormLabel className="col-sm-2" htmlFor={ id }>
-            { label }</FormLabel>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
         <div className="col-sm-10">
             <UtcDatePicker 
                 className="form-control"
@@ -35,15 +35,15 @@ export function DateInput({ label, value, setValue, edit }) {
                 dateFormat="d.MM.yyyy"
                 onChange={ date => setValue(date) } />
         </div>
-    </FormGroup>
+    </Form.Group>
 }
 
 export function ListInput({ label, value, setValue, separator, edit }) {
     const id = useId()
     if (separator === undefined) separator = ','    
     if (!edit) return <p><b>{label}:</b> {value.join(', ')}</p>
-    return <FormGroup className="row my-2">
-        <FormLabel className="col-sm-2" htmlFor={ id }>{ label }</FormLabel>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>{ label }</Form.Label>
             <div className="col-sm-10">
                 <input 
                     id={ id } 
@@ -58,15 +58,15 @@ export function ListInput({ label, value, setValue, separator, edit }) {
                     className="form-control" 
                 />
         </div>
-    </FormGroup>
+    </Form.Group>
 }
 
 export function TextInput({ label, value, setValue, edit }) {
     const id = useId()
     if (!edit) return <p><b>{label}:</b> {value}</p>
-    return <FormGroup className="row my-2">
-        <FormLabel className="col-sm-2" htmlFor={ id }>
-            { label }</FormLabel>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
         <div className="col-sm-10">
             <textarea 
                 id={ id } 
@@ -75,7 +75,7 @@ export function TextInput({ label, value, setValue, edit }) {
                 className="form-control" 
             />
         </div>
-    </FormGroup>
+    </Form.Group>
 }
 
 //
@@ -83,7 +83,7 @@ export function TextInput({ label, value, setValue, edit }) {
 //
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
-export function PersonInput({ label, value, setValue, edit }) {
+export function PersonInput({ label, value, setValue, edit, multiple }) {
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false)
@@ -99,11 +99,30 @@ export function PersonInput({ label, value, setValue, edit }) {
 
     const engine = useEngine()
 
-    const [selected, setSelected] = useState(value ? [value] : [])
+    if (multiple === undefined) {
+        multiple = false
+    }
+
+    // Determine the value of selected that should be initialized
+    const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
+
+    const labelDisplayFunction = x => {
+        if (x.noPersonSelected || x.newPersonEntry)
+            return ""
+
+        return `${x.firstName} ${x.lastName} (${x.affiliation})`
+    }
 
     if (! edit) {
-        if (!value) return <p><strong>persona: </strong>nessuna selezione</p>
-        return <p><strong>persona: </strong>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
+        if (multiple) {
+            return <p>
+                <strong>persone: </strong>{Array.from(value).map(labelDisplayFunction).join(", ")}
+            </p>
+        }
+        else {
+            if (!value) return <p><strong>persona: </strong>nessuna selezione</p>
+            return <p><strong>persona: </strong>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
+        }
     }
 
     function handleClose() {
@@ -118,9 +137,15 @@ export function PersonInput({ label, value, setValue, edit }) {
                 affiliation: newPersonAffiliation
             })
         }).then(res => {
-            res.json().then(data => {                
-                setValue(data)
-                setSelected([ data ])
+            res.json().then(data => {      
+                if (multiple) {
+                    setValue([ ...value, data ])
+                    setSelected([ ...value, data ])
+                }   
+                else {       
+                    setValue(data)
+                    setSelected([ data ])
+                }
                 typeaheadref.current.blur()
             })
         })
@@ -129,18 +154,24 @@ export function PersonInput({ label, value, setValue, edit }) {
     }
 
     function onChangeHandler(evt) {
-        if (evt.length > 0 && evt[0].newPersonEntry) {
+        if (evt.length > 0 && evt[evt.length - 1].newPersonEntry) {
             setNewPersonFirstName("")
-            setNewPersonLastName(evt[0].query)
+            setNewPersonLastName(evt[evt.length - 1].query)
             setNewPersonAffiliation("")
-
             setShow(true)
             return;
         }
 
+        // Filter the entries removing the "No Person selected entries, if any"
+        evt = Array.from(evt).filter(x => ! (x.noPersonSelected || x.newPersonEntry))
+
         setSelected(evt)
+
         if (evt.length > 0) {
-            setValue(evt[0])
+            setValue(multiple ? evt : evt[0])
+        }
+        else {
+            setValue(multiple ? [] : null)
         }
     }
 
@@ -153,9 +184,11 @@ export function PersonInput({ label, value, setValue, edit }) {
                     ...x
                 }
             })
-            var newoptions = [{ 
-                noPersonSelected: true
-            }, ...searchoptions ]
+
+            let newoptions = searchoptions
+
+            if (! multiple)
+                newoptions = [ { noPersonSelected: true }, ...newoptions ]
 
             if (searchoptions.length === 0) {
                 newoptions = [{
@@ -169,18 +202,9 @@ export function PersonInput({ label, value, setValue, edit }) {
         })   
     }
 
-    const labelDisplayFunction = x => {
-        if (x.noPersonSelected) {
-            return ""
-        }
-        return `${x.firstName} ${x.lastName} (${x.affiliation})`
-    }
-
     const menuRenderFunction = x => {
         if (x.newPersonEntry) {
-            return <>
-                <span className="text-muted">Nuova persona</span> {x.query}
-            </>
+            return <><span className="text-muted">Nuova persona</span> {x.query}</>
         }
         if (x.noPersonSelected) {
             return <span className="text-muted">Nessuna persona</span>
@@ -189,7 +213,12 @@ export function PersonInput({ label, value, setValue, edit }) {
     }
 
     const onBlurHandler = x => {
-        setSelected(value ? [value] : [])
+        if (multiple) {
+            setSelected(value)
+        }
+        else {
+            setSelected(value ? [value] : [])
+        }
 
         if (! value) {
             typeaheadref.current.clear()
@@ -198,7 +227,7 @@ export function PersonInput({ label, value, setValue, edit }) {
 
     const filterBy = () => true
 
-    return <FormGroup className="row">
+    return <Form.Group className="row">
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Crea una nuova persona</Modal.Title>
@@ -217,11 +246,11 @@ export function PersonInput({ label, value, setValue, edit }) {
           </Button>
         </Modal.Footer>
       </Modal>
-       <FormLabel className="col-sm-2">
+       <Form.Label className="col-sm-2">
             { label }
-        </FormLabel>
-        <div className="col-sm-10">
+        </Form.Label>
         <AsyncTypeahead
+          className="col-sm-10"
           filterBy={filterBy}
           isLoading={isLoading}
           id={ id }
@@ -234,16 +263,16 @@ export function PersonInput({ label, value, setValue, edit }) {
           placeholder="Seleziona una persona..."
           selected={selected}
           renderMenuItemChildren={menuRenderFunction}
+          multiple={multiple}
         />
-        </div>
-    </FormGroup>
+    </Form.Group>
 }
 export function SelectInput({ options, label, value, setValue, edit }) {
     const id = useId()
     if (!edit) return <p><b>{label}:</b> {value}</p>
-    return <FormGroup className="row my-2">
-        <FormLabel className="col-sm-2" htmlFor={ id }>
-            { label }</FormLabel>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
         <div className="col-sm-10">
             <select className="form-control col-sm-10"
                 id={ id } 
@@ -252,5 +281,5 @@ export function SelectInput({ options, label, value, setValue, edit }) {
             { options.map(value => <option value={value}>{ value }</option>)}
             </select>
         </div>
-    </FormGroup>
+    </Form.Group>
 }

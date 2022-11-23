@@ -1,3 +1,6 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {useCreateEngine, EngineProvider} from './Engine'
@@ -20,6 +23,7 @@ import TokensPage from './pages/TokensPage'
 import RoomLabelsPage from './pages/RoomLabelsPage'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
+
 
 console.log("dm-manager (app starting)")
 
