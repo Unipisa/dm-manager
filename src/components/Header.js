@@ -13,7 +13,7 @@ export default function Header() {
   return (
       <Navbar bg="light" expand="lg" className="mb-4">
         <Container>
-          <Navbar.Brand href="/">dm-manager { package_json.version }</Navbar.Brand>
+          <Navbar.Brand href="/">{ engine.config.SERVER_NAME } { package_json.version }</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
