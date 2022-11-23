@@ -87,12 +87,10 @@ export default function VisitPage() {
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }>
             <PersonInput value={obj.person} setValue={setter("person")} label="persona" edit={ edit }/>
-            <StringInput label="nome" value={ obj.firstName } setValue={ setter('firstName') } edit={ edit }/> 
-            <StringInput value={obj.lastName} setValue={setter("lastName")} label="cognome" edit={ edit }/>
             <StringInput value={obj.affiliation} setValue={setter("affiliation")} label="affiliazione" edit={ edit }/>
             <StringInput value={obj.country} setValue={setter("country")} label="nazione" edit={ edit }/>
-            <StringInput value={obj.email} setValue={setter("email")} label="email" edit={ edit }/>
-            <StringInput value={obj.invitedBy} setValue={setter("invitedBy")} label="referente" edit={ edit }/>
+            <PersonInput value={obj.referencePerson} setValue={setter("referencePerson")} label="referente" edit={ edit }/>
+            <StringInput value={obj.invitedBy} setValue={setter("invitedBy")} label="altri referenti" edit={ edit }/>
             <StringInput value={obj.fundingAgency} setValue={setter("fundingAgency")} label="fondo" edit={ edit }/>
             <StringInput value={obj.SSD} setValue={setter("SSD")} label="SSD" setStore= { setObj } edit={ edit }/>
             <DateInput value={obj.startDate} setValue={setter("startDate")} label="inizio" edit={ edit }/>

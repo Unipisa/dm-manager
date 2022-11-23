@@ -102,8 +102,8 @@ export function PersonInput({ label, value, setValue, edit }) {
     const [selected, setSelected] = useState(value ? [value] : [])
 
     if (! edit) {
-        if (!value) return <p><strong>persona: </strong>nessuna selezione</p>
-        return <p><strong>persona: </strong>{`${value.firstName} ${value.lastName} (${value.affiliation})`}</p>
+        const v = value ? `${value.firstName} ${value.lastName} (${value.affiliation})` : ''
+        return <p><strong>{label}: </strong>{v}</p>
     }
 
     function handleClose() {
