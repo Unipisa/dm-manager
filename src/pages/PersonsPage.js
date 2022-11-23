@@ -32,6 +32,8 @@ export default function PersonsPage() {
                         <tr>
                             <Th filter={filter.header('lastName')}>cognome</Th>
                             <Th filter={filter.header('firstName')}>nome</Th>
+                            <Th filter={filter.header('affiliation')}>affiliazione</Th>
+                            <Th filter={filter.header('email')}>email</Th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,6 +42,8 @@ export default function PersonsPage() {
                             <tr key={obj._id} onClick={()=>navigateTo(obj)}>
                                 <td>{ obj.lastName }</td>
                                 <td>{ obj.firstName }</td>
+                                <td>{ obj.affiliation }</td>
+                                <td>{ obj.email }</td>
                             </tr>) 
                         }
                     </tbody>
