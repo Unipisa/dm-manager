@@ -10,18 +10,16 @@ export default function VisitPage() {
     const objName = 'visita'
     const indexUrl = '/visits'
     const empty = {
-        lastName: "",
-        firstName: "",
+        person: null,
         affiliation: "",
-        email: "",
         startDate: "",
         endDate: "",
         building: "",
         roomNumber: "",
+        referencePerson: null,
         invitedBy: "",
         SSD: "",
         notes: "",
-        person: null,
         country: "",
         fundingAgency: "",
     }
@@ -78,6 +76,7 @@ export default function VisitPage() {
         } else {
             setObj(obj => ({...obj, [field]: value}))
         }
+        console.log(`setting field ${field} to value ${value}`)
     }
 
     return <Card>

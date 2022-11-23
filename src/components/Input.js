@@ -107,7 +107,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
 
     const labelDisplayFunction = x => {
-        if (x.noPersonSelected || x.newPersonEntry)
+        if (x === null || x.noPersonSelected || x.newPersonEntry)
             return ""
 
         return `${x.firstName} ${x.lastName} (${x.affiliation})`
@@ -116,7 +116,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     if (! edit) {
         const values = multiple ? value : [ value ]
         return <p>
-            <strong>{ label }: </strong>{Array.from(value).map(labelDisplayFunction).join(", ")}
+            <strong>{ label }: </strong>{Array.from(values).map(labelDisplayFunction).join(", ")}
         </p> 
     }
 
@@ -255,7 +255,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
           ref={typeaheadref}
           onChange={onChangeHandler}
           onBlur={onBlurHandler}
-          placeholder="Seleziona una persona..."
+          placeholder="cognome"
           selected={selected}
           renderMenuItemChildren={menuRenderFunction}
           multiple={multiple}
