@@ -66,6 +66,8 @@ export default function PersonPage() {
 
     if (redirect !== null) return <Navigate to={redirect} />
 
+    const setter = field => value => setObj(obj => ({...obj, [field]: value}))
+
     return <Card>
         <Card.Header>
             <h3>{ create ? `nuova ${objName}` : `${objName} ${obj?.lastName}` }</h3>
@@ -73,13 +75,13 @@ export default function PersonPage() {
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }
         >
-            <StringInput name="firstName" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
-            <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="affiliation" label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="unipiId" label="matricola unipi" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="country" label="paese" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="phone" label="telefono" store={ obj } setStore={ setObj } edit={ edit }/>
-            <TextInput name="notes" label="note" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.firstName} setValue={setter("firstName")} label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
+            <StringInput value={obj.lastName} setValue={setter("lastName")} label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.affiliation} setValue={setter("affiliation")} label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.unipiId} setValue={setter("unipiId")} label="matricola unipi" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.country} setValue={setter("country")} label="paese" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.phone} setValue={setter("phone")} label="telefono" store={ obj } setStore={ setObj } edit={ edit }/>
+            <TextInput value={obj.notes} setValue={setter("notes")} label="note" store={ obj } setStore={ setObj } edit={ edit }/>
             { edit ?
                 <ButtonGroup className="mt-3">
                     <Button 

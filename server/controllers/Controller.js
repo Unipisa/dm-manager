@@ -1,4 +1,4 @@
-const {log, requireSomeRole} = require('./middleware') 
+const {log, requireSomeRole, requireUser} = require('./middleware') 
 
 function sendBadRequest(res, message) {
     res.status(400)
@@ -85,6 +85,10 @@ class Controller {
             }
     
         }
+
+    async getModel(req, res) {
+        res.send(this.Model)
+    }
 
     async get(req, res, id) {
         try {
@@ -297,8 +301,10 @@ class Controller {
     }
 
     register_path(router, method, path, roles, callback) {
-        router[method](path, requireSomeRole(...roles), callback)
-
+        router[method](path, 
+            roles===null ? requireUser : requireSomeRole(...roles), 
+            callback)
+ 
         // brief JSON description of path
         return {
             method: method.toUpperCase(),
@@ -307,9 +313,13 @@ class Controller {
             approximative_object_keys: Object.keys(this.Model.schema.obj)
         }
     }
-
+    
     register(router) {
         return [
+            this.register_path(router, 'get', `/${this.path}/Model`, 
+                this.searchRoles, 
+                (req, res) => this.getModel(req, res)),
+    
             this.register_path(router, 'get', `/${this.path}/search/`,
                 this.searchRoles,
                 (req, res) => this.search(req, res)),
@@ -329,7 +339,6 @@ class Controller {
             this.register_path(router, 'patch', `/${this.path}/:id`, 
                 this.managerRoles, 
                 (req, res) => {
-                    console.log("BUH")
                     const payload = {...req.body,
                         updatedBy: req.user._id
                     }

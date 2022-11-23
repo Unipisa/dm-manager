@@ -62,6 +62,8 @@ export default function UserPage() {
 
     if (redirect !== null) return <Navigate to={redirect} />
 
+    const setter = field => value => setObj(obj => ({...obj, [field]: value}))
+
     return <Card>
         <Card.Header>
             <h3>{ create ? `nuovo ${objName}` : `${objName} ${obj.firstName} ${obj.lastName}` }</h3>
@@ -72,11 +74,11 @@ export default function UserPage() {
             event.preventDefault()
             }}
         >
-            <StringInput name="username" label="username" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="email" label="email" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="firstName" label="nome" store={ obj} setStore={ setObj } edit={ edit }/>
-            <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
-            <ListInput name="roles" label="ruoli" store={ obj } setStore={ setObj } separator=" " edit={ edit }/>
+            <StringInput value={obj.username} setValue={setter("username")} label="username" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.email} setValue={setter("email")} label="email" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.firstName} setValue={setter("firstName")} label="nome" store={ obj} setStore={ setObj } edit={ edit }/>
+            <StringInput value={obj.lastName} setValue={setter("lastName")} label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
+            <ListInput value={obj.roles} setValue={setter("roles")} label="ruoli" store={ obj } setStore={ setObj } separator=" " edit={ edit }/>
                 { edit 
                 ?   <ButtonGroup>
                         <Button 

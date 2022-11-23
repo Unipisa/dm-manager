@@ -72,26 +72,34 @@ export default function VisitPage() {
 
     if (redirect !== null) return <Navigate to={redirect} />
 
+    const setter = field => value => {
+        if (field === 'person') {
+            setObj(obj => ({...obj, [field]: value, affiliation: value ? value.affiliation : ""}))
+        } else {
+            setObj(obj => ({...obj, [field]: value}))
+        }
+    }
+
     return <Card>
         <Card.Header>
             <h3>{ create ? `nuova ${objName}` : `${objName} ${obj?.lastName}` }</h3>
         </Card.Header>
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }>
-            <PersonInput name="person" label="persona" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="firstName" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
-            <StringInput name="lastName" label="cognome" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="affiliation" label="affiliazione" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="country" label="nazione" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="email" label="email" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="invitedBy" label="referente" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="fundingAgency" label="fondo" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="SSD" label="SSD" store={ obj } setStore= { setObj } edit={ edit }/>
-            <DateInput name="startDate" label="inizio" store={ obj } setStore={ setObj } edit={ edit }/>
-            <DateInput name="endDate" label="fine" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="building" label="edificio" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="roomNumber" label="stanza" store={ obj } setStore={ setObj } edit={ edit }/>
-            <TextInput name="notes" label="note" store={ obj } setStore={ setObj } edit={ edit }/>
+            <PersonInput value={obj.person} setValue={setter("person")} label="persona" edit={ edit }/>
+            <StringInput label="nome" value={ obj.firstName } setValue={ setter('firstName') } edit={ edit }/> 
+            <StringInput value={obj.lastName} setValue={setter("lastName")} label="cognome" edit={ edit }/>
+            <StringInput value={obj.affiliation} setValue={setter("affiliation")} label="affiliazione" edit={ edit }/>
+            <StringInput value={obj.country} setValue={setter("country")} label="nazione" edit={ edit }/>
+            <StringInput value={obj.email} setValue={setter("email")} label="email" edit={ edit }/>
+            <StringInput value={obj.invitedBy} setValue={setter("invitedBy")} label="referente" edit={ edit }/>
+            <StringInput value={obj.fundingAgency} setValue={setter("fundingAgency")} label="fondo" edit={ edit }/>
+            <StringInput value={obj.SSD} setValue={setter("SSD")} label="SSD" setStore= { setObj } edit={ edit }/>
+            <DateInput value={obj.startDate} setValue={setter("startDate")} label="inizio" edit={ edit }/>
+            <DateInput value={obj.endDate} setValue={setter("endDate")} label="fine" edit={ edit }/>
+            <StringInput value={obj.building} setValue={setter("building")} label="edificio" edit={ edit }/>
+            <StringInput value={obj.roomNumber} setValue={setter("roomNumber")} label="stanza" edit={ edit }/>
+            <TextInput value={obj.notes} setValue={setter("notes")} label="note" edit={ edit }/>
             { edit ?
                 <ButtonGroup className="mt-3">
                     <Button 

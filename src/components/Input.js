@@ -2,14 +2,12 @@ import { FormGroup, FormLabel, Modal, Button } from 'react-bootstrap'
 import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import { useState, useRef } from 'react';
+import { useState, useRef, useId } from 'react';
 
 import { myDateFormat, useEngine } from '../Engine'
 
-export function StringInput({ name, label, store, setStore, value, edit }) {
-    if (value === undefined && store!==undefined) value = store[name]
-    if (label === undefined) label = name
-    const id = `myinput-${name}`
+export function StringInput({ label, value, setValue, edit }) {
+    const id = useId()
     if (!edit) return <p><b>{label}:</b> {value}</p>
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
@@ -17,24 +15,15 @@ export function StringInput({ name, label, store, setStore, value, edit }) {
         <div className="col-sm-10">
             <input className="form-control col-sm-10"
                 id={ id } 
-                name={ name } 
                 value={ value || "" } 
-                onChange={ (evt) => {
-                    setStore(obj => {
-                        obj = {...obj}
-                        obj[name] = evt.target.value
-                        return obj
-                    })} 
-                }
+                onChange={ (evt) => {setValue(evt.target.value)} }
             />                 
         </div>
     </FormGroup>
 }
 
-export function DateInput({ name, label, store, setStore, value, edit }) {
-    if (value === undefined && store!==undefined) value = store[name]
-    if (label === undefined) label = name
-    const id = `dateinput-${name}`
+export function DateInput({ label, value, setValue, edit }) {
+    const id = useId()
     if (!edit) return <p><b>{label}:</b> {myDateFormat(value)}</p>
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
@@ -44,42 +33,26 @@ export function DateInput({ name, label, store, setStore, value, edit }) {
                 className="form-control"
                 selected={ value ? new Date(value) : null }  
                 dateFormat="d.MM.yyyy"
-                onChange={ date => {
-                        setStore(obj => {
-                            obj = {...obj}
-                            obj[name] = date
-                            return obj
-                        }) 
-                    } 
-            }/>
+                onChange={ date => setValue(date) } />
         </div>
     </FormGroup>
 }
 
-export function ListInput({ name, label, store, setStore, value, separator, edit }) {
-    if (value === undefined && store!==undefined) value = store[name]
-    if (label === undefined) label = name
+export function ListInput({ label, value, setValue, separator, edit }) {
+    const id = useId()
     if (separator === undefined) separator = ','    
-
     if (!edit) return <p><b>{label}:</b> {value.join(', ')}</p>
-
-    const id = `myinput-${name}`
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>{ label }</FormLabel>
             <div className="col-sm-10">
                 <input 
                     id={ id } 
-                    name={ name } 
                     value={ value.join(separator) || "" } 
                     onChange={ (evt) => {
                             const val = evt.target.value
                                 .split(separator)
                                 .map( x => x.trim())
-                            setStore(obj => {
-                                obj = {...obj}
-                                obj[name] = val
-                                return obj
-                            }) 
+                            setValue(val) 
                         } 
                     }
                     className="form-control" 
@@ -88,27 +61,17 @@ export function ListInput({ name, label, store, setStore, value, separator, edit
     </FormGroup>
 }
 
-export function TextInput({ name, label, store, setStore, value, edit }) {
-    if (value === undefined && store!==undefined) value = store[name]
-    if (label === undefined) label = name
+export function TextInput({ label, value, setValue, edit }) {
+    const id = useId()
     if (!edit) return <p><b>{label}:</b> {value}</p>
-    const id = `textinput-${name}`
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
             { label }</FormLabel>
         <div className="col-sm-10">
             <textarea 
                 id={ id } 
-                name={ name } 
                 value={ value || "" } 
-                onChange={ (evt) => {
-                        setStore(obj => {
-                            obj = {...obj}
-                            obj[name] = evt.target.value
-                            return obj
-                        }) 
-                    } 
-                }
+                onChange={ (evt) => setValue(evt.target.value) }
                 className="form-control" 
             />
         </div>
@@ -118,13 +81,14 @@ export function TextInput({ name, label, store, setStore, value, edit }) {
 //
 // How to use this input: insert something along the lines of 
 //
-//  <PersonInput name="prova" label="Persona" value={person} setStore={setPerson} edit={true}></PersonInput>
+//  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
-export function PersonInput({ name, label, value, store, setStore, edit }) {
+export function PersonInput({ label, value, setValue, edit }) {
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
-    const [show, setShow] = useState(false);
-    const typeaheadref = useRef(null);
+    const [show, setShow] = useState(false)
+    const typeaheadref = useRef(null)
+    const id = useId()
 
     // Data used for the new person create
     const [newPersonFirstName, setNewPersonFirstName] = useState("");
@@ -134,9 +98,6 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
     const baseUrl = process.env.REACT_APP_SERVER_URL || ""
 
     const engine = useEngine()
-
-    if (value === undefined && store!==undefined) value = store[name]
-    if (label === undefined) label = name
 
     const [selected, setSelected] = useState(value ? [value] : [])
 
@@ -158,10 +119,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
             })
         }).then(res => {
             res.json().then(data => {                
-                setStore(obj => ({
-                    ...obj, 
-                    [name]: data
-                }))
+                setValue(data)
                 setSelected([ data ])
                 typeaheadref.current.blur()
             })
@@ -182,10 +140,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
 
         setSelected(evt)
         if (evt.length > 0) {
-            setStore(obj => ({
-                ...obj,
-                [name]: evt[0]
-            }))
+            setValue(evt[0])
         }
     }
 
@@ -269,7 +224,7 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
         <AsyncTypeahead
           filterBy={filterBy}
           isLoading={isLoading}
-          id={"typeahead-" + label}
+          id={ id }
           labelKey={labelDisplayFunction}
           onSearch={handleSearch}
           options={options}
@@ -283,10 +238,8 @@ export function PersonInput({ name, label, value, store, setStore, edit }) {
         </div>
     </FormGroup>
 }
-export function SelectInput({ options, name, label, store, setStore, value, edit }) {
-    if (value === undefined && store!==undefined) value = store[name]
-    if (label === undefined) label = name
-    const id = `select-input-${name}`
+export function SelectInput({ options, label, value, setValue, edit }) {
+    const id = useId()
     if (!edit) return <p><b>{label}:</b> {value}</p>
     return <FormGroup className="row my-2">
         <FormLabel className="col-sm-2" htmlFor={ id }>
@@ -294,15 +247,8 @@ export function SelectInput({ options, name, label, store, setStore, value, edit
         <div className="col-sm-10">
             <select className="form-control col-sm-10"
                 id={ id } 
-                name={ name } 
                 value={ value || "" } 
-                onChange={ (evt) => {
-                    setStore(obj => {
-                        obj = {...obj}
-                        obj[name] = evt.target.value
-                        return obj
-                    })} 
-                }>
+                onChange={ (evt) => setValue(evt.target.value) }>
             { options.map(value => <option value={value}>{ value }</option>)}
             </select>
         </div>

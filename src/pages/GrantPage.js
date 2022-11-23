@@ -73,6 +73,8 @@ export default function GrantPage() {
 
     if (redirect !== null) return <Navigate to={redirect} />
 
+    const setter = field => value => setObj(obj => ({...obj, [field]: value}))
+
     return <Card>
         <Card.Header>
             <h3>{ create ? `nuovo ${objName}` : `${objName} ${obj?.name}` }</h3>
@@ -80,22 +82,22 @@ export default function GrantPage() {
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }
         >
-            <StringInput name="name" label="nome" store={ obj } setStore={ setObj } edit={ edit }/> 
-            <StringInput name="identifier" label="id" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="projectType" label="tipo" store={ obj } setStore={ setObj } edit={ edit }/>
-            <SelectInput name="funds" label="fondi" options={["National", "International"]} store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="fundingEntity" label="ente erogatore" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="pi" label="principal investigator" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="localCoordinator" label="coordinatore locale" store={ obj } setStore={ setObj } edit={ edit }/>
-            <ListInput name="members" label="membri" store={ obj } setStore= { setObj } edit={ edit }/>
-            <DateInput name="startDate" label="inizio" store={ obj } setStore={ setObj } edit={ edit }/>
-            <DateInput name="endDate" label="fine" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="webSite" label="sito web" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="budgetAmount" label="ammontare budget" store={ obj } setStore={ setObj } edit={ edit }/>
-            <TextInput name="description" label="descrizione" store={ obj } setStore={ setObj } edit={ edit }/>
-            <ListInput name="keywords" label="parole chiave" store={ obj } setStore={ setObj } edit={ edit }/>
-            <StringInput name="ssd" label="SSD" store={ obj } setStore={ setObj } edit={ edit }/>
-            <TextInput name="notes" label="note" store={ obj } setStore={ setObj } edit={ edit }/>
+            <StringInput setValue={setter("name")} value={obj.name} label="nome" edit={ edit }/> 
+            <StringInput setValue={setter("identifier")} value={obj.identifier} label="id" edit={ edit }/>
+            <StringInput setValue={setter("projectType")} value={obj.projectType} label="tipo" edit={ edit }/>
+            <SelectInput setValue={setter("funds")} value={obj.funds} label="fondi" options={["National", "International"]} edit={ edit }/>
+            <StringInput setValue={setter("fundingEntity")} value={obj.fundingEntity} label="ente erogatore" edit={ edit }/>
+            <StringInput setValue={setter("pi")} value={obj.pi} label="principal investigator" edit={ edit }/>
+            <StringInput setValue={setter("localCoordinator")} value={obj.localCoordinator} label="coordinatore locale" edit={ edit }/>
+            <ListInput setValue={setter("members")} value={obj.members} label="membri" setStore= { setObj } edit={ edit }/>
+            <DateInput setValue={setter("startDate")} value={obj.startDate} label="inizio" edit={ edit }/>
+            <DateInput setValue={setter("endDate")} value={obj.endDate} label="fine" edit={ edit }/>
+            <StringInput setValue={setter("webSite")} value={obj.webSite} label="sito web" edit={ edit }/>
+            <StringInput setValue={setter("budgetAmount")} value={obj.budgetAmount} label="ammontare budget" edit={ edit }/>
+            <TextInput setValue={setter("description")} value={obj.description} label="descrizione" edit={ edit }/>
+            <ListInput setValue={setter("keywords")} value={obj.keywords} label="parole chiave" edit={ edit }/>
+            <StringInput setValue={setter("ssd")} value={obj.ssd} label="SSD" edit={ edit }/>
+            <TextInput setValue={setter("notes")} value={obj.notes} label="note" edit={ edit }/>
             { edit ?
                 <ButtonGroup className="mt-3">
                     <Button 
