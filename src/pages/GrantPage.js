@@ -3,7 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { StringInput, DateInput, TextInput, ListInput, SelectInput } from '../components/Input'
+import { StringInput, DateInput, TextInput, ListInput, SelectInput, PersonInput } from '../components/Input'
 
 export default function GrantPage() {
     const objCode = 'grant'
@@ -15,8 +15,8 @@ export default function GrantPage() {
         project_type: "", 
         funds: "National",
         funding_entity: "", 
-        pi: "", 
-        local_coordinator: "", 
+        pi: null, 
+        local_coordinator: null, 
         members: [], 
         startDate: null, 
         endDate: null, 
@@ -87,9 +87,9 @@ export default function GrantPage() {
             <StringInput setValue={setter("projectType")} value={obj.projectType} label="tipo" edit={ edit }/>
             <SelectInput setValue={setter("funds")} value={obj.funds} label="fondi" options={["National", "International"]} edit={ edit }/>
             <StringInput setValue={setter("fundingEntity")} value={obj.fundingEntity} label="ente erogatore" edit={ edit }/>
-            <StringInput setValue={setter("pi")} value={obj.pi} label="principal investigator" edit={ edit }/>
-            <StringInput setValue={setter("localCoordinator")} value={obj.localCoordinator} label="coordinatore locale" edit={ edit }/>
-            <ListInput setValue={setter("members")} value={obj.members} label="membri" setStore= { setObj } edit={ edit }/>
+            <PersonInput setValue={setter("pi")} value={obj.pi} label="principal investigator" edit={ edit }/>
+            <PersonInput setValue={setter("localCoordinator")} value={obj.localCoordinator} label="coordinatore locale" edit={ edit }/>
+            <PersonInput multiple setValue={setter("members")} value={obj.members} label="membri" setStore= { setObj } edit={ edit }/>
             <DateInput setValue={setter("startDate")} value={obj.startDate} label="inizio" edit={ edit }/>
             <DateInput setValue={setter("endDate")} value={obj.endDate} label="fine" edit={ edit }/>
             <StringInput setValue={setter("webSite")} value={obj.webSite} label="sito web" edit={ edit }/>

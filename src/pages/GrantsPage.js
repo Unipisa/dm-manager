@@ -41,7 +41,7 @@ export default function GrantsPage() {
                                 <td>{ obj.name }</td>
                                 <td>{ obj.identifier }</td>
                                 <td>{ obj.projectType }</td>
-                                <td>{ obj.pi }</td>
+                                <td>{ obj.pi.lastName }</td>
                             </tr>) 
                         }
                     </tbody>

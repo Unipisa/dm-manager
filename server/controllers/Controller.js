@@ -25,6 +25,7 @@ class Controller {
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
         this.populate_fields = ['createdBy', 'updatedBy']
+        if (this.Model) this.add_fields_population_from_model()
 
         // Fields used in the search endpoint
         this.searchFields = []
@@ -82,9 +83,20 @@ class Controller {
         if (this.Model.schema.options.timestamps) {
             this.fields['updatedAt'] = { can_sort: true }
             this.fields['createdAt'] = { can_sort: true }
-            }
-    
         }
+    }
+
+    add_fields_population_from_model() {
+        Object.entries(this.Model.schema.obj)
+            .forEach(([field, info]) => {
+                if (info.ref === 'Person') {
+                    this.populate_fields.push({
+                        path: field, 
+                        select: ['firstName', 'lastName', 'affiliation', 'email']
+                    })
+                }
+            })
+    }
 
     async getModel(req, res) {
         res.send(this.Model)
