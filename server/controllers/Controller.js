@@ -22,13 +22,16 @@ class Controller {
         // the mongoose Model of the managed objects
         this.Model = Model
 
+        // the pipeline used in aggregate query of this.index
+        this.queryPipeline = []
+
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
         this.populate_fields = ['createdBy', 'updatedBy']
-        if (this.Model) this.add_fields_population_from_model()
 
         // Fields used in the search endpoint
         this.searchFields = []
+        this.abc = []
 
         /***
          * information of fields which can be used
@@ -43,7 +46,12 @@ class Controller {
          *  match_date: true/false, enable special date comparisons
          ***/
         this.fields = {}
-        if (this.Model) this.add_fields_from_model()
+
+        if (this.Model) {
+            // inspect Model to populate controller properties
+            this.add_fields_from_model()
+            this.add_fields_population_from_model()
+        }
     }
 
     add_fields_from_model() {
@@ -60,16 +68,23 @@ class Controller {
                     type: info,
                 }
             }
-            switch(info.type) {
-                case String: return {
-                        can_sort: true,
-                        can_filter: true
-                    }
-                case Date: return {
-                        can_sort: true,
-                        can_filter: true,
-                        match_date: true,
-                    }
+            if (info.ref === 'Person') {
+                return {
+                    can_sort: ['lastName', 'firstName'],
+                    can_filter: true,
+                }
+            } else {
+                switch(info.type) {
+                    case String: return {
+                            can_sort: true,
+                            can_filter: true,
+                        }
+                    case Date: return {
+                            can_sort: true,
+                            can_filter: true,
+                            match_date: true,
+                        }
+                }
             }
         }
 
@@ -94,6 +109,15 @@ class Controller {
                         path: field, 
                         select: ['firstName', 'lastName', 'affiliation', 'email']
                     })
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "people",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                        }},
+                        {$unwind: '$'+field}, 
+                    )
                 }
             })
     }
@@ -132,8 +156,9 @@ class Controller {
         console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
 
         let $match = {}
+        const $sort = {}
         let filter = {}
-        let sort = "_id"
+        let sort = null
         let direction = 1
         let limit = 100
 
@@ -152,6 +177,7 @@ class Controller {
                 limit = parseInt(value);
                 if (isNaN(limit) || limit < 0) return sendBadRequest(res, `invalid _limit ${value}: positive integer expected`)
             } else if (key == '_sort') {
+                sort = value
                 if (value.length) {
                     if (value[0] === '+') {
                         direction = 1
@@ -164,7 +190,16 @@ class Controller {
                 if (!(fields[value] && fields[value].can_sort)) {
                     return sendBadRequest(res, `invalid _sort key ${value}. Fields: ${ JSON.stringify(fields) }`)
                 }
-                sort = value;
+                const can_sort = fields[value].can_sort
+                if (can_sort === true) {
+                    $sort[value] = direction
+                } else {
+                    // e' l'ordinamento di un campo strutturato
+                    // mi aspetto un array di campi
+                    can_sort.forEach(field => {
+                        $sort[`${value}.${field}`] = direction
+                    })
+                }
             } else if (fields[key0] && fields[key0].can_filter) {
                 const field = fields[key0];
                 filter[key] = value;
@@ -229,30 +264,32 @@ class Controller {
         console.log(`match ${JSON.stringify($match)} requested in index`)
 
         let total, data;
-        const $sort = {};
-        $sort[sort] = direction;
 
         if (direction < 0) sort = `-${sort}`
 
-        let result = await this.Model.aggregate([
-                {$match},
-                {$sort},
-                {$facet:{
-                    "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
-                    "limiting" : [ { "$skip": 0}, {"$limit": limit} ]
-                }},
-                {$unwind: "$counting"},
-                {$project:{
-                    total: "$counting.count",
-                    data: "$limiting"
-                }}
-            ])
+        const pipeline = [
+            {$match},
+            ...this.queryPipeline,
+            {$sort},
+            {$facet:{
+                "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
+                "limiting" : [ { "$skip": 0}, {"$limit": limit} ]
+            }},
+            {$unwind: "$counting"},
+            {$project:{
+                total: "$counting.count",
+                data: "$limiting"
+            }}
+        ]
+        
+        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline)}`)
+
+        let result = await this.Model.aggregate(pipeline)
         if (result.length === 0) {
             total = 0;
             data = result;
         } else {
             [{ total, data }] = result;
-            data = await this.Model.populate(data, this.populate_fields)
         }
             
         console.log(`${data.length} / ${total} items collected`);
