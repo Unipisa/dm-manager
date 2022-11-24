@@ -156,7 +156,7 @@ class Controller {
         console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
 
         let $match = {}
-        const $sort = {}
+        let $sort = {_id: 1}
         let filter = {}
         let sort = null
         let direction = 1
@@ -191,6 +191,7 @@ class Controller {
                     return sendBadRequest(res, `invalid _sort key ${value}. Fields: ${ JSON.stringify(fields) }`)
                 }
                 const can_sort = fields[value].can_sort
+                $sort={}
                 if (can_sort === true) {
                     $sort[value] = direction
                 } else {
