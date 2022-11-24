@@ -20,8 +20,9 @@ export default function PersonsPage() {
         `${indexUrl}/${obj._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
+    if (!query.isSuccess) return null
 
-    const data = query.isSuccess ? query.data.data : []
+    const data = query.data.data
 
     return <>
             <div>

@@ -13,10 +13,11 @@ export default function VisitsPage() {
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
         `/visits/${visit._id}`, {replace: true}), [navigate])
-
+        
     if (query.isLoading) return <span>loading...</span>
+    if (!query.isSuccess) return null
 
-    const data = query.isSuccess ? query.data.data : []
+    const data = query.data.data
 
     return <>
             <div>
@@ -48,9 +49,9 @@ export default function VisitsPage() {
                         }
                     </tbody>
                 </Table>
-                <p>Visualizzate {data.length}/{query.data.total} visite.</p>
-                { query.data.limit < query.data.total
-                  && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
+                    <p>Visualizzate {data.length}/{query.data.total} visite.</p>
+                    { query.data.limit < query.data.total
+                    && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
                 }
             </div>
     </>

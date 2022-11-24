@@ -12,6 +12,7 @@ export default function TokensPage() {
     const putToken = engine.usePut('token', (token) => engine.addInfoMessage(`token ${token.name} creato`))
 
     if (query.isLoading) return <span>loading....</span>
+    if (!query.isSuccess) return null
 
     const data = query.data.data
 
