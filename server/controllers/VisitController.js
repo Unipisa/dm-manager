@@ -7,6 +7,7 @@ class VisitController extends Controller {
         this.path = 'visit'
         this.managerRoles.push('visit-manager')
         this.supervisorRoles.push('visit-manager', 'visit-supervisor')
+        this.populateFields.push('referencePeople')
     }
 }
 

@@ -29,7 +29,6 @@ export default function VisitsPage() {
                             <Th filter={filter.header('endDate')}>al</Th>
                             <Th filter={filter.header('person')}>persona</Th>
                             <Th filter={filter.header('affiliation')}>affiliazione</Th>
-                            <Th filter={filter.header('invitedBy')}>referente</Th>
                             <Th filter={filter.header('building')}>edificio</Th>
                             <Th filter={filter.header('roomNumber')}>stanza</Th>
                         </tr>
@@ -42,7 +41,6 @@ export default function VisitsPage() {
                                 <td>{ myDateFormat(visit.endDate) }</td>
                                 <td>{ `${visit.person ? visit.person.lastName : ""} ${visit.person ? visit.person.firstName : ""}` }</td>
                                 <td>{ visit.affiliation }</td>
-                                <td>{ visit.referencePerson?.lastName }</td>
                                 <td>{ visit.building }</td>
                                 <td>{ visit.roomNumber }</td>
                             </tr>) 

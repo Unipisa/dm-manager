@@ -88,8 +88,7 @@ export default function VisitPage() {
             <PersonInput value={obj.person} setValue={setter("person")} label="persona" edit={ edit }/>
             <StringInput value={obj.affiliation} setValue={setter("affiliation")} label="affiliazione" edit={ edit }/>
             <StringInput value={obj.country} setValue={setter("country")} label="nazione" edit={ edit }/>
-            <PersonInput value={obj.referencePerson} setValue={setter("referencePerson")} label="referente" edit={ edit }/>
-            <StringInput value={obj.invitedBy} setValue={setter("invitedBy")} label="altri referenti" edit={ edit }/>
+            <PersonInput multiple value={obj.referencePeople} setValue={setter("referencePeople")} label="referenti" edit={ edit }/>
             <StringInput value={obj.fundingAgency} setValue={setter("fundingAgency")} label="fondo" edit={ edit }/>
             <StringInput value={obj.SSD} setValue={setter("SSD")} label="SSD" setStore= { setObj } edit={ edit }/>
             <DateInput value={obj.startDate} setValue={setter("startDate")} label="inizio" edit={ edit }/>

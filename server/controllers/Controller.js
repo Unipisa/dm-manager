@@ -27,7 +27,7 @@ class Controller {
 
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
-        this.populate_fields = ['createdBy', 'updatedBy']
+        this.populateFields = ['createdBy', 'updatedBy']
 
         // Fields used in the search endpoint
         this.searchFields = []
@@ -105,7 +105,7 @@ class Controller {
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
                 if (info.ref === 'Person') {
-                    this.populate_fields.push({
+                    this.populateFields.push({
                         path: field, 
                         select: ['firstName', 'lastName', 'affiliation', 'email']
                     })
@@ -130,7 +130,7 @@ class Controller {
         try {
             let obj = await this.Model
                 .findById(id)
-                .populate(this.populate_fields)
+                .populate(this.populateFields)
             res.send(obj)
         } catch(error) {
             console.error(error)

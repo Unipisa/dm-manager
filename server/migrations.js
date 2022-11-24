@@ -7,6 +7,36 @@
  * più allo stato del database
  */
 
+async function find_person(people, name) {
+    const names = name.split(' ').map(s => s.trim()).filter(s => s!=='')
+    let p = null
+
+    async function findPerson(firstName, lastName) {
+        let p = await people.findOne({ firstName, lastName })
+        if (p === null) {
+            p = await people.insertOne({ firstName, lastName, affiliation: "Università di Pisa"})
+            p = p.insertedId
+            console.log(`Nuova persona creata: ${firstName} ${lastName}`)
+        } else {
+            p = p._id
+            console.log(`Persona trovata: ${firstName} ${lastName}`)
+        }
+        return p
+    }
+
+    if (names.length === 2) {
+        p = await findPerson(names[0], names[1])
+    } else if (names.length === 3) {
+        if (['del', 'de', 'di', 'della'].includes(names[1].toLowerCase())) {
+            p = await findPerson(names[0], `${names[1]} ${names[2]}`)
+        } else if (['carlo'].includes(names[1].toLowerCase())) {
+            p = await findPerson(`${names[0]} ${names[1]}`, names[2])
+        }
+    }
+    if (p === null) console.log(`*** Non sono riuscito ad associare una persona a "${name}"`)
+    return p    
+}
+
 const migrations = { 
     migration_test: async (db) => {
         return true
@@ -102,31 +132,7 @@ const migrations = {
 
             console.log(`referenti: ${JSON.stringify(referenti)}`)
             if (referenti.length>0) {
-                const names = referenti[0].split(' ')
-                let p = null
-
-                async function findPerson(firstName, lastName) {
-                    let p = await people.findOne({ firstName, lastName })
-                    if (p === null) {
-                        p = await people.insertOne({ firstName, lastName, affiliation: "Università di Pisa"})
-                        p = p.insertedId
-                        console.log(`Nuova persona creata: ${firstName} ${lastName}`)
-                    } else {
-                        console.log(`Persona trovata: ${firstName} ${lastName}`)
-                    }
-                    return p
-                }
-
-                if (names.length === 2) {
-                    p = await findPerson(names[0], names[1])
-                } else if (names.length === 3) {
-                    if (['del', 'de', 'di', 'della'].includes(names[1].toLowerCase())) {
-                        p = await findPerson(names[0], `${names[1]} ${names[2]}`)
-                    } else if (['carlo'].includes(names[1].toLowerCase())) {
-                        p = await findPerson(`${names[0]} ${names[1]}`, names[2])
-                    }
-                }
-                
+                let p = await find_person(people,referenti[0])
                 if (p) {
                     await visits.updateOne({_id}, 
                         { $set: {
@@ -134,13 +140,41 @@ const migrations = {
                             invitedBy: referenti.slice(1).join(', ')
                         }})
                 } else {
-                    console.log(`Non sono riuscito ad associare una persona a ${referenti[0]}`)
                     res = false
                 }
             }
         }
         return res
-    }
+    },
+
+    D20221124_adjust_visit_model_3: async (db) => {
+        const visits = db.collection('visits')
+        const people = db.collection('people')
+        let res = true
+        for (const visit of await visits.find({}).toArray()) {
+            const {_id, referencePerson, invitedBy} = visit
+            console.log(`visit ${_id}`)
+            let referenti = invitedBy
+                .split(',')
+                .map(name => name.trim())
+                .filter(name => name!=='')
+            let referencePeople = []
+            if (referencePerson) referencePeople.push(referencePerson)
+            for (let name of referenti) {
+                let p = await find_person(people, name)
+                if (p) {
+                    referencePeople.push(p)
+                } else {
+                    res = false
+                }
+            }
+            await visits.updateOne({_id}, {
+                $set: { referencePeople },
+                $unset: { referencePerson, invitedBy }
+            })
+        }
+        return res
+    },
 }
 
 async function migrate(db) {
