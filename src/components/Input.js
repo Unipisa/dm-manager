@@ -273,7 +273,7 @@ export function SelectInput({ options, label, value, setValue, edit }) {
                 id={ id } 
                 value={ value || "" } 
                 onChange={ (evt) => setValue(evt.target.value) }>
-            { options.map(value => <option value={value}>{ value }</option>)}
+            { options.map(value => <option key={value} value={value}>{ value }</option>)}
             </select>
         </div>
     </Form.Group>

@@ -123,7 +123,7 @@ class Controller {
     }
 
     async getModel(req, res) {
-        res.send(this.Model)
+        res.send(this.Model.jsonSchema())
     }
 
     async get(req, res, id) {

@@ -11,6 +11,7 @@ const PersonController = require('./controllers/PersonController')
 var router = express.Router()
 
 let paths = []
+let ModelSchemas = {}
 
 ;[
     RoomLabelController, 
@@ -22,6 +23,13 @@ let paths = []
 ].forEach(Controller => {
     const controller = new Controller()
     paths = [...paths, ...controller.register(router)]
+    const Schema = controller.Model.jsonSchema()
+    ModelSchemas[Schema.title] = Schema.properties 
+})
+
+// Informazioni sugli schemi dei modelli
+router.get('/Models', (req, res) => {
+    res.send(ModelSchemas)
 })
 
 router.get('/', (req, res) => {

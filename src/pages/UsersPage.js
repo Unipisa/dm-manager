@@ -13,8 +13,6 @@ export default function UsersPage() {
     const navigateTo = useCallback((user) => navigate(
         `/users/${user._id}`, {replace: true}), [navigate])
 
-    console.log(`Users Page ${query}`)
-    
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
     

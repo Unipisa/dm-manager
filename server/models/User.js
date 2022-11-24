@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose-schema-jsonschema')()
 const passportLocalMongoose = require('passport-local-mongoose')
 
-const Schema = mongoose.Schema
+const { Schema } = mongoose
 
 const userSchema = new Schema({
     firstName: String,

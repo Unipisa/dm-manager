@@ -70,7 +70,7 @@ app.get('/config', (req, res) => {
     SERVER_NAME: config.SERVER_NAME,
     VERSION: config.VERSION,
     OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
-    user
+    user,
   })
 })
 
