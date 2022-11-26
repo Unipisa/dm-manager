@@ -35,6 +35,7 @@ export function SchemaInputs({ schema, labels, obj, setObj, onChange, edit}) {
             if (onChange && onChange(field, value)) return
             setObj(obj => ({...obj, [field]: value}))
         }
+        console.log(`field: ${field}, value: ${JSON.stringify(obj[field])}`)
         lst.push(<SchemaInput key={field} schema={field_schema} value={obj[field]} setValue={setValue} label={(labels && labels[field]) || field} edit={edit} />)
         // lst.push(<p>{field}:  {JSON.stringify(field_schema)}</p>)
     }        
@@ -49,12 +50,13 @@ export function emptyObject(Model) {
         else if (Field['x-ref']) empty[field] = null
         else empty[field] = ''
     }
+    console.log(`Empty: ${JSON.stringify(empty)}`)
     return empty
 }
 
 export default function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName }) {
     const engine = useEngine()
-    const empty = emptyObject(engine.Models.Visit)
+    const empty = emptyObject(engine.Models[ModelName])
     const { id } = useParams()
     const create = (id === 'new')
     const [ edit, setEdit ] = useState(create)
