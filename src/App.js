@@ -1,3 +1,6 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {useCreateEngine, EngineProvider} from './Engine'
@@ -10,6 +13,8 @@ import Home from './pages/Home'
 import LoginPage from './pages/LoginPage'
 import VisitsPage from './pages/VisitsPage'
 import VisitPage from './pages/VisitPage'
+import GrantsPage from './pages/GrantsPage'
+import GrantPage from './pages/GrantPage'
 import PersonsPage from './pages/PersonsPage'
 import PersonPage from './pages/PersonPage'
 import UsersPage from './pages/UsersPage'
@@ -18,6 +23,7 @@ import TokensPage from './pages/TokensPage'
 import RoomLabelsPage from './pages/RoomLabelsPage'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
+
 
 console.log("dm-manager (app starting)")
 
@@ -45,6 +51,8 @@ function Internal() {
           <Route path="/roomLabels" element={<RoomLabelsPage />} />
           <Route path="/visits/:id" element={<VisitPage />} />
           <Route path="/visits" element={<VisitsPage />} />
+          <Route path="/grants/:id" element={<GrantPage />} />
+          <Route path="/grants" element={<GrantsPage />} />
           <Route path="/persons/:id" element={<PersonPage />} />
           <Route path="/persons" element={<PersonsPage />} />
           <Route path="/users/:id" element={<UserPage />} />

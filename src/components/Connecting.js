@@ -3,7 +3,8 @@ import { useState } from 'react'
 async function connect(engine, setMsg) {
     setMsg(null)
     try {
-        await engine.connect()
+        const config = await engine.connect()
+        if (config === null) setMsg('connessione al server fallita')
     } catch(err) {
         console.error(err)
         setMsg(err.message)

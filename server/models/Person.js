@@ -1,9 +1,8 @@
-const mongoose = require('mongoose')
-
-const Schema = mongoose.Schema
+const mongoose = require('mongoose-schema-jsonschema')()
+const { Schema } = mongoose
 
 const personSchema = new Schema({
-    firstName: String,
+    firstName:  String,
     lastName: String,
     affiliation: String, 
     unipiId: String,
@@ -17,5 +16,13 @@ const personSchema = new Schema({
  }, {
      timestamps: true // adds fields: createdAt, updatedAt
  })
+
+ personSchema.index({
+     firstName: 'text', 
+     lastName: 'text',
+     email: 'text',
+     affiliation: 'text',
+    });
+
 
  module.exports = mongoose.model('Person', personSchema)

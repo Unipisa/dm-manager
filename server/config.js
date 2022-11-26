@@ -1,8 +1,19 @@
 require('dotenv').config() // read environment variabiles from .env
 const { randomUUID } = require('crypto')
+const { execSync } = require('child_process')
+
+function current_branch(next) {
+    try {
+        return execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+    } catch(err) {
+        return null
+    }
+}
 
 class Options {
     constructor() {
+        const GIT_BRANCH = current_branch()
+
         const options = {
             STATIC_FILES_PATH: (process.env.NODE_ENV === 'production' ? 'build' : 'public'),
             SESSION_SECRET: randomUUID(),
@@ -23,7 +34,8 @@ class Options {
             EXCHANGE_CODE_FOR_TOKEN_SERVER_URL: null,
             TOKEN_SECRET: null,
             REACT_APP_SERVER_URL: null,
-            BASE_URL: "http://localhost:3000"
+            BASE_URL: "http://localhost:3000",
+            SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val

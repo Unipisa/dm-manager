@@ -13,12 +13,10 @@ export default function UsersPage() {
     const navigateTo = useCallback((user) => navigate(
         `/users/${user._id}`, {replace: true}), [navigate])
 
-    console.log(`Users Page ${query}`)
-
     if (query.isLoading) return <span>loading...</span>
-
+    if (!query.isSuccess) return null
+    
     const data = query.data.data
-
     return  <div>
         {engine.user.hasSomeRole('admin') && <Link className="btn btn-primary" to="/users/new">aggiungi utente</Link>}
         <Table hover>

@@ -2,7 +2,7 @@ import moment from 'moment'
 import { useState, createContext, useContext } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
-export const EngineContext = createContext(null)
+export const EngineContext = createContext('dm-manager')
 
 export const EngineProvider = EngineContext.Provider
   
@@ -17,6 +17,7 @@ export function useCreateEngine() {
         base_url: process.env.REACT_APP_SERVER_URL || "",
         config: null,
         user: null,
+        Models: null
     })
 
     const queryClient = useQueryClient()
@@ -87,6 +88,8 @@ export function useCreateEngine() {
     // e reso disponibile in ogni componente
     // grazie al context
     return {
+        api_fetch, post, put, patch, get, del,
+
         addMessage,
 
         addErrorMessage: (message) => addMessage(message, 'error'),
@@ -105,13 +108,15 @@ export function useCreateEngine() {
         connect: async () => {
             try {
                 const config = await get('/config')
-                let { user } = await post('/login');
+                let { user } = await post('/login')
 
                 if (user != null) {
                     user = new_user(user);
                 }
 
-                setState(s => ({...s, config, user}))
+                const Models = await get('/api/v0/Models')
+
+                setState(s => ({...s, config, user, Models}))
 
                 console.log(`config read: ${JSON.stringify(config)}`)
                 return config
@@ -125,6 +130,8 @@ export function useCreateEngine() {
 
         config: state.config,
 
+        Models: state.Models,
+
         login: async (username, password) => {
             /**
              * if username and password are provided use credentials
@@ -135,6 +142,7 @@ export function useCreateEngine() {
             if (user !== null) {
                 user = new_user(user)
             }
+
             setState(s => ({...s, user}))
         },
 

@@ -6,12 +6,15 @@ import { useEngine } from '../Engine'
 
 export default function TokensPage() {
     const engine = useEngine()
-    const [token, setToken ] = useState({roles: engine.user.roles})
+    const [obj, setObj ] = useState({roles: engine.user.roles})
     const query = engine.useIndex('token')
     const deleteToken = engine.useDelete('token', (response, token) => engine.addInfoMessage(`token ${token.name} rimosso`))
     const putToken = engine.usePut('token', (token) => engine.addInfoMessage(`token ${token.name} creato`))
 
     if (query.isLoading) return <span>loading....</span>
+    if (!query.isSuccess) return null
+
+    const setter = field => value => setObj(obj => ({...obj, [field]: value}))
 
     const data = query.data.data
 
@@ -41,9 +44,9 @@ export default function TokensPage() {
                 </tbody>
             </Table>
         </div>
-        <StringInput name="name" label="nome" store={token} setStore={ setToken } edit={true}/>
-        <ListInput name="roles" label="ruoli" store={ token } setStore={ setToken } separator=" " edit={true}/>
-                <Button onClick={ () => putToken(token) } className="btn btn-primary">
+        <StringInput value={obj.name} setValue={setter("name")} label="nome" edit={true}/>
+        <ListInput value={obj.roles} setValue={setter("roles")} label="ruoli" separator=" " edit={true}/>
+                <Button onClick={ () => putToken(obj) } className="btn btn-primary">
                     crea token
                 </Button>
     </>
