@@ -175,6 +175,16 @@ const migrations = {
         }
         return res
     },
+
+    D20221126_add_size_to_labels: async db => {
+        const labels = db.collection('roomlabels')
+        for(const label of await labels.find({}).toArray()) {
+            const {_id} = label
+            console.log(`label ${_id}`)
+            await labels.updateOne({_id}, {$set: {size: 0}})
+        }
+        return true
+    }
 }
 
 async function migrate(db) {
