@@ -7,7 +7,7 @@ class GrantController extends Controller {
         this.path = 'grant'
         this.managerRoles.push('grant-manager')
         this.supervisorRoles.push('grant-manager', 'grant-supervisor')
-        this.populate_fields.push({
+        this.populateFields.push({
             path: 'members',
             select: ['firstName', 'lastName', 'affiliation', 'email']
         })

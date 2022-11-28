@@ -1,5 +1,8 @@
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose-schema-jsonschema')()
+
+const SSD = require('./SSD')
+
+const { Schema } = mongoose
 
 const schema = new Schema({
     name: String,
@@ -20,7 +23,7 @@ const schema = new Schema({
     budgetAmount: String, 
     description: String, 
     keywords: [String], 
-    ssd: String,
+    SSD,
     notes: String,
 
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

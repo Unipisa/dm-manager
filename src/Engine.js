@@ -16,7 +16,8 @@ export function useCreateEngine() {
         messages: [],
         base_url: process.env.REACT_APP_SERVER_URL || "",
         config: null,
-        user: null
+        user: null,
+        Models: null
     })
 
     const queryClient = useQueryClient()
@@ -107,13 +108,15 @@ export function useCreateEngine() {
         connect: async () => {
             try {
                 const config = await get('/config')
-                let { user } = await post('/login');
+                let { user } = await post('/login')
 
                 if (user != null) {
                     user = new_user(user);
                 }
 
-                setState(s => ({...s, config, user}))
+                const Models = await get('/api/v0/Models')
+
+                setState(s => ({...s, config, user, Models}))
 
                 console.log(`config read: ${JSON.stringify(config)}`)
                 return config
@@ -126,6 +129,8 @@ export function useCreateEngine() {
         connected: state.config !== null,
 
         config: state.config,
+
+        Models: state.Models,
 
         login: async (username, password) => {
             /**

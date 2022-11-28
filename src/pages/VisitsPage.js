@@ -13,10 +13,11 @@ export default function VisitsPage() {
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
         `/visits/${visit._id}`, {replace: true}), [navigate])
-
+        
     if (query.isLoading) return <span>loading...</span>
+    if (!query.isSuccess) return null
 
-    const data = query.isSuccess ? query.data.data : []
+    const data = query.data.data
 
     return <>
             <div>
@@ -28,7 +29,6 @@ export default function VisitsPage() {
                             <Th filter={filter.header('endDate')}>al</Th>
                             <Th filter={filter.header('person')}>persona</Th>
                             <Th filter={filter.header('affiliation')}>affiliazione</Th>
-                            <Th filter={filter.header('invitedBy')}>referente</Th>
                             <Th filter={filter.header('building')}>edificio</Th>
                             <Th filter={filter.header('roomNumber')}>stanza</Th>
                         </tr>
@@ -41,16 +41,15 @@ export default function VisitsPage() {
                                 <td>{ myDateFormat(visit.endDate) }</td>
                                 <td>{ `${visit.person ? visit.person.lastName : ""} ${visit.person ? visit.person.firstName : ""}` }</td>
                                 <td>{ visit.affiliation }</td>
-                                <td>{ visit.referencePerson?.lastName }</td>
                                 <td>{ visit.building }</td>
                                 <td>{ visit.roomNumber }</td>
                             </tr>) 
                         }
                     </tbody>
                 </Table>
-                <p>Visualizzate {data.length}/{query.data.total} visite.</p>
-                { query.data.limit < query.data.total
-                  && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
+                    <p>Visualizzate {data.length}/{query.data.total} visite.</p>
+                    { query.data.limit < query.data.total
+                    && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
                 }
             </div>
     </>

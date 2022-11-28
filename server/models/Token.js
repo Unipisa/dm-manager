@@ -1,7 +1,6 @@
-const mongoose = require('mongoose')
 const crypto = require('crypto')
-
-const Schema = mongoose.Schema
+const mongoose = require('mongoose-schema-jsonschema')()
+const { Schema } = mongoose
 
 const tokenSchema = new Schema({
     name: String,

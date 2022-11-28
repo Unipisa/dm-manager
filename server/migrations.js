@@ -125,34 +125,43 @@ const migrations = {
         return true
     },
 
-    D20221123_adjust_visit_model: async (db) => {
+    D20221124_adjust_visit_model_3: async (db) => {
         const visits = db.collection('visits')
         const people = db.collection('people')
         let res = true
         for (const visit of await visits.find({}).toArray()) {
-            const {_id, invitedBy} = visit
+            const {_id, referencePerson, invitedBy} = visit
             console.log(`visit ${_id}`)
-            let referenti = invitedBy
+            let referenti = (invitedBy || '')
                 .split(',')
                 .map(name => name.trim())
                 .filter(name => name!=='')
-
-            console.log(`referenti: ${JSON.stringify(referenti)}`)
-            if (referenti.length>0) {
-                let p = personFromName(people, referenti[0])                
+            let referencePeople = []
+            if (referencePerson) referencePeople.push(referencePerson)
+            for (let name of referenti) {
+                let p = await findPerson(people, name)
                 if (p) {
-                    await visits.updateOne({_id}, 
-                        { $set: {
-                            referencePerson: p,
-                            invitedBy: referenti.slice(1).join(', ')
-                        }})
+                    referencePeople.push(p)
                 } else {
-                    console.log(`Non sono riuscito ad associare una persona a ${referenti[0]}`)
                     res = false
                 }
             }
+            await visits.updateOne({_id}, {
+                $set: { referencePeople },
+                $unset: { referencePerson, invitedBy }
+            })
         }
         return res
+    },
+
+    D20221126_add_size_to_labels: async db => {
+        const labels = db.collection('roomlabels')
+        for(const label of await labels.find({}).toArray()) {
+            const {_id} = label
+            console.log(`label ${_id}`)
+            await labels.updateOne({_id}, {$set: {size: 0}})
+        }
+        return true
     },
 
     D20221128_import_grants_11: async db => {
@@ -177,6 +186,7 @@ const migrations = {
         }
         return true
     },
+
 }
 
 async function migrate(db) {

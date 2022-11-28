@@ -1,22 +1,22 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose-schema-jsonschema')()
 
-const Schema = mongoose.Schema
+const SSD = require('./SSD')
+const { Schema } = mongoose
 
 const visitSchema = new Schema({
     person: { type: Schema.Types.ObjectId, ref: 'Person' },
+    affiliation: String,
+    country: String,
     startDate: Date,
     endDate: Date,
-    affiliation: String,
     roomNumber: String,
     building: String,
-    referencePerson: { type: Schema.Types.ObjectId, ref: 'Person' },
-    invitedBy: String,
-    SSD: String,
-    notes: String,
-    country: String,
+    referencePeople: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
     fundingAgency: String,
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    SSD,
+    notes: String,
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
  }, {
      timestamps: true // adds fields: createdAt, updatedAt
  })

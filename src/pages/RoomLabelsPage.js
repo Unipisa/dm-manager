@@ -3,11 +3,18 @@ import {Table, Button, Badge, ButtonGroup} from 'react-bootstrap'
 import ReactToPrint from 'react-to-print'
 import {useEngine} from '../Engine'
 
-function Display({names, number, onSave}) {
+function Display({roomLabel, onSave}) {
     const namesRef = useRef(null)
     const numberRef = useRef(null)
     const printRef = useRef(null)
     const blue = "#08467b"
+    const [size, setSize] = useState(roomLabel.size || 0)
+    const [lastId,setLastId] = useState(null)
+
+    if (lastId !== roomLabel._id) {
+        setLastId(roomLabel._id)
+        setSize(roomLabel.size)
+    }
 
     function sanitize(str) {
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -40,12 +47,12 @@ function Display({names, number, onSave}) {
                     contentEditable="true" style={{
                     color: blue,
                     textAlign: "center",
-                    fontSize: "1cm",
+                    fontSize: `${Math.round(100*Math.pow(2,size/2))/100}cm`, 
                     position: "relative",
                     top: "50%",
                     transform: "translateY(-50%)",
                     }}
-                    dangerouslySetInnerHTML={{__html: names.map(
+                    dangerouslySetInnerHTML={{__html: roomLabel.names.map(
                         name=>`<div>${sanitize(name)}</div>`).join('')}} />
             </div>
             <div style={{
@@ -66,13 +73,13 @@ function Display({names, number, onSave}) {
                     marginTop: "2cm",
                     float: "left"
                 }}
-                dangerouslySetInnerHTML={{__html: sanitize(number)}}
+                dangerouslySetInnerHTML={{__html: sanitize(roomLabel.number)}}
                 />
             <img alt="" style={{
                 height: "8cm",
                 position: "relative",
                 float: "right",
-                opacity: "0.15",
+                opacity: "0.12",
                 marginTop: "-3.2cm",
                 marginRight: "-0.4cm",
                 pointerEvents: "none"
@@ -88,13 +95,20 @@ function Display({names, number, onSave}) {
             <Button onClick={() => {
                 const names = [...namesRef.current.children].map(child => child.textContent)
                 const number = numberRef.current.textContent
-                onSave({names,number})
+                onSave({names, number, size})
             }}>aggiungi ai cartellini da fare</Button> }
+            <select value={ size } onChange={e => setSize(e.target.value)}>
+                <option value="2">scritta molto grande</option>
+                <option value="1">scritta grande</option>
+                <option value="0">scritta di dimensione normale</option>
+                <option value="-1">scritta piccola</option>
+                <option value="-2">scritta molto piccola</option>
+            </select>
         </ButtonGroup>
     </>
 }
 
-function RoomsTable({onClick, onDone, onDelete, data, label}) {
+function RoomsTable({onClick, onDone, onDelete, data}) {
     const engine = useEngine()
     // visibility of manager elements
     const visibility = engine.user.hasSomeRole('admin', 'room-manager') ? "visible" : "hidden"
@@ -169,34 +183,34 @@ function RoomLabels({onClick, onDone, onDelete}) {
 
 export default function RoomLabelPage() {
     const engine = useEngine()
-    const [names, setNames] = useState(["Nome Cognome"])
-    const [number, setNumber] = useState("123")
+    const [roomLabel, setRoomLabel] = useState({
+        names: ["Nome Cognome"],
+        number: "123",
+        fontSize: 0
+    })
     const putRoomLabel = engine.usePut('roomLabel')
     const patchRoomLabel = engine.usePatch('roomLabel')
     const onDelete = engine.useDelete('roomLabel')
     const isSupervisor = engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor')
 
-    const onSave = isSupervisor ? ({names, number}) => {
-        setNames(names)
-        setNumber(number)
-        putRoomLabel({names, number})
-    } : null
+    const onSave = (roomLabel) => {
+        setRoomLabel(roomLabel)
+        putRoomLabel(roomLabel)
+    }
 
     const onDone = (roomLabel) => {
         patchRoomLabel({_id: roomLabel._id, state: 'managed'})
     }
 
     const onClick = (roomLabel) => {
-        setNames(roomLabel.names)
-        setNumber(roomLabel.number)
+        setRoomLabel(roomLabel)
     }
 
     return <>
         <p>Puoi modificare il nome e il numero di stanza.</p>
         <Display 
-            number={number} 
-            names={names} 
-            onSave={onSave}/>
+            roomLabel={roomLabel}
+            onSave={isSupervisor?onSave:null}/>
         <div style={{marginTop: "1cm"}}/>
         { engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor') && 
             <RoomLabels onClick={onClick} onDone={onDone} onDelete={onDelete} />
