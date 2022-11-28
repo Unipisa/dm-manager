@@ -7,6 +7,43 @@
  * più allo stato del database
  */
 
+ async function findPerson(people, firstName, lastName, affiliazione) {
+    let p = await people.findOne({ firstName, lastName })
+    if (p === null) {
+        p = await people.insertOne({ firstName, lastName, affiliation: affiliazione || "Università di Pisa"})
+        p = p.insertedId
+        console.log(`Nuova persona creata: ${firstName} ${lastName}`)
+    } else {
+        console.log(`Persona trovata: ${firstName} ${lastName}`)
+    }
+    return p
+}
+
+async function personFromName(people, name) {
+    const aff = name.replace(')',' ').split('(').map(x => x.trim())
+    name = aff[0]
+    affiliazione = aff[1]
+    const names = name.split(' ').map(x => x.trim()).filter(x => x!=='')
+    if (names.length === 2) {
+        return await findPerson(people, names[0], names[1], affiliazione)
+    } else if (names.length === 3) {
+        if (['del', 'dal', 'de', 'di', 'da', 'della'].includes(names[1].toLowerCase())) {
+            return await findPerson(people, names[0], `${names[1]} ${names[2]}`, affiliazione)
+        } else if ([
+                'carlo', 'laura', 'giovanni', 'letizia', 
+                'stella', 'federico', 'antonio',
+                'alessandra', 'agnese', 'james',
+                'gianluca', 'gipo', 'romani',
+                's.', 'g.', 'a.',
+            ].includes(names[1].toLowerCase())) {
+            return await findPerson(people, `${names[0]} ${names[1]}`, names[2], affiliazione)
+        }
+    }
+    console.log(`*** cannot convert name "${name}" to Person`)
+    return null 
+}
+
+
 const migrations = { 
     migration_test: async (db) => {
         return true
@@ -102,31 +139,7 @@ const migrations = {
 
             console.log(`referenti: ${JSON.stringify(referenti)}`)
             if (referenti.length>0) {
-                const names = referenti[0].split(' ')
-                let p = null
-
-                async function findPerson(firstName, lastName) {
-                    let p = await people.findOne({ firstName, lastName })
-                    if (p === null) {
-                        p = await people.insertOne({ firstName, lastName, affiliation: "Università di Pisa"})
-                        p = p.insertedId
-                        console.log(`Nuova persona creata: ${firstName} ${lastName}`)
-                    } else {
-                        console.log(`Persona trovata: ${firstName} ${lastName}`)
-                    }
-                    return p
-                }
-
-                if (names.length === 2) {
-                    p = await findPerson(names[0], names[1])
-                } else if (names.length === 3) {
-                    if (['del', 'de', 'di', 'della'].includes(names[1].toLowerCase())) {
-                        p = await findPerson(names[0], `${names[1]} ${names[2]}`)
-                    } else if (['carlo'].includes(names[1].toLowerCase())) {
-                        p = await findPerson(`${names[0]} ${names[1]}`, names[2])
-                    }
-                }
-                
+                let p = personFromName(people, referenti[0])                
                 if (p) {
                     await visits.updateOne({_id}, 
                         { $set: {
@@ -140,7 +153,30 @@ const migrations = {
             }
         }
         return res
-    }
+    },
+
+    D20221128_import_grants_11: async db => {
+        const people = db.collection('people')
+        const grants = db.collection('grants')
+        const data = require('./migration_20221128')
+        for (let record of data) {
+            record.pi = record.pi ? await personFromName(people, record.pi) : null
+            if (record.pi) record.pi = record.pi._id
+            record.localCoordinator = record.localCoordinator ? await personFromName(people, record.localCoordinator) : null
+            if (record.localCoordinator) record.localCoordinator = record.localCoordinator._id
+            const members = []
+            for (let name of record.members.split(',')) {
+                if (name.trim() === '') continue
+                const p = await personFromName(people, name)
+                if (p) members.push(p._id)
+            }
+            record.members = members
+            console.log(`inserting ${JSON.stringify(record, null, 2)}`)
+            const res = await grants.insertOne(record)
+            console.log(`...${JSON.stringify(res)}`)
+        }
+        return true
+    },
 }
 
 async function migrate(db) {
