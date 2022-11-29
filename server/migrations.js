@@ -7,35 +7,42 @@
  * più allo stato del database
  */
 
-async function find_person(people, name) {
-    const names = name.split(' ').map(s => s.trim()).filter(s => s!=='')
-    let p = null
-
-    async function findPerson(firstName, lastName) {
-        let p = await people.findOne({ firstName, lastName })
-        if (p === null) {
-            p = await people.insertOne({ firstName, lastName, affiliation: "Università di Pisa"})
-            p = p.insertedId
-            console.log(`Nuova persona creata: ${firstName} ${lastName}`)
-        } else {
-            p = p._id
-            console.log(`Persona trovata: ${firstName} ${lastName}`)
-        }
-        return p
+ async function findPerson(people, firstName, lastName, affiliazione) {
+    let p = await people.findOne({ firstName, lastName })
+    if (p === null) {
+        p = await people.insertOne({ firstName, lastName, affiliation: affiliazione || "Università di Pisa"})
+        p = p.insertedId
+        console.log(`Nuova persona creata: ${firstName} ${lastName}`)
+    } else {
+        console.log(`Persona trovata: ${firstName} ${lastName}`)
     }
-
-    if (names.length === 2) {
-        p = await findPerson(names[0], names[1])
-    } else if (names.length === 3) {
-        if (['del', 'de', 'di', 'della'].includes(names[1].toLowerCase())) {
-            p = await findPerson(names[0], `${names[1]} ${names[2]}`)
-        } else if (['carlo'].includes(names[1].toLowerCase())) {
-            p = await findPerson(`${names[0]} ${names[1]}`, names[2])
-        }
-    }
-    if (p === null) console.log(`*** Non sono riuscito ad associare una persona a "${name}"`)
-    return p    
+    return p
 }
+
+async function personFromName(people, name) {
+    const aff = name.replace(')',' ').split('(').map(x => x.trim())
+    name = aff[0]
+    affiliazione = aff[1]
+    const names = name.split(' ').map(x => x.trim()).filter(x => x!=='')
+    if (names.length === 2) {
+        return await findPerson(people, names[0], names[1], affiliazione)
+    } else if (names.length === 3) {
+        if (['del', 'dal', 'de', 'di', 'da', 'della'].includes(names[1].toLowerCase())) {
+            return await findPerson(people, names[0], `${names[1]} ${names[2]}`, affiliazione)
+        } else if ([
+                'carlo', 'laura', 'giovanni', 'letizia', 
+                'stella', 'federico', 'antonio',
+                'alessandra', 'agnese', 'james',
+                'gianluca', 'gipo', 'romani',
+                's.', 'g.', 'a.',
+            ].includes(names[1].toLowerCase())) {
+            return await findPerson(people, `${names[0]} ${names[1]}`, names[2], affiliazione)
+        }
+    }
+    console.log(`*** cannot convert name "${name}" to Person`)
+    return null 
+}
+
 
 const migrations = { 
     migration_test: async (db) => {
@@ -118,35 +125,6 @@ const migrations = {
         return true
     },
 
-    D20221123_adjust_visit_model: async (db) => {
-        const visits = db.collection('visits')
-        const people = db.collection('people')
-        let res = true
-        for (const visit of await visits.find({}).toArray()) {
-            const {_id, invitedBy} = visit
-            console.log(`visit ${_id}`)
-            let referenti = invitedBy
-                .split(',')
-                .map(name => name.trim())
-                .filter(name => name!=='')
-
-            console.log(`referenti: ${JSON.stringify(referenti)}`)
-            if (referenti.length>0) {
-                let p = await find_person(people,referenti[0])
-                if (p) {
-                    await visits.updateOne({_id}, 
-                        { $set: {
-                            referencePerson: p,
-                            invitedBy: referenti.slice(1).join(', ')
-                        }})
-                } else {
-                    res = false
-                }
-            }
-        }
-        return res
-    },
-
     D20221124_adjust_visit_model_3: async (db) => {
         const visits = db.collection('visits')
         const people = db.collection('people')
@@ -154,14 +132,14 @@ const migrations = {
         for (const visit of await visits.find({}).toArray()) {
             const {_id, referencePerson, invitedBy} = visit
             console.log(`visit ${_id}`)
-            let referenti = invitedBy
+            let referenti = (invitedBy || '')
                 .split(',')
                 .map(name => name.trim())
                 .filter(name => name!=='')
             let referencePeople = []
             if (referencePerson) referencePeople.push(referencePerson)
             for (let name of referenti) {
-                let p = await find_person(people, name)
+                let p = await findPerson(people, name)
                 if (p) {
                     referencePeople.push(p)
                 } else {
@@ -184,7 +162,31 @@ const migrations = {
             await labels.updateOne({_id}, {$set: {size: 0}})
         }
         return true
-    }
+    },
+
+    D20221128_import_grants_11: async db => {
+        const people = db.collection('people')
+        const grants = db.collection('grants')
+        const data = require('./migration_20221128')
+        for (let record of data) {
+            record.pi = record.pi ? await personFromName(people, record.pi) : null
+            if (record.pi) record.pi = record.pi._id
+            record.localCoordinator = record.localCoordinator ? await personFromName(people, record.localCoordinator) : null
+            if (record.localCoordinator) record.localCoordinator = record.localCoordinator._id
+            const members = []
+            for (let name of record.members.split(',')) {
+                if (name.trim() === '') continue
+                const p = await personFromName(people, name)
+                if (p) members.push(p._id)
+            }
+            record.members = members
+            console.log(`inserting ${JSON.stringify(record, null, 2)}`)
+            const res = await grants.insertOne(record)
+            console.log(`...${JSON.stringify(res)}`)
+        }
+        return true
+    },
+
 }
 
 async function migrate(db) {
