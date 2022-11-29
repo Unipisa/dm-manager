@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { ListInput, StringInput } from '../components/Input'
 
-import { useEngine } from '../Engine'
+import { useEngine, myDateFormat } from '../Engine'
 
 export default function TokensPage() {
     const engine = useEngine()
@@ -25,20 +25,22 @@ export default function TokensPage() {
                     <tr>
                         <th>nome</th>
                         <th>ruoli</th>
+                        <th>creato</th>
                         <th>copia</th>
                         <th>elimina</th>
                     </tr>
                 </thead>
                 <tbody>
                     { 
-                    data.map(token =>
-                        <tr key={ token._id}>
-                            <td>{ token.name }</td>
-                            <td>{ token.roles.join(" ") }</td>
+                    data.map(obj =>
+                        <tr key={ obj._id}>
+                            <td>{ obj.name }</td>
+                            <td>{ obj.roles.join(" ") }</td>
+                            <td>{ myDateFormat(obj.createdAt)}</td>
                             <td><Button onClick={() => {
-                                navigator.clipboard.writeText(token.token)
-                            }}>{token.token.slice(0,8)}...</Button></td>
-                            <td><Button className="btn-danger" onClick={() => deleteToken(token, `token cancellato`)}>remove</Button></td>
+                                navigator.clipboard.writeText(obj.token)
+                            }}>{obj.token.slice(0,8)}...</Button></td>
+                            <td><Button className="btn-danger" onClick={() => deleteToken(obj, `token cancellato`)}>remove</Button></td>
                         </tr>) 
                     }
                 </tbody>

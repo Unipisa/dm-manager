@@ -31,6 +31,7 @@ export default function GrantsPage() {
                             <Th filter={filter.header('identifier')}>id</Th>
                             <Th filter={filter.header('projectType')}>tipo</Th>
                             <Th filter={filter.header('pi')}>pi</Th>
+                            <Th filter={filter.header('updatedAt')}>modificato</Th>
                         </tr>
                     </thead>
                     <tbody>
@@ -43,6 +44,7 @@ export default function GrantsPage() {
                                 <td>{ obj.identifier }</td>
                                 <td>{ obj.projectType }</td>
                                 <td>{ obj.pi?.lastName }</td>
+                                <td>{ myDateFormat(obj.updatedAt)}</td>
                             </tr>) 
                         }
                     </tbody>

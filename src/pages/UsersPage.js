@@ -2,7 +2,7 @@ import { useCallback } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { useEngine, useQueryFilter } from '../Engine'
+import { useEngine, useQueryFilter, myDateFormat } from '../Engine'
 import { Th } from '../components/Table'
 
 export default function UsersPage() {
@@ -27,17 +27,19 @@ export default function UsersPage() {
                     <Th filter={filter.header('username')}>username</Th>
                     <Th filter={filter.header('email')}>email</Th>
                     <th>ruoli</th>
+                    <Th filter={filter.header('updatedAt')}>modificato</Th>
                 </tr>
             </thead>
             <tbody>
                 { 
-                data.map(user =>
-                    <tr key={ user._id} onClick={()=>navigateTo(user)}>
-                        <td>{ user.lastName }</td>
-                        <td>{ user.firstName }</td>
-                        <td>{ user.username }</td>
-                        <td>{ user.email }</td>
-                        <td>{ user.roles.join(" ")}</td>
+                data.map(obj =>
+                    <tr key={ obj._id} onClick={()=>navigateTo(obj)}>
+                        <td>{ obj.lastName }</td>
+                        <td>{ obj.firstName }</td>
+                        <td>{ obj.username }</td>
+                        <td>{ obj.email }</td>
+                        <td>{ obj.roles.join(" ")}</td>
+                        <td>{ myDateFormat(obj.updatedAt)}</td>
                     </tr>) 
                 }
             </tbody>

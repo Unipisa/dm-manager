@@ -115,6 +115,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
 
     if (! edit) {
         const values = multiple ? value : [ value ]
+        console.log(`value: ${JSON.stringify(value)}`)
         return <p>
             <strong>{ label }: </strong>{Array.from(values).map(labelDisplayFunction).join(", ")}
         </p> 
@@ -277,4 +278,22 @@ export function SelectInput({ options, label, value, setValue, edit }) {
             </select>
         </div>
     </Form.Group>
+}
+
+export function BooleanInput({ label, value, setValue, edit }) {
+    const id = useId()
+    if (!edit) return <p><b>{label}:</b> {value?'sì':'no'}</p>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
+        <div className="col-sm-10">
+            <input className="form-check-input col-sm-10"
+                type='checkbox' 
+                id={ id } 
+                checked={ !!value } 
+                onChange={ (evt) => {setValue(!!evt.target.checked)} }
+            />                 
+        </div>
+    </Form.Group>
+
 }

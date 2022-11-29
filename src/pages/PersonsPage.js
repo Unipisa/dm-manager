@@ -2,8 +2,7 @@ import { useCallback } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
-import { useEngine } from '../Engine'
-import { useQueryFilter } from '../Engine'
+import { useEngine, useQueryFilter, myDateFormat } from '../Engine'
 import { Th } from '../components/Table'
 
 export default function PersonsPage() {
@@ -35,6 +34,7 @@ export default function PersonsPage() {
                             <Th filter={filter.header('firstName')}>nome</Th>
                             <Th filter={filter.header('affiliation')}>affiliazione</Th>
                             <Th filter={filter.header('email')}>email</Th>
+                            <Th filter={filter.header('updatedAt')}>modificato</Th>
                         </tr>
                     </thead>
                     <tbody>
@@ -45,6 +45,7 @@ export default function PersonsPage() {
                                 <td>{ obj.firstName }</td>
                                 <td>{ obj.affiliation }</td>
                                 <td>{ obj.email }</td>
+                                <td>{ myDateFormat(obj.updatedAt)}</td>
                             </tr>) 
                         }
                     </tbody>

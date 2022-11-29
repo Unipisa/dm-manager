@@ -187,6 +187,35 @@ const migrations = {
         return true
     },
 
+    D20221129_fix_referencePeople_3: async db => {
+        const visits = db.collection('visits')
+        for (const visit of await visits.find({}).toArray()) {
+            const {_id, referencePeople} = visit
+            console.log(`visit ${_id}`)
+            let modified = false
+            const people = referencePeople.map(person => {
+                if (person?._id) {
+                    modified = true
+                    return person?._id
+                }
+                return person
+            })
+            console.log(`people: ${JSON.stringify(people)}`)
+            if (modified) {
+                console.log(`...fix ${_id}`)
+                await visits.updateOne({_id}, {
+                    $set: { referencePeople: people },
+                })
+            }
+        }
+        return true
+    },
+
+    D20221129_add_publish: async db => {
+        const visits = db.collection('visits')
+        visits.updateMany({}, {$set: {publish: true}})
+        return true
+    }
 }
 
 async function migrate(db) {

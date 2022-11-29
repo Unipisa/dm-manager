@@ -31,18 +31,20 @@ export default function VisitsPage() {
                             <Th filter={filter.header('affiliation')}>affiliazione</Th>
                             <Th filter={filter.header('building')}>edificio</Th>
                             <Th filter={filter.header('roomNumber')}>stanza</Th>
+                            <Th filter={filter.header('updatedAt')}>modificato</Th>
                         </tr>
                     </thead>
                     <tbody>
                         { 
-                        data.map(visit =>
-                            <tr key={visit._id} onClick={()=>navigateTo(visit)}>
-                                <td>{ myDateFormat(visit.startDate) }</td>
-                                <td>{ myDateFormat(visit.endDate) }</td>
-                                <td>{ `${visit.person ? visit.person.lastName : ""} ${visit.person ? visit.person.firstName : ""}` }</td>
-                                <td>{ visit.affiliation }</td>
-                                <td>{ visit.building }</td>
-                                <td>{ visit.roomNumber }</td>
+                        data.map(obj =>
+                            <tr key={obj._id} onClick={()=>navigateTo(obj)}>
+                                <td>{ myDateFormat(obj.startDate) }</td>
+                                <td>{ myDateFormat(obj.endDate) }</td>
+                                <td>{ `${obj.person ? obj.person.lastName : ""} ${obj.person ? obj.person.firstName : ""}` }</td>
+                                <td>{ obj.affiliation }</td>
+                                <td>{ obj.building }</td>
+                                <td>{ obj.roomNumber }</td>
+                                <td>{ myDateFormat(obj.updatedAt)}</td>
                             </tr>) 
                         }
                     </tbody>
