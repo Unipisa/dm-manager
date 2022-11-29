@@ -124,7 +124,7 @@ module.exports = [
     "fundingEntity": "Europeo",
     "pi": "",
     "localCoordinator": "Giovanni Federico Gronchi",
-    "members": "H. Ma, S. Marò",
+    "members": "Helene Ma, Stefano Marò",
     "startDate": "2013-02-01",
     "endDate": "2017-01-31",
     "webSite": "https://robotik.dfki-bremen.de/en/research/projects/itn-stardust.html"
@@ -267,7 +267,7 @@ module.exports = [
     "fundingEntity": "Nazionale",
     "pi": "Paolo Tortora (Università di Bologna)",
     "localCoordinator": "Giacomo Tommei",
-    "members": "G. Lari",
+    "members": "Giacomo Lari",
     "startDate": "2022-04-06",
     "endDate": "2025-04-05",
     "webSite": ""
@@ -280,7 +280,7 @@ module.exports = [
     "fundingEntity": "Nazionale",
     "pi": "Gianni Dal Maso (SISSA, Trieste)",
     "localCoordinator": "Giovanni Alberti",
-    "members": "De Luca, Maria Stella Gelli, Matteo Novaga",
+    "members": "Lucia De Luca, Maria Stella Gelli, Matteo Novaga",
     "startDate": "2019-08-01",
     "endDate": "2023-02-19",
     "webSite": ""
