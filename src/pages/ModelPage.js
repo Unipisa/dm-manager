@@ -3,12 +3,13 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { ListInput, PersonInput, DateInput, SelectInput, StringInput } from '../components/Input'
+import { BooleanInput, ListInput, PersonInput, DateInput, SelectInput, StringInput } from '../components/Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function SchemaInput({ schema, label, value, setValue, edit}) {
+export function SchemaInput({ field, schema, label, value, setValue, edit}) {
     const type = schema['type']
+    console.log(`type: ${JSON.stringify(type)} value: ${JSON.stringify(value)} field: ${JSON.stringify(field)}`)
     if (type === 'array') {
         const xref = schema.items['x-ref']
         if (!xref) return <ListInput label={label} value={value} setValue={setValue} edit={edit}/>
@@ -23,6 +24,7 @@ export function SchemaInput({ schema, label, value, setValue, edit}) {
     const enum_ = schema['enum']
     if (enum_) return <SelectInput options={enum_} label={label} value={value} setValue={setValue} edit={edit} />
     if (type === 'string') return <StringInput label={label} value={value} setValue={setValue} edit={edit}/>
+    if (type === 'boolean') return <BooleanInput label={label} value={value} setValue={setValue} edit={edit}/>
     return <span>unknown input type {JSON.stringify(schema)}</span>
 }
 
@@ -36,7 +38,7 @@ export function SchemaInputs({ schema, labels, obj, setObj, onChange, edit}) {
             setObj(obj => ({...obj, [field]: value}))
         }
         console.log(`field: ${field}, value: ${JSON.stringify(obj[field])}`)
-        lst.push(<SchemaInput key={field} schema={field_schema} value={obj[field]} setValue={setValue} label={(labels && labels[field]) || field} edit={edit} />)
+        lst.push(<SchemaInput key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} label={(labels && labels[field]) || field} edit={edit} />)
         // lst.push(<p>{field}:  {JSON.stringify(field_schema)}</p>)
     }        
     return lst

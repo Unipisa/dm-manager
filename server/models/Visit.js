@@ -14,6 +14,7 @@ const visitSchema = new Schema({
     referencePeople: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
     fundingAgency: String,
     SSD,
+    publish: {type: Boolean, default: true},
     notes: String,
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },

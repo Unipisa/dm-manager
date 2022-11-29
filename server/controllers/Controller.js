@@ -84,6 +84,11 @@ class Controller {
                             can_filter: true,
                             match_date: true,
                         }
+                    case Boolean: return {
+                        can_sort: true,
+                        can_filter: true,
+                        match_boolean: true,
+                    }
                 }
             }
         }
@@ -218,6 +223,8 @@ class Controller {
                     } catch(err) {
                         return sendBadRequest(res, `comma separated list of mongo ids expected but got "${value}"`)
                     }
+                } else if (field.match_boolean) {
+                    $match[key0] = ['1','yes','true'].includes(value)
                 } else if (field.match_date) {
                     let date_value = null
                     if (value === 'today') {
