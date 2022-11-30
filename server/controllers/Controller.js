@@ -121,7 +121,10 @@ class Controller {
                             foreignField: "_id",
                             as: field,
                         }},
-                        {$unwind: '$'+field}, 
+                        {$unwind: {
+                            "path": '$'+field,
+                            "preserveNullAndEmptyArrays": true,
+                        }}, 
                     )
                 }
             })
