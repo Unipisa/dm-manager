@@ -1,35 +1,41 @@
-const mongoose = require('mongoose-schema-jsonschema')()
-
-const SSD = require('./SSD')
-
-const { Schema } = mongoose
+const {
+    Schema, 
+    model, 
+    ObjectId, 
+    startDate, 
+    endDate, 
+    createdBy, 
+    updatedBy, 
+    SSD, 
+    notes
+} = require('./Model')
 
 const schema = new Schema({
-    name: String,
-    identifier: String, 
-    projectType: String, 
+    name: {type: String, label: 'nome'},
+    identifier: {type: String, label: 'identificativo'}, 
+    projectType: {type: String, label: 'tipo progetto'},
     funds: {
         type: String,
+        label: 'finanziamento',
         enum: ["National", "International"],
         default: "National",
     },
-    fundingEntity: String, 
-    pi: { type: Schema.Types.ObjectId, ref: 'Person' }, 
-    localCoordinator: { type: Schema.Types.ObjectId, ref: 'Person' }, 
-    members: [ { type: Schema.Types.ObjectId, ref: 'Person' } ], 
-    startDate: Date, 
-    endDate: Date, 
-    webSite: String, 
-    budgetAmount: String, 
-    description: String, 
-    keywords: [String], 
+    fundingEntity: {type: String, label: 'ente finanziatore'}, 
+    pi: { type: ObjectId, label: 'principal investigator', ref: 'Person' }, 
+    localCoordinator: { type: ObjectId, label: 'coordinatore locale', ref: 'Person' }, 
+    members: [ { type: ObjectId, label: 'partecipanti', ref: 'Person' } ], 
+    startDate, 
+    endDate, 
+    webSite: {type: String, label: 'URL sito web'}, 
+    budgetAmount: {type: String, label: 'budget'}, 
+    description: {type: String, label: 'descrizione', widget: 'text'}, 
+    keywords: [{type: String, label: 'parole chiave'}], 
     SSD,
-    notes: String,
-
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    notes,
+    createdBy,
+    updatedBy,
  }, {
      timestamps: true // adds fields: createdAt, updatedAt
  })
 
- module.exports = mongoose.model('Grant', schema)
+ module.exports = model('Grant', schema)

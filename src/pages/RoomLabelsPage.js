@@ -8,12 +8,12 @@ function Display({roomLabel, onSave}) {
     const numberRef = useRef(null)
     const printRef = useRef(null)
     const blue = "#08467b"
-    const [size, setSize] = useState(roomLabel.size || 0)
+    const [size, setSize] = useState(roomLabel?.size || 0)
     const [lastId,setLastId] = useState(null)
 
     if (lastId !== roomLabel._id) {
         setLastId(roomLabel._id)
-        setSize(roomLabel.size)
+        setSize(roomLabel?.size || 0)
     }
 
     function sanitize(str) {
