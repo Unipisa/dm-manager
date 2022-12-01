@@ -3,32 +3,32 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, DateInput, SelectInput, StringInput } from '../components/Input'
+import { BooleanInput, ListInput, PersonInput, DateInput, SelectInput, StringInput, TextInput } from '../components/Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function SchemaInput({ field, schema, label, value, setValue, edit}) {
-    const type = schema['type']
-    console.log(`type: ${JSON.stringify(type)} value: ${JSON.stringify(value)} field: ${JSON.stringify(field)}`)
-    if (type === 'array') {
-        const xref = schema.items['x-ref']
-        if (!xref) return <ListInput label={label} value={value} setValue={setValue} edit={edit}/>
-        if (xref === 'Person') return <PersonInput multiple label={label} value={value} setValue={setValue} edit={edit} />
-        return <p>x-ref to {xref} not yet implemented in array</p>
+export function SchemaInput({ field, schema, value, setValue, edit}) {
+    if (schema.type === 'array') {
+        const label = schema.items.label || field
+        if (!schema.items['x-ref']) return <ListInput label={label} value={value} setValue={setValue} edit={edit}/>
+        if (schema.items['x-ref'] === 'Person') return <PersonInput multiple label={label} value={value} setValue={setValue} edit={edit} />
+        return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
+    } else {
+        const label = schema.label || field
+        if (schema['x-ref'] === 'Person') return <PersonInput label={label} value={value} setValue={setValue} edit={edit} />
+        if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
+        if (schema.format === 'date-time') return <DateInput label={label} value={value} setValue={setValue} edit={edit} />
+        if (schema.enum) return <SelectInput options={schema.enum} label={label} value={value} setValue={setValue} edit={edit} />
+        if (schema.type === 'string') {
+            if (schema.widget === 'text') return <TextInput label={label} value={value} setValue={setValue} edit={edit}/>
+            else return <StringInput label={label} value={value} setValue={setValue} edit={edit}/>
+        }
+        if (schema.type === 'boolean') return <BooleanInput label={label} value={value} setValue={setValue} edit={edit}/>
+        return <span>unknown input type {JSON.stringify(schema)}</span>
     }
-    const xref = schema['x-ref']
-    const format = schema['format']
-    if (xref === 'Person') return <PersonInput label={label} value={value} setValue={setValue} edit={edit} />
-    if (xref) return <p>x-ref to {xref} not yet implemented</p> 
-    if (format === 'date-time') return <DateInput label={label} value={value} setValue={setValue} edit={edit} />
-    const enum_ = schema['enum']
-    if (enum_) return <SelectInput options={enum_} label={label} value={value} setValue={setValue} edit={edit} />
-    if (type === 'string') return <StringInput label={label} value={value} setValue={setValue} edit={edit}/>
-    if (type === 'boolean') return <BooleanInput label={label} value={value} setValue={setValue} edit={edit}/>
-    return <span>unknown input type {JSON.stringify(schema)}</span>
 }
 
-export function SchemaInputs({ schema, labels, obj, setObj, onChange, edit}) {
+export function SchemaInputs({ schema, obj, setObj, onChange, edit}) {
     let lst = []
     for (let [field, field_schema] of Object.entries(schema)) {
         if (RESERVED_FIELDS.includes(field)) continue
@@ -37,9 +37,7 @@ export function SchemaInputs({ schema, labels, obj, setObj, onChange, edit}) {
             if (onChange && onChange(field, value)) return
             setObj(obj => ({...obj, [field]: value}))
         }
-        console.log(`field: ${field}, value: ${JSON.stringify(obj[field])}`)
-        lst.push(<SchemaInput key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} label={(labels && labels[field]) || field} edit={edit} />)
-        // lst.push(<p>{field}:  {JSON.stringify(field_schema)}</p>)
+        lst.push(<SchemaInput key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} edit={edit} />)
     }        
     return lst
 }
@@ -52,11 +50,10 @@ export function emptyObject(Model) {
         else if (Field['x-ref']) empty[field] = null
         else empty[field] = ''
     }
-    console.log(`Empty: ${JSON.stringify(empty)}`)
     return empty
 }
 
-export default function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName }) {
+export default function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName, Details }) {
     const engine = useEngine()
     const empty = emptyObject(engine.Models[ModelName])
     const { id } = useParams()
@@ -104,7 +101,8 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
 
     if (redirect !== null) return <Navigate to={redirect} />
 
-    return <Card>
+    return <>
+    <Card>
         <Card.Header>
             <h3>{ create ? `nuov${oa} ${objName}` : `${objName} ${describe(obj)}` }</h3>
         </Card.Header>
@@ -154,4 +152,6 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
         </p>
         </Card.Body>
     </Card>
+    { Details && !edit && <Details obj={obj}/>}
+    </>
 }

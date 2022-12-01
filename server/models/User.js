@@ -1,14 +1,12 @@
-const mongoose = require('mongoose-schema-jsonschema')()
+const { Schema, model } = require('./Model')
 const passportLocalMongoose = require('passport-local-mongoose')
 
-const { Schema } = mongoose
-
 const userSchema = new Schema({
-    firstName: String,
-    lastName: String,
-    email: String,
-    username: String,
-    roles: [String],
+    firstName: {type: String, label: 'cognome'},
+    lastName: {type: String, label: 'nome'},
+    email: {type: String, label: 'email'},
+    username: {type: String, label: 'username'},
+    roles: [{type: String, label: 'ruoli'}],
  }, { timestamps: true })
 
 userSchema.plugin(passportLocalMongoose)
@@ -24,4 +22,4 @@ userSchema.options.toObject.transform = function (doc, ret, options) {
   return ret
 }
 
-module.exports = mongoose.model('User', userSchema)
+module.exports = model('User', userSchema)

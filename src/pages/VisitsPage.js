@@ -6,8 +6,8 @@ import { useEngine, myDateFormat } from '../Engine'
 import { useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function VisitsPage() {
-    const filter = useQueryFilter({'_sort': '-startDate', '_limit': 10})
+export default function VisitsPage({...options}) {
+    const filter = useQueryFilter({'_sort': '-startDate', '_limit': 10, ...options})
     const engine = useEngine()
     const query = engine.useIndex('visit', filter.filter)
     const navigate = useNavigate()
