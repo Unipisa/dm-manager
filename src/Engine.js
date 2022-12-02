@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useState, createContext, useContext } from 'react'
+import { useState, createContext, useContext, useEffect } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
 export const EngineContext = createContext('dm-manager')
@@ -40,6 +40,7 @@ export function useCreateEngine() {
     }
 
     const api_fetch = async (url, options) => {
+        console.log(`API_FETCH ${url} - ${JSON.stringify(options)}`)
         options = {credentials: 'include', ...options}
         const response = await fetch(state.base_url + url, options)
         if (response.status === 401) throw new Error("invalid credentials")
@@ -228,6 +229,30 @@ export function useCreateEngine() {
                 })
             }
         },
+
+        useGetRelated: (modelName, _id) => {
+            const related = state.Models[modelName].related
+            const [data, setData] = useState(related.map(
+                info => ({...info, data: null})))
+            useEffect(() => {
+                related.forEach((info, i) => {
+                    console.log(`useGetRelated: GET ${info.url} ${info.field}=${_id}`)
+                    get(`/api/v0/${info.url}`, {[info.field]: _id}).then(result => {
+                        console.log(`useGetRelated: RESPONSE: ${JSON.stringify(result)}`)
+                        setData(data => data.map(
+                            (old, i_) => {
+                                if (i !== i_) return old
+                                return {
+                                    ...info, 
+                                    data: result.data
+                                }
+                            }
+                        ))
+                    })
+                })
+            }, [])
+            return data
+        }
     }
 }
 

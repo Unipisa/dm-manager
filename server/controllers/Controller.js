@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongoose').Types
 const {log, requireSomeRole, requireUser} = require('./middleware') 
 
 function sendBadRequest(res, message) {
@@ -63,15 +64,27 @@ class Controller {
          * to ignore or override these settings
          ***/
         function field_from_model_info(info) {
-            if (typeof info !== 'object') {
-                info = {
-                    type: info,
+            if (Array.isArray(info)) {
+                if (info.length !== 1) return
+                info = info[0]
+                if (info.ref === 'Person') {
+                    // elenco di ObjectId di Person
+                    return {
+                        can_filter: true,
+                        related_field: true,
+                        related_many: true,
+                    }
                 }
+                return
+            }
+            if (typeof info !== 'object') {
+                return
             }
             if (info.ref === 'Person') {
                 return {
                     can_sort: ['lastName', 'firstName'],
                     can_filter: true,
+                    related_field: true,
                 }
             } else {
                 switch(info.type) {
@@ -97,7 +110,8 @@ class Controller {
             .forEach(([field, info]) => {
                 if (field === 'updatedBy') return
                 if (field === 'createdBy') return
-                this.fields[field] = field_from_model_info(info)
+                const field_info = field_from_model_info(info)
+                if (field_info) this.fields[field] = field_info 
             })
 
         if (this.Model.schema.options.timestamps) {
@@ -164,6 +178,7 @@ class Controller {
         console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
 
         let $match = {}
+        let $match_lookups = {}
         let $sort = {_id: 1}
         let filter = {}
         let sort = null
@@ -221,7 +236,7 @@ class Controller {
                 } else if (field.match_ids) {
                     try {
                         $match['_id'] = {
-                            $in: value.split(",").map(id => new mongoose.Types.ObjectId(id))
+                            $in: value.split(",").map(id => new ObjectId(id))
                         }
                     } catch(err) {
                         return sendBadRequest(res, `comma separated list of mongo ids expected but got "${value}"`)
@@ -255,6 +270,12 @@ class Controller {
                     } else {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
+                } else if (field.related_field) {
+                    if (key_parts[1] === '_id' || key_parts.length === 1) { 
+                        $match[key0] = new ObjectId(value)
+                    } else {
+                        return sendBadRequest(res, `related field query not yet supported [${key0}.${key_parts[1]}]`)
+                    }
                 } else {
                     if (key_parts.length === 1) {
                         $match[key] = value
@@ -281,6 +302,7 @@ class Controller {
         const pipeline = [
             {$match},
             ...this.queryPipeline,
+            {$match: $match_lookups},
             {$sort},
             {$facet:{
                 "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
