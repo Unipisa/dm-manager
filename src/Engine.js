@@ -250,7 +250,7 @@ export function useCreateEngine() {
                         ))
                     })
                 })
-            }, [])
+            }, [_id, related])
             return data
         }
     }
