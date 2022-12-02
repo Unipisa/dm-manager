@@ -108,7 +108,7 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
         </Card.Header>
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }>
-            <SchemaInputs schema={engine.Models[ModelName]} obj={obj} setObj={setObj} onChange={onChange && onChange(setObj)} edit={edit}/>
+            <SchemaInputs schema={engine.Models[ModelName].fields} obj={obj} setObj={setObj} onChange={onChange && onChange(setObj)} edit={edit}/>
             { edit ?
                 <ButtonGroup className="mt-3">
                     <Button 

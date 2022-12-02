@@ -24,8 +24,25 @@ const visitSchema = new Schema({
     notes: {type: String, label: 'note', widget: 'text'},
     createdBy,
     updatedBy,
- }, {
-     timestamps: true // adds fields: createdAt, updatedAt
- })
+}, {
+    timestamps: true // adds fields: createdAt, updatedAt
+})
 
- module.exports = model('Visit', visitSchema)
+const Visit = model('Visit', visitSchema)
+
+const Person = require('./Person')
+
+Person.relatedModels.push({
+    model: Visit,
+    modelName: 'Visit',
+    url: 'visit',
+    field: 'person',
+}, {
+    model: Visit,
+    modelName: 'Visit',
+    url: 'visit',
+    field: 'referencePeople',
+    multiple: true,
+})
+
+module.exports = Visit

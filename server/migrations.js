@@ -225,9 +225,7 @@ async function migrate(db) {
         config = { migrations: [] }
         await db.collection('config').insertOne(config)
     }
-    console.log(`config: ${JSON.stringify(config)}`)
-    // console.log(`applied migrations: ${ config.migrations.join(', ') || "none"}`)
-    console.log("applying migrations:")
+    console.log("Migrations:")
 
     for (const [name, run] of Object.entries(migrations)) {
         if (config.migrations.includes(name)) {

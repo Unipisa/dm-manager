@@ -7,6 +7,7 @@ const GrantController = require('./controllers/GrantController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
 const PersonController = require('./controllers/PersonController')
+const { Model } = require('mongoose')
 
 var router = express.Router()
 
@@ -24,7 +25,14 @@ let ModelSchemas = {}
     const controller = new Controller()
     paths = [...paths, ...controller.register(router)]
     const Schema = controller.Model.jsonSchema()
-    ModelSchemas[Schema.title] = Schema.properties 
+    const related = controller.Model.relatedModels || []
+    ModelSchemas[Schema.title] = {
+        fields: Schema.properties,
+        related: related.map(related => ({
+            multiple: false,
+            ...related,
+        }))
+    }
 })
 
 // Informazioni sugli schemi dei modelli

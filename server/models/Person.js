@@ -27,8 +27,7 @@ personSchema.index({
     affiliation: 'text',
 })
 
-personSchema.methods.getRelated = () => {
-    
-}
+const Person = model('Person', personSchema)
+Person.relatedModels = []
 
-module.exports = model('Person', personSchema)
+module.exports = Person

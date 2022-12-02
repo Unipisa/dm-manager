@@ -34,8 +34,29 @@ const schema = new Schema({
     notes,
     createdBy,
     updatedBy,
- }, {
-     timestamps: true // adds fields: createdAt, updatedAt
- })
+}, {
+    timestamps: true // adds fields: createdAt, updatedAt
+})
 
- module.exports = model('Grant', schema)
+const Grant = model('Grant', schema)
+
+const Person = require('./Person')
+Person.relatedModels.push({
+    model: Grant,
+    modelName: 'Grant',
+    url: 'grant',
+    field: 'pi',
+},  {
+    model: Grant,
+    modelName: 'Grant',
+    url: 'grant',
+    field: 'localCoordinator',
+}, {
+    model: Grant,
+    modelName: 'Grant',
+    url: 'grant',
+    field: 'members',
+    multiple: true,
+})
+
+module.exports = Grant
