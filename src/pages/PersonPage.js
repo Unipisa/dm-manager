@@ -1,4 +1,3 @@
-import { useQueryFilter } from '../Engine'
 import ModelPage from './ModelPage'
 
 function PersonDetails({obj}) {
