@@ -1,25 +1,31 @@
-const mongoose = require('mongoose-schema-jsonschema')()
-
-const SSD = require('./SSD')
-const { Schema } = mongoose
+const { 
+    model, 
+    Schema, 
+    ObjectId, 
+    startDate, 
+    endDate, 
+    SSD, 
+    createdBy, 
+    updatedBy,
+} = require('./Model')
 
 const visitSchema = new Schema({
-    person: { type: Schema.Types.ObjectId, ref: 'Person' },
-    affiliation: String,
-    country: String,
-    startDate: Date,
-    endDate: Date,
-    roomNumber: String,
-    building: String,
-    referencePeople: [{ type: Schema.Types.ObjectId, ref: 'Person' }],
-    fundingAgency: String,
+    person: { type: ObjectId, label: 'visitatore', ref: 'Person' },
+    affiliation: {type: String, label: 'affiliazione'},
+    country: {type: String, label: 'nazione'},
+    startDate,
+    endDate,
+    roomNumber: {type: String, label: 'piano, numero stanza'},
+    building: {type: String, label: 'edificio'},
+    referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
+    fundingAgency: {type: String, label: 'ente finanziatore'},
     SSD,
-    publish: {type: Boolean, default: true},
-    notes: String,
-    createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    publish: {type: Boolean, label: 'pubblica sul web', default: true},
+    notes: {type: String, label: 'note', widget: 'text'},
+    createdBy,
+    updatedBy,
  }, {
      timestamps: true // adds fields: createdAt, updatedAt
  })
 
- module.exports = mongoose.model('Visit', visitSchema)
+ module.exports = model('Visit', visitSchema)

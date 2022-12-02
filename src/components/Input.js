@@ -70,7 +70,8 @@ export function TextInput({ label, value, setValue, edit }) {
         <div className="col-sm-10">
             <textarea 
                 id={ id } 
-                value={ value || "" } 
+                value={ value || "" }
+                rows={10}
                 onChange={ (evt) => setValue(evt.target.value) }
                 className="form-control" 
             />
@@ -107,7 +108,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
 
     const labelDisplayFunction = x => {
-        if (x === null || x.noPersonSelected || x.newPersonEntry)
+        if (!x || x.noPersonSelected || x.newPersonEntry)
             return ""
 
         return `${x.firstName} ${x.lastName} (${x.affiliation})`

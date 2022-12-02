@@ -1,28 +1,34 @@
-const mongoose = require('mongoose-schema-jsonschema')()
-const { Schema } = mongoose
+const { 
+    Schema, 
+    model, 
+    createdBy, 
+    updatedBy 
+} = require('./Model')
 
 const personSchema = new Schema({
-    firstName:  String,
-    lastName: String,
-    affiliation: String, 
-    unipiId: String,
-    country: String, 
-    email: String, 
-    phone: String, 
-    notes: String,
-    notes: String,
-    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
- }, {
-     timestamps: true // adds fields: createdAt, updatedAt
- })
+    firstName:  {type: String, label: 'nome'},
+    lastName: {type: String, label: 'cognome'},
+    affiliation: {type: String, label: 'affiliazione'}, 
+    unipiId: {type: String, label: 'matricola unipi'},
+    country: {type: String, label: 'nazione'}, 
+    email: {type: String, label: 'email'}, 
+    phone: {type: String, label: 'telefono'}, 
+    notes: {type: String, label: 'note', widget: 'text'},
+    createdBy,
+    updatedBy,
+}, {
+    timestamps: true // adds fields: createdAt, updatedAt
+})
 
- personSchema.index({
-     firstName: 'text', 
-     lastName: 'text',
-     email: 'text',
-     affiliation: 'text',
-    });
+personSchema.index({
+    firstName: 'text', 
+    lastName: 'text',
+    email: 'text',
+    affiliation: 'text',
+})
 
+personSchema.methods.getRelated = () => {
+    
+}
 
- module.exports = mongoose.model('Person', personSchema)
+module.exports = model('Person', personSchema)
