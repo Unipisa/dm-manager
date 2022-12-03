@@ -28,7 +28,7 @@ class Controller {
 
         // these fields contain foreignkey ids which 
         // are going to be expanded with the referred objects
-        this.populateFields = ['createdBy', 'updatedBy']
+        this.populateFields = []
 
         // Fields used in the search endpoint
         this.searchFields = []
@@ -123,7 +123,22 @@ class Controller {
     add_fields_population_from_model() {
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
-                if (info.ref === 'Person') {
+                if (Array.isArray(info) && info.length === 1 && info[0].ref === 'Person') {
+                    // descrive un array
+                    info = info[0]
+                    this.populateFields.push({
+                        path: field,
+                        select: ['firstName', 'lastName', 'affiliation', 'email']
+                    })
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "people",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                        }},
+                    )
+                } else if (info.ref === 'Person') {
                     this.populateFields.push({
                         path: field, 
                         select: ['firstName', 'lastName', 'affiliation', 'email']
