@@ -215,7 +215,17 @@ const migrations = {
         const visits = db.collection('visits')
         visits.updateMany({}, {$set: {publish: true}})
         return true
-    }
+    },
+
+    D20221204_rename_role_1: async db => {
+        const users = db.collection('users')
+        users.updateMany({roles: 'room-manager'},{$set:{"roles.$": 'label-manager' }})
+        users.updateMany({roles: 'room-supervisor'},{$set:{"roles.$": 'label-supervisor' }})
+        const tokens = db.collection('tokens')
+        users.updateMany({roles: 'room-manager'},{$set:{"roles.$": 'label-manager' }})
+        users.updateMany({roles: 'room-supervisor'},{$set:{"roles.$": 'label-supervisor' }})
+        return true
+    },
 }
 
 async function migrate(db) {

@@ -18,7 +18,7 @@ export default function Header() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>
-              <NavLink to="/roomLabels" className="nav-link">
+              <NavLink to="/labels" className="nav-link">
                 Cartellino Stanze</NavLink>
               {user.hasSomeRole('room-manager','room-supervisor','supervisor','admin') 
               && <NavLink to="/rooms" className="nav-link">

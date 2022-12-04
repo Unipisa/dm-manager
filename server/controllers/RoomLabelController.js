@@ -5,8 +5,8 @@ class RoomLabelController extends Controller {
     constructor() {
         super(RoomLabel)
         this.path = 'roomLabel'
-        this.managerRoles.push('room-manager')
-        this.supervisorRoles.push('room-manager', 'room-supervisor')
+        this.managerRoles.push('label-manager')
+        this.supervisorRoles.push('label-manager', 'label-supervisor')
     }
 }
 

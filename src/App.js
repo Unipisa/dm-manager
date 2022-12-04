@@ -11,6 +11,11 @@ import Header from './components/Header'
 
 import Home from './pages/Home'
 import LoginPage from './pages/LoginPage'
+import RoomLabelsPage from './pages/RoomLabelsPage'
+import RoomPage from './pages/RoomPage'
+import RoomsPage from './pages/RoomsPage'
+import RoomAssignementPage from './pages/RoomAssignementPage'
+import RoomAssignementsPage from './pages/RoomAssignementsPage'
 import VisitsPage from './pages/VisitsPage'
 import VisitPage from './pages/VisitPage'
 import GrantsPage from './pages/GrantsPage'
@@ -20,9 +25,6 @@ import PersonPage from './pages/PersonPage'
 import UsersPage from './pages/UsersPage'
 import UserPage from './pages/UserPage'
 import TokensPage from './pages/TokensPage'
-import RoomLabelsPage from './pages/RoomLabelsPage'
-import RoomPage from './pages/RoomPage'
-import RoomsPage from './pages/RoomsPage'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
 
@@ -50,9 +52,11 @@ function Internal() {
       <Container>
         <Routes>  
           <Route path="/" element={<Home />} />
-          <Route path="/roomLabels" element={<RoomLabelsPage />} />
+          <Route path="/labels" element={<RoomLabelsPage />} />
           <Route path="/rooms/:id" element={<RoomPage />} />
           <Route path="/rooms" element={<RoomsPage />} />
+          <Route path="/assignements/:id" element={<RoomAssignementPage />} />
+          <Route path="/assignements" element={<RoomAssignementsPage />} />
           <Route path="/visits/:id" element={<VisitPage />} />
           <Route path="/visits" element={<VisitsPage />} />
           <Route path="/grants/:id" element={<GrantPage />} />

@@ -8,7 +8,7 @@ export default function Home() {
   return (<>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
         <ul>
-          <li><Link to="/roomLabels">elaborare un cartellino con i nominativi per le stanze</Link></li>
+          <li><Link to="/labels">elaborare un cartellino con i nominativi per le stanze</Link></li>
           { user.hasSomeRole('room-manager','admin') && 
             <li><Link to="/rooms">gestire le stanze</Link></li>
           }
