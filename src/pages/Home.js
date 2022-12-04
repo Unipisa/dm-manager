@@ -9,6 +9,12 @@ export default function Home() {
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
         <ul>
           <li><Link to="/roomLabels">elaborare un cartellino con i nominativi per le stanze</Link></li>
+          { user.hasSomeRole('room-manager','admin') && 
+            <li><Link to="/rooms">gestire le stanze</Link></li>
+          }
+          { user.hasSomeRole('room-supervisor','supervisor') && 
+            <li><Link to="/rooms">vedere le stanze</Link></li>
+          }
           { user.hasSomeRole('visit-manager','admin') && 
             <li><Link to="/visits">gestire i visitatori</Link></li>
           }

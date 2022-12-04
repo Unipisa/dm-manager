@@ -20,6 +20,9 @@ export default function Header() {
               <NavLink to="/" className="nav-link">Home</NavLink>
               <NavLink to="/roomLabels" className="nav-link">
                 Cartellino Stanze</NavLink>
+              {user.hasSomeRole('room-manager','room-supervisor','supervisor','admin') 
+              && <NavLink to="/rooms" className="nav-link">
+                Stanze</NavLink>}
               {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') 
               && <NavLink to="/visits" className="nav-link">
                 Visitatori</NavLink>}

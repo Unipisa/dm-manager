@@ -7,6 +7,7 @@ const GrantController = require('./controllers/GrantController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
 const PersonController = require('./controllers/PersonController')
+const RoomController = require('./controllers/RoomController')
 const { Model } = require('mongoose')
 
 var router = express.Router()
@@ -21,6 +22,7 @@ let ModelSchemas = {}
     UserController,
     TokenController,
     PersonController,
+    RoomController,
 ].forEach(Controller => {
     const controller = new Controller()
     paths = [...paths, ...controller.register(router)]

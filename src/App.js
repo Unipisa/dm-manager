@@ -21,6 +21,8 @@ import UsersPage from './pages/UsersPage'
 import UserPage from './pages/UserPage'
 import TokensPage from './pages/TokensPage'
 import RoomLabelsPage from './pages/RoomLabelsPage'
+import RoomPage from './pages/RoomPage'
+import RoomsPage from './pages/RoomsPage'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
 
@@ -49,6 +51,8 @@ function Internal() {
         <Routes>  
           <Route path="/" element={<Home />} />
           <Route path="/roomLabels" element={<RoomLabelsPage />} />
+          <Route path="/rooms/:id" element={<RoomPage />} />
+          <Route path="/rooms" element={<RoomsPage />} />
           <Route path="/visits/:id" element={<VisitPage />} />
           <Route path="/visits" element={<VisitsPage />} />
           <Route path="/grants/:id" element={<GrantPage />} />
