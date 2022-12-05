@@ -106,6 +106,12 @@ class Controller {
             }
         }
 
+        this.fields['_id'] = {
+            can_sort: true,
+            can_filter: true,
+            match_ids: true,
+        }
+
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
                 if (field === 'updatedBy') return
@@ -307,8 +313,6 @@ class Controller {
                 }
             }
         }
-
-        console.log(`match ${JSON.stringify($match)} requested in index`)
 
         let total, data;
 
