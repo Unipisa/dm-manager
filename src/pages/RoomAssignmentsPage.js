@@ -6,13 +6,13 @@ import { useEngine, myDateFormat } from '../Engine'
 import { useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function RoomAssignementsPage() {
+export default function RoomAssignmentsPage() {
     const filter = useQueryFilter({'_sort': 'startDate', '_limit': 10})
     const engine = useEngine()
-    const query = engine.useIndex('roomAssignement', filter.filter)
+    const query = engine.useIndex('roomAssignment', filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        `/roomAssignements/${obj._id}`, {replace: true}), [navigate])
+        `/roomAssignments/${obj._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
@@ -21,7 +21,7 @@ export default function RoomAssignementsPage() {
 
     return <>
             <div>
-                { engine.user.hasSomeRole('admin','assignement-manager') && <Link className="btn btn-primary" to="/assignements/new">aggiungi assegnazione stanza</Link> }
+                { engine.user.hasSomeRole('admin','assignment-manager') && <Link className="btn btn-primary" to="/assignments/new">aggiungi assegnazione stanza</Link> }
                 <Table hover>
                     <thead className="thead-dark">
                         <tr>

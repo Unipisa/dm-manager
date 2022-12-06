@@ -1,9 +1,9 @@
 import ModelPage from './ModelPage'
 
-export default function RoomAssignementPage() {
+export default function RoomAssignmentPage() {
     return <ModelPage
-        ModelName = 'RoomAssignement'
-        objCode = 'roomAssignement'
+        ModelName = 'RoomAssignment'
+        objCode = 'roomAssignment'
         objName = 'assegnazione stanza'
         indexUrl = '/rooms'
         oa = 'a'

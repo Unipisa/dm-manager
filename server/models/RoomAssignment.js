@@ -21,6 +21,6 @@ const schema = new Schema({
     timestamps: true // adds fields: createdAt, updatedAt
 })
 
-const RoomAssignement = model('RoomAssignement', schema)
+const RoomAssignment = model('RoomAssignment', schema)
 
-module.exports = RoomAssignement
+module.exports = RoomAssignment

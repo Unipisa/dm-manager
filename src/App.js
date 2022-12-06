@@ -14,8 +14,8 @@ import LoginPage from './pages/LoginPage'
 import RoomLabelsPage from './pages/RoomLabelsPage'
 import RoomPage from './pages/RoomPage'
 import RoomsPage from './pages/RoomsPage'
-import RoomAssignementPage from './pages/RoomAssignementPage'
-import RoomAssignementsPage from './pages/RoomAssignementsPage'
+import RoomAssignmentPage from './pages/RoomAssignmentPage'
+import RoomAssignmentsPage from './pages/RoomAssignmentsPage'
 import VisitsPage from './pages/VisitsPage'
 import VisitPage from './pages/VisitPage'
 import GrantsPage from './pages/GrantsPage'
@@ -55,8 +55,8 @@ function Internal() {
           <Route path="/labels" element={<RoomLabelsPage />} />
           <Route path="/rooms/:id" element={<RoomPage />} />
           <Route path="/rooms" element={<RoomsPage />} />
-          <Route path="/assignements/:id" element={<RoomAssignementPage />} />
-          <Route path="/assignements" element={<RoomAssignementsPage />} />
+          <Route path="/assignments/:id" element={<RoomAssignmentPage />} />
+          <Route path="/assignments" element={<RoomAssignmentsPage />} />
           <Route path="/visits/:id" element={<VisitPage />} />
           <Route path="/visits" element={<VisitsPage />} />
           <Route path="/grants/:id" element={<GrantPage />} />

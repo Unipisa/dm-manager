@@ -3,7 +3,7 @@ var express = require('express')
 const config = require('./config')
 const RoomController = require('./controllers/RoomController')
 const RoomLabelController = require('./controllers/RoomLabelController')
-const RoomAssignementController = require('./controllers/RoomAssignementController')
+const RoomAssignmentController = require('./controllers/RoomAssignmentController')
 const VisitController = require('./controllers/VisitController')
 const GrantController = require('./controllers/GrantController')
 const UserController = require('./controllers/UserController')
@@ -19,7 +19,7 @@ let ModelSchemas = {}
 ;[
     RoomLabelController, 
     RoomController,
-    RoomAssignementController,
+    RoomAssignmentController,
     VisitController, 
     GrantController,
     UserController,
