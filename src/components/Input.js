@@ -85,7 +85,7 @@ export function TextInput({ label, value, setValue, edit }) {
 //
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
-export function PersonInput({ label, value, setValue, edit, multiple }) {
+export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, label, value, setValue, edit, multiple }) {
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false)
@@ -93,9 +93,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const id = useId()
 
     // Data used for the new person create
-    const [newPersonFirstName, setNewPersonFirstName] = useState("");
-    const [newPersonLastName, setNewPersonLastName] = useState("");
-    const [newPersonAffiliation, setNewPersonAffiliation] = useState("");
+    const [newObject, setNewObject] = useState({})
 
     if (multiple === undefined) {
         multiple = false
@@ -105,10 +103,10 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
 
     const labelDisplayFunction = x => {
-        if (!x || x.noPersonSelected || x.newPersonEntry)
+        if (!x || x.noObjectSelected || x.newObjectEntry)
             return ""
 
-        return `${x.firstName} ${x.lastName} (${x.affiliation})`
+        return render(x)
     }
 
     if (! edit) {
@@ -121,11 +119,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
 
     function handleClose() {
         // Add a new person with the given data
-        api.put(`/api/v0/${model_code}`, {
-                firstName: newPersonFirstName, 
-                lastName: newPersonLastName, 
-                affiliation: newPersonAffiliation
-        }).then(data => {      
+        api.put(`/api/v0/${objCode}`, newObject).then(data => {      
             if (multiple) {
                 setValue([ ...value, data ])
                 setSelected([ ...value, data ])
@@ -141,16 +135,14 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     }
 
     function onChangeHandler(evt) {
-        if (evt.length > 0 && evt[evt.length - 1].newPersonEntry) {
-            setNewPersonFirstName("")
-            setNewPersonLastName(evt[evt.length - 1].query)
-            setNewPersonAffiliation("")
+        if (evt.length > 0 && evt[evt.length - 1].newObjectEntry) {
+            setNewObject(new_object(evt[evt.length - 1].query))
             setShow(true)
-            return;
+            return
         }
 
-        // Filter the entries removing the "No Person selected entries, if any"
-        evt = Array.from(evt).filter(x => ! (x.noPersonSelected || x.newPersonEntry))
+        // Filter the entries removing the "No Object selected entries, if any"
+        evt = Array.from(evt).filter(x => ! (x.noObjectSelected || x.newObjectEntry))
 
         setSelected(evt)
 
@@ -165,21 +157,19 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        api.get('/api/v0/person/search', {q: query}).then((data) => {
+        api.get(`/api/v0/${objCode}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
-                return {
-                    ...x
-                }
+                return {...x}
             })
 
             let newoptions = searchoptions
 
             if (! multiple)
-                newoptions = [ { noPersonSelected: true }, ...newoptions ]
+                newoptions = [ { noObjectSelected: true }, ...newoptions ]
 
             if (searchoptions.length === 0) {
                 newoptions = [{
-                    newPersonEntry: true,
+                    newObjectEntry: true,
                     query: query
                 }, ...newoptions ]
             }
@@ -190,11 +180,11 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     }
 
     const menuRenderFunction = x => {
-        if (x.newPersonEntry) {
-            return <><span className="text-muted">Nuova persona</span> {x.query}</>
+        if (x.newObjectEntry) {
+            return <><span className="text-muted">{`Nuov${oa} ${objName}`}</span> {x.query}</>
         }
-        if (x.noPersonSelected) {
-            return <span className="text-muted">Nessuna persona</span>
+        if (x.noObjectSelected) {
+            return <span className="text-muted">{`Nessun${oa} ${objName}`}</span>
         }
         return <span>{labelDisplayFunction(x)}</span>
     }
@@ -217,12 +207,12 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     return <Form.Group className="row">
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Crea una nuova persona</Modal.Title>
+          <Modal.Title>{`Crea nuov${oa} ${objName}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            <input className="mb-2 form-control" placeholder='Nome' value={newPersonFirstName} onChange={x => setNewPersonFirstName(x.target.value)}></input>
-            <input className="mb-2 form-control" placeholder='Cognome' value={newPersonLastName} onChange={x => setNewPersonLastName(x.target.value)}></input>
-            <input className="mb-2 form-control" placeholder='Affiliazione' value={newPersonAffiliation} onChange={x => setNewPersonAffiliation(x.target.value)}></input>
+            {Object.entries(inputs).map(([key, label]) => 
+                <input key={key} className="mb-2 form-control" placeholder={label} value={newObject[key]} onChange={x => setNewObject(o => ({...o, [key]: x.target.value}))}></input>
+            )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={x => setShow(false)}>
@@ -247,12 +237,29 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
           ref={typeaheadref}
           onChange={onChangeHandler}
           onBlur={onBlurHandler}
-          placeholder="cognome"
+          placeholder={placeholder}
           selected={selected}
           renderMenuItemChildren={menuRenderFunction}
           multiple={multiple}
         />
     </Form.Group>
+}
+
+export function PersonInput({ label, value, setValue, edit, multiple }) {
+    return <ObjectInput 
+        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        objCode="person"
+        objName="persona"
+        oa="a"
+        render={_ => `${_.firstName} ${_.lastName} (${_.affiliation})`}
+        new_object={q => ({firstName: "", lastName: q, affiliation: ""})}
+        inputs={{
+                firstName: 'Nome',
+                lastName: 'Cognome',
+                affiliation: 'Affiliazione',
+        }}
+        placeholder="cognome"
+        />
 }
 
 export function SelectInput({ options, label, value, setValue, edit }) {
