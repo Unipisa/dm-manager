@@ -4,7 +4,8 @@ import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState, useRef, useId } from 'react';
 
-import { myDateFormat, useEngine } from '../Engine'
+import api from '../api'
+import { myDateFormat } from '../Engine'
 
 export function StringInput({ label, value, setValue, edit }) {
     const id = useId()
@@ -96,10 +97,6 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const [newPersonLastName, setNewPersonLastName] = useState("");
     const [newPersonAffiliation, setNewPersonAffiliation] = useState("");
 
-    const baseUrl = process.env.REACT_APP_SERVER_URL || ""
-
-    const engine = useEngine()
-
     if (multiple === undefined) {
         multiple = false
     }
@@ -124,27 +121,20 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
 
     function handleClose() {
         // Add a new person with the given data
-        fetch(baseUrl + "/api/v0/person", {
-            credentials: 'include', method: 'PUT', headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }, body: JSON.stringify({
+        api.put(`/api/v0/${model_code}`, {
                 firstName: newPersonFirstName, 
                 lastName: newPersonLastName, 
                 affiliation: newPersonAffiliation
-            })
-        }).then(res => {
-            res.json().then(data => {      
-                if (multiple) {
-                    setValue([ ...value, data ])
-                    setSelected([ ...value, data ])
-                }   
-                else {       
-                    setValue(data)
-                    setSelected([ data ])
-                }
-                typeaheadref.current.blur()
-            })
+        }).then(data => {      
+            if (multiple) {
+                setValue([ ...value, data ])
+                setSelected([ ...value, data ])
+            }   
+            else {       
+                setValue(data)
+                setSelected([ data ])
+            }
+            typeaheadref.current.blur()
         })
 
         setShow(false);
@@ -175,7 +165,7 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        engine.get('/api/v0/person/search', {q: query}).then((data) => {
+        api.get('/api/v0/person/search', {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {
                     ...x

@@ -2,6 +2,18 @@ import moment from 'moment'
 import { useState, createContext, useContext, useEffect } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
+import api from './api'
+
+function new_user(json) {
+    let user = {
+        roles: [],
+        ...json
+    }
+    // inject functionality into user object:
+    user.hasSomeRole = (...roles) => roles.some(role => user.roles.includes(role))
+    return user
+}
+
 export const EngineContext = createContext('dm-manager')
 
 export const EngineProvider = EngineContext.Provider
@@ -22,16 +34,6 @@ export function useCreateEngine() {
 
     const queryClient = useQueryClient()
 
-    function new_user(json) {
-        let user = {
-            roles: [],
-            ...json
-        }
-        // inject functionality into user object:
-        user.hasSomeRole = (...roles) => roles.some(role => user.roles.includes(role))
-        return user
-    }
-    
     const addMessage = (message, type='error') => {
         setState( s => ({
             ...s,
@@ -39,58 +41,10 @@ export function useCreateEngine() {
         }))
     }
 
-    const api_fetch = async (url, options) => {
-        console.log(`API_FETCH ${url} - ${JSON.stringify(options)}`)
-        options = {credentials: 'include', ...options}
-        const response = await fetch(state.base_url + url, options)
-        if (response.status === 401) throw new Error("invalid credentials")
-        if (response.status === 400) {
-            const data = await response.json()
-            throw new Error(`Server error: ${data.error}`)
-        }
-        if (response.status !== 200) throw new Error("server error")
-        const data = await response.json()
-        return data
-    }
-
-    const post = async (url, data) => api_fetch(url, {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-
-    const put = async (url, data) => api_fetch(url, {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-
-    const patch = async (url, data) => api_fetch(url, {
-            method: 'PATCH',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-
-    const get = async (url, data) => api_fetch(url + '?' + new URLSearchParams(data))
-    
-    // delete is a reserved word
-    const del = async (url) => api_fetch(url, {method: 'DELETE'})
-
     // questo oggetto è l'engine creato in App.js
     // e reso disponibile in ogni componente
     // grazie al context
     return {
-        api_fetch, post, put, patch, get, del,
-
         addMessage,
 
         addErrorMessage: (message) => addMessage(message, 'error'),
@@ -108,14 +62,14 @@ export function useCreateEngine() {
 
         connect: async () => {
             try {
-                const config = await get('/config')
-                let { user } = await post('/login')
+                const config = await api.get('/config')
+                let { user } = await api.post('/login')
 
                 if (user != null) {
                     user = new_user(user);
                 }
 
-                const Models = await get('/api/v0/Models')
+                const Models = await api.get('/api/v0/Models')
 
                 setState(s => ({...s, config, user, Models}))
 
@@ -138,7 +92,7 @@ export function useCreateEngine() {
              * if username and password are provided use credentials
              * otherwise check for existing session
              */
-            let { user } = await post('/login/password', {username, password})
+            let { user } = await api.post('/login/password', {username, password})
             // console.log(`user: ${JSON.stringify(user)}`)
             if (user !== null) {
                 user = new_user(user)
@@ -148,13 +102,13 @@ export function useCreateEngine() {
         },
 
         start_oauth2: async () => {
-            let url = state.base_url + '/login/oauth2'
+            let url = api.BASE_URL + '/login/oauth2'
             console.log(`start_oauth2: redirecting to ${url}`)
             window.location.href = url
         },
 
         logout: async () => {
-            await post("/logout")
+            await api.post("/logout")
             setState(s => ({...s, user: null}))
             return true
         },
@@ -164,12 +118,12 @@ export function useCreateEngine() {
         user: state.user,
 
         impersonate_role: async (role) => {
-            let user = new_user(await post("/impersonate", { role }))
+            let user = new_user(await api.post("/impersonate", { role }))
             setState(s => ({...s, user}))
         },
 
         useIndex: (path, filter={}) => {
-            const query = useQuery([path, filter], () => get(`/api/v0/${path}`, filter), {
+            const query = useQuery([path, filter], () => api.get(`/api/v0/${path}`, filter), {
                 onError: (err) => { 
                     addMessage(err.message, 'error') },
                 })
@@ -179,14 +133,14 @@ export function useCreateEngine() {
         useGet: (path, id) => {
             const query = useQuery(
                 [path, id], 
-                () => get(`/api/v0/${path}/${id}`), {
+                () => api.get(`/api/v0/${path}/${id}`), {
                     enabled: id !== 'new'
                 })
             return query
         },
 
         usePut: (path, cb) => {
-            const mutation = useMutation(payload => put(`/api/v0/${path}/`, payload))
+            const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload))
             return async (object) => {
                 mutation.mutate(object, {
                     onSuccess: (result) => {
@@ -201,7 +155,7 @@ export function useCreateEngine() {
         },
 
         usePatch: (path, cb) => {
-            const mutation = useMutation(payload => patch(`/api/v0/${path}/${payload._id}`, payload))
+            const mutation = useMutation(payload => api.patch(`/api/v0/${path}/${payload._id}`, payload))
             return async (object) => {
                 mutation.mutate(object, {
                     onSuccess: (result, object) => {
@@ -216,7 +170,7 @@ export function useCreateEngine() {
         },
 
         useDelete: (path, cb) => { 
-            const mutation = useMutation(async (object) => del(`/api/v0/${path}/${object._id}`))
+            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`))
             return async (object) => {
                 mutation.mutate(object, {
                     onSuccess: (result, object) => {
@@ -237,7 +191,7 @@ export function useCreateEngine() {
             useEffect(() => {
                 related.forEach((info, i) => {
                     console.log(`useGetRelated: GET ${info.url} ${info.field}=${_id}`)
-                    get(`/api/v0/${info.url}`, {[info.field]: _id}).then(result => {
+                    api.get(`/api/v0/${info.url}`, {[info.field]: _id}).then(result => {
                         console.log(`useGetRelated: RESPONSE: ${JSON.stringify(result)}`)
                         setData(data => data.map(
                             (old, i_) => {
