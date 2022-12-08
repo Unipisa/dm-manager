@@ -129,6 +129,7 @@ class Controller {
     add_fields_population_from_model() {
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
+                console.log(`populate ${field} ${JSON.stringify(info)}`)
                 if (Array.isArray(info) && info.length === 1 && info[0].ref === 'Person') {
                     // descrive un array
                     info = info[0]
@@ -161,6 +162,11 @@ class Controller {
                             "preserveNullAndEmptyArrays": true,
                         }}, 
                     )
+                } else if (info.ref === 'User') {
+                    this.populateFields.push({
+                        path: field,
+                        select: ['firstName', 'lastName', 'username', 'email']
+                    })
                 }
             })
     }
