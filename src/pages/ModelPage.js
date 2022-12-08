@@ -44,10 +44,12 @@ export function SchemaInputs({ schema, obj, setObj, onChange, edit}) {
 
 export function emptyObject(Model) {
     const empty = {}
-    for (let [field, Field] of Object.entries(Model)) {
+    for (let [field, Field] of Object.entries(Model.fields)) {
         if (RESERVED_FIELDS.includes(field)) continue
         if (Field['type'] === 'array') empty[field] = []
         else if (Field['x-ref']) empty[field] = null
+        else if (Field['default']) empty[field] = Field['default']
+        else if (Field['enum']) empty[field] = Field['enum'][0]
         else empty[field] = ''
     }
     return empty
@@ -88,6 +90,7 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
             return val !== original[key]})
 
     const submit = async (evt) => {
+        console.log(`SUBMIT. Empty: ${JSON.stringify(empty)} original: ${JSON.stringify(original)} obj: ${JSON.stringify(obj)}`)
         if (obj._id) {
             let payload = Object.fromEntries(Object.keys(empty)
                 .filter(key => obj[key]!==original[key])

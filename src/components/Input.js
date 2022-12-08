@@ -264,8 +264,10 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
         />
     </Form.Group>
 }
+
 export function SelectInput({ options, label, value, setValue, edit }) {
     const id = useId()
+    console.assert(options.includes(value)) 
     if (!edit) return <p><b>{label}:</b> {value}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
