@@ -5,8 +5,8 @@ export default function RoomAssignmentPage() {
         ModelName = 'RoomAssignment'
         objCode = 'roomAssignment'
         objName = 'assegnazione stanza'
-        indexUrl = '/rooms'
+        indexUrl = '/assignments'
         oa = 'a'
-        describe = {obj => `{obj.person?.lastName} {obj.room?.number} {obj.room?.building} {obj.room?.floor}`}
+        describe = {obj => `${obj.person?.lastName} ${obj.room?.number} ${obj.room?.building} ${obj.room?.floor}`}
     />
 }

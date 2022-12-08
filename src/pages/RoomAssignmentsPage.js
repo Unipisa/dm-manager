@@ -12,7 +12,7 @@ export default function RoomAssignmentsPage() {
     const query = engine.useIndex('roomAssignment', filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        `/roomAssignments/${obj._id}`, {replace: true}), [navigate])
+        `/assignments/${obj._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
@@ -45,7 +45,7 @@ export default function RoomAssignmentsPage() {
                         }
                     </tbody>
                 </Table>
-                <p>Visualizzate {data.length}/{query.data.total} stanze.</p>
+                <p>Visualizzate {data.length}/{query.data.total} assegnazioni.</p>
                 { query.data.limit < query.data.total
                   && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
                 }
