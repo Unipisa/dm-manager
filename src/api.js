@@ -55,6 +55,7 @@ async function del(url) {
 }
 
 const api = {
+    BASE_URL,
     api_fetch,
     get,
     post,
