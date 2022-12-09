@@ -7,62 +7,22 @@ import { useEngine, myDateFormat } from '../Engine'
 import { useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
-function RoomAssignmentsPage() {
-    const filter = useQueryFilter({'_sort': 'startDate', '_limit': 10})
-    const engine = useEngine()
-    const query = engine.useIndex('roomAssignment', filter.filter)
-    const navigate = useNavigate()
-    const navigateTo = useCallback((obj) => navigate(
-        `/assignment/${obj._id}`, {replace: true}), [navigate])
-
-    if (query.isLoading) return <span>loading...</span>
-    if (!query.isSuccess) return null
-
-    const data = query.data.data
-
-    return <>
-            <div>
-                { engine.user.hasSomeRole('admin','assignment-manager') && <Link className="btn btn-primary" to="/assignments/new">aggiungi assegnazione stanza</Link> }
-                <Table hover>
-                    <thead className="thead-dark">
-                        <tr>
-                            <Th filter={filter.header('startDate')}>dal</Th>
-                            <Th filter={filter.header('endDate')}>al</Th>
-                            <Th filter={filter.header('person')}>persona</Th>
-                            <Th filter={filter.header('room')}>stanza</Th>
-                            <Th filter={filter.header('updatedAt')}>modificato</Th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { 
-                        data.map(obj =>
-                            <tr key={obj._id} onClick={()=>navigateTo(obj)}>
-                                <td>{ myDateFormat(obj.startDate) }</td>
-                                <td>{ myDateFormat(obj.endDate) }</td>
-                                <td>{ `${obj.person ? obj.person.lastName : ""} ${obj.person ? obj.person.firstName : ""}` }</td>
-                                <td>{ `${obj.room?.number} ${obj.room?.building} ${obj.room?.floor}`}</td>
-                                <td>{ myDateFormat(obj.updatedAt)}</td>
-                            </tr>) 
-                        }
-                    </tbody>
-                </Table>
-                <p>Visualizzate {data.length}/{query.data.total} assegnazioni.</p>
-                { query.data.limit < query.data.total
-                  && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
-                }
-            </div>
-    </>
-}
-
 export default class RoomAssignment extends Model {
     static code = 'roomAssignment'
     static name = "assegnazione stanza"
     static oa = "a"
     static ModelName = 'RoomAssignment'
-    
+    static indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+    static managerRoles = ['admin', 'assignment-manager'] 
+    static columns = {
+        'startDate': "dal",
+        'endDate': "al",
+        'person': "persona",
+        'room': "stanza",
+        'updatedAt': "modificato",
+    }
+
     static describe(obj) {
         return `${obj.person?.lastName} ${obj.room?.number} ${obj.room?.building} ${obj.room?.floor}`
     }
-
-    static Index = RoomAssignmentsPage
 }

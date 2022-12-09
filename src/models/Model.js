@@ -1,9 +1,9 @@
-import { Route } from 'react-router-dom'
-import { useState } from 'react'
-import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
-import { useParams, Navigate } from 'react-router-dom'
+import { useState, useCallback } from 'react'
+import { Card, Form, Table, Button, ButtonGroup } from 'react-bootstrap'
+import { Route, useParams, useNavigate, Link, Navigate } from 'react-router-dom'
 
-import { useEngine, myDateFormat } from '../Engine'
+import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
+import { Th } from '../components/Table'
 import { BooleanInput, ListInput, PersonInput, DateInput, SelectInput, StringInput, TextInput } from '../components/Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
@@ -105,7 +105,7 @@ function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelNa
 
     if (redirect !== null) return <Navigate to={redirect} />
 
-    console.log(`ModelPage obj: ${JSON.stringify(obj)}`)
+    // console.log(`ModelPage obj: ${JSON.stringify(obj)}`)
 
     return <>
     <Card>
@@ -162,6 +162,69 @@ function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelNa
     </>
 }
 
+function IndexPage({Model}) {
+    const filter = useQueryFilter(Model.indexDefaultFilter)
+    const engine = useEngine()
+    const query = engine.useIndex(Model.code, filter.filter)
+    const navigate = useNavigate()
+    const navigateTo = useCallback((obj) => navigate(
+        Model.pageUrl(obj._id), {replace: true}), [navigate])
+
+    if (query.isLoading) return <span>loading...</span>
+    if (!query.isSuccess) return null
+
+    const data = query.data.data
+
+    const modelFields = engine.Models[Model.ModelName].fields
+    
+    console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
+
+    function displayField(obj, key) {
+        let value = obj[key]
+        if (value === undefined) return ''
+        if (value === null) return '---'
+        if (modelFields[key].type === 'array') {
+            return value.join(', ')
+        }
+        if (modelFields[key].format === 'date-time') return myDateFormat(value)
+        if (modelFields[key]['x-ref'] === 'Person') {
+            return value.lastName
+        }
+        return value
+    }
+
+    return <>
+        <div>
+            { engine.user.hasSomeRole(...Model.managerRoles) && <Link className="btn btn-primary" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link> }
+            <Table hover>
+                <thead className="thead-dark">
+                    <tr>
+                        {
+                            Object.entries(Model.columns).map(([key, label]) => 
+                                <Th key={key} filter={filter.header(key)}>{label}</Th>)
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    { 
+                    data.map(obj =>
+                        <tr key={obj._id} onClick={()=>navigateTo(obj)}>
+                            {
+                                Object.entries(Model.columns).map(([key, label]) => 
+                                <td key={key}>{ displayField(obj, key) }</td>)
+                            }
+                        </tr>) 
+                    }
+                </tbody>
+            </Table>
+            <p>Visualizzat{Model.oa == "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
+            { query.data.limit < query.data.total
+                && <Button onClick={ filter.extendLimit }>visualizza altri</Button>
+            }
+        </div>
+    </>
+}
+
 export default class Model {
     // string identifier of model
     static code = null 
@@ -188,12 +251,21 @@ export default class Model {
         return null
     }
 
+    // initial filter of index page
+    static indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+
+    // roles which have manage privilege
+    static managerRoles = ['admin']
+
+    // columns in index page: {key: label}
+    static columns = {}
+
     // react object page element
     static Page() {
         return <ModelPage
             ModelName = { this.ModelName }
             objCode = { this.code }
-            objName = { this.Name }
+            objName = { this.name }
             indexUrl = { this.indexUrl() }
             oa = { this.oa }
             describe = { this.describe.bind(this) }
@@ -202,16 +274,15 @@ export default class Model {
         />
     }
 
-    // react objects index element
-    static Index() {return <p>Index not yet implemented</p>}
+    static Index = IndexPage
 
     // react routers to object pages
     static routers() {
         const Page = this.Page.bind(this)
-        const Index = this.Index.bind(this)
+        const Index = this.Index
         return [
           <Route path={this.pageUrl(":id")} element={<Page />} />,
-          <Route path={this.indexUrl()} element={<Index />} />
+          <Route path={this.indexUrl()} element={<Index Model={this} />} />
         ]
     }    
 }

@@ -1,72 +1,34 @@
-import { useCallback } from 'react'
-import { Table, Button } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
-
 import Model from './Model'
-import { useEngine, myDateFormat } from '../Engine'
-import { useQueryFilter } from '../Engine'
+
+import { useState, useCallback } from 'react'
+import { Card, Form, Table, Button, ButtonGroup } from 'react-bootstrap'
+import { Route, useParams, useNavigate, Link, Navigate } from 'react-router-dom'
+
+import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
+import { BooleanInput, ListInput, PersonInput, DateInput, SelectInput, StringInput, TextInput } from '../components/Input'
 
-function GrantsPage() {
-    const filter = useQueryFilter({'_sort': '-startDate', '_limit': 10})
-    const engine = useEngine()
-    const query = engine.useIndex('grant', filter.filter)
-    const navigate = useNavigate()
-    const navigateTo = useCallback((obj) => navigate(
-        `/grant/${obj._id}`, {replace: true}), [navigate])
-
-    if (query.isLoading) return <span>loading...</span>
-    if (!query.isSuccess) return null
-
-    const data = query.data.data
-
-    return <>
-            <div>
-                { engine.user.hasSomeRole('admin','grant-manager') && <Link className="btn btn-primary" to="/grants/new">aggiungi grant</Link> }
-                <Table hover>
-                    <thead className="thead-dark">
-                        <tr>
-                            <Th filter={filter.header('startDate')}>dal</Th>
-                            <Th filter={filter.header('endDate')}>al</Th>
-                            <Th filter={filter.header('name')}>nome</Th>
-                            <Th filter={filter.header('identifier')}>id</Th>
-                            <Th filter={filter.header('projectType')}>tipo</Th>
-                            <Th filter={filter.header('pi')}>pi</Th>
-                            <Th filter={filter.header('updatedAt')}>modificato</Th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { 
-                        data.map(obj =>
-                            <tr key={obj._id} onClick={()=>navigateTo(obj)}>
-                                <td>{ myDateFormat(obj.startDate) }</td>
-                                <td>{ myDateFormat(obj.endDate) }</td>
-                                <td>{ obj.name }</td>
-                                <td>{ obj.identifier }</td>
-                                <td>{ obj.projectType }</td>
-                                <td>{ obj.pi?.lastName }</td>
-                                <td>{ myDateFormat(obj.updatedAt)}</td>
-                            </tr>) 
-                        }
-                    </tbody>
-                </Table>
-                <p>Visualizzati {data.length}/{query.data.total} grants.</p>
-                { query.data.limit < query.data.total
-                  && <Button onClick={ filter.extendLimit }>visualizza altri</Button>
-                }
-            </div>
-    </>
-}
 
 export default class Grant extends Model {
     static code = 'grant'
     static name = "grant"
+    static names = "grants"
     static ModelName = 'Grant'
     static oa = 'o'
+    static indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+    static managerRoles = ['admin', 'grant-manager']
+    static columns = {                              
+        'startDate': "dal",
+        'endDate': "al",
+        'name': "nome",
+        'identifier': "id",
+        'projectType': "tipo",
+        'pi': "pi",
+        'updatedAt': "modificato",
+    }
 
-    static describe(grant) {return grant?.name }
-    
-    static Index = GrantsPage
+    static describe(grant) { return grant?.name }
+
 }
 
 
