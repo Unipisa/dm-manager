@@ -1,3 +1,4 @@
+import { Route } from 'react-router-dom'
 import { useState } from 'react'
 import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
@@ -55,7 +56,7 @@ export function emptyObject(Model) {
     return empty
 }
 
-export default function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName, Details }) {
+function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName, Details }) {
     const engine = useEngine()
     const empty = emptyObject(engine.Models[ModelName])
     const { id } = useParams()
@@ -103,6 +104,8 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
     }
 
     if (redirect !== null) return <Navigate to={redirect} />
+
+    console.log(`ModelPage obj: ${JSON.stringify(obj)}`)
 
     return <>
     <Card>
@@ -157,4 +160,58 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
     </Card>
     { Details && !edit && <Details obj={obj}/>}
     </>
+}
+
+export default class Model {
+    // string identifier of model
+    static code = null 
+    
+    // italian name of model
+    static name = null 
+
+    // italian gender identifier
+    static oa = "o"
+
+    // brief description of given object
+    static describe(obj) { return "<object description not implemented>"}
+
+    // absolute url of objects index
+    static indexUrl() {return `/${this.code}`}
+    
+    // absolute url of object with given id
+    static pageUrl(id) {return `/${this.code}/${id}`}
+
+    static onObjectChange(setObj) {}
+
+    // react element with more details on given object
+    static ObjectDetails(obj) {
+        return null
+    }
+
+    // react object page element
+    static Page() {
+        return <ModelPage
+            ModelName = { this.ModelName }
+            objCode = { this.code }
+            objName = { this.Name }
+            indexUrl = { this.indexUrl() }
+            oa = { this.oa }
+            describe = { this.describe.bind(this) }
+            onChange = { this.onObjectChange.bind(this) }
+            Details = { this.ObjectDetails }
+        />
+    }
+
+    // react objects index element
+    static Index() {return <p>Index not yet implemented</p>}
+
+    // react routers to object pages
+    static routers() {
+        const Page = this.Page.bind(this)
+        const Index = this.Index.bind(this)
+        return [
+          <Route path={this.pageUrl(":id")} element={<Page />} />,
+          <Route path={this.indexUrl()} element={<Index />} />
+        ]
+    }    
 }

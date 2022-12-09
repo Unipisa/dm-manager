@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
-import { ListInput, StringInput } from '../components/Input'
 
+import Model from './Model'
+import { ListInput, StringInput } from '../components/Input'
 import { useEngine, myDateFormat } from '../Engine'
 
-export default function TokensPage() {
+function TokensPage() {
     const engine = useEngine()
     const [obj, setObj ] = useState({roles: engine.user.roles})
     const query = engine.useIndex('token')
@@ -52,5 +53,13 @@ export default function TokensPage() {
                     crea token
                 </Button>
     </>
+}
+
+export default class Token extends Model {
+    static code = 'token'
+    static name = "token"
+    static ModelName = 'Token'
+
+    static Index = TokensPage
 }
 

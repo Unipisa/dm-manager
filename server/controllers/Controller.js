@@ -299,7 +299,12 @@ class Controller {
                     }
                 } else if (field.related_field) {
                     if (key_parts[1] === '_id' || key_parts.length === 1) { 
-                        $match[key0] = new ObjectId(value)
+                        try {
+                            $match[key0] = new ObjectId(value)
+                        } catch(err) {
+                            console.error(err)
+                            return sendBadRequest(res, `invalid id "${value}"`)
+                        }
                     } else {
                         return sendBadRequest(res, `related field query not yet supported [${key0}.${key_parts[1]}]`)
                     }

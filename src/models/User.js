@@ -2,16 +2,17 @@ import { useCallback } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
+import Model from './Model'
 import { useEngine, useQueryFilter, myDateFormat } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function UsersPage() {
+function UsersPage() {
     const filter = useQueryFilter({ _sort: 'createdAt', _limit: 10 })
     const engine = useEngine()
     const query = engine.useIndex('user', filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((user) => navigate(
-        `/users/${user._id}`, {replace: true}), [navigate])
+        `/user/${user._id}`, {replace: true}), [navigate])
 
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
@@ -49,5 +50,16 @@ export default function UsersPage() {
                   && <Button onClick={ filter.extendLimit }>visualizza altri</Button>
                 }
     </div>
+}
+
+export default class User extends Model {
+    static code = 'user'
+    static ModelName = 'User'
+    static name = "utente"
+    static oa = "o"
+    
+    static describe(obj) { return obj?.username } 
+
+    static Index = UsersPage
 }
 

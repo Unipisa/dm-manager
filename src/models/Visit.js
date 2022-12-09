@@ -2,17 +2,18 @@ import { useCallback } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
+import Model from './Model'
 import { useEngine, myDateFormat } from '../Engine'
 import { useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function VisitsPage({...options}) {
+function VisitsPage({...options}) {
     const filter = useQueryFilter({'_sort': '-startDate', '_limit': 10, ...options})
     const engine = useEngine()
     const query = engine.useIndex('visit', filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((visit) => navigate(
-        `/visits/${visit._id}`, {replace: true}), [navigate])
+        `/visit/${visit._id}`, {replace: true}), [navigate])
         
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
@@ -55,5 +56,21 @@ export default function VisitsPage({...options}) {
                 }
             </div>
     </>
+}
+
+export default class Visit extends Model {
+    static code = 'visit'
+    static name = "visita"
+    static oa = "a"
+    static ModelName = 'Visit' 
+
+    static describe(obj) { return `${obj?.person?.lastName}` }
+
+    static onObjectChange = setObj => (field, value) => {
+        if (field === 'person') {
+            setObj(obj => ({...obj, affiliation: value ? value.affiliation : ""}))
+        }}
+
+    static Index = VisitsPage
 }
 

@@ -18,25 +18,25 @@ export default function Header() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <NavLink to="/" className="nav-link">Home</NavLink>
-              <NavLink to="/labels" className="nav-link">
+              <NavLink to="/roomLabel" className="nav-link">
                 Cartellino Stanze</NavLink>
               {user.hasSomeRole('room-manager','room-supervisor','supervisor','admin') 
-              && <NavLink to="/rooms" className="nav-link">
+              && <NavLink to="/room" className="nav-link">
                 Stanze</NavLink>}
               {user.hasSomeRole('visit-manager','visit-supervisor','supervisor','admin') 
-              && <NavLink to="/visits" className="nav-link">
+              && <NavLink to="/visit" className="nav-link">
                 Visitatori</NavLink>}
               {user.hasSomeRole('grant-manager','grant-supervisor','supervisor','admin') 
-              && <NavLink to="/grants" className="nav-link">
+              && <NavLink to="/grant" className="nav-link">
                 Grants</NavLink>}              
               {user.hasSomeRole('supervisor', 'admin', 'person-supervisor', 'person-manager')
-              && <NavLink to="/persons" className="nav-link">
+              && <NavLink to="/person" className="nav-link">
                 Persone</NavLink>}
               {user.hasSomeRole('supervisor','admin') 
-                && <NavLink to="/users" className="nav-link">
+                && <NavLink to="/user" className="nav-link">
                   Utenti</NavLink>}
               {user.hasSomeRole('supervisor','admin') 
-                && <NavLink to="/tokens" className="nav-link">
+                && <NavLink to="/token" className="nav-link">
                   Tokens</NavLink>}
              </Nav>
           </Navbar.Collapse>

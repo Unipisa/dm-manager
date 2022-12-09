@@ -1,6 +1,8 @@
 import {useState,useRef} from 'react'
 import {Table, Button, Badge, ButtonGroup} from 'react-bootstrap'
 import ReactToPrint from 'react-to-print'
+
+import Model from './Model'
 import {useEngine} from '../Engine'
 
 function Display({roomLabel, onSave}) {
@@ -181,7 +183,7 @@ function RoomLabels({onClick, onDone, onDelete}) {
     </>
 }
 
-export default function RoomLabelPage() {
+function RoomLabelsPage() {
     const engine = useEngine()
     const [roomLabel, setRoomLabel] = useState({
         names: ["Nome Cognome"],
@@ -216,5 +218,11 @@ export default function RoomLabelPage() {
             <RoomLabels onClick={onClick} onDone={onDone} onDelete={onDelete} />
         }
     </>
+}
+
+export default class RoomLabel extends Model{
+    static code = 'roomLabel'
+    static name = "cartellino stanza"
+    static Index = RoomLabelsPage
 }
 

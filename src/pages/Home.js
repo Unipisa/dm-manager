@@ -8,39 +8,39 @@ export default function Home() {
   return (<>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
         <ul>
-          <li><Link to="/labels">elaborare un cartellino con i nominativi per le stanze</Link></li>
+          <li><Link to="/roomLabel">elaborare un cartellino con i nominativi per le stanze</Link></li>
           { user.hasSomeRole('room-manager','admin') && 
-            <li><Link to="/rooms">gestire le stanze</Link></li>
+            <li><Link to="/room">gestire le stanze</Link></li>
           }
           { user.hasSomeRole('room-supervisor','supervisor') && 
-            <li><Link to="/rooms">vedere le stanze</Link></li>
+            <li><Link to="/room">vedere le stanze</Link></li>
           }
           { user.hasSomeRole('visit-manager','admin') && 
-            <li><Link to="/visits">gestire i visitatori</Link></li>
+            <li><Link to="/visit">gestire i visitatori</Link></li>
           }
           { user.hasSomeRole('visit-supervisor','supervisor') && 
-            <li><Link to="/visits">vedere i visitatori</Link></li>
+            <li><Link to="/visit">vedere i visitatori</Link></li>
           }
           { user.hasSomeRole('grant-manager','admin') && 
-            <li><Link to="/grants">gestire i grants</Link></li>
+            <li><Link to="/grant">gestire i grants</Link></li>
           }
           { user.hasSomeRole('grant-supervisor','supervisor') && 
-            <li><Link to="/grants">vedere i visitatori</Link></li>
+            <li><Link to="/grant">vedere i visitatori</Link></li>
           }
           { user.hasSomeRole('person-manager', 'admin') &&
-            <li><Link to="/persons">gestire l'elenco delle persone</Link></li>
+            <li><Link to="/person">gestire l'elenco delle persone</Link></li>
           }
           { user.hasSomeRole('person-supervisor', 'supervisor') &&
-            <li><Link to="/persons">visualizzare l'elenco delle persone</Link></li>
+            <li><Link to="/person">visualizzare l'elenco delle persone</Link></li>
           }
           { user.hasSomeRole('admin') &&
-            <li><Link to="/users">gestire gli utenti</Link></li>
+            <li><Link to="/user">gestire gli utenti</Link></li>
           }
           { user.hasSomeRole('supervisor') &&
-            <li><Link to="/users">vedere gli utenti</Link></li>
+            <li><Link to="/user">vedere gli utenti</Link></li>
           }
           { user.hasSomeRole('admin') &&
-            <li><Link to="/tokens">gestire i token</Link></li>
+            <li><Link to="/token">gestire i token</Link></li>
           }
         </ul>
       </>

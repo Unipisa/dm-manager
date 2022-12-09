@@ -2,14 +2,15 @@ import { useCallback } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 
+import Model from './Model'
 import { useEngine, useQueryFilter, myDateFormat } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function PersonsPage() {
+function PersonsPage() {
     const objCode = 'person'
     const objName = 'persona'
     const objPluralName = 'persone'
-    const indexUrl = '/persons'
+    const indexUrl = '/person'
     const managerRoles = ['admin', 'person-manager']
     const filter = useQueryFilter({'_sort': 'lastName', '_limit': 10})
     const engine = useEngine()
@@ -58,3 +59,41 @@ export default function PersonsPage() {
     </>
 }
 
+export default class Person extends Model {
+    static code = 'person'
+    static name = "persona"
+    static oa = "a"
+    static ModelName = 'Person'
+
+    static describe(obj) { return `${obj?.lastName}, ${obj?.firstName}` }
+
+    static Index = PersonsPage
+
+    static ObjectDetails = ({obj}) => {
+        console.log(`ObjectDetails ${JSON.stringify(obj)}`)
+        const engine = useEngine()
+        const related = engine.useGetRelated('Person', obj._id)
+        return <>
+            {related.map((info, i) => 
+                <p key={i}>
+                    <b>{info.modelName} {info.field}:</b>
+                    &nbsp;
+                    { info.data === null 
+                        ? `...` 
+                        : info.data.length === 0 
+                            ? `---`
+                            : info.data.map(obj => {
+                            switch(info.modelName) {
+                                case 'Visit':
+                                    return <a href={`/visits/${obj._id}`}>visita {myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}</a>
+                                case 'Grant':
+                                    return <a href={`/grants/${obj._id}`}>grant {obj.identifier || obj.name}</a>
+                                default:
+                                    return <span>not implemented {info.modelName}</span>
+                            }
+                        }).map((_,i) => <span key={i}>{_} </span>)}
+                </p>
+            )}
+        </>
+    }
+}
