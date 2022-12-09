@@ -1,11 +1,4 @@
-import { useCallback } from 'react'
-import { Table, Button } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
-
 import Model from './Model'
-import { useEngine, myDateFormat } from '../Engine'
-import { useQueryFilter } from '../Engine'
-import { Th } from '../components/Table'
 
 export default class Room extends Model {
     static code = 'room'
