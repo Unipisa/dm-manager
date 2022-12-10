@@ -7,6 +7,13 @@ export default class User extends Model {
         this.ModelName = 'User'
         this.name = "utente"
         this.oa = "o"
+        this.articulation = {
+            'oggetto': "utente", 
+            'oggetti': "utenti",
+            'l\'oggetto': "l'utente",
+            'gli oggetti': "gli utenti", 
+            'un oggetto': "un utente", 
+        }
         this.managerRoles = ['admin']
         this.indexDefaultFilter = { _sort: 'createdAt', _limit: 10 }
         this.columns = {

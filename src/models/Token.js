@@ -61,6 +61,13 @@ export default class Token extends Model {
         this.code = 'token'
         this.name = "token"
         this.ModelName = 'Token'
+        this.articulation = {
+            'oggetto': "token", 
+            'oggetti': "token",
+            'l\'oggetto': "il token",
+            'gli oggetti': "i token", 
+            'un oggetto': "un token", 
+        }
     }
 
     Index() {

@@ -3,6 +3,7 @@ import { useState, createContext, useContext, useEffect } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
 import api from './api'
+import models from './models/Models'
 
 function new_user(json) {
     let user = {
@@ -69,7 +70,11 @@ export function useCreateEngine() {
                     user = new_user(user);
                 }
 
-                const Models = await api.get('/api/v0/Models')
+                const Models = (await api.get('/api/v0/Models'))
+
+                models.forEach(Model => {
+                    Model.schema = Models[Model.ModelName]    
+                })
 
                 setState(s => ({...s, config, user, Models}))
 

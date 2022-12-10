@@ -6,6 +6,13 @@ export default class Visit extends Model {
         this.code = 'visit'
         this.name = "visita"
         this.oa = "a"
+        this.articulation = {
+            'oggetto': "visita", 
+            'oggetti': "visite",
+            'l\'oggetto': "la visita",
+            'gli oggetti': "le visite", 
+            'un oggetto': "una visita", 
+        }
         this.ModelName = 'Visit' 
         this.columns = {
             'startDate': "dal",

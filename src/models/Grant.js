@@ -8,6 +8,13 @@ export default class Grant extends Model {
         this.names = "grants"
         this.ModelName = 'Grant'
         this.oa = 'o'
+        this.articulation = {
+            'oggetto': "grant", 
+            'oggetti': "grants",
+            'l\'oggetto': "il grant",
+            'gli oggetti': "i grants", 
+            'un oggetto': "un grant", 
+        }
         this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
         this.managerRoles = ['admin', 'grant-manager']
         this.columns = {

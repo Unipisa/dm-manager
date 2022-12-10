@@ -34,6 +34,13 @@ export default class Person extends Model {
         this.code = 'person'
         this.name = "persona"
         this.oa = "a"
+        this.articulation = {
+            'oggetto': "persona", 
+            'oggetti': "persone",
+            'l\'oggetto': "la persona",
+            'gli oggetti': "le persone", 
+            'un oggetto': "una persona", 
+        }
         this.ModelName = 'Person'
         this.managerRoles = ['admin', 'person-manager']
         this.indexDefaultFilter = {'_sort': 'lastName', '_limit': 10}
