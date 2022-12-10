@@ -1,4 +1,4 @@
-import { Route, Link } from 'react-router-dom'
+import { Route, Link, NavLink } from 'react-router-dom'
 
 import ModelPage from '../pages/ModelPage'
 import IndexPage from '../pages/IndexPage'
@@ -91,6 +91,20 @@ export default class Model {
             return <Link to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>
         } else if (user.hasSomeRole(...this.schema.supervisorRoles)) {
             return <Link to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>
+        } else {
+            return null
+        }
+    }
+
+    // return a menu element to be inserted in
+    // the header bar
+    menuElement(user) {
+        if (user && user.hasSomeRole(...this.schema.supervisorRoles)) {
+            return <NavLink key={this.code} to={this.indexUrl()} className="nav-link">
+                {this.articulation['oggetti']}
+            </NavLink>
+        } else {
+            return null
         }
     }
 }
