@@ -55,6 +55,28 @@ class Controller {
         }
     }
 
+    getSchema() {
+        const schema = this.Model.jsonSchema()
+        const related = this.Model.relatedModels || []
+        const fields = Object.fromEntries(
+            Object.entries(schema.properties)
+            .map(([field,info]) => {
+                const myInfo = this.fields[field] || {}
+                return [field, {...info, ...myInfo}]
+            }))
+        return {
+            fields,
+            related: related.map(related => ({
+                multiple: false,
+                ...related,
+            })),
+            modelName: schema.title,
+            path: this.path,
+            managerRoles: this.managerRoles,
+            supervisorRoles: this.supervisorRoles,
+        }
+    }
+
     add_fields_from_model() {
         /***
          * Try to construct the fields information structure
@@ -172,7 +194,7 @@ class Controller {
     }
 
     async getModel(req, res) {
-        res.send(this.Model.jsonSchema())
+        res.send(this.getSchema())
     }
 
     async get(req, res, id) {

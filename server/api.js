@@ -9,7 +9,6 @@ const GrantController = require('./controllers/GrantController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
 const PersonController = require('./controllers/PersonController')
-const { Model } = require('mongoose')
 
 var router = express.Router()
 
@@ -27,16 +26,9 @@ let ModelSchemas = {}
     PersonController,
 ].forEach(Controller => {
     const controller = new Controller()
+    const schema = controller.getSchema()
+    ModelSchemas[schema.modelName] = schema 
     paths = [...paths, ...controller.register(router)]
-    const Schema = controller.Model.jsonSchema()
-    const related = controller.Model.relatedModels || []
-    ModelSchemas[Schema.title] = {
-        fields: Schema.properties,
-        related: related.map(related => ({
-            multiple: false,
-            ...related,
-        }))
-    }
 })
 
 // Informazioni sugli schemi dei modelli
