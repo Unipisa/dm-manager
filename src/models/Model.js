@@ -158,7 +158,7 @@ function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelNa
         </p>
         </Card.Body>
     </Card>
-    { Details && !edit && <Details obj={obj}/>}
+    { Details && !edit && <Details obj={obj} /> }
     </>
 }
 
@@ -177,7 +177,7 @@ function IndexPage({Model}) {
 
     const modelFields = engine.Models[Model.ModelName].fields
     
-    console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
+    // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
 
     function displayField(obj, key) {
         let value = obj[key]
@@ -226,42 +226,43 @@ function IndexPage({Model}) {
 }
 
 export default class Model {
-    // string identifier of model
-    static code = null 
+    constructor() {
+        // string identifier of model
+        this.code = null 
     
-    // italian name of model
-    static name = null 
+        // italian name of model
+        this.name = null 
 
-    // italian gender identifier
-    static oa = "o"
+        // italian gender identifier
+        this.oa = "o"
 
-    // brief description of given object
-    static describe(obj) { return "<object description not implemented>"}
+        // initial filter of index page
+        this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
 
-    // absolute url of objects index
-    static indexUrl() {return `/${this.code}`}
-    
-    // absolute url of object with given id
-    static pageUrl(id) {return `/${this.code}/${id}`}
+        // roles which have manage privilege
+        this.managerRoles = ['admin']
 
-    static onObjectChange(setObj) {}
+        // columns in index page: {key: label}
+        this.columns = {}
 
-    // react element with more details on given object
-    static ObjectDetails(obj) {
-        return null
+        // the react component used to render
+        // object details
+        this.ObjectDetails = null
     }
 
-    // initial filter of index page
-    static indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+    Index() {
+        // react component to render index page
+        // cannot use directly IndexPage
+        // otherwise react thinks it is the same component
+        // for each model
+        const MyIndexPage = () => {
+            return <IndexPage Model={this} />
+        }
 
-    // roles which have manage privilege
-    static managerRoles = ['admin']
+        return <MyIndexPage />
+    }
 
-    // columns in index page: {key: label}
-    static columns = {}
-
-    // react object page element
-    static Page() {
+    Page() {
         return <ModelPage
             ModelName = { this.ModelName }
             objCode = { this.code }
@@ -274,15 +275,23 @@ export default class Model {
         />
     }
 
-    static Index = IndexPage
+    // brief description of given object
+    describe(obj) { return "<object description not implemented>"}
+
+    // absolute url of objects index
+    indexUrl() {return `/${this.code}`}
+    
+    // absolute url of object with given id
+    pageUrl(id) {return `/${this.code}/${id}`}
+
+    onObjectChange(setObj) {}
 
     // react routers to object pages
-    static routers() {
-        const Page = this.Page.bind(this)
-        const Index = this.Index
+    routers() {
+        console.log(`routers: ${this.pageUrl(":id")}, ${this.indexUrl()}`)
         return [
-          <Route path={this.pageUrl(":id")} element={<Page />} />,
-          <Route path={this.indexUrl()} element={<Index Model={this} />} />
+          <Route path={this.pageUrl(":id")} element={this.Page()} />,
+          <Route path={this.indexUrl()} element={this.Index()} />
         ]
     }    
 }

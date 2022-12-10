@@ -220,9 +220,16 @@ function RoomLabelsPage() {
     </>
 }
 
-export default class RoomLabel extends Model{
-    static code = 'roomLabel'
-    static name = "cartellino stanza"
-    static Index = RoomLabelsPage
+export default class RoomLabel extends Model {
+    constructor() {
+        super()
+        this.code = 'roomLabel'
+        this.name = "cartellino stanza"
+    }
+
+    Index() {
+        return <RoomLabelsPage />
+    }
+
 }
 

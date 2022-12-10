@@ -1,76 +1,28 @@
-import { useCallback } from 'react'
-import { Table, Button } from 'react-bootstrap'
-import { Link, useNavigate } from 'react-router-dom'
-
 import Model from './Model'
-import { useEngine, myDateFormat } from '../Engine'
-import { useQueryFilter } from '../Engine'
-import { Th } from '../components/Table'
-
-function VisitsPage({...options}) {
-    const filter = useQueryFilter({'_sort': '-startDate', '_limit': 10, ...options})
-    const engine = useEngine()
-    const query = engine.useIndex('visit', filter.filter)
-    const navigate = useNavigate()
-    const navigateTo = useCallback((visit) => navigate(
-        `/visit/${visit._id}`, {replace: true}), [navigate])
-        
-    if (query.isLoading) return <span>loading...</span>
-    if (!query.isSuccess) return null
-
-    const data = query.data.data
-
-    return <>
-            <div>
-                { engine.user.hasSomeRole('admin','visit-manager') && <Link className="btn btn-primary" to="/visits/new">aggiungi visitatore</Link> }
-                <Table hover>
-                    <thead className="thead-dark">
-                        <tr>
-                            <Th filter={filter.header('startDate')}>dal</Th>
-                            <Th filter={filter.header('endDate')}>al</Th>
-                            <Th filter={filter.header('person')}>persona</Th>
-                            <Th filter={filter.header('affiliation')}>affiliazione</Th>
-                            <Th filter={filter.header('building')}>edificio</Th>
-                            <Th filter={filter.header('roomNumber')}>stanza</Th>
-                            <Th filter={filter.header('updatedAt')}>modificato</Th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        { 
-                        data.map(obj =>
-                            <tr key={obj._id} onClick={()=>navigateTo(obj)}>
-                                <td>{ myDateFormat(obj.startDate) }</td>
-                                <td>{ myDateFormat(obj.endDate) }</td>
-                                <td>{ `${obj.person ? obj.person.lastName : ""} ${obj.person ? obj.person.firstName : ""}` }</td>
-                                <td>{ obj.affiliation }</td>
-                                <td>{ obj.building }</td>
-                                <td>{ obj.roomNumber }</td>
-                                <td>{ myDateFormat(obj.updatedAt)}</td>
-                            </tr>) 
-                        }
-                    </tbody>
-                </Table>
-                    <p>Visualizzate {data.length}/{query.data.total} visite.</p>
-                    { query.data.limit < query.data.total
-                    && <Button onClick={ filter.extendLimit }>visualizza altre</Button>
-                }
-            </div>
-    </>
-}
 
 export default class Visit extends Model {
-    static code = 'visit'
-    static name = "visita"
-    static oa = "a"
-    static ModelName = 'Visit' 
+    constructor() {
+        super()
+        this.code = 'visit'
+        this.name = "visita"
+        this.oa = "a"
+        this.ModelName = 'Visit' 
+        this.columns = {
+            'startDate': "dal",
+            'endDate': "al",
+            'person': "persona",
+            'affiliation': "affiliazione",
+            'building': "edificio",
+            'roomNumber': "stanza",
+            'updatedAt': "modificato",
+        }
+    }
 
-    static describe(obj) { return `${obj?.person?.lastName}` }
-
-    static onObjectChange = setObj => (field, value) => {
+    describe(obj) { return `${obj?.person?.lastName}` }
+    
+    onObjectChange = setObj => (field, value) => {
         if (field === 'person') {
             setObj(obj => ({...obj, affiliation: value ? value.affiliation : ""}))
         }}
-
-    static Index = VisitsPage
 }
 

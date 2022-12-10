@@ -56,10 +56,15 @@ function TokensPage() {
 }
 
 export default class Token extends Model {
-    static code = 'token'
-    static name = "token"
-    static ModelName = 'Token'
+    constructor() {
+        super()
+        this.code = 'token'
+        this.name = "token"
+        this.ModelName = 'Token'
+    }
 
-    static Index = TokensPage
+    Index() {
+        return <TokensPage />
+    }
 }
 

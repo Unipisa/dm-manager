@@ -190,9 +190,7 @@ export function useCreateEngine() {
                 info => ({...info, data: null})))
             useEffect(() => {
                 related.forEach((info, i) => {
-                    console.log(`useGetRelated: GET ${info.url} ${info.field}=${_id}`)
                     api.get(`/api/v0/${info.url}`, {[info.field]: _id}).then(result => {
-                        console.log(`useGetRelated: RESPONSE: ${JSON.stringify(result)}`)
                         setData(data => data.map(
                             (old, i_) => {
                                 if (i !== i_) return old

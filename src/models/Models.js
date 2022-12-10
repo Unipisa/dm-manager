@@ -8,14 +8,14 @@ import User from './User'
 import Token from './Token'
 
 const models = [ 
-    RoomLabel, 
-    Room, 
-    RoomAssignment, 
-    Visit, 
-    Grant, 
-    Person, 
-    User, 
-    Token,
+    new RoomLabel, 
+    new Room, 
+    new RoomAssignment, 
+    new Visit, 
+    new Grant, 
+    new Person, 
+    new User, 
+    new Token,
 ]
 
 export default models
