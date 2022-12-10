@@ -168,7 +168,7 @@ function IndexPage({Model}) {
     const query = engine.useIndex(Model.code, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        Model.pageUrl(obj._id), {replace: true}), [navigate])
+        Model.pageUrl(obj._id), {replace: true}), [navigate, Model])
 
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
@@ -217,7 +217,7 @@ function IndexPage({Model}) {
                     }
                 </tbody>
             </Table>
-            <p>Visualizzat{Model.oa == "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
+            <p>Visualizzat{Model.oa === "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
             { query.data.limit < query.data.total
                 && <Button onClick={ filter.extendLimit }>visualizza altri</Button>
             }
