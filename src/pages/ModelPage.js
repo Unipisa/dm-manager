@@ -3,7 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, DateInput, SelectInput, StringInput, TextInput } from '../components/Input'
+import { BooleanInput, ListInput, PersonInput, RoomInput, DateInput, SelectInput, StringInput, TextInput } from '../components/Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
@@ -16,6 +16,7 @@ export function SchemaInput({ field, schema, value, setValue, edit}) {
     } else {
         const label = schema.label || field
         if (schema['x-ref'] === 'Person') return <PersonInput label={label} value={value} setValue={setValue} edit={edit} />
+        if (schema['x-ref'] === 'Room') return <RoomInput label={label} value={value} setValue={setValue} edit={edit} />
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
         if (schema.format === 'date-time') return <DateInput label={label} value={value} setValue={setValue} edit={edit} />
         if (schema.enum) return <SelectInput options={schema.enum} label={label} value={value} setValue={setValue} edit={edit} />

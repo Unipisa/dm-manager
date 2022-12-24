@@ -262,6 +262,23 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
         />
 }
 
+export function RoomInput({ label, value, setValue, edit, multiple }) {
+    return <ObjectInput 
+        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        objCode="room"
+        objName="stanza"
+        oa="a"
+        render={_ => `${_.number}, piano ${_.floor } ${_.building}`}
+        new_object={q => ({number: q, floor: "", building: ""})}
+        inputs={{
+                number: 'Numero',
+                floor: 'Piano',
+                building: 'Edificio',
+        }}
+        placeholder="numero"
+        />
+}
+
 export function SelectInput({ options, label, value, setValue, edit }) {
     const id = useId()
     console.assert(options.includes(value)) 

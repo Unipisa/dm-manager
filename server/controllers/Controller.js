@@ -189,6 +189,11 @@ class Controller {
                         path: field,
                         select: ['firstName', 'lastName', 'username', 'email']
                     })
+                } else if (info.ref === 'Room') {
+                    this.populateFields.push({
+                        path: field,
+                        select: ['number', 'floor', 'building']
+                    })
                 }
             })
     }
