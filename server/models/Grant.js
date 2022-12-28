@@ -30,7 +30,7 @@ const schema = new Schema({
     budgetAmount: {type: String, label: 'budget'}, 
     description: {type: String, label: 'descrizione', widget: 'text'}, 
     keywords: [{type: String, label: 'parole chiave'}], 
-    SSD,
+    SSD: {type: [String], label: "SSD"},
     notes,
     createdBy,
     updatedBy,

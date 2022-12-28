@@ -227,17 +227,17 @@ const migrations = {
         return true
     },
     
-    D20221228_visits_multiple_ssds: async db => {
-        const visits = db.collection('visits')
-        visits.find().forEach(async (visit) => {
+    D20221228_grants_multiple_ssds: async db => {
+        const grants = db.collection('grants')
+        grants.find().forEach(async (grant) => {
             var newSSD = []
-            if (! Array.isArray(visit.SSD)) {
-            if (visit.SSD)
-                newSSD = [ visit.SSD ]
+            if (! Array.isArray(grant.SSD)) {
+            if (grant.SSD)
+                newSSD = [ grant.SSD ]
             else 
                 newSSD = []
             }
-            await visits.updateOne({ _id: visit._id }, { $set: { 'SSD': newSSD }})
+            await grants.updateOne({ _id: grant._id }, { $set: { 'SSD': newSSD }})
         })
 
           return true;
