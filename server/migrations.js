@@ -226,6 +226,22 @@ const migrations = {
         users.updateMany({roles: 'room-supervisor'},{$set:{"roles.$": 'label-supervisor' }})
         return true
     },
+    
+    D20221228_visits_multiple_ssds: async db => {
+        const visits = db.collection('visits')
+        visits.find().forEach(async (visit) => {
+            var newSSD = []
+            if (! Array.isArray(visit.SSD)) {
+            if (visit.SSD)
+                newSSD = [ visit.SSD ]
+            else 
+                newSSD = []
+            }
+            await visits.updateOne({ _id: visit._id }, { $set: { 'SSD': newSSD }})
+        })
+
+          return true;
+    }
 }
 
 async function migrate(db) {

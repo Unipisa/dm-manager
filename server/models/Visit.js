@@ -19,7 +19,7 @@ const visitSchema = new Schema({
     building: {type: String, label: 'edificio'},
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
     fundingAgency: {type: String, label: 'ente finanziatore'},
-    SSD,
+    SSD: {type: [String], label: "SSD"},
     publish: {type: Boolean, label: 'pubblica sul web', default: true},
     notes: {type: String, label: 'note', widget: 'text'},
     createdBy,
