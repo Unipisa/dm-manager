@@ -7,6 +7,7 @@ class GrantController extends Controller {
         this.path = 'grant'
         this.managerRoles.push('grant-manager')
         this.supervisorRoles.push('grant-manager', 'grant-supervisor')
+        this.searchFields = ['identifier', 'description']
     }
 }
 

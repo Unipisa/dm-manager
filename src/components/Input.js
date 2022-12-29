@@ -111,7 +111,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
 
     if (! edit) {
         const values = multiple ? value : [ value ]
-        console.log(`value: ${JSON.stringify(value)}`)
         return <p>
             <strong>{ label }: </strong>{Array.from(values).map(labelDisplayFunction).join(", ")}
         </p> 
@@ -276,6 +275,21 @@ export function RoomInput({ label, value, setValue, edit, multiple }) {
                 building: 'Edificio',
         }}
         placeholder="numero"
+        />
+}
+
+export function GrantInput({ label, value, setValue, edit, multiple }) {
+    return <ObjectInput 
+        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        objCode="grant"
+        objName="grant"
+        oa="o"
+        render={_ => `${_.identifier || _.name} (${_.pi })`}
+        new_object={q => ({identifier: q})}
+        inputs={{
+                identifier: 'Identificativo',
+        }}
+        placeholder="grant"
         />
 }
 

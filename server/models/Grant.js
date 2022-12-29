@@ -30,7 +30,7 @@ const schema = new Schema({
     budgetAmount: {type: String, label: 'budget'}, 
     description: {type: String, label: 'descrizione', widget: 'text'}, 
     keywords: [{type: String, label: 'parole chiave'}], 
-    SSD,
+    SSD: [SSD],
     notes,
     createdBy,
     updatedBy,
@@ -39,6 +39,7 @@ const schema = new Schema({
 })
 
 const Grant = model('Grant', schema)
+Grant.relatedModels = []
 
 const Person = require('./Person')
 Person.relatedModels.push({

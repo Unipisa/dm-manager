@@ -3,7 +3,7 @@ const {
     Schema, 
     ObjectId, 
     startDate, 
-    endDate, 
+    endDate,
     SSD, 
     createdBy, 
     updatedBy,
@@ -19,6 +19,7 @@ const visitSchema = new Schema({
     building: {type: String, label: 'edificio'},
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
     fundingAgency: {type: String, label: 'ente finanziatore'},
+    grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,
     publish: {type: Boolean, label: 'pubblica sul web', default: true},
     notes: {type: String, label: 'note', widget: 'text'},
@@ -42,6 +43,16 @@ Person.relatedModels.push({
     modelName: 'Visit',
     url: 'visit',
     field: 'referencePeople',
+    multiple: true,
+})
+
+const Grant = require('./Grant')
+
+Grant.relatedModels.push({
+    model: Visit,
+    modelName: 'Visit',
+    url: 'visit',
+    field: 'grants',
     multiple: true,
 })
 

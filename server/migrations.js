@@ -217,15 +217,21 @@ const migrations = {
         return true
     },
 
-    D20221204_rename_role_1: async db => {
+    D20221204_rename_role_2: async db => {
         const users = db.collection('users')
         users.updateMany({roles: 'room-manager'},{$set:{"roles.$": 'label-manager' }})
         users.updateMany({roles: 'room-supervisor'},{$set:{"roles.$": 'label-supervisor' }})
         const tokens = db.collection('tokens')
-        users.updateMany({roles: 'room-manager'},{$set:{"roles.$": 'label-manager' }})
-        users.updateMany({roles: 'room-supervisor'},{$set:{"roles.$": 'label-supervisor' }})
+        tokens.updateMany({roles: 'room-manager'},{$set:{"roles.$": 'label-manager' }})
+        tokens.updateMany({roles: 'room-supervisor'},{$set:{"roles.$": 'label-supervisor' }})
         return true
     },
+
+    D20221229_SSD_to_array_2: async db => {
+        const visits = db.collection('grants')
+        visits.updateMany({}, [{$set: {"SSD": ["$SSD"]}}])
+        return true
+    }
 }
 
 async function migrate(db) {
