@@ -6,7 +6,7 @@ const {
     endDate, 
     createdBy, 
     updatedBy, 
-    SSD, 
+    multipleSSDs,
     notes
 } = require('./Model')
 
@@ -30,7 +30,7 @@ const schema = new Schema({
     budgetAmount: {type: String, label: 'budget'}, 
     description: {type: String, label: 'descrizione', widget: 'text'}, 
     keywords: [{type: String, label: 'parole chiave'}], 
-    SSD: {type: [String], label: "SSD"},
+    SSD: multipleSSDs,
     notes,
     createdBy,
     updatedBy,

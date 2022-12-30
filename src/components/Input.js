@@ -328,3 +328,24 @@ export function BooleanInput({ label, value, setValue, edit }) {
     </Form.Group>
 
 }
+
+export function MultipleSelectInput({ options, label, value, setValue, edit }) {
+    const id = useId()
+    if (!edit) return <p><b>{label}:</b> {value.join(",")}</p>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
+        <div className="col-sm-10">
+            <select multiple className="form-control col-sm-10"
+                id={ id }
+                value={ value || [] }
+                onChange={ (evt) => {
+                    const opts = Array.from(evt.target.options)
+                    const selectedOpts = opts.filter(x => x.selected).map(x => x.value)
+                    setValue(selectedOpts)
+                }}>
+            { options.map(value => <option key={value} value={value}>{ value }</option>)}
+            </select>
+        </div>
+    </Form.Group>
+}
