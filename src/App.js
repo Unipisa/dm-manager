@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
+import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {useCreateEngine, EngineProvider} from './Engine'
