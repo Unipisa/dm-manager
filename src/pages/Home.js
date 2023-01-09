@@ -1,37 +1,26 @@
-import { Link } from 'react-router-dom'
 import { useEngine } from '../Engine'
+import models from '../models/Models'
 
 export default function Home() {
   const engine = useEngine()
   const user = engine.user
-  return (<>
+
+  const modelElements = models
+    .map(Model => [Model, Model.homeElement(user)])
+    .filter(([Model, Element]) => Model !== null)
+
+  return <>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>
-        <ul>
-          <li><Link to="/roomLabels">elaborare un cartellino con i nominativi per le stanze</Link></li>
-          { user.hasSomeRole('visit-manager','admin') && 
-            <li><Link to="/visits">gestire i visitatori</Link></li>
-          }
-          { user.hasSomeRole('visit-supervisor','supervisor') && 
-            <li><Link to="/visits">vedere i visitatori</Link></li>
-          }
-          { user.hasSomeRole('person-manager', 'admin') &&
-            <li><Link to="/persons">gestire l'elenco delle persone</Link></li>
-          }
-          { user.hasSomeRole('person-supervisor', 'supervisor') &&
-            <li><Link to="/persons">visualizzare l'elenco delle persone</Link></li>
-          }
-          { user.hasSomeRole('admin') &&
-            <li><Link to="/users">gestire gli utenti</Link></li>
-          }
-          { user.hasSomeRole('supervisor') &&
-            <li><Link to="/users">vedere gli utenti</Link></li>
-          }
-          { user.hasSomeRole('admin') &&
-            <li><Link to="/tokens">gestire i token</Link></li>
-          }
-        </ul>
-      </>
-    );
+      <ul>
+      { modelElements.map(([Model, Element]) => 
+      <li key={Model.code}>{Element}</li>) }
+      { modelElements.length === 0 &&
+          <li>Nulla. 
+            Scrivi a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>
+            per maggiori informazioni
+          </li> }
+      </ul>
+  </>
   }
   
   

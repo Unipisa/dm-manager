@@ -1,7 +1,6 @@
-const mongoose = require('mongoose')
 const crypto = require('crypto')
-
-const Schema = mongoose.Schema
+const mongoose = require('mongoose-schema-jsonschema')()
+const { Schema } = mongoose
 
 const tokenSchema = new Schema({
     name: String,
@@ -15,7 +14,7 @@ const tokenSchema = new Schema({
     },
     token: {
         type: String,
-        default: () => crypto.randomBytes(64).toString('hex'),
+        default: () => crypto.randomBytes(16).toString('hex'),
         required: true,
     },
     roles: {

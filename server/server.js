@@ -12,6 +12,7 @@ const Token = require('./models/Token')
 const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
+const migrations = require('./migrations')
 
 // local password authentication
 passport.use(User.createStrategy())
@@ -66,9 +67,10 @@ app.use('/api/v0', api)
 app.get('/config', (req, res) => {
   const user = req.user || null
   res.send({
+    SERVER_NAME: config.SERVER_NAME,
     VERSION: config.VERSION,
     OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
-    user
+    user,
   })
 })
 
@@ -236,6 +238,11 @@ async function main() {
 
   await create_admin_user()
   await create_secret_token()
+
+  if (!await migrations.migrate(mongoose.connection.db)) {
+    console.log(`server aborting`)
+    process.exit(123)
+  }
 
   app.listen(parseInt(config.PORT), () => {
     console.log(`server started: ${config.SERVER_URL}`)

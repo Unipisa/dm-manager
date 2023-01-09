@@ -1,3 +1,7 @@
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-bootstrap-typeahead/css/Typeahead.css';
+
+import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 
 import {useCreateEngine, EngineProvider} from './Engine'
@@ -8,16 +12,10 @@ import Header from './components/Header'
 
 import Home from './pages/Home'
 import LoginPage from './pages/LoginPage'
-import VisitsPage from './pages/VisitsPage'
-import VisitPage from './pages/VisitPage'
-import PersonsPage from './pages/PersonsPage'
-import PersonPage from './pages/PersonPage'
-import UsersPage from './pages/UsersPage'
-import UserPage from './pages/UserPage'
-import TokensPage from './pages/TokensPage'
-import RoomLabelsPage from './pages/RoomLabelsPage'
+import models from './models/Models'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
+
 
 console.log("dm-manager (app starting)")
 
@@ -42,14 +40,7 @@ function Internal() {
       <Container>
         <Routes>  
           <Route path="/" element={<Home />} />
-          <Route path="/roomLabels" element={<RoomLabelsPage />} />
-          <Route path="/visits/:id" element={<VisitPage />} />
-          <Route path="/visits" element={<VisitsPage />} />
-          <Route path="/persons/:id" element={<PersonPage />} />
-          <Route path="/persons" element={<PersonsPage />} />
-          <Route path="/users/:id" element={<UserPage />} />
-          <Route path="/users" element={<UsersPage />} />
-          <Route path="/tokens" element={<TokensPage />} />
+          {  models.map(x => x.routers()) }
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Container>

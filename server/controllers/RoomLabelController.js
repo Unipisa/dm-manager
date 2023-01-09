@@ -3,11 +3,10 @@ const Controller = require('./Controller')
 
 class RoomLabelController extends Controller {
     constructor() {
-        super()
+        super(RoomLabel)
         this.path = 'roomLabel'
-        this.managerRoles.push('room-manager')
-        this.supervisorRoles.push('room-manager', 'room-supervisor')
-        this.Model = RoomLabel
+        this.managerRoles.push('label-manager')
+        this.supervisorRoles.push('label-manager', 'label-supervisor')
     }
 }
 
