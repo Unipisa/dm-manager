@@ -23,6 +23,7 @@ const visitSchema = new Schema({
     SSD,
     publish: {type: Boolean, label: 'pubblica sul web', default: true},
     notes: {type: String, label: 'note', widget: 'text'},
+    tags: {type:[String], label: 'tags', default: [], enum: ["INdAM Visiting Fellow", "UniPi Visiting Fellow"]},
     createdBy,
     updatedBy,
 }, {
