@@ -247,7 +247,10 @@ const migrations = {
         const grants = db.collection('grants')
 
         for (grant of await grants.find().toArray()) {
-            await grants.updateOne({ _id: grant._id }, { $set: { 'startDate': new Date(grant.startDate), 'endDate': new Date(grant.endDate) }})
+            if (grants.startDate)
+                await grants.updateOne({ _id: grant._id }, { $set: { 'startDate': new Date(grant.startDate) }})
+            if (grants.endDate)
+                await grants.updateOne({ _id: grant._id }, { $set: { 'endDate': new Date(grant.endDate) }})
         }
 
         return true;
