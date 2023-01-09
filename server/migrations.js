@@ -240,8 +240,18 @@ const migrations = {
             await grants.updateOne({ _id: grant._id }, { $set: { 'SSD': newSSD }})
         })
 
-          return true;
+        return true;
     },
+
+    D20230109_grants_isodates: async db => {
+        const grants = db.collection('grants')
+
+        for (grant of await grants.find().toArray()) {
+            await grants.updateOne({ _id: grant._id }, { $set: { 'startDate': new Date(grant.startDate), 'endDate': new Date(grant.endDate) }})
+        }
+
+        return true;
+    }
 }
 
 async function migrate(db) {
