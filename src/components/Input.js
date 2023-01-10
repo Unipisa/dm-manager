@@ -3,9 +3,10 @@ import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState, useRef, useId } from 'react';
+import { useQuery } from 'react-query'
 
 import api from '../api'
-import { myDateFormat } from '../Engine'
+import { myDateFormat, useEngine } from '../Engine'
 
 export function StringInput({ label, value, setValue, edit }) {
     const id = useId()
@@ -261,23 +262,6 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
         />
 }
 
-export function RoomInput({ label, value, setValue, edit, multiple }) {
-    return <ObjectInput 
-        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
-        objCode="room"
-        objName="stanza"
-        oa="a"
-        render={_ => `${_.number}, piano ${_.floor } ${_.building}`}
-        new_object={q => ({number: q, floor: "", building: ""})}
-        inputs={{
-                number: 'Numero',
-                floor: 'Piano',
-                building: 'Edificio',
-        }}
-        placeholder="numero"
-        />
-}
-
 export function GrantInput({ label, value, setValue, edit, multiple }) {
     return <ObjectInput 
         label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
@@ -293,10 +277,10 @@ export function GrantInput({ label, value, setValue, edit, multiple }) {
         />
 }
 
-export function SelectInput({ options, label, value, setValue, edit }) {
+export function SelectInput({ options, label, value, setValue, edit, displayFunction }) {
     const id = useId()
-    console.assert(options.includes(value)) 
-    if (!edit) return <p><b>{label}:</b> {value}</p>
+    console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
+    if (!edit) return <p><b>{label}:</b> {displayFunction?displayFunction(value):value}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -305,7 +289,7 @@ export function SelectInput({ options, label, value, setValue, edit }) {
                 id={ id } 
                 value={ value || "" } 
                 onChange={ (evt) => setValue(evt.target.value) }>
-            { options.map(value => <option key={value} value={value}>{ value }</option>)}
+           { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
             </select>
         </div>
     </Form.Group>
@@ -348,4 +332,23 @@ export function MultipleSelectInput({ options, label, value, setValue, edit }) {
             </select>
         </div>
     </Form.Group>
+}
+
+export function RoomInput({ label, value, setValue, edit }) {
+    const engine = useEngine()
+    const path = 'room'
+    const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_limit: 300}), {
+        onError: (err) => { 
+            engine.addMessage(err.message, 'error') },
+        })
+    if (query.isLoading) return <span>loading...</span>
+    const data = new Map(query.data.data.map(room => ([room._id, room])))
+    return <SelectInput 
+        options = {Array.from(data.keys())}
+        displayFunction = {id => {
+            const room = data.get(id)
+            return `${room.building} piano ${room.floor} stanza ${room.number}`
+        }}
+        label={label} value={value._id} setValue={setValue} edit={edit}
+    />
 }
