@@ -164,29 +164,6 @@ const migrations = {
         return true
     },
 
-    D20221128_import_grants_11: async db => {
-        const people = db.collection('people')
-        const grants = db.collection('grants')
-        const data = require('./migration_20221128')
-        for (let record of data) {
-            record.pi = record.pi ? await personFromName(people, record.pi) : null
-            if (record.pi) record.pi = record.pi._id
-            record.localCoordinator = record.localCoordinator ? await personFromName(people, record.localCoordinator) : null
-            if (record.localCoordinator) record.localCoordinator = record.localCoordinator._id
-            const members = []
-            for (let name of record.members.split(',')) {
-                if (name.trim() === '') continue
-                const p = await personFromName(people, name)
-                if (p) members.push(p._id)
-            }
-            record.members = members
-            console.log(`inserting ${JSON.stringify(record, null, 2)}`)
-            const res = await grants.insertOne(record)
-            console.log(`...${JSON.stringify(res)}`)
-        }
-        return true
-    },
-
     D20221129_fix_referencePeople_3: async db => {
         const visits = db.collection('visits')
         for (const visit of await visits.find({}).toArray()) {
