@@ -331,7 +331,7 @@ class Controller {
                             'lte': '$lte',
                         }[key_parts[1]]
                         if (!modifier) return sendBadRequest(res, `invalid field modifier '${key_parts[1]}'`)
-                        if (!$match[key0]) $match[key0] = {}
+                        if (!$match[key0]) $match[key0] = {}                        
                         $match[key0][modifier] = date_value
                     } else {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
@@ -385,7 +385,7 @@ class Controller {
         ]
         
         console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline)}`)
-
+        
         let result = await this.Model.aggregate(pipeline)
         if (result.length === 0) {
             total = 0;

@@ -129,6 +129,7 @@ export function useCreateEngine() {
 
         useIndex: (path, filter={}) => {
             const query = useQuery([path, filter], () => api.get(`/api/v0/${path}`, filter), {
+                keepPreviousData: true,
                 onError: (err) => { 
                     addMessage(err.message, 'error') },
                 })

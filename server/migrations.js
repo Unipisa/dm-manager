@@ -220,13 +220,13 @@ const migrations = {
         return true;
     },
 
-    D20230109_grants_isodates: async db => {
+    D20230111_grants_isodates: async db => {
         const grants = db.collection('grants')
 
-        for (grant of await grants.find().toArray()) {
-            if (grants.startDate)
+        for (let grant of await grants.find().toArray()) {
+            if (grant.startDate)
                 await grants.updateOne({ _id: grant._id }, { $set: { 'startDate': new Date(grant.startDate) }})
-            if (grants.endDate)
+            if (grant.endDate)
                 await grants.updateOne({ _id: grant._id }, { $set: { 'endDate': new Date(grant.endDate) }})
         }
 
