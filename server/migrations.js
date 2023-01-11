@@ -231,6 +231,37 @@ const migrations = {
         }
 
         return true;
+    },
+
+    D20230111_import_room_assignments_6: async db => {
+        const rooms = await db.collection('rooms').find().toArray()
+        const visits = db.collection('visits')
+        const assignments = db.collection('roomassignments')
+        console.log(JSON.stringify(rooms.map(x=>x.number)))
+        for (let visit of await visits.find().toArray()) {
+            if (visit.building == "" && visit.roomNumber == "") continue
+            if (visit.building == "Ex Albergo") visit.building = 'Ex-Albergo'
+            const found = rooms.filter(room => {
+                return (room.building == visit.building
+                    && `Piano ${room.floor}, ${room.number}` == visit.roomNumber)
+                })
+            if (found.length === 0) {
+                console.log(`*** cannot find room for visit ${JSON.stringify(visit)}`)
+                continue
+            }
+            if (found.length > 1) {
+                console.log(`*** multiple rooms: ${found}`)
+                continue
+            }
+            let assignment = await assignments.insertOne({
+                person: visit.person,
+                startDate: visit.startDate,
+                endDate: visit.endDate,
+                room: found[0]._id,
+                notes: `visit: ${visit._id}`
+            })
+        }
+        return true
     }
 }
 

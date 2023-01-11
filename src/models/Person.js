@@ -16,11 +16,13 @@ function PersonDetails({obj}) {
                         : info.data.map(obj => {
                         switch(info.modelName) {
                             case 'Visit':
-                                return <a href={`/visits/${obj._id}`}>visita {myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}</a>
+                                return <a href={`/${info.url}/${obj._id}`}>visita {myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}</a>
                             case 'Grant':
-                                return <a href={`/grants/${obj._id}`}>grant {obj.identifier || obj.name}</a>
+                                return <a href={`/${info.url}/${obj._id}`}>grant {obj.identifier || obj.name}</a>
+                            case 'RoomAssignment':
+                                return <a href={`/${info.url}/${obj._id}`}>stanza {obj.room.number}, Piano {obj.room.floor}, Edificio {obj.room.building}, {myDateFormat(obj.startDate)}-{myDateFormat(obj.endDate)}</a>
                             default:
-                                return <span>not implemented {info.modelName}</span>
+                                return <span>not implemented {JSON.stringify(info)}</span>
                         }
                     }).map((_,i) => <span key={i}>{_} </span>)}
             </p>

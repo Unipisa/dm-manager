@@ -24,3 +24,21 @@ const schema = new Schema({
 const RoomAssignment = model('RoomAssignment', schema)
 
 module.exports = RoomAssignment
+
+const Person = require('./Person')
+
+Person.relatedModels.push({
+    model: RoomAssignment,
+    modelName: 'RoomAssignment',
+    url: 'roomAssignment',
+    field: 'person',
+})
+
+const Room = require('./Room')
+
+Room.relatedModels.push({
+    model: RoomAssignment,
+    modelName: 'RoomAssignment',
+    url: 'roomAssignment',
+    field: 'room',
+})

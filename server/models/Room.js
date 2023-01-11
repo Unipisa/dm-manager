@@ -19,5 +19,6 @@ const schema = new Schema({
 })
 
 const Room = model('Room', schema)
+Room.relatedModels = []
 
 module.exports = Room
