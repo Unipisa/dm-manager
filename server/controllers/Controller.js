@@ -194,6 +194,18 @@ class Controller {
                         path: field,
                         select: ['number', 'floor', 'building']
                     })
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "rooms",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                        }},
+                        {$unwind: {
+                            "path": '$'+field,
+                            "preserveNullAndEmptyArrays": true,
+                        }}, 
+                    )
                 }
             })
     }

@@ -164,29 +164,6 @@ const migrations = {
         return true
     },
 
-    D20221128_import_grants_11: async db => {
-        const people = db.collection('people')
-        const grants = db.collection('grants')
-        const data = require('./migration_20221128')
-        for (let record of data) {
-            record.pi = record.pi ? await personFromName(people, record.pi) : null
-            if (record.pi) record.pi = record.pi._id
-            record.localCoordinator = record.localCoordinator ? await personFromName(people, record.localCoordinator) : null
-            if (record.localCoordinator) record.localCoordinator = record.localCoordinator._id
-            const members = []
-            for (let name of record.members.split(',')) {
-                if (name.trim() === '') continue
-                const p = await personFromName(people, name)
-                if (p) members.push(p._id)
-            }
-            record.members = members
-            console.log(`inserting ${JSON.stringify(record, null, 2)}`)
-            const res = await grants.insertOne(record)
-            console.log(`...${JSON.stringify(res)}`)
-        }
-        return true
-    },
-
     D20221129_fix_referencePeople_3: async db => {
         const visits = db.collection('visits')
         for (const visit of await visits.find({}).toArray()) {
@@ -254,6 +231,36 @@ const migrations = {
         }
 
         return true;
+    },
+
+    D20230111_import_room_assignments_6: async db => {
+        const rooms = await db.collection('rooms').find().toArray()
+        const visits = db.collection('visits')
+        const assignments = db.collection('roomassignments')
+        for (let visit of await visits.find().toArray()) {
+            if (visit.building == "" && visit.roomNumber == "") continue
+            if (visit.building == "Ex Albergo") visit.building = 'Ex-Albergo'
+            const found = rooms.filter(room => {
+                return (room.building == visit.building
+                    && `Piano ${room.floor}, ${room.number}` == visit.roomNumber)
+                })
+            if (found.length === 0) {
+                console.log(`*** cannot find room for visit ${JSON.stringify(visit)}`)
+                continue
+            }
+            if (found.length > 1) {
+                console.log(`*** multiple rooms: ${found}`)
+                continue
+            }
+            let assignment = await assignments.insertOne({
+                person: visit.person,
+                startDate: visit.startDate,
+                endDate: visit.endDate,
+                room: found[0]._id,
+                notes: `visit: ${visit._id}`
+            })
+        }
+        return true
     }
 }
 
