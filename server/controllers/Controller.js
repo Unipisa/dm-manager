@@ -310,7 +310,7 @@ class Controller {
                     }
                     console.log(`date_value: ${date_value}`)
                     if (key_parts.length === 1) {
-                        $match[key0] = date_value.toISOString()
+                        $match[key0] = date_value
                     } else if (key_parts.length === 2) {
                         const modifier = {
                             'lt': '$lt',
@@ -320,7 +320,7 @@ class Controller {
                         }[key_parts[1]]
                         if (!modifier) return sendBadRequest(res, `invalid field modifier '${key_parts[1]}'`)
                         if (!$match[key0]) $match[key0] = {}                        
-                        $match[key0][modifier] = date_value.toISOString()
+                        $match[key0][modifier] = date_value
                     } else {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
