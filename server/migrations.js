@@ -237,7 +237,6 @@ const migrations = {
         const rooms = await db.collection('rooms').find().toArray()
         const visits = db.collection('visits')
         const assignments = db.collection('roomassignments')
-        console.log(JSON.stringify(rooms.map(x=>x.number)))
         for (let visit of await visits.find().toArray()) {
             if (visit.building == "" && visit.roomNumber == "") continue
             if (visit.building == "Ex Albergo") visit.building = 'Ex-Albergo'
