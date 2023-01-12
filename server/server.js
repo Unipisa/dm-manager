@@ -222,6 +222,17 @@ async function create_secret_token() {
 }
 
 async function main() {
+  console.log(`
+ ___    ___ ___         ___ ___   ____  ____    ____   ____    ___  ____  
+|   \\  |   |   |       |   |   | /    ||    \\  /    | /    |  /  _]|    \\ 
+|    \\ | _   _ | _____ | _   _ ||  o  ||  _  ||  o  ||   __| /  [_ |  D  )
+|  D  ||  \\_/  ||     ||  \\_/  ||     ||  |  ||     ||  |  ||    _]|    / 
+|     ||   |   ||_____||   |   ||  _  ||  |  ||  _  ||  |_ ||   [_ |    \\ 
+|     ||   |   |       |   |   ||  |  ||  |  ||  |  ||     ||     ||  .  \\
+|_____||___|___|       |___|___||__|__||__|__||__|__||___,_||_____||__|\\_|
+  `)
+                                                                          
+  console.log(`${new Date}`)
   console.log("options (configure using environment variables or .env file):")
   for(let [key, val] of Object.entries(config)) {
     if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
