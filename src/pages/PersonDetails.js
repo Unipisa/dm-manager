@@ -1,4 +1,4 @@
-import { useEngine, myDateFormat } from '../Engine'
+import { useEngine } from '../Engine'
 import RelatedDetails from './RelatedDetails'
 
 export default function PersonDetails({obj}) {
