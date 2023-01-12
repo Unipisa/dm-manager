@@ -1,4 +1,5 @@
 import Model from './Model'
+import RoomDetails from '../pages/RoomDetails'
 
 export default class Room extends Model {
     constructor() {
@@ -23,6 +24,7 @@ export default class Room extends Model {
             'updatedAt': "modificato",
             'notes': "note",
         }
+        this.ObjectDetails = RoomDetails
     }
 
     describe(room) { return `${room.number} ${room.floor} ${room.building}` }
