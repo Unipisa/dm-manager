@@ -268,7 +268,7 @@ export function GrantInput({ label, value, setValue, edit, multiple }) {
         objCode="grant"
         objName="grant"
         oa="o"
-        render={_ => `${_.identifier || _.name} (${_.pi })`}
+        render={_ => `${_.name} (${_.identifier})`}
         new_object={q => ({identifier: q})}
         inputs={{
                 identifier: 'Identificativo',
