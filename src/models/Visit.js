@@ -1,4 +1,5 @@
 import Model from './Model'
+import VisitDetails from '../pages/VisitDetails'
 
 export default class Visit extends Model {
     constructor() {
@@ -23,6 +24,7 @@ export default class Visit extends Model {
             'roomNumber': "stanza",
             'updatedAt': "modificato",
         }
+        this.ObjectDetails = VisitDetails
     }
 
     describe(obj) { return `${obj?.person?.lastName}` }

@@ -108,6 +108,12 @@ class Controller {
                     can_filter: true,
                     related_field: true,
                 }
+            } else if (info.ref === 'Room') {
+                return {
+                    can_sort: ['building', 'floor', 'number'],
+                    can_filter: true,
+                    related_field: true,
+                }
             } else {
                 switch(info.type) {
                     case String: return {
