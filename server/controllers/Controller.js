@@ -188,6 +188,39 @@ class Controller {
                             "path": '$'+field,
                             "preserveNullAndEmptyArrays": true,
                         }},
+                        // inserisce tutte le assegnazioni
+                        // stanze
+                        {$lookup: {
+                            from: "roomassignments",
+                            localField: field+'._id',
+                            foreignField: "person",
+                            as: field+'.roomAssignments',
+                            pipeline: [
+                                // inserisce i dati della stanza
+                                {$lookup: {
+                                    from: "rooms",
+                                    localField: "room",
+                                    foreignField: "_id",
+                                    as: "room",
+                                }},
+                                // tiene solo le assegnazioni che non 
+                                // iniziano in una data successiva ad oggi
+                                {$project: {
+                                    "startDate": 1,
+                                    "endDate": 1,
+                                    "room._id": 1,
+                                    "room.building": 1,
+                                    "room.floor": 1,
+                                    "room.number": 1,
+                                }},
+                                // ordina per data finale...
+                                // la prima assegnazione dovrebbe essere quella attuale
+                                {$sort: {"endDate": 1}},
+                            ]
+                        }},
+                        {$match: {
+                            [field+".roomAssignments.startDate"]: {$not: {$gte: new Date()}},
+                        }},
                     )
                 } else if (info.ref === 'User') {
                     this.populateFields.push({
