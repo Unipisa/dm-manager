@@ -57,7 +57,7 @@ const requireSomeRole = (...roles) => ((req, res, next) => {
             next()
         } else {
             res.status(403)
-            const error = `not authorized (some role in [${roles.join(", ")}] required, your roles: [${req.roles.join(", ")}])`
+            const error = `some role in [${roles.join(", ")}] required, your roles: [${req.roles.join(", ")}]`
             console.log(error)
             res.send({error})
         }

@@ -87,6 +87,7 @@ export function TextInput({ label, value, setValue, edit }) {
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
 export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, label, value, setValue, edit, multiple }) {
+    const engine = useEngine()
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false)
@@ -176,7 +177,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
 
             setOptions(newoptions)
             setIsLoading(false);
-        })   
+        }).catch(err => engine.addMessage(err.message))
     }
 
     const menuRenderFunction = x => {
