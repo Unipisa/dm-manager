@@ -487,7 +487,10 @@ class Controller {
                 (req, res) => this.index(req, res)),
 
             this.register_path(router, 'put', `/${this.path}`, 
-                this.managerRoles, 
+                this.managerRoles.concat(this.searchRoles), 
+                // searchRoles can create new objects, to enable
+                // related object-managers to create references
+                // to this object (as in ObjectInput)
                 (req, res) => this.put(req, res)),
 
             this.register_path(router, 'patch', `/${this.path}/:id`, 
