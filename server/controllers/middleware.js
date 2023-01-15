@@ -48,7 +48,9 @@ const requireRoles = (req, res, next) => {
 }
 
 const hasSomeRole = (req, ...roles) => {
-    return roles.some(role => (req.roles && req.roles.includes(role)))
+    if (!req.roles) return false
+    if (roles.includes('@any-logged-user')) return true
+    return roles.some(role => req.roles.includes(role))
 }
 
 const requireSomeRole = (...roles) => ((req, res, next) => {

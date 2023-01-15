@@ -11,7 +11,10 @@ function new_user(json) {
         ...json
     }
     // inject functionality into user object:
-    user.hasSomeRole = (...roles) => roles.some(role => user.roles.includes(role))
+    user.hasSomeRole = (...roles) => {
+        if (roles.includes('@any-logged-user')) return true
+        return roles.some(role => user.roles.includes(role))
+    }
     return user
 }
 

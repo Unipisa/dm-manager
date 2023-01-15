@@ -6,7 +6,7 @@ class RoomLabelController extends Controller {
         super(RoomLabel)
         this.path = 'roomLabel'
         this.managerRoles.push('label-manager')
-        this.supervisorRoles.push('label-manager', 'label-supervisor')
+        this.supervisorRoles.push('@any-logged-user')
     }
 }
 
