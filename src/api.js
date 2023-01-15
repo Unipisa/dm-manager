@@ -13,6 +13,10 @@ async function api_fetch(url, options) {
         const data = await response.json()
         throw new Error(`Not authorized: ${data.error}`)
     }
+    if (response.status === 404) {
+        const data = await response.json()
+        throw new Error(`Not found: ${data.error}`)
+    }
     if (response.status !== 200) throw new Error("server error")
     const data = await response.json()
     return data

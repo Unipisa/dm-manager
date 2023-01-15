@@ -224,10 +224,13 @@ class Controller {
             let obj = await this.Model
                 .findById(id)
                 .populate(this.populateFields)
+            if (obj === null) {
+                return res.status(404).send({error: `not found ${id}`})
+            }
             res.send(obj)
         } catch(error) {
             console.error(error)
-            res.status(404).send({error: error.message})
+            res.status(404).send({error: `invalid id ${id}`})
         }
     }
 

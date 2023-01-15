@@ -133,8 +133,7 @@ export function useCreateEngine() {
         useIndex: (path, filter={}) => {
             const query = useQuery([path, filter], () => api.get(`/api/v0/${path}`, filter), {
                 keepPreviousData: true,
-                onError: (err) => { 
-                    addMessage(err.message, 'error') },
+                onError: (err) => addMessage(err.message, 'error'),
                 })
             return query
         },
@@ -142,8 +141,10 @@ export function useCreateEngine() {
         useGet: (path, id) => {
             const query = useQuery(
                 [path, id], 
-                () => api.get(`/api/v0/${path}/${id}`), {
-                    enabled: id !== 'new'
+                () => api.get(`/api/v0/${path}/${id}`), 
+                {
+                    enabled: id !== 'new',
+                    onError: (err) => addMessage(err.message, 'error'),
                 })
             return query
         },
