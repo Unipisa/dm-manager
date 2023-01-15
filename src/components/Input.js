@@ -130,7 +130,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
                 setSelected([ data ])
             }
             typeaheadref.current.blur()
-        })
+        }).catch(err => engine.addMessage(err.message))
 
         setShow(false);
     }
