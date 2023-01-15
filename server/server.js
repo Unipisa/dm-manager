@@ -55,10 +55,18 @@ app.use(express.static(config.STATIC_FILES_PATH))
 app.use(express.json()) // parse request data into req.body
 
 app.use(session({
-  secret: config.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}))
+    secret: config.SESSION_SECRET,
+    cookie: { maxAge: 2628000000 },
+    store: new (require('express-sessions'))({
+        storage: 'mongodb',
+        instance: mongoose, // optional
+        host: 'localhost', // optional
+        port: 27017, // optional
+        db: 'dm-manager', // optional
+        collection: 'sessions', // optional
+        expire: 86400 // optional
+    })
+}));
 
 app.use(passport.session())
 
