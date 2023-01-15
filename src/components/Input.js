@@ -349,6 +349,6 @@ export function RoomInput({ label, value, setValue, edit }) {
             const room = data.get(id)
             return `${room.building} piano ${room.floor} stanza ${room.number}`
         }}
-        label={label} value={value._id} setValue={setValue} edit={edit}
+        label={label} value={value?value._id:null} setValue={setValue} edit={edit}
     />
 }
