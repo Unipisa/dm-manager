@@ -22,7 +22,7 @@ export default class Visit extends Model {
             'affiliation': "affiliazione",
             'building': "edificio",
             'roomNumber': "stanza",
-            'room': "(debug)",
+            'roomAssignment': "(debug)",
             'updatedAt': "modificato",
         }
         this.ObjectDetails = VisitDetails

@@ -1,7 +1,7 @@
 import { Route, Link, NavLink } from 'react-router-dom'
 
 import ModelPage from '../pages/ModelPage'
-import IndexPage from '../pages/IndexPage'
+import ModelsPage from '../pages/ModelsPage'
 
 export default class Model {
     constructor() {
@@ -38,6 +38,9 @@ export default class Model {
         // lo schema caricato dal server al momento 
         // della connessione (vedi Engine.js connect)
         this.schema = null
+
+        // if null use ModelsPage as IndexPage element
+        this.IndexPage = null
     }
 
     Index() {
@@ -46,7 +49,7 @@ export default class Model {
         // otherwise react thinks it is the same component
         // for each model
         const MyIndexPage = () => {
-            return <IndexPage Model={this} />
+            return <ModelsPage Model={this} />
         }
 
         return <MyIndexPage />
@@ -78,9 +81,24 @@ export default class Model {
 
     // react routers to object pages
     routers() {
+        const Model = this
+        
+        function MyIndex() {
+            // react component to render index page
+            // cannot use directly IndexPage
+            // otherwise react thinks it is the same component
+            // for each model
+            const MyIndexPage = () => {
+                return <ModelsPage Model={Model} />
+            }
+    
+            if (Model.IndexPage) return <Model.IndexPage />
+            return <MyIndexPage />
+        }
+    
         return [
           <Route path={this.pageUrl(":id")} element={this.Page()} />,
-          <Route path={this.indexUrl()} element={this.Index()} />
+          <Route path={this.indexUrl()} element={MyIndex()} />
         ]
     }    
 

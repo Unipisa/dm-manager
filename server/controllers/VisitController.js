@@ -52,7 +52,7 @@ class VisitController extends Controller {
                 ]
             }},
             { $addFields: {
-                room: {
+                roomAssignment: {
                     $ifNull: [
                         { $arrayElemAt: ["$roomAssignments", -1] },
                         null

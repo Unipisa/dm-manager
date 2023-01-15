@@ -5,14 +5,14 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function IndexPage({Model}) {
+export default function ModelsPage({ Model, columns }) {
     const filter = useQueryFilter(Model.indexDefaultFilter)
     const engine = useEngine()
     const query = engine.useIndex(Model.code, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
         Model.pageUrl(obj._id), {replace: true}), [navigate, Model])
-
+    
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
 
@@ -21,6 +21,8 @@ export default function IndexPage({Model}) {
     const modelFields = engine.Models[Model.ModelName].fields
     
     // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
+
+    columns = columns || Model.columns
 
     function displayField(obj, key) {
         let value = obj[key]
@@ -31,7 +33,7 @@ export default function IndexPage({Model}) {
             return value.join(', ')
         }
         if (field && field.format === 'date-time') return myDateFormat(value)
-        if (key === 'room') return `${value.room.building} ${value.room.floor}: ${value.room.number}`
+        if (key === 'roomAssignment') return `${value.room.building} ${value.room.floor}: ${value.room.number}`
         const xref = field && field['x-ref'] 
         if (xref === 'Person') {
             return value.lastName
@@ -49,7 +51,7 @@ export default function IndexPage({Model}) {
                 <thead className="thead-dark">
                     <tr>
                         {
-                            Object.entries(Model.columns).map(([key, label]) => 
+                            Object.entries(columns).map(([key, label]) => 
                                 <Th key={key} filter={filter.header(key)}>{label}</Th>)
                         }
                     </tr>
@@ -59,7 +61,7 @@ export default function IndexPage({Model}) {
                     data.map(obj =>
                         <tr key={obj._id} onClick={()=>navigateTo(obj)}>
                             {
-                                Object.entries(Model.columns).map(([key, label]) => 
+                                Object.entries(columns).map(([key, label]) => 
                                 <td key={key}>{ displayField(obj, key) }</td>)
                             }
                         </tr>) 
@@ -73,4 +75,3 @@ export default function IndexPage({Model}) {
         </div>
     </>
 }
-
