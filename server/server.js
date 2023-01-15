@@ -60,13 +60,13 @@ app.use(session({
     store: new (require('express-sessions'))({
         storage: 'mongodb',
         instance: mongoose, // optional
-        host: 'localhost', // optional
-        port: 27017, // optional
-        db: 'dm-manager', // optional
+        host: config.MONGO_HOST, // optional
+        port: config.MONGO_PORT, // optional
+        db: config.MONGO_DB, // optional
         collection: 'sessions', // optional
         expire: 86400 // optional
     })
-}));
+}))
 
 app.use(passport.session())
 
