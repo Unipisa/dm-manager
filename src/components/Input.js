@@ -343,12 +343,15 @@ export function RoomInput({ label, value, setValue, edit }) {
         })
     if (query.isLoading) return <span>loading...</span>
     const data = new Map(query.data.data.map(room => ([room._id, room])))
+    if (value && value._id) value = value._id
     return <SelectInput 
         options = {Array.from(data.keys())}
         displayFunction = {id => {
+            if (id === null) return '---'
             const room = data.get(id)
+            if (room === undefined) return '???' // database inconsistency
             return `${room.building} piano ${room.floor} stanza ${room.number}`
         }}
-        label={label} value={value?value._id:null} setValue={setValue} edit={edit}
+        label={label} value={value} setValue={value => setValue(value?data.get(value):null)} edit={edit}
     />
 }

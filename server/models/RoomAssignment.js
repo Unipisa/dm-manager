@@ -10,8 +10,8 @@ const {
 } = require('./Model')
 
 const schema = new Schema({
-    person: { type: ObjectId, label: 'persona', ref: 'Person' },
-    room: { type: ObjectId, label: 'stanza', ref: 'Room' },
+    person: { type: ObjectId, label: 'persona', ref: 'Person', required: true },
+    room: { type: ObjectId, label: 'stanza', ref: 'Room', required: true },
     startDate,
     endDate,
     notes,

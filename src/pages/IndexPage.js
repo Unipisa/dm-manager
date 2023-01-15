@@ -26,11 +26,13 @@ export default function IndexPage({Model}) {
         let value = obj[key]
         if (value === undefined) return ''
         if (value === null) return '---'
-        if (modelFields[key].type === 'array') {
+        const field = modelFields[key]
+        if (field && field.type === 'array') {
             return value.join(', ')
         }
-        if (modelFields[key].format === 'date-time') return myDateFormat(value)
-        const xref= modelFields[key]['x-ref']
+        if (field && field.format === 'date-time') return myDateFormat(value)
+        if (key === 'room') return `${value.room.building} ${value.room.floor}: ${value.room.number}`
+        const xref = field && field['x-ref'] 
         if (xref === 'Person') {
             return value.lastName
         } else if (xref === 'Room') {
