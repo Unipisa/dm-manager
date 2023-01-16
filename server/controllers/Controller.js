@@ -385,22 +385,11 @@ class Controller {
 
         if (direction < 0) sort = `-${sort}`
 
-        // If any search conditions have bene specified through the
-        // _search parameter, we add them as a required condition,
-        // joined with an $or operator.
-        if (search_conditions.length > 0) {
-            $match = {
-                $and: [
-                    $match,
-                    { $or: search_conditions }
-                ]
-            }
-        }
-
         const pipeline = [
             {$match},
             ...this.queryPipeline,
             {$match: $match_lookups},
+            {$match: search_conditions.length > 0 ? {$or: search_conditions }: {}},
             {$sort},
             {$facet:{
                 "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
