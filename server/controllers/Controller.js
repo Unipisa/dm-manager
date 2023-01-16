@@ -258,6 +258,7 @@ class Controller {
         let sort = null
         let direction = 1
         let limit = 100
+        let search_conditions = []
 
         const fields = this.fields
 
@@ -296,6 +297,14 @@ class Controller {
                     // mi aspetto un array di campi
                     can_sort.forEach(field => {
                         $sort[`${value}.${field}`] = direction
+                    })
+                }
+            }
+            else if (key == '_search') {
+                // Implement a custom filter over searchable fields
+                for (let field of this.searchFields) {
+                    search_conditions.push({
+                        [field]: { $regex: value, $options: 'i' }
                     })
                 }
             } else if (fields[key0] && fields[key0].can_filter) {
@@ -376,6 +385,18 @@ class Controller {
 
         if (direction < 0) sort = `-${sort}`
 
+        // If any search conditions have bene specified through the
+        // _search parameter, we add them as a required condition,
+        // joined with an $or operator.
+        if (search_conditions.length > 0) {
+            $match = {
+                $and: [
+                    $match,
+                    { $or: search_conditions }
+                ]
+            }
+        }
+
         const pipeline = [
             {$match},
             ...this.queryPipeline,
@@ -392,7 +413,7 @@ class Controller {
             }}
         ]
         
-        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline)}`)
+        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline, null, 2)}`)
         
         let result = await this.Model.aggregate(pipeline)
         if (result.length === 0) {

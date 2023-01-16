@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { Table, Button } from 'react-bootstrap'
+import { Table, Button, InputGroup } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
@@ -12,7 +12,7 @@ export default function ModelsPage({ Model, columns }) {
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
         Model.pageUrl(obj._id), {replace: true}), [navigate, Model])
-    
+
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
 
@@ -44,9 +44,23 @@ export default function ModelsPage({ Model, columns }) {
         }
         return value
     }
+
+    function updateFilter(evt) {
+        let text = evt.target.value
+        console.log(text)
+
+        filter.setFilter(filter => ({
+            ...filter, 
+            "_search": text
+        }))
+    }
+
     return <>
         <div>
-            { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="btn btn-primary" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link> }
+            <div className="d-flex">
+                <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
+                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link>}
+            </div>
             <Table hover>
                 <thead className="thead-dark">
                     <tr>
