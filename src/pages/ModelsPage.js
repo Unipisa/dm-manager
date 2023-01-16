@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
 
-export default function IndexPage({Model}) {
+export default function ModelsPage({ Model, columns }) {
     const filter = useQueryFilter(Model.indexDefaultFilter)
     const engine = useEngine()
     const query = engine.useIndex(Model.code, filter.filter)
@@ -22,15 +22,19 @@ export default function IndexPage({Model}) {
     
     // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
 
+    columns = columns || Model.columns
+
     function displayField(obj, key) {
         let value = obj[key]
         if (value === undefined) return ''
         if (value === null) return '---'
-        if (modelFields[key].type === 'array') {
+        const field = modelFields[key]
+        if (field && field.type === 'array') {
             return value.join(', ')
         }
-        if (modelFields[key].format === 'date-time') return myDateFormat(value)
-        const xref= modelFields[key]['x-ref']
+        if (field && field.format === 'date-time') return myDateFormat(value)
+        if (key === 'roomAssignment') return `${value.room.building} ${value.room.floor}: ${value.room.number}`
+        const xref = field && field['x-ref'] 
         if (xref === 'Person') {
             return value.lastName
         } else if (xref === 'Room') {
@@ -40,14 +44,28 @@ export default function IndexPage({Model}) {
         }
         return value
     }
+
+    function updateFilter(evt) {
+        let text = evt.target.value
+        console.log(text)
+
+        filter.setFilter(filter => ({
+            ...filter, 
+            "_search": text
+        }))
+    }
+
     return <>
         <div>
-            { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="btn btn-primary" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link> }
+            <div className="d-flex">
+                <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
+                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link>}
+            </div>
             <Table hover>
                 <thead className="thead-dark">
                     <tr>
                         {
-                            Object.entries(Model.columns).map(([key, label]) => 
+                            Object.entries(columns).map(([key, label]) => 
                                 <Th key={key} filter={filter.header(key)}>{label}</Th>)
                         }
                     </tr>
@@ -57,7 +75,7 @@ export default function IndexPage({Model}) {
                     data.map(obj =>
                         <tr key={obj._id} onClick={()=>navigateTo(obj)}>
                             {
-                                Object.entries(Model.columns).map(([key, label]) => 
+                                Object.entries(columns).map(([key, label]) => 
                                 <td key={key}>{ displayField(obj, key) }</td>)
                             }
                         </tr>) 
@@ -71,4 +89,3 @@ export default function IndexPage({Model}) {
         </div>
     </>
 }
-

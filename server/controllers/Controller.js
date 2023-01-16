@@ -157,7 +157,6 @@ class Controller {
     add_fields_population_from_model() {
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
-                console.log(`populate ${field} ${JSON.stringify(info)}`)
                 if (Array.isArray(info) && info.length === 1 && info[0].ref === 'Person') {
                     // descrive un array
                     info = info[0]
@@ -188,7 +187,7 @@ class Controller {
                         {$unwind: {
                             "path": '$'+field,
                             "preserveNullAndEmptyArrays": true,
-                        }}, 
+                        }},
                     )
                 } else if (info.ref === 'User') {
                     this.populateFields.push({
@@ -225,10 +224,13 @@ class Controller {
             let obj = await this.Model
                 .findById(id)
                 .populate(this.populateFields)
+            if (obj === null) {
+                return res.status(404).send({error: `not found ${id}`})
+            }
             res.send(obj)
         } catch(error) {
             console.error(error)
-            res.status(404).send({error: error.message})
+            res.status(404).send({error: `invalid id ${id}`})
         }
     }
 
@@ -256,6 +258,7 @@ class Controller {
         let sort = null
         let direction = 1
         let limit = 100
+        let search_conditions = []
 
         const fields = this.fields
 
@@ -294,6 +297,14 @@ class Controller {
                     // mi aspetto un array di campi
                     can_sort.forEach(field => {
                         $sort[`${value}.${field}`] = direction
+                    })
+                }
+            }
+            else if (key == '_search') {
+                // Implement a custom filter over searchable fields
+                for (let field of this.searchFields) {
+                    search_conditions.push({
+                        [field]: { $regex: value, $options: 'i' }
                     })
                 }
             } else if (fields[key0] && fields[key0].can_filter) {
@@ -378,6 +389,7 @@ class Controller {
             {$match},
             ...this.queryPipeline,
             {$match: $match_lookups},
+            {$match: search_conditions.length > 0 ? {$or: search_conditions }: {}},
             {$sort},
             {$facet:{
                 "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
@@ -390,7 +402,7 @@ class Controller {
             }}
         ]
         
-        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline)}`)
+        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline, null, 2)}`)
         
         let result = await this.Model.aggregate(pipeline)
         if (result.length === 0) {
@@ -488,7 +500,10 @@ class Controller {
                 (req, res) => this.index(req, res)),
 
             this.register_path(router, 'put', `/${this.path}`, 
-                this.managerRoles, 
+                this.managerRoles.concat(this.searchRoles), 
+                // searchRoles can create new objects, to enable
+                // related object-managers to create references
+                // to this object (as in ObjectInput)
                 (req, res) => this.put(req, res)),
 
             this.register_path(router, 'patch', `/${this.path}/:id`, 

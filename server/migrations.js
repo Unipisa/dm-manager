@@ -275,10 +275,10 @@ async function migrate(db) {
 
     for (const [name, run] of Object.entries(migrations)) {
         if (config.migrations.includes(name)) {
-            console.log(`= ${name}`)
+            console.log(` (*) ${name}`)
             continue
         }
-        console.log(`+ ${name}`)
+        console.log(` (+) ${name}`)
         if (await run(db)) {
             // migrazione applicata!
             config.migrations.push(name)

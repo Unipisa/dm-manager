@@ -1,7 +1,7 @@
 ## setup
 
  ```
- npm install
+ npm ci
  ```
 
 ## development

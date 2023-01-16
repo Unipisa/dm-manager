@@ -87,6 +87,7 @@ export function TextInput({ label, value, setValue, edit }) {
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
 export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, label, value, setValue, edit, multiple }) {
+    const engine = useEngine()
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false)
@@ -129,7 +130,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
                 setSelected([ data ])
             }
             typeaheadref.current.blur()
-        })
+        }).catch(err => engine.addMessage(err.message))
 
         setShow(false);
     }
@@ -176,7 +177,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
 
             setOptions(newoptions)
             setIsLoading(false);
-        })   
+        }).catch(err => engine.addMessage(err.message))
     }
 
     const menuRenderFunction = x => {
@@ -343,12 +344,15 @@ export function RoomInput({ label, value, setValue, edit }) {
         })
     if (query.isLoading) return <span>loading...</span>
     const data = new Map(query.data.data.map(room => ([room._id, room])))
+    if (value && value._id) value = value._id
     return <SelectInput 
         options = {Array.from(data.keys())}
         displayFunction = {id => {
+            if (id === null) return '---'
             const room = data.get(id)
+            if (room === undefined) return '???' // database inconsistency
             return `${room.building} piano ${room.floor} stanza ${room.number}`
         }}
-        label={label} value={value?value._id:null} setValue={setValue} edit={edit}
+        label={label} value={value} setValue={value => setValue(value?data.get(value):null)} edit={edit}
     />
 }

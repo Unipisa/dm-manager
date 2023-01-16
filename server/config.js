@@ -1,3 +1,4 @@
+const url = require('url')
 require('dotenv').config() // read environment variabiles from .env
 const { randomUUID } = require('crypto')
 const { execSync } = require('child_process')
@@ -46,6 +47,12 @@ class Options {
             this.REACT_APP_SERVER_URL = this.SERVER_URL
             process.env.REACT_APP_SERVER_URL = this.SERVER_URL
         }
+        const parsedUrl = url.parse(this.MONGO_URI)
+
+        this.MONGO_HOST = parsedUrl.hostname
+        this.MONGO_PORT = parseInt(parsedUrl.port)
+        const pathname = parsedUrl.pathname
+        this.MONGO_DB = pathname.split('/')[1]
     }
 }
 

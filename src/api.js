@@ -7,7 +7,15 @@ async function api_fetch(url, options) {
     if (response.status === 401) throw new Error("invalid credentials")
     if (response.status === 400) {
         const data = await response.json()
-        throw new Error(`Server error: ${data.error}`)
+        throw new Error(`Bad request: ${data.error}`)
+    }
+    if (response.status === 403) {
+        const data = await response.json()
+        throw new Error(`Not authorized: ${data.error}`)
+    }
+    if (response.status === 404) {
+        const data = await response.json()
+        throw new Error(`Not found: ${data.error}`)
     }
     if (response.status !== 200) throw new Error("server error")
     const data = await response.json()

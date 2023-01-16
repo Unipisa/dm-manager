@@ -13,6 +13,7 @@ const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
 const migrations = require('./migrations')
+const MongoStore = require('connect-mongo')
 
 // local password authentication
 passport.use(User.createStrategy())
@@ -36,128 +37,142 @@ if (config.OAUTH2_CLIENT_ID) {
 
 const app = express()
 
-app.use(cors(
-  {
-    origin: config.CORS_ORIGIN.split(","),
-    optionsSuccessStatus: 200,
-    credentials: true // Needed for the client to handle session
+function setup_routes() {
+  app.use(cors(
+    {
+      origin: config.CORS_ORIGIN.split(","),
+      optionsSuccessStatus: 200,
+      credentials: true // Needed for the client to handle session
+    }))
+  
+  app.use(morgan('tiny')) // access log
+  
+  const test_filename = `${config.STATIC_FILES_PATH}/manifest.json`
+  if (!fs.existsSync(test_filename)) {
+    console.log(`WARNING: cannot stat ${test_filename}`)
+    console.log(`cwd: ${process.cwd()}`)
+  }
+  app.use(express.static(config.STATIC_FILES_PATH))
+  
+  app.use(express.json()) // parse request data into req.body
+  
+  app.use(session({
+    secret: config.SESSION_SECRET,
+    cookie: { maxAge: 2628000000 },
+    resave: true,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      client: mongoose.connection.getClient(),
+      dbName: config.MONGO_DB,
+      collectionName: "sessions",
+      stringify: false,
+      autoRemove: "interval",
+      autoRemoveInterval: 30
+    })
   }))
-
-app.use(morgan('tiny')) // access log
-
-const test_filename = `${config.STATIC_FILES_PATH}/manifest.json`
-if (!fs.existsSync(test_filename)) {
-  console.log(`WARNING: cannot stat ${test_filename}`)
-  console.log(`cwd: ${process.cwd()}`)
-}
-app.use(express.static(config.STATIC_FILES_PATH))
-
-app.use(express.json()) // parse request data into req.body
-
-app.use(session({
-  secret: config.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false
-}))
-
-app.use(passport.session())
-
-app.use('/api/v0', api)
-
-app.get('/config', (req, res) => {
-  const user = req.user || null
-  res.send({
-    SERVER_NAME: config.SERVER_NAME,
-    VERSION: config.VERSION,
-    OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
-    user,
+  
+  app.use(passport.session())
+  
+  
+  app.use('/api/v0', api)
+  
+  app.get('/config', (req, res) => {
+    const user = req.user || null
+    res.send({
+      SERVER_NAME: config.SERVER_NAME,
+      VERSION: config.VERSION,
+      OAUTH2_ENABLED: !!config.OAUTH2_CLIENT_ID,
+      user,
+    })
   })
-})
-
-app.post('/login', function(req, res) {
-  const user = req.user || null
-  res.send({ user })
-})
-
-app.post('/login/password',
-  passport.authenticate('local'),
-  function(req, res) {
-    console.log(`login/password body: ${req.body}`)
-    const user = req.user.toObject()
-    console.log(`login ${JSON.stringify(user)}`)
+  
+  app.post('/login', function(req, res) {
+    const user = req.user || null
     res.send({ user })
   })
-
-if (config.OAUTH2_CLIENT_ID) {
-  app.get('/login/oauth2',
-    passport.authenticate('oauth2'))
+  
+  app.post('/login/password',
+    passport.authenticate('local'),
+    function(req, res) {
+      console.log(`login/password body: ${req.body}`)
+      const user = req.user.toObject()
+      console.log(`login ${JSON.stringify(user)}`)
+      res.send({ user })
+    })
+  
+  if (config.OAUTH2_CLIENT_ID) {
+    app.get('/login/oauth2',
+      passport.authenticate('oauth2'))
+  }
+  
+  app.get('/login/oauth2/callback',
+    passport.authenticate('oauth2'),
+    function(req, res) {
+      const user = req.user.toObject()
+      console.log(`login ${JSON.stringify(user)}`)
+      res.redirect(config.BASE_URL || `http://localhost:3000`)
+    }
+  )
+  
+  app.post('/logout', function(req, res){
+    req.logout(function(err) {
+      if (err) { return next(err) }
+      // res.redict('/login')
+      res.send({ "user": null })
+    })
+  })
+  
+  app.post('/impersonate', function(req, res) {
+    const role = req.body.role
+    if (role) {
+      if (req.user && req.user.roles && (req.user.roles.includes('admin') || req.user.roles.includes('disguised-admin'))) {
+        const roles = role === 'admin' ? [role] : [role, 'disguised-admin']
+        User.findByIdAndUpdate(req.user._id, { roles }, (err, result) => {
+          if (err) {
+            res.status('500')
+            res.send({error: err.message})
+            console.error(err)
+          } else {
+            console.log(`user disguised as ${role}`)
+            req.user = result
+            res.send(req.user.toObject())
+          }
+        })
+      } else {
+        res.status("403")
+        res.send({error: "'admin' or 'disguised-admin' role needed for this operation"})
+      }
+    } else {
+      res.status("300")
+      res.send({error: "specify 'role' in json request body"})
+    }
+  })
+  
+  app.get('/hello', (req, res) => {
+    console.log(`params: ${JSON.stringify(req.params)}`)
+    console.log(`query: ${JSON.stringify(req.query)}`)
+    console.log(`body: ${JSON.stringify(req.body)}`)
+    console.log(`session: ${JSON.stringify(req.session)}`)
+    console.log(`user: ${JSON.stringify(req.user)}`)
+    console.log(`isAuthenticated: ${req.isAuthenticated()}`)
+    res.send('Hello World!')
+  })
+  
+  // all unhandled requests are sent to the react application
+  app.all('*', function(req, res) {
+    res.sendFile(`${config.STATIC_FILES_PATH}/index.html`, { 
+      root: `${__dirname}/../` })
+  })
+  
+  // gestisci errori
+  app.use((err, req, res, next) => {
+    res.status(500).send({ error: "internal server error" })
+    console.log("ERROR CATCHED!")
+    console.error(err)
+  })
 }
 
-app.get('/login/oauth2/callback',
-  passport.authenticate('oauth2'),
-  function(req, res) {
-    const user = req.user.toObject()
-    console.log(`login ${JSON.stringify(user)}`)
-    res.redirect(config.BASE_URL || `http://localhost:3000`)
-  }
-)
 
-app.post('/logout', function(req, res){
-  req.logout(function(err) {
-    if (err) { return next(err) }
-    // res.redict('/login')
-    res.send({ "user": null })
-  })
-})
-
-app.post('/impersonate', function(req, res) {
-  const role = req.body.role
-  if (role) {
-    if (req.user && req.user.roles && (req.user.roles.includes('admin') || req.user.roles.includes('disguised-admin'))) {
-      const roles = role === 'admin' ? [role] : [role, 'disguised-admin']
-      User.findByIdAndUpdate(req.user._id, { roles }, (err, result) => {
-        if (err) {
-          res.status('500')
-          res.send({error: err.message})
-          console.error(err)
-        } else {
-          console.log(`user disguised as ${role}`)
-          req.user = result
-          res.send(req.user.toObject())
-        }
-      })
-    } else {
-      res.status("403")
-      res.send({error: "'admin' or 'disguised-admin' role needed for this operation"})
-    }
-  } else {
-    res.status("300")
-    res.send({error: "specify 'role' in json request body"})
-  }
-})
-
-app.get('/hello', (req, res) => {
-  console.log(`params: ${JSON.stringify(req.params)}`)
-  console.log(`query: ${JSON.stringify(req.query)}`)
-  console.log(`body: ${JSON.stringify(req.body)}`)
-  console.log(`session: ${JSON.stringify(req.session)}`)
-  console.log(`user: ${JSON.stringify(req.user)}`)
-  console.log(`isAuthenticated: ${req.isAuthenticated()}`)
-  res.send('Hello World!')
-})
-
-// all unhandled requests are sent to the react application
-app.all('*', function(req, res) {
-  res.sendFile(`${config.STATIC_FILES_PATH}/index.html`, { 
-    root: `${__dirname}/../` })
-})
-
-// gestisci errori
-app.use((err, req, res, next) => {
-  res.status(500).send({ error: "internal server error" })
-  console.log("ERROR CATCHED!")
-  console.error(err)
-})
 
 async function create_admin_user() {
   const username = config.ADMIN_USER
@@ -222,6 +237,17 @@ async function create_secret_token() {
 }
 
 async function main() {
+  console.log(`
+ ___    ___ ___         ___ ___   ____  ____    ____   ____    ___  ____  
+|   \\  |   |   |       |   |   | /    ||    \\  /    | /    |  /  _]|    \\ 
+|    \\ | _   _ | _____ | _   _ ||  o  ||  _  ||  o  ||   __| /  [_ |  D  )
+|  D  ||  \\_/  ||     ||  \\_/  ||     ||  |  ||     ||  |  ||    _]|    / 
+|     ||   |   ||_____||   |   ||  _  ||  |  ||  _  ||  |_ ||   [_ |    \\ 
+|     ||   |   |       |   |   ||  |  ||  |  ||  |  ||     ||     ||  .  \\
+|_____||___|___|       |___|___||__|__||__|__||__|__||___,_||_____||__|\\_|
+  `)
+                                                                          
+  console.log(`${new Date}`)
   console.log("options (configure using environment variables or .env file):")
   for(let [key, val] of Object.entries(config)) {
     if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
@@ -235,6 +261,8 @@ async function main() {
     process.exit(1)
   }
   console.log('MongoDB is connected')
+
+  setup_routes()
 
   await create_admin_user()
   await create_secret_token()
