@@ -39,33 +39,13 @@ export default class Model {
         // della connessione (vedi Engine.js connect)
         this.schema = null
 
-        // if null use ModelsPage as IndexPage element
+        // react element of index
+        // if null use ModelsPage
         this.IndexPage = null
-    }
 
-    Index() {
-        // react component to render index page
-        // cannot use directly IndexPage
-        // otherwise react thinks it is the same component
-        // for each model
-        const MyIndexPage = () => {
-            return <ModelsPage Model={this} />
-        }
-
-        return <MyIndexPage />
-    }
-
-    Page() {
-        return <ModelPage
-            ModelName = { this.ModelName }
-            objCode = { this.code }
-            objName = { this.name }
-            indexUrl = { this.indexUrl() }
-            oa = { this.oa }
-            describe = { this.describe.bind(this) }
-            onChange = { this.onObjectChange.bind(this) }
-            Details = { this.ObjectDetails }
-        />
+        // react element of object view
+        // if null use ModelPage
+        this.ViewPage = null
     }
 
     // brief description of given object
@@ -95,9 +75,23 @@ export default class Model {
             if (Model.IndexPage) return <Model.IndexPage />
             return <MyIndexPage />
         }
+
+        function ViewPage() {
+            if (Model.ViewPage) return <Model.ViewPage />
+            return <ModelPage
+                ModelName = { Model.ModelName }
+                objCode = { Model.code }
+                objName = { Model.name }
+                indexUrl = { Model.indexUrl() }
+                oa = { Model.oa }
+                describe = { Model.describe.bind(Model) }
+                onChange = { Model.onObjectChange.bind(Model) }
+                Details = { Model.ObjectDetails }
+            />
+        }
     
         return [
-          <Route path={this.pageUrl(":id")} element={this.Page()} />,
+          <Route path={this.pageUrl(":id")} element={ViewPage()} />,
           <Route path={this.indexUrl()} element={MyIndex()} />
         ]
     }    
