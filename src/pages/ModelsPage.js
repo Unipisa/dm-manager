@@ -83,6 +83,8 @@ export default function ModelsPage({ Model, columns }) {
                                         // directly, or we can simply call window.open.
                                         window.open(Model.pageUrl(obj._id), '_blank')
                                         break
+                                    default:
+                                        // NOOP
                                 }
                             }
 
