@@ -72,13 +72,29 @@ export default function ModelsPage({ Model, columns }) {
                 </thead>
                 <tbody>
                     { 
-                    data.map(obj =>
-                        <tr key={obj._id} onClick={()=>navigateTo(obj)}>
-                            {
-                                Object.entries(columns).map(([key, label]) => 
-                                <td key={key}>{ displayField(obj, key) }</td>)
+                    data.map(obj => {
+                            function handleMouseDown(evt) {
+                                switch (evt.button) {
+                                    case 0:
+                                        navigateTo(obj)
+                                        break
+                                    case 1:
+                                        // It is currently unclear if this can be handled with React router
+                                        // directly, or we can simply call window.open.
+                                        window.open(Model.pageUrl(obj._id), '_blank')
+                                        break
+                                    default:
+                                        // NOOP
+                                }
                             }
-                        </tr>) 
+
+                            return <tr key={obj._id} onMouseDown={handleMouseDown} >
+                                {
+                                    Object.entries(columns).map(([key, label]) =>
+                                    <td key={key}>{ displayField(obj, key) }</td>)
+                                }
+                            </tr>
+                        })
                     }
                 </tbody>
             </Table>
