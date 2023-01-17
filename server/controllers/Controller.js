@@ -157,21 +157,36 @@ class Controller {
     add_fields_population_from_model() {
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
-                if (Array.isArray(info) && info.length === 1 && info[0].ref === 'Person') {
+                if (Array.isArray(info) && info.length === 1) {
                     // descrive un array
                     info = info[0]
-                    this.populateFields.push({
-                        path: field,
-                        select: ['firstName', 'lastName', 'affiliation', 'email']
-                    })
-                    this.queryPipeline.push(
-                        {$lookup: {
-                            from: "people",
-                            localField: field,
-                            foreignField: "_id",
-                            as: field,
-                        }},
-                    )
+                    if (info.ref === 'Person') {
+                        this.populateFields.push({
+                            path: field,
+                            select: ['firstName', 'lastName', 'affiliation', 'email']
+                        })
+                        this.queryPipeline.push(
+                            {$lookup: {
+                                from: "people",
+                                localField: field,
+                                foreignField: "_id",
+                                as: field,
+                            }},
+                        )
+                    } else if (info.ref === 'Grant') {
+                        this.populateFields.push({
+                            path: field,
+                            select: ['identifier', 'name']
+                        })
+                        this.queryPipeline.push(
+                            {$lookup: {
+                                from: "grants",
+                                localField: field,
+                                foreignField: "_id",
+                                as: field,
+                            }},
+                        )
+                    }
                 } else if (info.ref === 'Person') {
                     this.populateFields.push({
                         path: field, 

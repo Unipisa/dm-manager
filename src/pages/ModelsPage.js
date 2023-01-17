@@ -18,7 +18,7 @@ export default function ModelsPage({ Model, columns }) {
 
     const data = query.data.data
 
-    const modelFields = engine.Models[Model.ModelName].fields
+    const modelFields = engine.Models[Model.ModelName].schema.fields
     
     // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
 
@@ -57,7 +57,7 @@ export default function ModelsPage({ Model, columns }) {
 
     return <>
         <div>
-            <div className="d-flex">
+            <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
                 { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link>}
             </div>
@@ -73,7 +73,7 @@ export default function ModelsPage({ Model, columns }) {
                 <tbody>
                     { 
                     data.map(obj => {
-                            function handleMouseDown(evt) {
+                            const handleMouseDown = (evt) => {
                                 switch (evt.button) {
                                     case 0:
                                         navigateTo(obj)
