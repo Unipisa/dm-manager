@@ -7,15 +7,15 @@ import Person from './Person'
 import User from './User'
 import Token from './Token'
 
-const models = [ 
-    new RoomLabel(),
-    new Room(),
-    new RoomAssignment(),
-    new Visit(),
-    new Grant(),
-    new Person(),
-    new User(),
-    new Token(),
-]
+const Models = { 
+    RoomLabel: new RoomLabel(),
+    Room: new Room(),
+    RoomAssignment: new RoomAssignment(),
+    Visit: new Visit(),
+    Grant: new Grant(),
+    Person: new Person(),
+    User: new User(),
+    Token: new Token(),
+}
 
-export default models
+export default Models

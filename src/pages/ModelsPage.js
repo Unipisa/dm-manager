@@ -18,7 +18,7 @@ export default function ModelsPage({ Model, columns }) {
 
     const data = query.data.data
 
-    const modelFields = engine.Models[Model.ModelName].fields
+    const modelFields = engine.Models[Model.ModelName].schema.fields
     
     // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
 
