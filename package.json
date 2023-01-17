@@ -39,6 +39,7 @@
   },
   "scripts": {
     "server": "nodemon --watch server server/server.js",
+    "clear-sessions": "node server/server.js --clear-sessions",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test-api": "node server/test.js",
