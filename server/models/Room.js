@@ -11,6 +11,7 @@ const schema = new Schema({
     number: {type: String, label: 'numero'},
     floor: {type: String, label: 'piano', enum: ["0", "1", "2"]},
     building: {type: String, label: 'edificio', enum: ["A", "B", "Ex-Albergo"]},
+    nSeats: {type: Number, label: 'numero posti', default: 0},
     notes,
     createdBy,
     updatedBy,
