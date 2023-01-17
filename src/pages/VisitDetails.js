@@ -9,8 +9,8 @@ export default function VisitDetails({obj}) {
     let elements = []
     const Person = engine.Models.Person
     if (engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
-        elements.push(<p><b>persona:</b> <a href={`/person/${person._id}`}>{person.lastName}, {person.firstName}</a></p>)
-        elements.push(<PersonDetails obj={visit.person} />)
+        elements.push(<p key='persona'><b>persona:</b> <a href={`/person/${person._id}`}>{person.lastName}, {person.firstName}</a></p>)
+        elements.push(<PersonDetails key='persondetails' obj={visit.person} />)
     }
     return elements
 }
