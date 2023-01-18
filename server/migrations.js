@@ -272,6 +272,13 @@ const migrations = {
         rooms.updateMany({}, {$set: {nSeats: 0}})
         return true
     },
+
+    D20230118_fix_grants_nazionale: async db => {
+        const grants = db.collection('grants')
+        grants.updateMany({ funds: 'Nazionale' }, { $set: {funds: 'National'}})
+        grants.updateMany({ funds: 'Internazionale' }, { $set: {funds: 'International'}})
+        return true
+    }
 }
 
 async function migrate(db) {

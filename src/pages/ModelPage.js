@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
-import { useParams, Navigate } from 'react-router-dom'
+import { useParams, Navigate, useNavigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
 import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput } from '../components/Input'
@@ -79,6 +79,7 @@ export default function ModelPage({ Model }) {
     const [ edit, setEdit ] = useState(create)
     const [ obj, setObj ] = useState(create ? empty : null)
     const [ redirect, setRedirect ] = useState(null)
+    const navigate = useNavigate()
     const query = engine.useGet(objCode, id)
     const putObj = engine.usePut(objCode, (obj) => {
         engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
@@ -156,7 +157,7 @@ export default function ModelPage({ Model }) {
                     modifica
                 </Button>
                 <Button 
-                    onClick={ () => setRedirect(indexUrl)}
+                    onClick={ () => navigate(-1) }
                     className="btn btn-secondary">
                         torna all'elenco
                 </Button>
