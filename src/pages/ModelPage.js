@@ -72,7 +72,6 @@ export default function ModelPage({ Model }) {
     const ModelName = Model.ModelName
     const Details = Model.ObjectDetails
     const engine = useEngine()
-    console.log(`Model: ${JSON.stringify(Model)}`)
     const empty = emptyObject(engine.Models[ModelName].schema)
     const { id } = useParams()
     const create = (id === 'new')
