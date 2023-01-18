@@ -3,7 +3,7 @@ import { Card, Form, Button, ButtonGroup } from 'react-bootstrap'
 import { useParams, Navigate, useNavigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput } from '../components/Input'
+import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput } from '../components/Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
@@ -27,6 +27,8 @@ export function SchemaInput({ field, schema, value, setValue, edit}) {
         if (schema.type === 'string') {
             if (schema.widget === 'text') return <TextInput label={label} value={value} setValue={setValue} edit={edit}/>
             else return <StringInput label={label} value={value} setValue={setValue} edit={edit}/>
+        } else if (schema.type === 'number') {
+            return <NumberInput label={label} value={value} setValue={setValue} edit={edit}/>
         }
         if (schema.type === 'boolean') return <BooleanInput label={label} value={value} setValue={setValue} edit={edit}/>
         return <span>unknown input type {JSON.stringify(schema)}</span>
@@ -62,7 +64,7 @@ export function emptyObject(Model) {
 
 export default function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName, Details }) {
     const engine = useEngine()
-    const empty = emptyObject(engine.Models[ModelName])
+    const empty = emptyObject(engine.Models[ModelName].schema)
     const { id } = useParams()
     const create = (id === 'new')
     const [ edit, setEdit ] = useState(create)
@@ -119,7 +121,7 @@ export default function ModelPage({ objCode, objName, indexUrl, oa, describe, on
         </Card.Header>
         <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }>
-            <SchemaInputs schema={engine.Models[ModelName].fields} obj={obj} setObj={setObj} onChange={onChange && onChange(setObj)} edit={edit}/>
+            <SchemaInputs schema={engine.Models[ModelName].schema.fields} obj={obj} setObj={setObj} onChange={onChange && onChange(setObj)} edit={edit}/>
             { edit ?
                 <ButtonGroup className="mt-3">
                     <Button 

@@ -236,7 +236,7 @@ async function create_secret_token() {
   }
 }
 
-async function main() {
+async function serve() {
   console.log(`
  ___    ___ ___         ___ ___   ____  ____    ____   ____    ___  ____  
 |   \\  |   |   |       |   |   | /    ||    \\  /    | /    |  /  _]|    \\ 
@@ -262,6 +262,17 @@ async function main() {
   }
   console.log('MongoDB is connected')
 
+  for (let arg of process.argv.slice(2)) {
+    if (arg === '--clear-sessions' || arg === '-c') {
+      console.log('clear sessions collection')
+      await mongoose.connection.db.collection('sessions').deleteMany({})
+      process.exit(0)
+    } else {
+      console.log(`invalid argument: ${arg}`)
+      process.exit(1)
+    }
+  }
+
   setup_routes()
 
   await create_admin_user()
@@ -277,4 +288,4 @@ async function main() {
   })
 }
 
-main()
+serve() // start server
