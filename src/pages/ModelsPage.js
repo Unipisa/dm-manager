@@ -11,7 +11,7 @@ export default function ModelsPage({ Model, columns }) {
     const query = engine.useIndex(Model.code, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        Model.pageUrl(obj._id), {replace: true}), [navigate, Model])
+        Model.pageUrl(obj._id), {replace: false}), [navigate, Model])
 
     if (query.isLoading) return <span>loading...</span>
     if (!query.isSuccess) return null
