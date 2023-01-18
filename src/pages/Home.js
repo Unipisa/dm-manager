@@ -1,11 +1,11 @@
 import { useEngine } from '../Engine'
-import models from '../models/Models'
+import Models from '../models/Models'
 
 export default function Home() {
   const engine = useEngine()
   const user = engine.user
 
-  const modelElements = models
+  const modelElements = Object.values(Models)
     .map(Model => [Model, Model.homeElement(user)])
     .filter(([Model, Element]) => Element !== null)
 

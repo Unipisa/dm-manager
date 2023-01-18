@@ -4,7 +4,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown'
 import { Container } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
-import models from '../models/Models'
+import Models from '../models/Models'
 import package_json from '../../package.json'
 
 export default function Header() {
@@ -18,7 +18,7 @@ export default function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              { models.map(Model => Model.menuElement(user))}
+              { Object.values(Models).map(Model => Model.menuElement(user))}
             </Nav>
           </Navbar.Collapse>
           <Nav className="right">

@@ -24,6 +24,23 @@ export function StringInput({ label, value, setValue, edit }) {
     </Form.Group>
 }
 
+export function NumberInput({ label, value, setValue, edit }) {
+    const id = useId()
+    if (!edit) return <p><b>{label}:</b> {value}</p>
+    return <Form.Group className="row my-2">
+        <Form.Label className="col-sm-2" htmlFor={ id }>
+            { label }</Form.Label>
+        <div className="col-sm-10">
+            <input className="form-control col-sm-10"
+                id={ id } 
+                type="number"
+                value={ value || "" } 
+                onChange={ (evt) => {setValue(evt.target.value)} }
+            />                 
+        </div>
+    </Form.Group>
+}
+
 export function DateInput({ label, value, setValue, edit }) {
     const id = useId()
     if (!edit) return <p><b>{label}:</b> {myDateFormat(value)}</p>

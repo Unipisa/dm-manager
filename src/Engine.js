@@ -3,7 +3,7 @@ import { useState, createContext, useContext, useEffect } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
 import api from './api'
-import models from './models/Models'
+import Models from './models/Models'
 
 function new_user(json) {
     let user = {
@@ -73,10 +73,10 @@ export function useCreateEngine() {
                     user = new_user(user);
                 }
 
-                const Models = (await api.get('/api/v0/Models'))
+                const ServerModels = (await api.get('/api/v0/Models'))
 
-                models.forEach(Model => {
-                    Model.schema = Models[Model.ModelName]    
+                Object.values(Models).forEach(Model => {
+                    Model.schema = ServerModels[Model.ModelName]    
                 })
 
                 setState(s => ({...s, config, user, Models}))
@@ -195,7 +195,7 @@ export function useCreateEngine() {
         },
 
         useGetRelated: (modelName, _id) => {
-            const related = state.Models[modelName].related
+            const related = state.Models[modelName].schema.related
             const [data, setData] = useState(related.map(
                 info => ({...info, data: null})))
             useEffect(() => {

@@ -233,10 +233,14 @@ const migrations = {
         return true;
     },
 
-    D20230111_import_room_assignments_6: async db => {
+    D20230111_import_room_assignments_7: async db => {
         const rooms = await db.collection('rooms').find().toArray()
         const visits = db.collection('visits')
         const assignments = db.collection('roomassignments')
+
+        console.log(`rimuovo tutte le assegnazioni prima di re-importarle`)
+        assignments.deleteMany({})
+
         for (let visit of await visits.find().toArray()) {
             if (visit.building == "" && visit.roomNumber == "") continue
             if (visit.building == "Ex Albergo") visit.building = 'Ex-Albergo'
@@ -252,7 +256,7 @@ const migrations = {
                 console.log(`*** multiple rooms: ${found}`)
                 continue
             }
-            let assignment = await assignments.insertOne({
+            await assignments.insertOne({
                 person: visit.person,
                 startDate: visit.startDate,
                 endDate: visit.endDate,
@@ -260,6 +264,19 @@ const migrations = {
                 notes: `visit: ${visit._id}`
             })
         }
+        return true
+    },
+
+    D20230117_add_nSeats_to_rooms: async db => {
+        const rooms = db.collection('rooms')
+        rooms.updateMany({}, {$set: {nSeats: 0}})
+        return true
+    },
+
+    D20230118_fix_grants_nazionale: async db => {
+        const grants = db.collection('grants')
+        grants.updateMany({ funds: 'Nazionale' }, { $set: {funds: 'National'}})
+        grants.updateMany({ funds: 'Internazionale' }, { $set: {funds: 'International'}})
         return true
     }
 }
