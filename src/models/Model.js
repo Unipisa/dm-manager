@@ -78,16 +78,7 @@ export default class Model {
 
         function ViewPage() {
             if (Model.ViewPage) return <Model.ViewPage />
-            return <ModelPage
-                ModelName = { Model.ModelName }
-                objCode = { Model.code }
-                objName = { Model.name }
-                indexUrl = { Model.indexUrl() }
-                oa = { Model.oa }
-                describe = { Model.describe.bind(Model) }
-                onChange = { Model.onObjectChange.bind(Model) }
-                Details = { Model.ObjectDetails }
-            />
+            return <ModelPage Model = { Model } />
         }
     
         return [
