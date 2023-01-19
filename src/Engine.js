@@ -131,9 +131,16 @@ export function useCreateEngine() {
         },
 
         useIndex: (path, filter={}) => {
-            const query = useQuery([path, filter], () => api.get(`/api/v0/${path}`, filter), {
-                keepPreviousData: true,
-                onError: (err) => addMessage(err.message, 'error'),
+            filter = Object.fromEntries(Object.entries(filter).map(
+                ([key, val]) => {
+                    if (val instanceof Date) val = val.toISOString()
+                    return [key, val]
+                }
+            )) 
+            const query = useQuery([path, filter], 
+                () => api.get(`/api/v0/${path}`, filter), {
+                    keepPreviousData: true,
+                    onError: (err) => addMessage(err.message, 'error'),
                 })
             return query
         },
