@@ -38,7 +38,7 @@ export default function ModelsPage({ Model, columns }) {
         if (xref === 'Person') {
             return value.lastName
         } else if (xref === 'Room') {
-            return `${value.building} ${value.number} p. ${value.floor}`
+            return `${value.building}${value.floor} ${value.number}`
         } else if (xref) {
             return `${xref} not implemented`
         }

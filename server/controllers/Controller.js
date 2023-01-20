@@ -272,7 +272,7 @@ class Controller {
         let filter = {}
         let sort = null
         let direction = 1
-        let limit = 100
+        let limit = 0
         let search_conditions = []
 
         const fields = this.fields
@@ -400,16 +400,19 @@ class Controller {
 
         if (direction < 0) sort = `-${sort}`
 
+        let $facet = {
+            "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
+            "limiting": [ {$skip: 0} ]
+        }
+        if (limit>0) $facet.limiting.push({$limit: limit})
+
         const pipeline = [
             {$match},
             ...this.queryPipeline,
             {$match: $match_lookups},
             {$match: search_conditions.length > 0 ? {$or: search_conditions }: {}},
             {$sort},
-            {$facet:{
-                "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
-                "limiting" : [ { "$skip": 0}, {"$limit": limit} ]
-            }},
+            {$facet},
             {$unwind: "$counting"},
             {$project:{
                 total: "$counting.count",

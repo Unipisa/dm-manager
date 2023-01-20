@@ -1,7 +1,6 @@
 import { Card } from 'react-bootstrap'
 import { myDateFormat, useEngine } from '../Engine'
 
-
 function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     const engine = useEngine()
     const assignmentsQuery = engine.useIndex('roomAssignment', {
@@ -9,6 +8,8 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
         endDate__gte: startDate,
     })
     const roomsQuery = engine.useIndex('room', {})
+    const putRoomAssignment = engine.usePut('roomAssignment')
+    const deleteRoomAssignment = engine.useDelete('roomAssignment')
     if (!(assignmentsQuery.isSuccess && roomsQuery.isSuccess)) return <p>loading ...</p>
     const rooms = roomsQuery.data.data
     const assignments = assignmentsQuery.data.data
@@ -18,6 +19,7 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     let dates = [startDate, endDate]
     assignments.forEach(assignment => {
         console.log(`assignment: ${assignment.person.lastName} ${myDateFormat(assignment.startDate)}-${myDateFormat(assignment.endDate)}`)
+        console.log(`${assignment.person._id} ? ${person._id}`)
         const room = roomWithId[assignment.room._id]
         if (room === undefined) {
             console.log(`internal error: room ${assignment.room._id} not found`)
@@ -40,9 +42,8 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
         room.list.forEach((item, i) => {
             count += item[1]
             if (count > room.max_occupation) room.max_occupation = count
-            room.list[i] = [item[0], count]
         })
-        room.freeSeats = room.max_occupation - room.nSeats
+        room.freeSeats = room.nSeats - room.max_occupation
     })
     rooms.sort((a, b) => b.freeSeats - a.freeSeats)
 
@@ -56,11 +57,27 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
         return count
     }
 
+    function createAssignment(room) {
+        console.log(`create assignment for ${person.lastName} ${person.firstName} in room ${room._id}`)
+        const assignment = {
+            person: person._id,
+            room: room._id,
+            startDate: startDate,
+            endDate: endDate,
+        }
+        putRoomAssignment(assignment)
+    }
+
     return <>
+        { assignments.filter(assignment => assignment.person._id == person._id).map(assignment => 
+            <p key={assignment._id}>
+                {assignment.person.lastName} {assignment.person.firstName} in {assignment.room.building}{assignment.room.floor} {assignment.room.number} {myDateFormat(assignment.startDate)}-{myDateFormat(assignment.endDate)}
+                <button onClick={() => deleteRoomAssignment(assignment)}>rimuovi</button>
+            </p>)}
         <table>
             <thead>
                 <tr>
-                    <th>Stanza</th>
+                    <th>Assegna Stanza</th>
                     <th>posti</th>
                     {dates.slice(0,-1).map((date,i) => 
                         <th key={i}>{myDateFormat(date)}-{myDateFormat(dates[i+1])}</th>)}
@@ -69,7 +86,9 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
             <tbody>
                 {rooms.map(room => <tr key={room._id}>
                     <th>
-                        {room.building}{room.floor} {room.number}
+                        <button onClick={() => createAssignment(room)}>
+                            {room.building}{room.floor} {room.number}
+                        </button>
                     </th>
                     <th>{room.freeSeats}</th>
                     {dates.slice(0,-1).map((date,i) =>
