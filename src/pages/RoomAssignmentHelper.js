@@ -69,7 +69,7 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     }
 
     return <>
-        { assignments.filter(assignment => assignment.person._id == person._id).map(assignment => 
+        { assignments.filter(assignment => assignment.person._id === person._id).map(assignment => 
             <p key={assignment._id}>
                 {assignment.person.lastName} {assignment.person.firstName} in {assignment.room.building}{assignment.room.floor} {assignment.room.number} {myDateFormat(assignment.startDate)}-{myDateFormat(assignment.endDate)}
                 <button onClick={() => deleteRoomAssignment(assignment)}>rimuovi</button>
