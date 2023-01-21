@@ -3,10 +3,10 @@ import { myDateFormat, useEngine } from '../Engine'
 
 function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     const engine = useEngine()
-    const assignmentsQuery = engine.useIndex('roomAssignment', {
-        startDate__lte: endDate,
-        endDate__gte: startDate,
-    })
+    let filter = {}
+    if (startDate) filter.endDate__gte_or_null = startDate
+    if (endDate) filter.startDate__lte_or_null = endDate
+    const assignmentsQuery = engine.useIndex('roomAssignment', filter)
     const roomsQuery = engine.useIndex('room', {})
     const putRoomAssignment = engine.usePut('roomAssignment')
     const deleteRoomAssignment = engine.useDelete('roomAssignment')
@@ -45,7 +45,17 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
         })
         room.freeSeats = room.nSeats - room.max_occupation
     })
-    rooms.sort((a, b) => b.freeSeats - a.freeSeats)
+    rooms.sort((a, b) => {
+        if (b.freeSeats > a.freeSeats) return 1
+        if (b.freeSeats < a.freeSeats) return -1
+        if (a.building > b.building) return 1
+        if (a.building < b.building) return -1
+        if (a.floor > b.floor) return 1 
+        if (a.floor < b.floor) return -1
+        const a_number = parseInt(a.number)
+        const b_number = parseInt(b.number)
+        return a_number - b_number
+    })
 
     function occupation(room, date) {
         const list = room.list
@@ -65,7 +75,10 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
             startDate: startDate,
             endDate: endDate,
         }
-        putRoomAssignment(assignment)
+        putRoomAssignment(assignment, () => {
+            console.log(`assignment created`)
+            engine.addMessage(`Assegnata stanza ${room.building}${room.floor} ${room.number} a ${person.lastName} ${person.firstName}`, 'success')
+        })
     }
 
     return <>
