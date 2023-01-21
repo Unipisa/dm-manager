@@ -175,7 +175,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        api.get(`/api/v0/${objCode}/search`, {q: query}).then((data) => {
+        api.get(`/api/v0/${objCode}`, {_search: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
             })
@@ -222,7 +222,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
 
     const filterBy = () => true
 
-    return <Form.Group className="row">
+    return <Form.Group className="row my-2">
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>{`Crea nuov${oa} ${objName}`}</Modal.Title>
@@ -286,7 +286,7 @@ export function GrantInput({ label, value, setValue, edit, multiple }) {
         objCode="grant"
         objName="grant"
         oa="o"
-        render={_ => `${_.name} (${_.identifier})`}
+        render={_ => `${_.name} (${_.pi ? _.pi.lastName : ''} - ${_.identifier})`}
         new_object={q => ({identifier: q})}
         inputs={{
                 identifier: 'Identificativo',
@@ -356,7 +356,7 @@ export function RoomInput({ label, value, setValue, edit }) {
     const engine = useEngine()
     const path = 'room'
     const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_limit: 300}), {
-        onError: (err) => { 
+        onError: (err) => {
             engine.addMessage(err.message, 'error') },
         })
     if (query.isLoading) return <span>loading...</span>

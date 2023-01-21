@@ -3,7 +3,7 @@ import { myDateFormat } from '../Engine'
 export default function RelatedDetails({related}) {
     return <>
         {related.filter(info => info.data !== null && info.data.length > 0).map((info, i) => 
-            <p key={i}>
+            <div key={i}>
                 <b>{info.modelName} {info.field}:</b>
                 <ul>
                 { info.data === null 
@@ -23,7 +23,7 @@ export default function RelatedDetails({related}) {
                         }
                     }).map((_,i) => <li key={i}>{_} </li>)}
                 </ul>
-            </p>
+            </div>
         )}
     </>
 }

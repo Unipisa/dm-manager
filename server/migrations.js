@@ -278,6 +278,14 @@ const migrations = {
         grants.updateMany({ funds: 'Nazionale' }, { $set: {funds: 'National'}})
         grants.updateMany({ funds: 'Internazionale' }, { $set: {funds: 'International'}})
         return true
+    },
+
+    D20230119_rename_Ex_Albergo_1: async db => {
+        const rooms = db.collection('rooms')
+        rooms.updateMany({building: 'Ex-Albergo'}, {$set: {building: 'X'}})
+        const visits = db.collection('visits')
+        visits.updateMany({building: 'Ex-Albergo'}, {$set: {building: 'X'}})
+        return true
     }
 }
 

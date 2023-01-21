@@ -266,13 +266,13 @@ class Controller {
     async index (req, res) {
         console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
 
-        let $match = {}
+        let $matches = []
         let $match_lookups = {}
         let $sort = {_id: 1}
         let filter = {}
         let sort = null
         let direction = 1
-        let limit = 100
+        let limit = 0
         let search_conditions = []
 
         const fields = this.fields
@@ -327,20 +327,20 @@ class Controller {
                 filter[key] = value;
                 if (field.match_integer) {
                     try {
-                        $match[key0] = parseInt(value);
+                        $matches.push({ [key0]: parseInt(value) })
                     } catch (err) {
                         return sendBadRequest(res, `integer expected but got string: "${value}"`)
                     }
                 } else if (field.match_ids) {
                     try {
-                        $match['_id'] = {
+                        $matches.push({ [key0]: {
                             $in: value.split(",").map(id => new ObjectId(id))
-                        }
+                        } })
                     } catch(err) {
                         return sendBadRequest(res, `comma separated list of mongo ids expected but got "${value}"`)
                     }
                 } else if (field.match_boolean) {
-                    $match[key0] = ['1','yes','true'].includes(value)
+                    $matches.push({ [key0]: ['1','yes','true'].includes(value) })
                 } else if (field.match_date) {
                     let date_value = null
                     if (value === 'today') {
@@ -354,24 +354,43 @@ class Controller {
                     }
                     console.log(`date_value: ${date_value}`)
                     if (key_parts.length === 1) {
-                        $match[key0] = date_value
+                        $matches.push({ [key0]: date_value })
                     } else if (key_parts.length === 2) {
-                        const modifier = {
-                            'lt': '$lt',
-                            'gt': '$gt',
-                            'gte': '$gte',
-                            'lte': '$lte',
-                        }[key_parts[1]]
-                        if (!modifier) return sendBadRequest(res, `invalid field modifier '${key_parts[1]}'`)
-                        if (!$match[key0]) $match[key0] = {}                        
-                        $match[key0][modifier] = date_value
+                        switch(key_parts[1]) {
+                            case 'lt':
+                                $matches.push({ [key0]: {$lt: date_value} })
+                                break
+                            case 'gt':
+                                $matches.push({ [key0]: {$gt: date_value} })
+                                break
+                            case 'gte': 
+                                $matches.push({ [key0]: {$gte: date_value} })
+                                break
+                            case 'lte':
+                                $matches.push({ [key0]: {$lte: date_value} })
+                                break
+                            case 'gte_or_null':
+                                $matches.push({ $or: [{[key0]: {$gte: date_value}}, { [key0]: null }]})
+                                break
+                            case 'gt_or_null':
+                                $matches.push({ $or: [{[key0]: {$gt: date_value}}, { [key0]: null }]})
+                                break
+                            case 'lte_or_null':
+                                $matches.push({ $or: [{[key0]: {$lte: date_value}}, { [key0]: null }]})
+                                break
+                            case 'lt_or_null':
+                                $matches.push({ $or: [{[key0]: {$lt: date_value}}, { [key0]: null }]})
+                                break
+                            default:
+                                return sendBadRequest(res, `invalid field modifier '${key_parts[1]}'`)
+                        }
                     } else {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
                 } else if (field.related_field) {
                     if (key_parts[1] === '_id' || key_parts.length === 1) { 
                         try {
-                            $match[key0] = new ObjectId(value)
+                            $matches.push({ [key0]: new ObjectId(value) })
                         } catch(err) {
                             console.error(err)
                             return sendBadRequest(res, `invalid id "${value}"`)
@@ -381,12 +400,12 @@ class Controller {
                     }
                 } else {
                     if (key_parts.length === 1) {
-                        $match[key] = value
+                        $matches.push({ [key0]: value })
                     }
                     else {
                         if (key_parts[1] == 'regex') {
                             // We do case-insensitive regexp by default
-                            $match[key0] = { $regex: new RegExp(value, "i") }
+                            $matches.push({ [key0]: { $regex: new RegExp(value, "i") } })
                         }
                         else {
                             return sendBadRequest(res, `Unsupported field modifier in '${key}'`)
@@ -400,16 +419,19 @@ class Controller {
 
         if (direction < 0) sort = `-${sort}`
 
+        let $facet = {
+            "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
+            "limiting": [ {$skip: 0} ]
+        }
+        if (limit>0) $facet.limiting.push({$limit: limit})
+
         const pipeline = [
-            {$match},
+            ...$matches.map(x => ({$match: x})),
             ...this.queryPipeline,
             {$match: $match_lookups},
             {$match: search_conditions.length > 0 ? {$or: search_conditions }: {}},
             {$sort},
-            {$facet:{
-                "counting" : [ { "$group": {_id:null, count:{$sum:1}}} ],
-                "limiting" : [ { "$skip": 0}, {"$limit": limit} ]
-            }},
+            {$facet},
             {$unwind: "$counting"},
             {$project:{
                 total: "$counting.count",
@@ -417,7 +439,7 @@ class Controller {
             }}
         ]
         
-        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline, null, 2)}`)
+        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
         
         let result = await this.Model.aggregate(pipeline)
         if (result.length === 0) {

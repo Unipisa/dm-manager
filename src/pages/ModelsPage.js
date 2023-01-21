@@ -33,12 +33,12 @@ export default function ModelsPage({ Model, columns }) {
             return value.join(', ')
         }
         if (field && field.format === 'date-time') return myDateFormat(value)
-        if (key === 'roomAssignment') return `${value.room.building} ${value.room.floor}: ${value.room.number}`
+        if (key === 'roomAssignment') return `${value.room.building}${value.room.floor} ${value.room.number}`
         const xref = field && field['x-ref'] 
         if (xref === 'Person') {
             return value.lastName
         } else if (xref === 'Room') {
-            return `${value.building} ${value.number} p. ${value.floor}`
+            return `${value.building}${value.floor} ${value.number}`
         } else if (xref) {
             return `${xref} not implemented`
         }

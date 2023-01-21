@@ -62,7 +62,15 @@ export function emptyObject(Model) {
     return empty
 }
 
-export default function ModelPage({ objCode, objName, indexUrl, oa, describe, onChange, ModelName, Details }) {
+export default function ModelPage({ Model }) {
+    const objCode = Model.code
+    const objName = Model.name
+    const indexUrl = Model.indexUrl()
+    const oa = Model.oa 
+    const describe = Model.describe.bind(Model)
+    const onChange = Model.onObjectChange.bind(Model)
+    const ModelName = Model.ModelName
+    const Details = Model.ObjectDetails
     const engine = useEngine()
     const empty = emptyObject(engine.Models[ModelName].schema)
     const { id } = useParams()

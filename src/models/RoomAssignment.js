@@ -26,6 +26,6 @@ export default class RoomAssignment extends Model {
     }
 
     describe(obj) {
-        return `${obj.person?.lastName} ${obj.room?.number} ${obj.room?.building} ${obj.room?.floor}`
+        return `${obj.person?.lastName} ${obj.room?.building}${obj.room?.floor} ${obj.room?.number}`
     }
 }
