@@ -9,6 +9,7 @@ const GrantController = require('./controllers/GrantController')
 const UserController = require('./controllers/UserController')
 const TokenController = require('./controllers/TokenController')
 const PersonController = require('./controllers/PersonController')
+const StaffController = require('./controllers/StaffController')
 
 var router = express.Router()
 
@@ -24,6 +25,7 @@ let ModelSchemas = {}
     UserController,
     TokenController,
     PersonController,
+    StaffController,
 ].forEach(Controller => {
     const controller = new Controller()
     const schema = controller.getSchema()
