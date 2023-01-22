@@ -10,7 +10,9 @@ export default function VisitDetails({obj}) {
     let elements = []
     const Person = engine.Models.Person
 
-    if (obj.person && obj.startDate && engine.user.hasSomeRole('assignment-manager', 'assignment-supervisor')) {
+    console.log(`RoomAssignment.schema: ${engine.Models.RoomAssignment.schema}`)
+
+    if (obj.person && obj.startDate && engine.user.hasSomeRole(...engine.Models.RoomAssignment.schema.supervisorRoles)) {
         elements.push(<RoomAssignmentHelper 
             key={RoomAssignmentHelper} 
             person={obj.person}
