@@ -11,10 +11,19 @@ const {
 
 const staffSchema = new Schema({
     person: { type: ObjectId, label: 'persona', ref: 'Person' },
+    jobId: { type: String, label: 'UNIPI id'},
+    qualification: {type: String, label: 'qualifica', 
+        enum: [
+            'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+            'Assegnista', 'Dottorando', 'PTA', 
+            'Collaboratore e Docente Esterno',
+            'Professore Emerito',
+        ]},
     startDate,
     endDate,
     SSD,
     publish: {type: Boolean, label: 'pubblica sul web', default: true},
+    wordpressId: String,
     notes: {type: String, label: 'note', widget: 'text'},
     createdBy,
     updatedBy,

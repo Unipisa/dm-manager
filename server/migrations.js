@@ -7,7 +7,7 @@
  * più allo stato del database
  */
 
- async function findPerson(people, firstName, lastName, affiliazione) {
+async function findPerson(people, firstName, lastName, affiliazione) {
     let p = await people.findOne({ firstName, lastName })
     if (p === null) {
         p = await people.insertOne({ firstName, lastName, affiliation: affiliazione || "Università di Pisa"})
@@ -286,7 +286,114 @@ const migrations = {
         const visits = db.collection('visits')
         visits.updateMany({building: 'Ex-Albergo'}, {$set: {building: 'X'}})
         return true
-    }
+    },
+
+    D20230122_import_people_from_wordpress_nop: async db => {
+        return true // disabilitata per ora
+        const staffs = db.collection('staffs')
+        const people = db.collection('people')
+        const rooms = db.collection('rooms')
+        const roomassignments = db.collection('roomassignments')
+        const axios = require('axios')
+        let data = []
+        let page = []
+        let count = 1
+        const per_page = 99
+        do {
+            const URL=`https://www.dm.unipi.it/wp-json/wp/v2/people?per_page=${per_page}&page=${count}`
+            console.log(`fetch: ${URL}`)
+            const response = await axios.get(URL)
+            count++
+            page = response.data
+            console.log(`page.length: ${page.length}`)
+            //console.log(`response: ${JSON.stringify(response)}`)
+            //page = await response.json()
+            data.push(...page)
+        } while(page.length >= per_page)
+        console.log(data[data.length-1])
+        console.log(`data length: ${data.length}`)
+        console.log(`cancello collection staff`)
+        staffs.deleteMany({})
+        for (let record of data) {
+            console.log(`**************** ${record.acf.nome} ${record.acf.cognome}`)
+            console.log(`${record.link}`)
+            if (['antonelli-saida',
+                'goli-tommaso', 'trimarco-carmine', 'modica-luciano', 'magherini-cecilia', 
+                'maffei-andrea', 'zapadinskaya-alexandra', 'vaccaro-andrea', 'ueno-jacue-carlos'].includes(record.slug)) {
+                console.log(`Salta: record marcato come invalido`)
+                continue
+            }
+            if (record.acf.qualifica === 'Studente') {
+                console.log(`salta: Studente`)
+                continue
+            }
+            if (![
+                'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+                'Assegnista', 'Dottorando', 'PTA', 
+                'Collaboratore e Docente Esterno',
+                'Professore Emerito',
+            ].includes(record.acf.qualifica)) {
+                console.log(`##################invalid qualification: ${record.acf.qualifica}`)
+                continue
+                return false
+            }
+            const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
+            console.log(`person: ${JSON.stringify(person)}`)
+            if (!person.gender) {
+                await people.findOneAndUpdate({_id: person._id}, {$set: {gender: record.acf.Genere}})
+            } else if (person.gender != record.acf.Genere) {
+                console.log(`il genere non corrisponde ${person.gender}!=${record.acf.Genere}`)
+                return false
+            }
+            if (!person.email) {
+                await people.findOneAndUpdate({_id: person.id}, {$set: {email: record.acf.email}})
+            } else if (person.email !== record.acf.email) {
+                console.log(`l'email non corrisponde ${person.email}!=${record.acf.email}`)
+                return false
+            }
+
+            if (record.acf.stanza 
+                && record.acf.stanza !== '0' 
+                && record.acf.stanza !== 'a') {
+                if (record.acf.edificio === 'Ex Albergo') record.acf.edificio='X'
+                room = await rooms.findOne({
+                    building: record.acf.edificio,
+                    floor: record.acf.piano,
+                    number: record.acf.stanza
+                })
+                if (!room) {
+                    console.log(`non trovo la stanza ${record.acf.edificio}${record.acf.piano}-${record.acf.stanza}`)
+                    return false
+                }
+                console.log(`room found ${room._id}`)
+                let assignment = await roomassignments.findOne({"person": person._id, "room": room._id })
+                console.log(`assignment: ${JSON.stringify(assignment)}`)
+                assignment = await roomassignments.findOneAndUpdate(
+                    { "person": person._id, "room": room._id }, // condition
+                    { $set: {}}, // update
+                    { upsert: true } // options
+                )
+            }
+
+            const staff = await staffs.insertOne({
+                "person": person._id,
+                wordpressId: record.id,
+                jobId: record.username,
+                qualification: record.acf.qualifica,
+                SSD: record.acf.ssd,
+                orcid: record.acf.orcid,
+                arxiv_orcid: record.acf.arxiv_orcid,
+                google_scholar: record.acf.google_scholar,
+                mathscinet: record.acf.mathscinet,
+                cn_ldap: record.acf.cn_ldap,
+                notes: `
+                    ulteriore qualifica: ${record.ulteriore_qualifica}
+                    wordpressLink: ${record.link}
+                `
+            })
+        }
+        return true
+    },
 }
 
 async function migrate(db) {
