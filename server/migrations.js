@@ -233,7 +233,7 @@ const migrations = {
         return true;
     },
 
-    D20230111_import_room_assignments_7: async db => {
+    D20230111_import_room_assignments_8: async db => {
         const rooms = await db.collection('rooms').find().toArray()
         const visits = db.collection('visits')
         const assignments = db.collection('roomassignments')
