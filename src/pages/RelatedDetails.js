@@ -1,4 +1,4 @@
-import { myDateFormat, useGetRelated } from '../Engine'
+import { myDateFormat } from '../Engine'
 
 export default function RelatedDetails({related}) {
     return <>
