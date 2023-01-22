@@ -29,7 +29,7 @@ const schema = new Schema({
     webSite: {type: String, label: 'URL sito web'}, 
     budgetAmount: {type: String, label: 'budget'}, 
     description: {type: String, label: 'descrizione', widget: 'text'}, 
-    keywords: [{type: String, label: 'parole chiave'}], 
+    // keywords: [{type: String, label: 'parole chiave'}], 
     SSD: multipleSSDs,
     notes,
     createdBy,
