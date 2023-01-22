@@ -20,9 +20,7 @@ export default class Visit extends Model {
             'endDate': "al",
             'person': "persona",
             'affiliation': "affiliazione",
-            'building': "edificio",
-            'roomNumber': "stanza",
-            'roomAssignment': "(debug)",
+            'roomAssignment': "stanza",
             'updatedAt': "modificato",
         }
         this.ObjectDetails = VisitDetails
