@@ -12,11 +12,11 @@ const {
 const visitSchema = new Schema({
     person: { type: ObjectId, label: 'visitatore', ref: 'Person' },
     affiliation: {type: String, label: 'affiliazione'},
-    country: {type: String, label: 'nazione'},
+    // country: {type: String, label: 'nazione'},
     startDate,
     endDate,
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
-    fundingAgency: {type: String, label: 'ente finanziatore'},
+    // fundingAgency: {type: String, label: 'ente finanziatore'},
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,
     publish: {type: Boolean, label: 'pubblica sul web', default: true},
