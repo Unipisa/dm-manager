@@ -10,7 +10,7 @@ export default function VisitDetails({obj}) {
     let elements = []
     const Person = engine.Models.Person
 
-    if (obj.person && obj.startDate) {
+    if (obj.person && obj.startDate && engine.user.hasSomeRole('assignment-manager', 'assignment-supervisor')) {
         elements.push(<RoomAssignmentHelper 
             key={RoomAssignmentHelper} 
             person={obj.person}
