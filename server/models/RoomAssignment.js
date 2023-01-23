@@ -66,12 +66,18 @@ RoomAssignment.personRoomAssignmentPipeline = () => ([{$lookup: {
             "room.floor": 1,
             "room.number": 1,
         }},
-        // tiene solo le assegnazioni che includono la data odierna 
+        // tiene solo le assegnazioni che includono il periodo [start, end] 
         {$match: {
             $expr: {
                 $and: [
-                    { $lte: ["$startDate", "$$end"],},
-                    { $gte: ["$endDate", "$$start"], }
+                    { $or: [
+                        { $eq: ["$$end", null] },
+                        { $eq: ["$startDate", null] },
+                        { $lte: ["$startDate", "$$end"] } ]},
+                    { $or: [
+                        { $eq: ["$$start", null] },
+                        { $eq: ["$endDate", null] },
+                        { $gte: ["$endDate", "$$start"] } ]}
                 ]},
             },
         },

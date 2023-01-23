@@ -36,7 +36,7 @@ export default function ModelsPage({ Model, columns }) {
         if (key === 'roomAssignment') return `${value.room.building}${value.room.floor} ${value.room.number}`
         const xref = field && field['x-ref'] 
         if (xref === 'Person') {
-            return value.lastName
+            return `${value.lastName} ${value.firstName}`
         } else if (xref === 'Room') {
             return `${value.building}${value.floor} ${value.number}`
         } else if (xref) {

@@ -12,7 +12,6 @@ const personSchema = new Schema({
     gender: {type: String, label: 'genere', 
         enum: ['Uomo', 'Donna', 'Non Specificato'],
         default: 'Non Specificato'},
-    unipiId: {type: String, label: 'matricola unipi'},
     country: {type: String, label: 'nazione'}, 
     email: {type: String, label: 'email'}, 
     phone: {type: String, label: 'telefono'}, 

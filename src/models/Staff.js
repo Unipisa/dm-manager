@@ -9,15 +9,14 @@ export default class Staff extends Model {
         this.oa = "o"
         this.articulation = {
             'oggetto': "unità di personale",
-            'oggetti': "unità di personale",
+            'oggetti': "personale strutturato",
             'l\'oggetto': "l'unità di personale",
             'gli oggetti': "le unità di personale",
             'un oggetto': "una unità di personale",
         }
         this.ModelName = 'Staff' 
         this.columns = {
-            'startDate': "dal",
-            'endDate': "al",
+            'qualification': "qualifica",
             'person': "persona",
             'roomAssignment': "stanza",
             'updatedAt': "modificato",

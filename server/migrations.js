@@ -288,7 +288,7 @@ const migrations = {
         return true
     },
 
-    D20230122_import_people_from_wordpress_4: async db => {
+    D20230122_import_people_from_wordpress_9: async db => {
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const rooms = db.collection('rooms')
@@ -337,15 +337,31 @@ const migrations = {
             const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
             console.log(`person: ${JSON.stringify(person)}`)
             if (!person.gender) {
+                console.log(`assegna genere: ${record.acf.Genere}`)
                 await people.findOneAndUpdate({_id: person._id}, {$set: {gender: record.acf.Genere}})
             } else if (person.gender != record.acf.Genere) {
                 failure(record, `il genere non corrisponde ${person.gender}!=${record.acf.Genere}`)
                 continue
             }
             if (!person.email) {
-                await people.findOneAndUpdate({_id: person.id}, {$set: {email: record.acf.email}})
+                console.log(`assegna email: ${record.acf.email}`)
+                await people.findOneAndUpdate({_id: person._id}, {$set: {email: record.acf.email}})
             } else if (person.email !== record.acf.email) {
                 failure(record, `l'email non corrisponde ${person.email}!=${record.acf.email}`)
+                continue
+            }
+            if (!person.phone) {
+                console.log(`assegna telefono: ${record.acf.telefono}`)
+                await people.findOneAndUpdate({_id: person._id}, {$set: {phone: record.acf.telefono}})
+            } else if (person.phone !== record.acf.telefono) {
+                failure(record, `il telefono non corrisponde ${person.phone}!=${record.acf.telefono}`)
+                continue
+            }
+            if (!person.personalPage) {
+                console.log(`assegna pagina personale: ${record.acf.pagina_personale}`)
+                await people.findOneAndUpdate({_id: person._id}, {$set: {personalPage: record.acf.pagina_personale}})
+            } else if (person.personalPage !== record.acf.pagina_personale) {
+                failure(record, `la pagina personale non corrisponde ${person.personalPage}!=${record.acf.pagina_personale}`)
                 continue
             }
 
@@ -375,7 +391,7 @@ const migrations = {
             const staff = await staffs.insertOne({
                 "person": person._id,
                 wordpressId: record.id,
-                jobId: record.username,
+                matricola: record.acf.username,
                 qualification: record.acf.qualifica,
                 SSD: record.acf.ssd,
                 orcid: record.acf.orcid,
@@ -383,10 +399,7 @@ const migrations = {
                 google_scholar: record.acf.google_scholar,
                 mathscinet: record.acf.mathscinet,
                 cn_ldap: record.acf.cn_ldap,
-                notes: `
-                    ulteriore qualifica: ${record.ulteriore_qualifica}
-                    wordpressLink: ${record.link}
-                `
+                notes: `wordpressLink: ${record.link}`
             })
         }
         if (failed.length) {
@@ -395,6 +408,15 @@ const migrations = {
         }
         return true
     },
+
+    D20230123_fill_assignments_dates_1: async function(db) {
+        const assignments = db.collection('roomassignments')
+        assignments.updateMany({"startDate": { $exists: false }},
+            { $set: { startDate: null } })
+        assignments.updateMany({"endDate": { $exists: false }},
+            { $set: { endDate: null } })
+        return true
+    }, 
 }
 
 async function migrate(db) {

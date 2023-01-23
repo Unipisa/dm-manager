@@ -11,7 +11,7 @@ const {
 
 const staffSchema = new Schema({
     person: { type: ObjectId, label: 'persona', ref: 'Person' },
-    jobId: { type: String, label: 'UNIPI id'},
+    matricola: { type: String, label: 'matricola'},
     qualification: {type: String, label: 'qualifica', 
         enum: [
             'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
