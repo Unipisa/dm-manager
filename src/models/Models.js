@@ -6,12 +6,14 @@ import Visit from './Visit'
 import Person from './Person'
 import User from './User'
 import Token from './Token'
+import Staff from './Staff'
 
 const Models = { 
     RoomLabel: new RoomLabel(),
     Room: new Room(),
     RoomAssignment: new RoomAssignment(),
     Visit: new Visit(),
+    Staff: new Staff(),
     Grant: new Grant(),
     Person: new Person(),
     User: new User(),

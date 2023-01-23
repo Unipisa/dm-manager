@@ -2,15 +2,13 @@ import { useEngine } from '../Engine'
 import PersonDetails from './PersonDetails'
 import RoomAssignmentHelper from './RoomAssignmentHelper'
 
-export default function VisitDetails({obj}) {
+export default function StaffDetails({obj}) {
     const engine = useEngine()
     const visit = obj
     const person = visit.person
     if (visit.person === null) return
     let elements = []
     const Person = engine.Models.Person
-
-    console.log(`RoomAssignment.schema: ${engine.Models.RoomAssignment.schema}`)
 
     if (obj.person && obj.startDate && engine.user.hasSomeRole(...engine.Models.RoomAssignment.schema.supervisorRoles)) {
         elements.push(<RoomAssignmentHelper 

@@ -126,7 +126,15 @@ function setup_routes() {
     const role = req.body.role
     if (role) {
       if (req.user && req.user.roles && (req.user.roles.includes('admin') || req.user.roles.includes('disguised-admin'))) {
-        const roles = role === 'admin' ? [role] : [role, 'disguised-admin']
+        // user want to add role
+        // if role is admin it is the only role we need
+        // otherwise remove admin and add disguised-admin
+        let roles = [role]
+        if (role !== 'admin') {
+          roles.push(...req.user.roles)
+          roles = roles.filter(x => x!=='admin')
+          if (!roles.includes('disguised-admin')) roles.push('disguised-admin')
+        }
         User.findByIdAndUpdate(req.user._id, { roles }, (err, result) => {
           if (err) {
             res.status('500')
