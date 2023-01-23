@@ -288,8 +288,7 @@ const migrations = {
         return true
     },
 
-    D20230122_import_people_from_wordpress_nop: async db => {
-        return true // disabilitata per ora
+    D20230122_import_people_from_wordpress_4: async db => {
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const rooms = db.collection('rooms')
@@ -299,6 +298,11 @@ const migrations = {
         let page = []
         let count = 1
         const per_page = 99
+        let failed = []
+        function failure(record, msg) {
+            console.log(`############# FAIL: ${msg}`)
+            failed.push(`${record.slug}: ${msg}`)
+        }
         do {
             const URL=`https://www.dm.unipi.it/wp-json/wp/v2/people?per_page=${per_page}&page=${count}`
             console.log(`fetch: ${URL}`)
@@ -317,14 +321,8 @@ const migrations = {
         for (let record of data) {
             console.log(`**************** ${record.acf.nome} ${record.acf.cognome}`)
             console.log(`${record.link}`)
-            if (['antonelli-saida',
-                'goli-tommaso', 'trimarco-carmine', 'modica-luciano', 'magherini-cecilia', 
-                'maffei-andrea', 'zapadinskaya-alexandra', 'vaccaro-andrea', 'ueno-jacue-carlos'].includes(record.slug)) {
-                console.log(`Salta: record marcato come invalido`)
-                continue
-            }
-            if (record.acf.qualifica === 'Studente') {
-                console.log(`salta: Studente`)
+            if (['', 'Studente', 'Docente Esterno', 'non in servizio'].includes(record.acf.qualifica)) {
+                console.log(`salta qualifica: ${record.acf.qualifica}`)
                 continue
             }
             if (![
@@ -333,23 +331,22 @@ const migrations = {
                 'Collaboratore e Docente Esterno',
                 'Professore Emerito',
             ].includes(record.acf.qualifica)) {
-                console.log(`##################invalid qualification: ${record.acf.qualifica}`)
+                failure(record, `invalid qualification: ${record.acf.qualifica}`)
                 continue
-                return false
             }
             const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
             console.log(`person: ${JSON.stringify(person)}`)
             if (!person.gender) {
                 await people.findOneAndUpdate({_id: person._id}, {$set: {gender: record.acf.Genere}})
             } else if (person.gender != record.acf.Genere) {
-                console.log(`il genere non corrisponde ${person.gender}!=${record.acf.Genere}`)
-                return false
+                failure(record, `il genere non corrisponde ${person.gender}!=${record.acf.Genere}`)
+                continue
             }
             if (!person.email) {
                 await people.findOneAndUpdate({_id: person.id}, {$set: {email: record.acf.email}})
             } else if (person.email !== record.acf.email) {
-                console.log(`l'email non corrisponde ${person.email}!=${record.acf.email}`)
-                return false
+                failure(record, `l'email non corrisponde ${person.email}!=${record.acf.email}`)
+                continue
             }
 
             if (record.acf.stanza 
@@ -362,8 +359,8 @@ const migrations = {
                     number: record.acf.stanza
                 })
                 if (!room) {
-                    console.log(`non trovo la stanza ${record.acf.edificio}${record.acf.piano}-${record.acf.stanza}`)
-                    return false
+                    failure(record, `non trovo la stanza ${record.acf.edificio}${record.acf.piano}-${record.acf.stanza}`)
+                    continue
                 }
                 console.log(`room found ${room._id}`)
                 let assignment = await roomassignments.findOne({"person": person._id, "room": room._id })
@@ -391,6 +388,10 @@ const migrations = {
                     wordpressLink: ${record.link}
                 `
             })
+        }
+        if (failed.length) {
+            console.log(`==> migration failed`)
+            failed.forEach(msg => console.log(`- ${msg}`))
         }
         return true
     },
