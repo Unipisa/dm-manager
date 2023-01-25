@@ -114,6 +114,9 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     // Data used for the new person create
     const [newObject, setNewObject] = useState({})
 
+    // Use to avoid opening the menu after creating a new object
+    const [avoidMenu, setAvoidMenu] = useState(false)
+
     if (multiple === undefined) {
         multiple = false
     }
@@ -139,17 +142,17 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
         // Add a new person with the given data
         api.put(`/api/v0/${objCode}`, newObject).then(data => {      
             if (multiple) {
-                setValue([ ...value, data ])
                 setSelected([ ...value, data ])
+                setValue([ ...value, data ])
             }   
-            else {       
-                setValue(data)
+            else {
                 setSelected([ data ])
+                setValue(data)
             }
-            typeaheadref.current.blur()
-        }).catch(err => engine.addMessage(err.message))
 
-        setShow(false);
+            setShow(false);
+            setAvoidMenu(true)
+        }).catch(err => engine.addMessage(err.message))
     }
 
     function onChangeHandler(evt) {
@@ -163,6 +166,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
         evt = Array.from(evt).filter(x => ! (x.noObjectSelected || x.newObjectEntry))
 
         setSelected(evt)
+        typeaheadref.current.hideMenu()
 
         if (evt.length > 0) {
             setValue(multiple ? evt : evt[0])
@@ -222,6 +226,13 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
 
     const filterBy = () => true
 
+    const onMenuToggle = () => {
+        if (avoidMenu) {
+            typeaheadref.current.hideMenu()
+            setAvoidMenu(false)
+        }
+    }
+
     return <Form.Group className="row my-2">
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
@@ -245,6 +256,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
             { label }
         </Form.Label>
         <AsyncTypeahead
+          ref={typeaheadref}
           className="col-sm-10"
           filterBy={filterBy}
           isLoading={isLoading}
@@ -252,9 +264,9 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
           labelKey={labelDisplayFunction}
           onSearch={handleSearch}
           options={options}
-          ref={typeaheadref}
           onChange={onChangeHandler}
           onBlur={onBlurHandler}
+          onMenuToggle={onMenuToggle}
           placeholder={placeholder}
           selected={selected}
           renderMenuItemChildren={menuRenderFunction}
