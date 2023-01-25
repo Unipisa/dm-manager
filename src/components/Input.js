@@ -245,6 +245,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
             { label }
         </Form.Label>
         <AsyncTypeahead
+          ref={typeaheadref}
           className="col-sm-10"
           filterBy={filterBy}
           isLoading={isLoading}
@@ -252,7 +253,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
           labelKey={labelDisplayFunction}
           onSearch={handleSearch}
           options={options}
-          ref={typeaheadref}
           onChange={onChangeHandler}
           onBlur={onBlurHandler}
           placeholder={placeholder}
