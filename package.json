@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
