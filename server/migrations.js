@@ -288,7 +288,7 @@ const migrations = {
         return true
     },
 
-    D20230122_import_people_from_wordpress_9: async db => {
+    D20230122_import_people_from_wordpress_12: async db => {
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const rooms = db.collection('rooms')
@@ -336,35 +336,26 @@ const migrations = {
             }
             const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
             console.log(`person: ${JSON.stringify(person)}`)
-            if (!person.gender) {
-                console.log(`assegna genere: ${record.acf.Genere}`)
-                await people.findOneAndUpdate({_id: person._id}, {$set: {gender: record.acf.Genere}})
-            } else if (person.gender != record.acf.Genere) {
-                failure(record, `il genere non corrisponde ${person.gender}!=${record.acf.Genere}`)
-                continue
-            }
-            if (!person.email) {
-                console.log(`assegna email: ${record.acf.email}`)
-                await people.findOneAndUpdate({_id: person._id}, {$set: {email: record.acf.email}})
-            } else if (person.email !== record.acf.email) {
-                failure(record, `l'email non corrisponde ${person.email}!=${record.acf.email}`)
-                continue
-            }
-            if (!person.phone) {
-                console.log(`assegna telefono: ${record.acf.telefono}`)
-                await people.findOneAndUpdate({_id: person._id}, {$set: {phone: record.acf.telefono}})
-            } else if (person.phone !== record.acf.telefono) {
-                failure(record, `il telefono non corrisponde ${person.phone}!=${record.acf.telefono}`)
-                continue
-            }
-            if (!person.personalPage) {
-                console.log(`assegna pagina personale: ${record.acf.pagina_personale}`)
-                await people.findOneAndUpdate({_id: person._id}, {$set: {personalPage: record.acf.pagina_personale}})
-            } else if (person.personalPage !== record.acf.pagina_personale) {
-                failure(record, `la pagina personale non corrisponde ${person.personalPage}!=${record.acf.pagina_personale}`)
-                continue
-            }
-
+            ;[   
+                ['gender','Genere'], 
+                ['email', 'email'], 
+                ['phone', 'telefono'], 
+                ['personalPage', 'pagina_personale'], 
+                ['orcid','orcid'],
+                ['arxiv_orcid', 'arxiv_orcid'],
+                ['google_scholar', 'google_scholar'],
+                ['mathscinet', 'mathscinet'],
+                ['cn_ldap', 'cn_ldap']
+            ].forEach(([field, wpfield]) => {
+                if (!person[field]) {
+                    if (record.acf[wpfield]) {
+                        console.log(`assegna ${field}: ${record.acf[wpfield]}`)
+                        people.findOneAndUpdate({_id: person._id}, {$set: {[field]: record.acf[wpfield]}})
+                    }
+                } else if (person[field] !== record.acf[wpfield]) {
+                    failure(record, `${field} non corrisponde ${person[field]}!=${record.acf[wpfield]}`)
+                }
+            })
             if (record.acf.stanza 
                 && record.acf.stanza !== '0' 
                 && record.acf.stanza !== 'a') {
@@ -403,7 +394,7 @@ const migrations = {
             })
         }
         if (failed.length) {
-            console.log(`==> migration failed`)
+            console.log(`==> migration failures:`)
             failed.forEach(msg => console.log(`- ${msg}`))
         }
         return true
