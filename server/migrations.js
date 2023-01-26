@@ -288,7 +288,7 @@ const migrations = {
         return true
     },
 
-    D20230122_import_people_from_wordpress_12: async db => {
+    D20230122_import_people_from_wordpress_13: async db => {
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const rooms = db.collection('rooms')
@@ -321,19 +321,6 @@ const migrations = {
         for (let record of data) {
             console.log(`**************** ${record.acf.nome} ${record.acf.cognome}`)
             console.log(`${record.link}`)
-            if (['', 'Studente', 'Docente Esterno', 'non in servizio'].includes(record.acf.qualifica)) {
-                console.log(`salta qualifica: ${record.acf.qualifica}`)
-                continue
-            }
-            if (![
-                'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
-                'Assegnista', 'Dottorando', 'PTA', 
-                'Collaboratore e Docente Esterno',
-                'Professore Emerito',
-            ].includes(record.acf.qualifica)) {
-                failure(record, `invalid qualification: ${record.acf.qualifica}`)
-                continue
-            }
             const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
             console.log(`person: ${JSON.stringify(person)}`)
             ;[   
@@ -356,6 +343,19 @@ const migrations = {
                     failure(record, `${field} non corrisponde ${person[field]}!=${record.acf[wpfield]}`)
                 }
             })
+            if (['', 'Studente', 'Docente Esterno', 'non in servizio'].includes(record.acf.qualifica)) {
+                console.log(`salta qualifica: ${record.acf.qualifica}`)
+                continue
+            }
+            if (![
+                'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+                'Assegnista', 'Dottorando', 'PTA', 
+                'Collaboratore e Docente Esterno',
+                'Professore Emerito',
+            ].includes(record.acf.qualifica)) {
+                failure(record, `invalid qualification: ${record.acf.qualifica}`)
+                continue
+            }
             if (record.acf.stanza 
                 && record.acf.stanza !== '0' 
                 && record.acf.stanza !== 'a') {
