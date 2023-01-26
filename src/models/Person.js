@@ -9,7 +9,7 @@ export default class Person extends Model {
         this.oa = "a"
         this.articulation = {
             'oggetto': "persona", 
-            'oggetti': "persone",
+            'oggetti': "anagrafica",
             'l\'oggetto': "la persona",
             'gli oggetti': "le persone", 
             'un oggetto': "una persona", 

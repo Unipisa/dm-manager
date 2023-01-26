@@ -5,14 +5,14 @@ export default class Staff extends Model {
     constructor() {
         super()
         this.code = 'staff'
-        this.name = "personale"
+        this.name = "qualifica"
         this.oa = "o"
         this.articulation = {
-            'oggetto': "unità di personale",
-            'oggetti': "personale strutturato",
-            'l\'oggetto': "l'unità di personale",
-            'gli oggetti': "le unità di personale",
-            'un oggetto': "una unità di personale",
+            'oggetto': "qualifica",
+            'oggetti': "qualifiche",
+            'l\'oggetto': "la qualifica",
+            'gli oggetti': "le qualifiche",
+            'un oggetto': "una qualifica",
         }
         this.ModelName = 'Staff' 
         this.columns = {
