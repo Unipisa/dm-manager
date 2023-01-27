@@ -19,31 +19,6 @@ async function findPerson(people, firstName, lastName, affiliazione) {
     return p
 }
 
-async function personFromName(people, name) {
-    const aff = name.replace(')',' ').split('(').map(x => x.trim())
-    name = aff[0]
-    affiliazione = aff[1]
-    const names = name.split(' ').map(x => x.trim()).filter(x => x!=='')
-    if (names.length === 2) {
-        return await findPerson(people, names[0], names[1], affiliazione)
-    } else if (names.length === 3) {
-        if (['del', 'dal', 'de', 'di', 'da', 'della'].includes(names[1].toLowerCase())) {
-            return await findPerson(people, names[0], `${names[1]} ${names[2]}`, affiliazione)
-        } else if ([
-                'carlo', 'laura', 'giovanni', 'letizia', 
-                'stella', 'federico', 'antonio',
-                'alessandra', 'agnese', 'james',
-                'gianluca', 'gipo', 'romani',
-                's.', 'g.', 'a.',
-            ].includes(names[1].toLowerCase())) {
-            return await findPerson(people, `${names[0]} ${names[1]}`, names[2], affiliazione)
-        }
-    }
-    console.log(`*** cannot convert name "${name}" to Person`)
-    return null 
-}
-
-
 const migrations = { 
     migration_test: async (db) => {
         return true
