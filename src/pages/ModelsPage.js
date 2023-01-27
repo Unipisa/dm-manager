@@ -30,6 +30,9 @@ export default function ModelsPage({ Model, columns }) {
         if (value === null) return '---'
         const field = modelFields[key]
         if (field && field.type === 'array') {
+            if (field.items['x-ref'] === 'Person') {
+                return value.map(person => `${person.lastName}`).join(', ')
+            }
             return value.join(', ')
         }
         if (field && field.format === 'date-time') return myDateFormat(value)
