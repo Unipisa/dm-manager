@@ -288,7 +288,7 @@ const migrations = {
         return true
     },
 
-    D20230122_import_people_from_wordpress_20: async db => {
+    D20230122_import_people_from_wordpress_22: async db => {
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const rooms = db.collection('rooms')
@@ -371,8 +371,14 @@ const migrations = {
                     await staffs.insertOne({...staff})
                 }
                 staff.qualification = 'Dottorando'
+                let ciclo_dottorato = record.acf.ciclo_dottorato
+                if (ciclo_dottorato === 'XXXIII') ciclo_dottorato = '33'
                 staff.startDate = new Date(`${parseInt(record.acf.ciclo_dottorato) + 1985}-11-01T00:00:00.000Z`)
                 staff.endDate = new Date(`${parseInt(record.acf.ciclo_dottorato) + 1989}-11-01T00:00:00.000Z`)
+                // check if startDate is invalid
+                if (staff.startDate.toString() === 'Invalid Date') {
+                    failure(record, `invalid ciclo_dottorato: ${record.acf.ciclo_dottorato}`)
+                }
             }
             await staffs.insertOne(staff)
             if (record.acf.stanza) {
