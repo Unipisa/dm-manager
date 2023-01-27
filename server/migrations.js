@@ -19,31 +19,6 @@ async function findPerson(people, firstName, lastName, affiliazione) {
     return p
 }
 
-async function personFromName(people, name) {
-    const aff = name.replace(')',' ').split('(').map(x => x.trim())
-    name = aff[0]
-    affiliazione = aff[1]
-    const names = name.split(' ').map(x => x.trim()).filter(x => x!=='')
-    if (names.length === 2) {
-        return await findPerson(people, names[0], names[1], affiliazione)
-    } else if (names.length === 3) {
-        if (['del', 'dal', 'de', 'di', 'da', 'della'].includes(names[1].toLowerCase())) {
-            return await findPerson(people, names[0], `${names[1]} ${names[2]}`, affiliazione)
-        } else if ([
-                'carlo', 'laura', 'giovanni', 'letizia', 
-                'stella', 'federico', 'antonio',
-                'alessandra', 'agnese', 'james',
-                'gianluca', 'gipo', 'romani',
-                's.', 'g.', 'a.',
-            ].includes(names[1].toLowerCase())) {
-            return await findPerson(people, `${names[0]} ${names[1]}`, names[2], affiliazione)
-        }
-    }
-    console.log(`*** cannot convert name "${name}" to Person`)
-    return null 
-}
-
-
 const migrations = { 
     migration_test: async (db) => {
         return true
@@ -418,35 +393,43 @@ const migrations = {
         return true
     }, 
 
-    D20230127_import_groups_from_wordpress_2: async function(db) {
+    D20230127_import_groups_from_wordpress_8: async function(db) {
         const people = db.collection('people')
         const groups = db.collection('groups')
         const axios = require('axios')
-        let URL=`https://www.dm.unipi.it/wp-json/wp/v2/typology`
-        console.log(`fetch: ${URL}`)
-        const response = await axios.get(URL)
-        const names = {}
-
+        let page = 0
         console.log(`clear collection groups`)
         await groups.deleteMany({})
 
-        for (const record of response.data) {
-            console.log(JSON.stringify(record.name)) 
-            URL = `https://www.dm.unipi.it/wp-json/wp/v2/people?typology=${record.id}`
-            console.log(`fetch: ${URL}` )
-            const res = await axios.get(URL)
-            console.log(res.data)
-            let members = []
-            for (const person of res.data) {
-                const p = await findPerson(people, person.acf.nome, person.acf.cognome, 'Università di Pisa')
-                members.push(p._id)
-            }
-            await groups.insertOne({
-                name: record.name,
-                members
-            })
-        }
+        while (true) {
+            page++
+            let URL=`https://www.dm.unipi.it/wp-json/wp/v2/typology?per_page=100&page=${page}`
+            console.log(`fetch: ${URL}`)
+            const response = await axios.get(URL)
+            console.log(`found ${response.data.length} groups`)
 
+            for (const record of response.data) {
+                console.log(JSON.stringify(record.name)) 
+                URL = `https://www.dm.unipi.it/wp-json/wp/v2/people?typology=${record.id}&per_page=100`
+                console.log(`fetch: ${URL}` )
+                const res = await axios.get(URL)
+                console.log(`found ${res.data.length} members`)
+                let members = []
+                if (res.data.length === 100) {
+                    console.log(`too many members for group ${record.name}!`)
+                    return false    
+                }
+                for (const person of res.data) {
+                    const p = await findPerson(people, person.acf.nome, person.acf.cognome, 'Università di Pisa')
+                    members.push(p._id)
+                }
+                await groups.insertOne({
+                    name: record.name,
+                    members
+                })
+            }
+            if (response.data.length < 100) break
+        }
         return true
     },        
 }
