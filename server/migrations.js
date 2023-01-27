@@ -417,6 +417,38 @@ const migrations = {
             { $set: { endDate: null } })
         return true
     }, 
+
+    D20230127_import_groups_from_wordpress_2: async function(db) {
+        const people = db.collection('people')
+        const groups = db.collection('groups')
+        const axios = require('axios')
+        let URL=`https://www.dm.unipi.it/wp-json/wp/v2/typology`
+        console.log(`fetch: ${URL}`)
+        const response = await axios.get(URL)
+        const names = {}
+
+        console.log(`clear collection groups`)
+        await groups.deleteMany({})
+
+        for (const record of response.data) {
+            console.log(JSON.stringify(record.name)) 
+            URL = `https://www.dm.unipi.it/wp-json/wp/v2/people?typology=${record.id}`
+            console.log(`fetch: ${URL}` )
+            const res = await axios.get(URL)
+            console.log(res.data)
+            let members = []
+            for (const person of res.data) {
+                const p = await findPerson(people, person.acf.nome, person.acf.cognome, 'Università di Pisa')
+                members.push(p._id)
+            }
+            await groups.insertOne({
+                name: record.name,
+                members
+            })
+        }
+
+        return true
+    },        
 }
 
 async function migrate(db) {
