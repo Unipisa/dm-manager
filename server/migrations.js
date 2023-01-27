@@ -288,7 +288,7 @@ const migrations = {
         return true
     },
 
-    D20230122_import_people_from_wordpress_12: async db => {
+    D20230122_import_people_from_wordpress_20: async db => {
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const rooms = db.collection('rooms')
@@ -314,13 +314,33 @@ const migrations = {
             //page = await response.json()
             data.push(...page)
         } while(page.length >= per_page)
-        console.log(data[data.length-1])
         console.log(`data length: ${data.length}`)
         console.log(`cancello collection staff`)
         staffs.deleteMany({})
         for (let record of data) {
             console.log(`**************** ${record.acf.nome} ${record.acf.cognome}`)
             console.log(`${record.link}`)
+            const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
+            console.log(`person: ${JSON.stringify(person)}`)
+            ;[   
+                ['gender','Genere'], 
+                ['email', 'email'], 
+                ['phone', 'telefono'], 
+                ['personalPage', 'pagina_personale'], 
+                ['orcid','orcid'],
+                ['arxiv_orcid', 'arxiv_orcid'],
+                ['google_scholar', 'google_scholar'],
+                ['mathscinet', 'mathscinet'],
+            ].forEach(([field, wpfield]) => {
+                if (!person[field]) {
+                    if (record.acf[wpfield]) {
+                        console.log(`assegna ${field}: ${record.acf[wpfield]}`)
+                        people.findOneAndUpdate({_id: person._id}, {$set: {[field]: record.acf[wpfield]}})
+                    }
+                } else if (person[field] !== record.acf[wpfield]) {
+                    failure(record, `${field} non corrisponde ${person[field]}!=${record.acf[wpfield]}`)
+                }
+            })
             if (['', 'Studente', 'Docente Esterno', 'non in servizio'].includes(record.acf.qualifica)) {
                 console.log(`salta qualifica: ${record.acf.qualifica}`)
                 continue
@@ -334,31 +354,28 @@ const migrations = {
                 failure(record, `invalid qualification: ${record.acf.qualifica}`)
                 continue
             }
-            const person = await findPerson(people, record.acf.nome, record.acf.cognome, 'Università di Pisa')
-            console.log(`person: ${JSON.stringify(person)}`)
-            ;[   
-                ['gender','Genere'], 
-                ['email', 'email'], 
-                ['phone', 'telefono'], 
-                ['personalPage', 'pagina_personale'], 
-                ['orcid','orcid'],
-                ['arxiv_orcid', 'arxiv_orcid'],
-                ['google_scholar', 'google_scholar'],
-                ['mathscinet', 'mathscinet'],
-                ['cn_ldap', 'cn_ldap']
-            ].forEach(([field, wpfield]) => {
-                if (!person[field]) {
-                    if (record.acf[wpfield]) {
-                        console.log(`assegna ${field}: ${record.acf[wpfield]}`)
-                        people.findOneAndUpdate({_id: person._id}, {$set: {[field]: record.acf[wpfield]}})
-                    }
-                } else if (person[field] !== record.acf[wpfield]) {
-                    failure(record, `${field} non corrisponde ${person[field]}!=${record.acf[wpfield]}`)
+            let staff = {
+                "person": person._id,
+                startDate: null,
+                endDate: null,
+                wordpressId: record.id,
+                matricola: record.acf.username,
+                qualification: record.acf.qualifica,
+                SSD: record.acf.ssd,
+                cn_ldap: record.acf.cn_ldap,
+                notes: `wordpressLink: ${record.link}`
+            }
+            if (record.acf.ciclo_dottorato) {
+                if (record.acf.qualifica !== 'Dottorando') {
+                    // inserisce due record
+                    await staffs.insertOne({...staff})
                 }
-            })
-            if (record.acf.stanza 
-                && record.acf.stanza !== '0' 
-                && record.acf.stanza !== 'a') {
+                staff.qualification = 'Dottorando'
+                staff.startDate = new Date(`${parseInt(record.acf.ciclo_dottorato) + 1985}-11-01T00:00:00.000Z`)
+                staff.endDate = new Date(`${parseInt(record.acf.ciclo_dottorato) + 1989}-11-01T00:00:00.000Z`)
+            }
+            await staffs.insertOne(staff)
+            if (record.acf.stanza) {
                 if (record.acf.edificio === 'Ex Albergo') record.acf.edificio='X'
                 room = await rooms.findOne({
                     building: record.acf.edificio,
@@ -378,20 +395,6 @@ const migrations = {
                     { upsert: true } // options
                 )
             }
-
-            const staff = await staffs.insertOne({
-                "person": person._id,
-                wordpressId: record.id,
-                matricola: record.acf.username,
-                qualification: record.acf.qualifica,
-                SSD: record.acf.ssd,
-                orcid: record.acf.orcid,
-                arxiv_orcid: record.acf.arxiv_orcid,
-                google_scholar: record.acf.google_scholar,
-                mathscinet: record.acf.mathscinet,
-                cn_ldap: record.acf.cn_ldap,
-                notes: `wordpressLink: ${record.link}`
-            })
         }
         if (failed.length) {
             console.log(`==> migration failures:`)
