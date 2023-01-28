@@ -45,6 +45,12 @@ jobs:
         context: .
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.8.0
+      with:
+        mongodb-version: ${{ matrix.mongodb-version }}
+    - name: Run tests
+      run: REACT_APP_SERVER_URL="" npm run build
     - name: Trigger update on Watchtower
       if: ${{ github.event_name != 'pull_request' }}
       run: |
