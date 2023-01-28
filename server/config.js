@@ -29,6 +29,7 @@ class Options {
             OAUTH2_CLIENT_SECRET: null,
             OAUTH2_USERNAME_FIELD: "email",
             MONGO_URI: "mongodb://localhost:27017/dm-manager",
+            MONGO_TEST_URI: "mongodb://localhost:27017/dm-manager-test",
             ADMIN_USER: null,
             ADMIN_PASSWORD: null,
             SERVER_URL: null,

@@ -35,9 +35,7 @@ if (config.OAUTH2_CLIENT_ID) {
   console.log("set OAUTH2_CLIEND_ID to enable")
 }
 
-const app = express()
-
-function setup_routes() {
+function setup_routes(app) {
   app.use(cors(
     {
       origin: config.CORS_ORIGIN.split(","),
@@ -94,7 +92,6 @@ function setup_routes() {
   app.post('/login/password',
     passport.authenticate('local'),
     function(req, res) {
-      console.log(`login/password body: ${req.body}`)
       const user = req.user.toObject()
       console.log(`login ${JSON.stringify(user)}`)
       res.send({ user })
@@ -156,6 +153,7 @@ function setup_routes() {
     }
   })
   
+
   app.get('/hello', (req, res) => {
     console.log(`params: ${JSON.stringify(req.params)}`)
     console.log(`query: ${JSON.stringify(req.query)}`)
@@ -179,8 +177,6 @@ function setup_routes() {
     console.error(err)
   })
 }
-
-
 
 async function create_admin_user() {
   const username = config.ADMIN_USER
@@ -244,6 +240,33 @@ async function create_secret_token() {
   }
 }
 
+function createApp() {
+  const app = express()
+  setup_routes(app)
+  return app
+}
+
+async function setupDatabase() {
+  if (process.env.NODE_ENV === 'test') {
+    try {
+      await mongoose.connect(config.MONGO_TEST_URI)
+    } catch(error) {
+      console.log(`Unable to connect to database: ${config.MONGO_URI_TEST}`)
+      return null
+    }
+    return mongoose.connection
+  }
+  console.log(`connecting to database: ${config.MONGO_URI}`)
+  try {
+    await mongoose.connect(config.MONGO_URI)
+  } catch(error) {
+    console.log(`ERROR: unable to connect to database... quitting`)
+    process.exit(1)
+  }
+  console.log('MongoDB is connected')
+  return mongoose.connection
+}
+
 async function serve() {
   console.log(`
  ___    ___ ___         ___ ___   ____  ____    ____   ____    ___  ____  
@@ -261,14 +284,8 @@ async function serve() {
     if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
     console.log(`  ${key}: ${val}`)
   }
-  console.log(`connecting to database: ${config.MONGO_URI}`)
-  try {
-    await mongoose.connect(config.MONGO_URI)
-  } catch(error) {
-    console.log(`ERROR: unable to connect to database... quitting`)
-    process.exit(1)
-  }
-  console.log('MongoDB is connected')
+
+  await setupDatabase()
 
   for (let arg of process.argv.slice(2)) {
     if (arg === '--clear-sessions' || arg === '-c') {
@@ -280,11 +297,11 @@ async function serve() {
       process.exit(1)
     }
   }
-
-  setup_routes()
-
+  
   await create_admin_user()
   await create_secret_token()
+  
+  const app = createApp()
 
   if (!await migrations.migrate(mongoose.connection.db)) {
     console.log(`server aborting`)
@@ -296,4 +313,14 @@ async function serve() {
   })
 }
 
-serve() // start server
+if (process.env.NODE_ENV !== 'test') {
+  serve() // start server
+}
+
+// export functionality for testing suite
+module.exports = {
+  createApp,
+  setupDatabase,
+  create_admin_user,
+}
+ 
