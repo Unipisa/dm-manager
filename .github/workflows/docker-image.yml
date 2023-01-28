@@ -36,6 +36,12 @@ jobs:
         username: ${{ secrets.HARBOR_ROBOT_USERNAME }}
         password: ${{ secrets.HARBOR_ROBOT }}
         registry: harbor.cs.dm.unipi.it
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.8.0
+      with:
+        mongodb-version: '6.0'
+    - name: Run tests
+      run: REACT_APP_SERVER_URL="" npm run build
     - name: Build and push
       id: docker_build
       uses: docker/build-push-action@v3
@@ -45,12 +51,6 @@ jobs:
         context: .
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-    - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.8.0
-      with:
-        mongodb-version: ${{ matrix.mongodb-version }}
-    - name: Run tests
-      run: REACT_APP_SERVER_URL="" npm run build
     - name: Trigger update on Watchtower
       if: ${{ github.event_name != 'pull_request' }}
       run: |
