@@ -24,7 +24,7 @@ jobs:
       with:
         mongodb-version: '6.0'
     - name: Run tests
-      run: REACT_APP_SERVER_URL="" npm run test
+      run: REACT_APP_SERVER_URL="" npm test
     - name: Extract version number
       run: echo VERSION=$( node -e 'console.log(require("./package.json").version)' ) >> $GITHUB_ENV
     - name: Docker meta
