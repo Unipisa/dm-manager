@@ -1,4 +1,4 @@
-import { Route, Link, NavLink } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 
 import ModelPage from '../pages/ModelPage'
 import ModelsPage from '../pages/ModelsPage'
@@ -69,9 +69,7 @@ export default class Model {
 
     // react routers to object pages
     routers() {
-        const Model = this
-        
-        const MyModelsPage = ({}) => {
+        const MyModelsPage = ({ Model }) => {
             // react component to render index page
             // cannot use directly ModelsPage because
             // otherwise react thinks it is the same component
@@ -79,13 +77,13 @@ export default class Model {
             return <ModelsPage Model={Model} />
         }
         let MyIndex = null
-        if (Model.IndexPage === ModelsPage) MyIndex = MyModelsPage
-        else if (Model.IndexPage) MyIndex = Model.IndexPage
+        if (this.IndexPage === ModelsPage) MyIndex = MyModelsPage
+        else if (this.IndexPage) MyIndex = this.IndexPage
 
         const indexRouter = MyIndex
-            && <Route path={this.indexUrl()} element={<MyIndex />} />
-        const pageRouter = Model.ViewPage 
-            && <Route path={this.pageUrl(":id")} element={<Model.ViewPage Model={Model}/>} />
+            && <Route path={this.indexUrl()} element={<MyIndex Model={this}/>} />
+        const pageRouter = this.ViewPage 
+            && <Route path={this.pageUrl(":id")} element={<this.ViewPage Model={this}/>} />
 
         return [indexRouter, pageRouter].filter(x => x)
     }    
