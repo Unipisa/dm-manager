@@ -50,7 +50,8 @@ class Controller {
 
         if (this.Model) {
             // inspect Model to populate controller properties
-            this.add_fields_from_model()
+            this.fields = Model._schema_info.properties
+//            this.add_fields_from_model()
             this.add_fields_population_from_model()
         }
     }

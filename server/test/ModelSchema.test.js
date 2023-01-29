@@ -125,13 +125,6 @@ const expected = {
           "can_sort": true,
           "can_filter": true
         },
-        "code": {
-          "type": "string",
-          "label": "codice",
-          "hidden": true,
-          "can_sort": true,
-          "can_filter": true
-        },
         "createdBy": {
           "type": "string",
           "x-ref": "User",
@@ -184,8 +177,6 @@ const expected = {
         "supervisor",
         "room-manager",
         "room-supervisor",
-        "assignment-manager",
-        "assignment-supervisor"
       ]
     },
     "RoomAssignment": {
