@@ -1,6 +1,6 @@
 import { useEngine } from '../Engine'
 import PersonDetails from './PersonDetails'
-import RoomAssignmentHelper from './RoomAssignmentHelper'
+import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
 
 export default function StaffDetails({obj}) {
     const engine = useEngine()

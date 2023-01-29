@@ -130,7 +130,7 @@ class Controller {
                 } else if (info.ref === 'Room') {
                     this.populateFields.push({
                         path: field,
-                        select: ['number', 'floor', 'building']
+                        select: ['code', 'number', 'floor', 'building']
                     })
                     this.queryPipeline.push(
                         {$lookup: {
@@ -216,8 +216,7 @@ class Controller {
                         $sort[`${value}.${field}`] = direction
                     })
                 }
-            }
-            else if (key == '_search') {
+            } else if (key == '_search') {
                 // Implement a custom filter over searchable fields
                 for (let field of this.searchFields) {
                     search_conditions.push({

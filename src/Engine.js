@@ -1,4 +1,4 @@
-import moment from 'moment'
+import moment, { max } from 'moment'
 import { useState, createContext, useContext, useEffect } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
@@ -272,7 +272,15 @@ export function useQueryFilter(initial) {
     }
 }
 
+export const minDate = new Date(-8640000000000000)
+export const maxDate = new Date(8640000000000000)
+
 export function myDateFormat(date) {
-    return date ? moment(date).format('D.M.YYYY') : "---"
+    if (date === undefined) return '???'
+    if (date === null) return '---'
+    date = moment(date)
+    if (date < minDate) return '---'
+    if (date > maxDate) return '---'
+    return moment(date).format('D.M.YYYY')
 }
 

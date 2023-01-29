@@ -1,6 +1,6 @@
 import { useEngine } from '../Engine'
 import PersonDetails from './PersonDetails'
-import RoomAssignmentHelper from './RoomAssignmentHelper'
+import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
 
 export default function VisitDetails({obj}) {
     const engine = useEngine()
@@ -9,6 +9,9 @@ export default function VisitDetails({obj}) {
     if (visit.person === null) return
     let elements = []
     const Person = engine.Models.Person
+
+    console.assert(!obj.startDate || obj.startDate instanceof Date)
+    console.assert(!obj.endDate || obj.endDate instanceof Date)
 
     console.log(`RoomAssignment.schema: ${engine.Models.RoomAssignment.schema}`)
 
