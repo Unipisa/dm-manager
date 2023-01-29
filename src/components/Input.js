@@ -179,7 +179,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        api.get(`/api/v0/${objCode}`, {_search: query}).then((data) => {
+        api.get(`/api/v0/${objCode}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
             })

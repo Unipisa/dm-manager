@@ -12,14 +12,16 @@ export default function RelatedDetails({related}) {
                         ? `---`
                         : info.data.map(obj => {
                         switch(info.modelName) {
-                            case 'Visit':
-                                return <a href={`/${info.url}/${obj._id}`}>visita {myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}</a>
                             case 'Grant':
                                 return <a href={`/${info.url}/${obj._id}`}>grant {obj.identifier || obj.name}</a>
+                            case 'Visit':
+                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: visita</a>
                             case 'RoomAssignment':
-                                return <a href={`/${info.url}/${obj._id}`}>{obj.person.lastName} {obj.person.firstName} stanza {obj.room.number}, Piano {obj.room.floor}, Edificio {obj.room.building}, {myDateFormat(obj.startDate)}-{myDateFormat(obj.endDate)}</a>
+                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} stanza {obj.room.number}, Piano {obj.room.floor}, Edificio {obj.room.building}</a>
                             case 'Staff':
-                                return <a href={`/${info.url}/${obj._id}`}> {myDateFormat(obj.startDate)}-{myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} {obj.qualification }</a>
+                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} {obj.qualification }</a>
+                            case 'Group':
+                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.name}</a>
                             default:
                                 return <span>not implemented {JSON.stringify(info)}</span>
                         }

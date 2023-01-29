@@ -35,9 +35,7 @@ if (config.OAUTH2_CLIENT_ID) {
   console.log("set OAUTH2_CLIEND_ID to enable")
 }
 
-const app = express()
-
-function setup_routes() {
+function setup_routes(app) {
   app.use(cors(
     {
       origin: config.CORS_ORIGIN.split(","),
@@ -94,9 +92,8 @@ function setup_routes() {
   app.post('/login/password',
     passport.authenticate('local'),
     function(req, res) {
-      console.log(`login/password body: ${req.body}`)
       const user = req.user.toObject()
-      console.log(`login ${JSON.stringify(user)}`)
+      console.log(`login ${user.username} roles: ${user.roles}`)
       res.send({ user })
     })
   
@@ -156,6 +153,7 @@ function setup_routes() {
     }
   })
   
+
   app.get('/hello', (req, res) => {
     console.log(`params: ${JSON.stringify(req.params)}`)
     console.log(`query: ${JSON.stringify(req.query)}`)
@@ -180,40 +178,60 @@ function setup_routes() {
   })
 }
 
+async function createOrUpdateUser({
+    username, 
+    password,
+    lastName,
+    firstName, 
+    email, 
+    roles, }) {
+  if (!username) throw new Error("username is required")
+  if (!lastName) lastName = username
+  if (!firstName) firstName = username
+  if (!roles) roles = []
 
+  let user = await User.findOne({ username })
+  if (!user) {
+    user = await User.create({ 
+      username, 
+      lastName,
+      firstName,
+      email,
+      roles,
+    })
+  } else {
+    await User.findByIdAndUpdate(user._id, {
+      username,
+      lastName,
+      firstName,
+      email,
+      roles,
+      })
+  }
+  if (password) {
+      await user.setPassword(password)
+      await user.save()
+  }
+  return user
+}
 
 async function create_admin_user() {
   const username = config.ADMIN_USER
   const password = config.ADMIN_PASSWORD
   
   if (username) {
-    let admin = await User.findOne({ username })
-    if (!admin) {
-      admin = await User.create({ 
-        username, 
-        lastName: "Admin",
-        firstName: "Admin",
-        roles: ['admin'] 
-      })
-      console.log(`Create user "${admin.username}"`)
-    }
+    const admin = createOrUpdateUser({
+      username,
+      password,
+      roles: ['admin'],
+    })
     if (password) {
-        await admin.setPassword(password)
-        await admin.save()
         console.log(`Password reset for user "${admin.username}"`)
     } else {
       console.log(`Password not provided (set ADMIN_PASSWORD)`)
     }
-    if (!admin.roles || !admin.roles.includes('admin')) {
-      admin.roles.push('admin')
-      await admin.save()
-    }
-    if (!admin.lastName) {
-      admin.lastName = "Admin"
-      admin.firstName = "Admin"
-      await admin.save()
-    }
   }
+
   const n = await User.countDocuments({})
   if ( n == 0) {
     console.log(`No users in database. Create one by setting ADMIN_USER and ADMIN_PASSWORD`)
@@ -244,6 +262,33 @@ async function create_secret_token() {
   }
 }
 
+function createApp() {
+  const app = express()
+  setup_routes(app)
+  return app
+}
+
+async function setupDatabase() {
+  if (process.env.NODE_ENV === 'test') {
+    try {
+      await mongoose.connect(config.MONGO_TEST_URI)
+    } catch(error) {
+      console.log(`Unable to connect to database: ${config.MONGO_URI_TEST}`)
+      return null
+    }
+    return mongoose.connection
+  }
+  console.log(`connecting to database: ${config.MONGO_URI}`)
+  try {
+    await mongoose.connect(config.MONGO_URI)
+  } catch(error) {
+    console.log(`ERROR: unable to connect to database... quitting`)
+    process.exit(1)
+  }
+  console.log('MongoDB is connected')
+  return mongoose.connection
+}
+
 async function serve() {
   console.log(`
  ___    ___ ___         ___ ___   ____  ____    ____   ____    ___  ____  
@@ -261,14 +306,8 @@ async function serve() {
     if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
     console.log(`  ${key}: ${val}`)
   }
-  console.log(`connecting to database: ${config.MONGO_URI}`)
-  try {
-    await mongoose.connect(config.MONGO_URI)
-  } catch(error) {
-    console.log(`ERROR: unable to connect to database... quitting`)
-    process.exit(1)
-  }
-  console.log('MongoDB is connected')
+
+  await setupDatabase()
 
   for (let arg of process.argv.slice(2)) {
     if (arg === '--clear-sessions' || arg === '-c') {
@@ -280,11 +319,11 @@ async function serve() {
       process.exit(1)
     }
   }
-
-  setup_routes()
-
+  
   await create_admin_user()
   await create_secret_token()
+  
+  const app = createApp()
 
   if (!await migrations.migrate(mongoose.connection.db)) {
     console.log(`server aborting`)
@@ -296,4 +335,15 @@ async function serve() {
   })
 }
 
-serve() // start server
+if (process.env.NODE_ENV !== 'test') {
+  serve() // start server
+}
+
+// export functionality for testing suite
+module.exports = {
+  createApp,
+  setupDatabase,
+  createOrUpdateUser,
+  create_admin_user,
+}
+ 
