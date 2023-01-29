@@ -249,23 +249,7 @@ class Controller {
         }
     }
 
-    async search(req, res) {
-        const $search = req.query.q || ''
-        const $escapedsearch = $search.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
-
-        var data = []
-        for (var field of this.searchFields) {
-            data = [ ...data, 
-                ...await this.Model.find({ [field]: { $regex: new RegExp($escapedsearch, "i") }}).limit(10)
-            ]
-        }
-
-        return res.send({ data })
-    }
-
-    async index (req, res) {
-        console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
-
+    async performQuery(query, res) {
         let $matches = []
         let $match_lookups = {}
         let $sort = {_id: 1}
@@ -277,8 +261,8 @@ class Controller {
 
         const fields = this.fields
 
-        for (let key in req.query) {
-            let value = req.query[key];
+        for (let key in query) {
+            let value = query[key];
             const key_parts = key.split('__')
             const key0 = key_parts[0]
 
@@ -458,6 +442,16 @@ class Controller {
             filter,
             total
         })
+    }
+
+    async search(req, res) {
+        console.log(`SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
+        return this.performQuery({_search: req.query.q || ''}, res)
+    }
+
+    async index (req, res) {
+        console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
+        return this.performQuery(req.query, res)
     }
 
     async put(req, res) {
