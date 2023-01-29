@@ -18,6 +18,9 @@ const staffSchema = new Schema({
             'Assegnista', 'Dottorando', 'PTA', 
             'Collaboratore e Docente Esterno',
             'Professore Emerito',
+            'Collaboratore',
+            'Docente Esterno',
+            'Dottorando Esterno'
         ]},
     startDate,
     endDate,

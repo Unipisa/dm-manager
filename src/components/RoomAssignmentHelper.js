@@ -132,10 +132,10 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
 }
 
 export default function RoomAssignmentHelper({ person, startDate, endDate }) {
-    return <Card>
+    return <Card className='mt-3'>
         <Card.Header>
             <h3>Assegnazione stanza {person.lastName} {person.firstName}</h3>
-            <h2>{myDateFormat(startDate)}-{myDateFormat(endDate)}</h2>
+            <h4>{myDateFormat(startDate)}-{myDateFormat(endDate)}</h4>
         </Card.Header>
         <Card.Body>
             <RoomAssignmentHelperBody person={person} startDate={startDate} endDate={endDate} />

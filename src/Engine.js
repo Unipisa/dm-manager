@@ -1,4 +1,4 @@
-import moment, { max } from 'moment'
+import moment from 'moment'
 import { useState, createContext, useContext, useEffect } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
