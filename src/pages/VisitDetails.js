@@ -19,7 +19,7 @@ export default function VisitDetails({obj}) {
         />)
     }
 
-    if (engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
+    if (person && engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
         elements.push(<p key='persona'><b>persona:</b> <a href={`/person/${person._id}`}>{person.lastName}, {person.firstName}</a></p>)
         elements.push(<PersonDetails key='PersonDetails' obj={visit.person} />)
     }

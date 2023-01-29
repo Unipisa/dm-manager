@@ -61,24 +61,21 @@ export function emptyObject(Model) {
     }
     return empty
 }
-
-export default function ModelForm({ Model, id }) {
+/*
+function ModelForm({ Model, id }) {
     const engine = useEngine()
-    const empty = emptyObject(engine.Models[Model.ModelName].schema)
-    const create = (id === 'new')
-    const objCode = Model.code
-    const query = engine.useGet(objCode, id)
+    const query = engine.useGet(Model.code, id)
     
-    if (create) return <ModelFormInternal Model={Model} original={empty} create={create}/>
-
     if (query.isError) return <div>errore caricamento</div>
     if (!query.isSuccess) return <div>caricamento...</div>
     
-    const obj = {...empty, ...(query.data || {})} 
-    return <ModelFormInternal Model={Model} original={obj} create={create}/>
-}
+    return <ModelFormInternal Model={Model} original={query.data}/>
+}*/
 
-function ModelFormInternal({ Model, original, create }) {
+export default function ModelForm({ Model, original }) {
+    const create = (original._id === undefined)
+    const [ edit, setEdit ] = useState(create)
+    const [obj, setObj] = useState(original)
     const objCode = Model.code
     const objName = Model.name
     const indexUrl = Model.indexUrl()
@@ -88,7 +85,6 @@ function ModelFormInternal({ Model, original, create }) {
     const ModelName = Model.ModelName
     const Details = Model.ObjectDetails
     const engine = useEngine()
-    const [ edit, setEdit ] = useState(create)
     const [ redirect, setRedirect ] = useState(null)
     const navigate = useNavigate()
     const putObj = engine.usePut(objCode, (obj) => {
@@ -103,7 +99,6 @@ function ModelFormInternal({ Model, original, create }) {
         engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
         setRedirect(indexUrl)
     })
-    const [obj, setObj] = useState(original)
 
     const changed = Object.entries(obj).some(([key, val])=>{
             return val !== original[key]})
