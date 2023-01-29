@@ -1,5 +1,5 @@
 const request = require('supertest')
-const { createApp, setupDatabase, create_admin_user } = require('../server')
+const { createApp, setupDatabase, create_admin_user, createOrUpdateUser } = require('../server')
 const http = require('http')
 const supertest = require('supertest')
 
@@ -13,8 +13,16 @@ beforeAll(async () => {
   connection = await setupDatabase()
   const server = createApp()
   app = supertest.agent(server)
-  await create_admin_user()
-  // console.log(`setup finished`)
+  await createOrUpdateUser({
+    username: 'admin',
+    password: 'secret',
+    roles: ['admin'],
+  })
+  await createOrUpdateUser({
+    username: 'visit-manager',
+    password: 'secret',
+    roles: ['visit-manager'],
+  })
 })
 
 afterAll(() => {
@@ -30,37 +38,60 @@ describe ('sanity checks', () => {
   })
 })
 
-describe('test API', () => {
+describe('test non logged user', () => {
   it('should respond', async () => {
-    const res = await app
+    await app
       .get('/api/v0/')
       .send({})
       .expect(200)
   })
   it('should check password ', async () => {
-    const res = await app
+    await app
       .post('/login/password')
       .send({ username: 'admin', password: 'invalid' })
       .expect(401)
   })
-  it('should reject listing to unauthorized users', async () => {
-    const res = await app
+  it('should reject listing', async () => {
+    await app
       .get('/api/v0/visit')
       .expect(401)
   })
-  it('should let admin login ', async () => {
-    const res = await app
+})
+
+describe('test admin user', () => {
+  it('can login ', async () => {
+    await app
       .post('/login/password')
       .send({ username: 'admin', password: 'secret' })
       .expect(200)
   })
-  it('should let admin list visits', async () => {
-    const res = await app
+  it('can list visits', async () => {
+    await app
       .get('/api/v0/visit')
       .expect(200)
   })
+  it('can search people', async () => {
+    await app
+      .get('/api/v0/person/search?_search=foo')
+      .expect(200)
+  })
 })
-/*
 
-curl 'http://localhost:8000/login/password' --data-raw '{"username":"admin","password":"secret"}'
-*/
+describe('test visit-manager', () => {
+  it('can login', async () => {
+    await app
+      .post('/login/password')
+      .send({ username: 'visit-manager', password: 'secret' })
+      .expect(200)
+  })
+  it('cannot list users', async () => {
+    await app
+      .get('/api/v0/user')
+      .expect(403)
+  })
+  it('can search people', async () => {
+    await app
+      .get('/api/v0/person/search?_search=foo')
+      .expect(200)
+  })
+})

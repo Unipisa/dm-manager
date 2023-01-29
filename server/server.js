@@ -93,7 +93,7 @@ function setup_routes(app) {
     passport.authenticate('local'),
     function(req, res) {
       const user = req.user.toObject()
-      console.log(`login ${JSON.stringify(user)}`)
+      console.log(`login ${user.username} roles: ${user.roles}`)
       res.send({ user })
     })
   
@@ -178,38 +178,60 @@ function setup_routes(app) {
   })
 }
 
+async function createOrUpdateUser({
+    username, 
+    password,
+    lastName,
+    firstName, 
+    email, 
+    roles, }) {
+  if (!username) throw new Error("username is required")
+  if (!lastName) lastName = username
+  if (!firstName) firstName = username
+  if (!roles) roles = []
+
+  let user = await User.findOne({ username })
+  if (!user) {
+    user = await User.create({ 
+      username, 
+      lastName,
+      firstName,
+      email,
+      roles,
+    })
+  } else {
+    await User.findByIdAndUpdate(user._id, {
+      username,
+      lastName,
+      firstName,
+      email,
+      roles,
+      })
+  }
+  if (password) {
+      await user.setPassword(password)
+      await user.save()
+  }
+  return user
+}
+
 async function create_admin_user() {
   const username = config.ADMIN_USER
   const password = config.ADMIN_PASSWORD
   
   if (username) {
-    let admin = await User.findOne({ username })
-    if (!admin) {
-      admin = await User.create({ 
-        username, 
-        lastName: "Admin",
-        firstName: "Admin",
-        roles: ['admin'] 
-      })
-      console.log(`Create user "${admin.username}"`)
-    }
+    const admin = createOrUpdateUser({
+      username,
+      password,
+      roles: ['admin'],
+    })
     if (password) {
-        await admin.setPassword(password)
-        await admin.save()
         console.log(`Password reset for user "${admin.username}"`)
     } else {
       console.log(`Password not provided (set ADMIN_PASSWORD)`)
     }
-    if (!admin.roles || !admin.roles.includes('admin')) {
-      admin.roles.push('admin')
-      await admin.save()
-    }
-    if (!admin.lastName) {
-      admin.lastName = "Admin"
-      admin.firstName = "Admin"
-      await admin.save()
-    }
   }
+
   const n = await User.countDocuments({})
   if ( n == 0) {
     console.log(`No users in database. Create one by setting ADMIN_USER and ADMIN_PASSWORD`)
@@ -321,6 +343,7 @@ if (process.env.NODE_ENV !== 'test') {
 module.exports = {
   createApp,
   setupDatabase,
+  createOrUpdateUser,
   create_admin_user,
 }
  
