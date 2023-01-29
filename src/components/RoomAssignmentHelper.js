@@ -132,8 +132,6 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
 }
 
 export default function RoomAssignmentHelper({ person, startDate, endDate }) {
-    console.assert(!startDate || typeof (startDate) === 'Date')
-    console.assert(!endDate || typeof (endDate) === 'Date')
     return <Card>
         <Card.Header>
             <h3>Assegnazione stanza {person.lastName} {person.firstName}</h3>

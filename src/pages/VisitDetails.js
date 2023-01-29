@@ -10,11 +10,6 @@ export default function VisitDetails({obj}) {
     let elements = []
     const Person = engine.Models.Person
 
-    console.assert(!obj.startDate || obj.startDate instanceof Date)
-    console.assert(!obj.endDate || obj.endDate instanceof Date)
-
-    console.log(`RoomAssignment.schema: ${engine.Models.RoomAssignment.schema}`)
-
     if (obj.person && obj.startDate && engine.user.hasSomeRole(...engine.Models.RoomAssignment.schema.supervisorRoles)) {
         elements.push(<RoomAssignmentHelper 
             key={RoomAssignmentHelper} 

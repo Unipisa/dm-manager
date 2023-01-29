@@ -81,7 +81,6 @@ export function useCreateEngine() {
 
                 setState(s => ({...s, config, user, Models}))
 
-                console.log(`config read: ${JSON.stringify(config)}`)
                 return config
             } catch(err) {
                 console.error(err)
