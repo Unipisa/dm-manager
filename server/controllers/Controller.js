@@ -51,7 +51,6 @@ class Controller {
         if (this.Model) {
             // inspect Model to populate controller properties
             this.fields = Model._schema_info.properties
-//            this.add_fields_from_model()
             this.add_fields_population_from_model()
         }
     }
@@ -71,21 +70,6 @@ class Controller {
             managerRoles: this.managerRoles,
             supervisorRoles: this.supervisorRoles,
         }
-    }
-
-    add_fields_from_model() {
-        /***
-         * Try to construct the fields information structure
-         * needed by controller to build the queries
-         * by inspecting the Model.
-         * The derived class will have the ability 
-         * to ignore or override these settings
-         ***/
-
-        Object.entries(this.Model._schema_info.properties)
-            .forEach(([field, info]) => {
-                this.fields[field] = info 
-            })
     }
 
     add_fields_population_from_model() {
