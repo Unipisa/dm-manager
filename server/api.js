@@ -52,3 +52,4 @@ router.get('/', (req, res) => {
 })
 
 module.exports = router
+module.exports.ModelSchemas = ModelSchemas

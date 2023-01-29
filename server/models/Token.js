@@ -1,17 +1,16 @@
 const crypto = require('crypto')
-const mongoose = require('mongoose-schema-jsonschema')()
-const { Schema } = mongoose
+
+const {
+    Schema, 
+    model, 
+    ObjectId,
+    createdBy, 
+    updatedBy, 
+    notes
+} = require('./Model')
 
 const tokenSchema = new Schema({
     name: String,
-    createdBy: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
-    },
-    updatedBy: { 
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
-    },
     token: {
         type: String,
         default: () => crypto.randomBytes(16).toString('hex'),
@@ -21,8 +20,12 @@ const tokenSchema = new Schema({
         type: [String],
         required: true,
     },
+    createdBy,
+    updatedBy,
  }, {
     timestamps: true // adds fields: createdAt, updatedAt
  })
 
-module.exports = mongoose.model('Token', tokenSchema)
+const Token = model('Token', tokenSchema)
+
+module.exports = Token

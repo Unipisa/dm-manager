@@ -1,9 +1,13 @@
-const mongoose = require('mongoose-schema-jsonschema')()
-const { Schema } = mongoose
+const {
+    Schema, 
+    model, 
+    ObjectId,
+    createdBy, 
+    updatedBy, 
+    notes
+} = require('./Model')
 
-const ObjectId = Schema.Types.ObjectId
-
-module.exports = mongoose.model('RoomLabel', new Schema({
+const RoomLabel = model('RoomLabel', new Schema({
     names: [String],
     number: String,
     size: Number, // la dimensione effettiva sara cm: 2^(size/2)
@@ -12,8 +16,10 @@ module.exports = mongoose.model('RoomLabel', new Schema({
         enum: ['submitted', 'managed'],
         default: 'submitted',
     },
-    createdBy: { type: ObjectId, ref: 'User' },
-    updatedBy: { type: ObjectId, ref: 'User' },
+    createdBy,
+    updatedBy,
 }, {
     timestamps: true
 }))
+
+module.exports = RoomLabel
