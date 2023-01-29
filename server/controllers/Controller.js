@@ -153,6 +153,11 @@ class Controller {
     }
 
     async get(req, res, id) {
+        if (id === 'new') {
+            const obj = (new this.Model()).toObject()
+            obj._id = undefined
+            return res.send(obj)
+        }
         try {
             let obj = await this.Model
                 .findById(id)

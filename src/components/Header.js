@@ -20,7 +20,9 @@ export default function Header() {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              { Object.values(Models).map(Model => Model.menuElement(user))}
+              { Object.values(Models)
+                .filter(Model => Model.MenuElement !== null)
+                .map(Model => <Model.MenuElement key={Model.code} Model={Model} user={user}/>)}
             </Nav>
           </Navbar.Collapse>
           <Nav className="right">

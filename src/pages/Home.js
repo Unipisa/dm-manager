@@ -6,8 +6,8 @@ export default function Home() {
   const user = engine.user
 
   const modelElements = Object.values(Models)
-    .map(Model => [Model, Model.homeElement(user)])
-    .filter(([Model, Element]) => Element !== null)
+    .filter(Model => Model.HomeElement !== null)
+    .map(Model => [Model, <Model.HomeElement Model={Model} user={user}/>])
 
   return <>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, puoi:</p>

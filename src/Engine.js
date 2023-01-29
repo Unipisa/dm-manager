@@ -81,7 +81,6 @@ export function useCreateEngine() {
 
                 setState(s => ({...s, config, user, Models}))
 
-                console.log(`config read: ${JSON.stringify(config)}`)
                 return config
             } catch(err) {
                 console.error(err)
@@ -150,7 +149,7 @@ export function useCreateEngine() {
                 [path, id], 
                 () => api.get(`/api/v0/${path}/${id}`), 
                 {
-                    enabled: id !== 'new',
+                 //   enabled: id !== 'new',
                     onError: (err) => addMessage(err.message, 'error'),
                 })
             return query
