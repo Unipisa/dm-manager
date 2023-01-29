@@ -50,20 +50,15 @@ class Controller {
 
         if (this.Model) {
             // inspect Model to populate controller properties
-            this.add_fields_from_model()
+            this.fields = Model._schema_info.properties
             this.add_fields_population_from_model()
         }
     }
 
     getSchema() {
-        const schema = this.Model.jsonSchema()
+        const schema = this.Model._schema_info
         const related = this.Model.relatedModels || []
-        const fields = Object.fromEntries(
-            Object.entries(schema.properties)
-            .map(([field,info]) => {
-                const myInfo = this.fields[field] || {}
-                return [field, {...info, ...myInfo}]
-            }))
+        const fields = schema.properties
         return {
             fields,
             related: related.map(related => ({
@@ -74,83 +69,6 @@ class Controller {
             path: this.path,
             managerRoles: this.managerRoles,
             supervisorRoles: this.supervisorRoles,
-        }
-    }
-
-    add_fields_from_model() {
-        /***
-         * Try to construct the fields information structure
-         * needed by controller to build the queries
-         * by inspecting the Model.
-         * The derived class will have the ability 
-         * to ignore or override these settings
-         ***/
-        function field_from_model_info(info) {
-            if (Array.isArray(info)) {
-                if (info.length !== 1) return
-                info = info[0]
-                if (info.ref === 'Person') {
-                    // elenco di ObjectId di Person
-                    return {
-                        can_filter: true,
-                        related_field: true,
-                        related_many: true,
-                    }
-                }
-                return
-            }
-            if (typeof info !== 'object') {
-                return
-            }
-            if (info.ref === 'Person') {
-                return {
-                    can_sort: ['lastName', 'firstName'],
-                    can_filter: true,
-                    related_field: true,
-                }
-            } else if (info.ref === 'Room') {
-                return {
-                    can_sort: ['building', 'floor', 'number'],
-                    can_filter: true,
-                    related_field: true,
-                }
-            } else {
-                switch(info.type) {
-                    case String: return {
-                            can_sort: true,
-                            can_filter: true,
-                        }
-                    case Date: return {
-                            can_sort: true,
-                            can_filter: true,
-                            match_date: true,
-                        }
-                    case Boolean: return {
-                        can_sort: true,
-                        can_filter: true,
-                        match_boolean: true,
-                    }
-                }
-            }
-        }
-
-        this.fields['_id'] = {
-            can_sort: true,
-            can_filter: true,
-            match_ids: true,
-        }
-
-        Object.entries(this.Model.schema.obj)
-            .forEach(([field, info]) => {
-                if (field === 'updatedBy') return
-                if (field === 'createdBy') return
-                const field_info = field_from_model_info(info)
-                if (field_info) this.fields[field] = field_info 
-            })
-
-        if (this.Model.schema.options.timestamps) {
-            this.fields['updatedAt'] = { can_sort: true }
-            this.fields['createdAt'] = { can_sort: true }
         }
     }
 
@@ -212,7 +130,7 @@ class Controller {
                 } else if (info.ref === 'Room') {
                     this.populateFields.push({
                         path: field,
-                        select: ['number', 'floor', 'building']
+                        select: ['code', 'number', 'floor', 'building']
                     })
                     this.queryPipeline.push(
                         {$lookup: {
@@ -298,8 +216,7 @@ class Controller {
                         $sort[`${value}.${field}`] = direction
                     })
                 }
-            }
-            else if (key == '_search') {
+            } else if (key == '_search') {
                 // Implement a custom filter over searchable fields
                 for (let field of this.searchFields) {
                     search_conditions.push({
@@ -445,12 +362,12 @@ class Controller {
     }
 
     async search(req, res) {
-        console.log(`SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
+        console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
         return this.performQuery({_search: req.query.q || ''}, res)
     }
 
     async index (req, res) {
-        console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
+        console.log(`*** INDEX ${req.path} ${JSON.stringify(req.query)}`)
         return this.performQuery(req.query, res)
     }
 
@@ -462,7 +379,9 @@ class Controller {
         }
         delete payload.createdAt
         delete payload.updatedAt
-    
+
+        console.log(`*** PUT ${JSON.stringify(payload)}`)
+
         try {
             log(req, {}, payload)
             const obj = await this.Model.create(payload)
@@ -474,12 +393,13 @@ class Controller {
     }
 
     async patch(req, res, id, payload) {    
-        console.log(`***PATCH ${id} ${JSON.stringify(payload)}`)
+        console.log(`*** PATCH ${id} ${JSON.stringify(payload)}`)
         try {
             const was = await this.Model.findById(id)
             log(req, was, payload)
-            const obj = await this.Model.findByIdAndUpdate(id, payload)
-            res.send(obj)
+            was.set({...was, ...payload})
+            was.save()
+            res.send(was)
         } catch(error) {
             console.error(error)
             res.status(400).send({error: err.message})

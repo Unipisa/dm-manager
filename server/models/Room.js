@@ -13,13 +13,19 @@ const schema = new Schema({
     building: {type: String, label: 'edificio', enum: ["A", "B", "X"]},
     nSeats: {type: Number, label: 'numero posti', default: 0},
     notes,
+    code: {type: String, label: 'codice', hidden: true},
     createdBy,
     updatedBy,
 }, {
     timestamps: true // adds fields: createdAt, updatedAt
 })
 
-const Room = model('Room', schema)
-Room.relatedModels = []
+schema.pre('save', function(next) {
+    this.code = `${this.building}${this.floor}:${this.number}`
+    next()
+})
 
+const Room = model('Room', schema)
 module.exports = Room
+
+Room.relatedModels = []

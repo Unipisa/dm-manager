@@ -9,9 +9,6 @@ class GrantController extends Controller {
         this.supervisorRoles.push('grant-manager', 'grant-supervisor')
         this.searchFields = ['identifier', 'description', 'name', 'pi.lastName', 'localCoordinator.lastName']
         this.searchRoles.push('visit-manager', 'grant-manager', 'grant-supervisor')
-        this.fields['SSD'] = {
-            'can_filter': true,
-        }
     }
 }
 

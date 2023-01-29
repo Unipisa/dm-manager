@@ -367,7 +367,7 @@ export function MultipleSelectInput({ options, label, value, setValue, edit }) {
 export function RoomInput({ label, value, setValue, edit }) {
     const engine = useEngine()
     const path = 'room'
-    const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_limit: 300}), {
+    const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_sort: 'code', _limit: 1000}), {
         onError: (err) => {
             engine.addMessage(err.message, 'error') },
         })
@@ -380,7 +380,7 @@ export function RoomInput({ label, value, setValue, edit }) {
             if (id === null) return '---'
             const room = data.get(id)
             if (room === undefined) return '???' // database inconsistency
-            return `${room.building} piano ${room.floor} stanza ${room.number}`
+            return room.code
         }}
         label={label} value={value} setValue={value => setValue(value?data.get(value):null)} edit={edit}
     />
