@@ -6,7 +6,7 @@ class RoomController extends Controller {
         super(Room)
         this.path = 'room'
         this.managerRoles.push('room-manager')
-        this.supervisorRoles.push('room-manager', 'room-supervisor')
+        this.supervisorRoles.push('room-manager', 'room-supervisor', 'assignment-manager', 'assignment-supervisor')
         this.searchFields = ['number', 'floor', 'building']
         this.searchRoles = ['room-manager', 'room-supervisor', 'assignment-manager']
     }
