@@ -38,6 +38,7 @@ export function SchemaInput({ field, schema, value, setValue, edit}) {
 export function SchemaInputs({ schema, obj, setObj, onChange, edit}) {
     let lst = []
     for (let [field, field_schema] of Object.entries(schema)) {
+        console.log(`*****schema input for ${field}: ${JSON.stringify(field_schema)}}`)
         if (RESERVED_FIELDS.includes(field)) continue
 
         const setValue = value => {
