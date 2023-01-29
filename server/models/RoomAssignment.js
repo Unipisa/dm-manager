@@ -62,6 +62,7 @@ RoomAssignment.personRoomAssignmentPipeline = () => ([
                 "startDate": 1,
                 "endDate": 1,
                 "room._id": 1,
+                "room.code": 1,
                 "room.building": 1,
                 "room.floor": 1,
                 "room.number": 1,

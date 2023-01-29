@@ -432,6 +432,12 @@ const migrations = {
         }
         return true
     },        
+
+    D20230129_set_code_for_rooms_4: async function(db) {
+        const rooms = db.collection('rooms')
+        await rooms.updateMany({}, [{ $set: { code: { $concat: [ "$building", "$floor", ":", "$number" ] } } }])
+        return true
+    },
 }
 
 async function migrate(db) {
