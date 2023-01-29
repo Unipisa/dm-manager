@@ -1,4 +1,5 @@
-import { Card } from 'react-bootstrap'
+import { Card, Button } from 'react-bootstrap'
+
 import { myDateFormat, useEngine, minDate, maxDate } from '../Engine'
 
 function RoomAssignmentHelperBody({ person, startDate, endDate }) {
@@ -106,7 +107,7 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
             <li key={assignment._id}>
                 {} in <a href={`/room/${assignment.room._id}`}>{assignment.room.code}</a> 
                 {} assegnazione <a href={`/roomassignment/${assignment._id}`}>{myDateFormat(assignment.startDate)}-{myDateFormat(assignment.endDate)}</a>
-                {} <button onClick={() => deleteRoomAssignment(assignment)}>rimuovi</button>
+                {} <Button className='mb-1' size='sm' variant='danger' onClick={() => deleteRoomAssignment(assignment)}>rimuovi</Button>
             </li>)}
         </ul>
         <h4>Elenco stanze e posti liberi nel periodo</h4>
@@ -116,9 +117,9 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
                 {} <b>posti:</b> {room.nSeats},
                 {} <b>occupati:</b> {room.occupiedSeats},
                 {} <b>liberi:</b> {room.freeSeats}
-                {} <button onClick={() => createAssignment(room)}>
+                {} <Button className='mb-1' size='sm' variant='warning' onClick={() => createAssignment(room)}>
                     assegna
-                </button>
+                    </Button>
                 <ul>
                     {room.periods.map(period =>
                         <li key={period.startDate}>
@@ -132,8 +133,6 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
 }
 
 export default function RoomAssignmentHelper({ person, startDate, endDate }) {
-    console.assert(!startDate || startDate instanceof Date)
-    console.assert(!endDate || endDate instanceof Date)
     return <Card className='mt-3'>
         <Card.Header>
             <h3>Assegnazione stanza {person.lastName} {person.firstName}</h3>

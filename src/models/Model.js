@@ -1,7 +1,9 @@
-import { Route, Link, NavLink } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 
 import ModelPage from '../pages/ModelPage'
 import ModelsPage from '../pages/ModelsPage'
+import ModelHomeElement from '../components/ModelHomeElement'
+import ModelMenuElement from '../components/ModelMenuElement'
 
 export default class Model {
     constructor() {
@@ -40,12 +42,18 @@ export default class Model {
         this.schema = null
 
         // react element of index
-        // if null use ModelsPage
-        this.IndexPage = null
+        this.IndexPage = ModelsPage
 
         // react element of object view
-        // if null use ModelPage
-        this.ViewPage = null
+        this.ViewPage = ModelPage
+
+        // react element to be inserted 
+        // in the home page
+        this.HomeElement = ModelHomeElement
+
+        // react element to be inserted
+        // in the header bar
+        this.MenuElement = ModelMenuElement
     }
 
     // brief description of given object
@@ -61,53 +69,22 @@ export default class Model {
 
     // react routers to object pages
     routers() {
-        const Model = this
-        
-        function MyIndex() {
+        const MyModelsPage = ({ Model }) => {
             // react component to render index page
-            // cannot use directly IndexPage
+            // cannot use directly ModelsPage because
             // otherwise react thinks it is the same component
             // for each model
-            const MyIndexPage = () => {
-                return <ModelsPage Model={Model} />
-            }
-    
-            if (Model.IndexPage) return <Model.IndexPage />
-            return <MyIndexPage />
+            return <ModelsPage Model={Model} />
         }
+        let MyIndex = null
+        if (this.IndexPage === ModelsPage) MyIndex = MyModelsPage
+        else if (this.IndexPage) MyIndex = this.IndexPage
 
-        function ViewPage() {
-            if (Model.ViewPage) return <Model.ViewPage />
-            return <ModelPage Model = { Model } />
-        }
-    
-        return [
-          <Route path={this.pageUrl(":id")} element={ViewPage()} />,
-          <Route path={this.indexUrl()} element={MyIndex()} />
-        ]
+        const indexRouter = MyIndex
+            && <Route path={this.indexUrl()} element={<MyIndex Model={this}/>} />
+        const pageRouter = this.ViewPage 
+            && <Route path={this.pageUrl(":id")} element={<this.ViewPage Model={this}/>} />
+
+        return [indexRouter, pageRouter].filter(x => x)
     }    
-
-    // return a react element to be inserted in 
-    // the home page
-    homeElement(user) {
-        if (user.hasSomeRole(...this.schema.managerRoles)) {
-            return <Link to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>
-        } else if (user.hasSomeRole(...this.schema.supervisorRoles)) {
-            return <Link to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>
-        } else {
-            return null
-        }
-    }
-
-    // return a menu element to be inserted in
-    // the header bar
-    menuElement(user) {
-        if (user && user.hasSomeRole(...this.schema.supervisorRoles)) {
-            return <NavLink key={this.code} to={this.indexUrl()} className="nav-link">
-                {this.articulation['oggetti']}
-            </NavLink>
-        } else {
-            return null
-        }
-    }
 }
