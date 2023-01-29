@@ -438,6 +438,17 @@ const migrations = {
         await rooms.updateMany({}, [{ $set: { code: { $concat: [ "$building", "$floor", ":", "$number" ] } } }])
         return true
     },
+
+    D20230129_set_group_dates_null_1: async function(db) {
+        const groups = db.collection('groups')
+        // set startDate and endDate to null
+        // if they are not defined
+        await groups.updateMany({"startDate": { $exists: false }},
+            { $set: { startDate: null } })
+        await groups.updateMany({"endDate": { $exists: false }},
+            { $set: { endDate: null } })
+        return true
+    }
 }
 
 async function migrate(db) {
