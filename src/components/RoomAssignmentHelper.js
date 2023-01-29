@@ -100,22 +100,25 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     rooms.sort((a,b) => (b.freeSeats-a.freeSeats))
 
     return <>
-        {assignments.filter(assignment => assignment.person._id === person._id).map(assignment =>
-            <p key={assignment._id}>
-                <a href={`/roomassignment/${assignment._id}`}>{assignment.person.lastName} {assignment.person.firstName}</a> 
+        <h4>Assegnazioni già inserite</h4>
+        <ul>
+            {assignments.filter(assignment => assignment.person._id === person._id).map(assignment =>
+            <li key={assignment._id}>
                 {} in <a href={`/room/${assignment.room._id}`}>{assignment.room.code}</a> 
                 {} assegnazione <a href={`/roomassignment/${assignment._id}`}>{myDateFormat(assignment.startDate)}-{myDateFormat(assignment.endDate)}</a>
                 {} <button onClick={() => deleteRoomAssignment(assignment)}>rimuovi</button>
-            </p>)}
+            </li>)}
+        </ul>
+        <h4>Elenco stanze e posti liberi nel periodo</h4>
         <ul>
             {rooms.map(room => <li key={room._id}>
-                <button onClick={() => createAssignment(room)}>
+                <b><a href={`/room/${room._id}`}>{room.code}</a></b>
+                {} <b>posti:</b> {room.nSeats},
+                {} <b>occupati:</b> {room.occupiedSeats},
+                {} <b>liberi:</b> {room.freeSeats}
+                {} <button onClick={() => createAssignment(room)}>
                     assegna
                 </button>
-                <b> <a href={`/room/${room._id}`}>{room.code}</a></b>
-                <b> posti:</b> {room.nSeats},
-                <b>occupati:</b> {room.occupiedSeats},
-                <b>liberi:</b> {room.freeSeats}
                 <ul>
                     {room.periods.map(period =>
                         <li key={period.startDate}>
