@@ -7,6 +7,7 @@ import { useQuery } from 'react-query'
 
 import api from '../api'
 import { myDateFormat, useEngine } from '../Engine'
+import Loading from './Loading'
 
 export function StringInput({ label, value, setValue, edit }) {
     const id = useId()
@@ -371,7 +372,7 @@ export function RoomInput({ label, value, setValue, edit }) {
         onError: (err) => {
             engine.addMessage(err.message, 'error') },
         })
-    if (query.isLoading) return <span>loading...</span>
+    if (query.isLoading) return <Loading />
     const data = new Map(query.data.data.map(room => ([room._id, room])))
     if (value && value._id) value = value._id
     return <SelectInput 

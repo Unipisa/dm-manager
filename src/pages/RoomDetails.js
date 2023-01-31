@@ -2,11 +2,12 @@ import {Link} from 'react-router-dom'
 
 import { useEngine, myDateFormat } from '../Engine'
 import RelatedDetails from './RelatedDetails'
+import Loading from '../components/Loading'
 
 function RoomAssignments({room}) {
     const engine = useEngine()
     const assignmentsQuery = engine.useIndex('roomAssignment', {'room': room._id, '_sort': '-startDate'})
-    if (!assignmentsQuery.isSuccess) return <>loading...</>
+    if (!assignmentsQuery.isSuccess) return <Loading />
     const assignments = assignmentsQuery.data.data
     return <ul>
         { assignments.map(assignment => <li key={assignment._id}>
