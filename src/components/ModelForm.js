@@ -61,21 +61,87 @@ export function emptyObject(Model) {
     }
     return empty
 }
-/*
-function ModelForm({ Model, id }) {
-    const engine = useEngine()
-    const query = engine.useGet(Model.code, id)
-    
-    if (query.isError) return <div>errore caricamento</div>
-    if (!query.isSuccess) return <div>caricamento...</div>
-    
-    return <ModelFormInternal Model={Model} original={query.data}/>
-}*/
+
+function Timestamps({ obj, oa }) {
+    oa = oa || 'o'
+    return <>
+        <p style={{align: "right"}}>
+            Creat{oa} da <b>{obj.createdBy?.username || '???'}</b> 
+            {' '}il <b>{myDateFormat(obj.createdAt)}</b>
+        <br />
+            Modificat{oa} da <b>{obj.updatedBy?.username || '???'}</b> 
+            {' '}il <b>{myDateFormat(obj.updatedAt)}</b>
+        </p>
+    </>
+}
 
 export default function ModelForm({ Model, original }) {
     const create = (original._id === undefined)
     const [ edit, setEdit ] = useState(create)
-    const [obj, setObj] = useState(original)
+    const Details = Model.ObjectDetails
+    const objName = Model.name
+    const oa = Model.oa 
+    const describe = Model.describe.bind(Model)
+    const navigate = useNavigate()
+
+    if (edit) return <>
+        <Card>
+            <Card.Header>
+                <h3>{ `nuov${oa} ${objName}` }</h3>
+            </Card.Header>
+            <Card.Body>
+                <ModelEdit Model={Model} obj={original} setEdit={setEdit}/>
+            </Card.Body>
+            <Card.Footer>
+                <Timestamps obj={original} />
+            </Card.Footer>
+        </Card>
+    </>
+    
+    if (!edit) return <>
+        <Card>
+            <Card.Header>
+                <h3>{ `${objName} ${describe(original)}` }</h3>
+            </Card.Header>
+            <Card.Body>
+                <ModelView Model={Model} create={create} edit={edit} obj={original} setEdit={setEdit}/>
+            </Card.Body>
+            <Card.Footer>
+                <Timestamps obj={original} />
+            </Card.Footer>
+        </Card>
+        { Details && <Details obj={original} /> }
+    </>
+}
+
+function ModelView({Model, obj, setEdit}) {
+    const navigate = useNavigate()
+
+    return <>
+        <SchemaInputs 
+                schema={Model.schema.fields} 
+                obj={obj} 
+                edit={false}
+            />
+        <ButtonGroup>
+            <Button 
+                onClick={ () => setEdit(true) }
+                className="btn-warning">
+                modifica
+            </Button>
+            <Button 
+                onClick={ () => navigate(-1) }
+                className="btn btn-secondary">
+                    torna all'elenco
+            </Button>
+        </ButtonGroup>
+    </>
+}
+
+function ModelEdit({Model, obj, setEdit}) {
+    const edit = true
+    const create = (obj._id === undefined)
+    const [modifiedObj, setModifiedObj] = useState(obj)
     const objCode = Model.code
     const objName = Model.name
     const indexUrl = Model.indexUrl()
@@ -83,7 +149,6 @@ export default function ModelForm({ Model, original }) {
     const describe = Model.describe.bind(Model)
     const onChange = Model.onObjectChange.bind(Model)
     const ModelName = Model.ModelName
-    const Details = Model.ObjectDetails
     const engine = useEngine()
     const [ redirect, setRedirect ] = useState(null)
     const navigate = useNavigate()
@@ -92,7 +157,7 @@ export default function ModelForm({ Model, original }) {
         setRedirect(indexUrl)
     })
     const patchObj = engine.usePatch(objCode, (response) => {
-        engine.addInfoMessage(`${objName} ${describe(obj)} modificat${oa}`)
+        engine.addInfoMessage(`${objName} ${describe(modifiedObj)} modificat${oa}`)
         setRedirect(indexUrl)
     })
     const deleteObj = engine.useDelete(objCode, (response, obj) => {
@@ -100,19 +165,19 @@ export default function ModelForm({ Model, original }) {
         setRedirect(indexUrl)
     })
 
-    const changed = Object.entries(obj).some(([key, val])=>{
-            return val !== original[key]})
+    const changed = Object.entries(modifiedObj).some(([key, val])=>{
+            return val !== obj[key]})
 
     const submit = async (evt) => {
-        console.log(`SUBMIT. original: ${JSON.stringify(original)} obj: ${JSON.stringify(obj)}`)
-        if (obj._id) {
-            let payload = Object.fromEntries(Object.keys(original)
-                .filter(key => obj[key]!==original[key])
-                .map(key => ([key, obj[key]])))
-            payload._id = obj._id
+        console.log(`SUBMIT. obj: ${JSON.stringify(obj)} obj: ${JSON.stringify(modifiedObj)}`)
+        if (modifiedObj._id) {
+            let payload = Object.fromEntries(Object.keys(obj)
+                .filter(key => modifiedObj[key]!==obj[key])
+                .map(key => ([key, modifiedObj[key]])))
+            payload._id = modifiedObj._id
             patchObj(payload)
         } else {
-            putObj(obj)
+            putObj(modifiedObj)
         }
     }
 
@@ -121,56 +186,26 @@ export default function ModelForm({ Model, original }) {
     // console.log(`ModelPage obj: ${JSON.stringify(obj)}`)
 
     return <>
-    <Card>
-        <Card.Header>
-            <h3>{ create ? `nuov${oa} ${objName}` : `${objName} ${describe(obj)}` }</h3>
-        </Card.Header>
-        <Card.Body>
         <Form onSubmit={ (event) => event.preventDefault() }>
-            <SchemaInputs schema={engine.Models[ModelName].schema.fields} obj={obj} setObj={setObj} onChange={onChange && onChange(setObj)} edit={edit}/>
-            { edit ?
-                <ButtonGroup className="mt-3">
-                    <Button 
-                        onClick={ submit } 
-                        className="btn-primary"
-                        disabled= { !changed }>
-                        {create?`aggiungi ${objName}`:`salva modifiche`}
-                    </Button>
-                    <Button 
-                        onClick={ () => setRedirect(indexUrl)}
-                        className="btn btn-secondary">
-                        { changed ? `annulla modifiche` : `torna all'elenco`}
-                    </Button>
-                    {!create && <Button
-                        onClick={ () => deleteObj(obj) }
-                        className="btn btn-danger pull-right">
-                            elimina {objName}
-                    </Button>}
-                </ButtonGroup>
-            : <ButtonGroup>
+            <SchemaInputs schema={engine.Models[ModelName].schema.fields} obj={modifiedObj} setObj={setModifiedObj} onChange={onChange && onChange(setModifiedObj)} edit={true}/>
+            <ButtonGroup className="mt-3">
                 <Button 
-                    onClick={ () => setEdit(true) }
-                    className="btn-warning">
-                    modifica
+                    onClick={ submit } 
+                    className="btn-primary"
+                    disabled= { !changed }>
+                    {create?`aggiungi ${objName}`:`salva modifiche`}
                 </Button>
                 <Button 
-                    onClick={ () => navigate(-1) }
+                    onClick={ () => setRedirect(indexUrl)}
                     className="btn btn-secondary">
-                        torna all'elenco
+                    { changed ? `annulla modifiche` : `torna all'elenco`}
                 </Button>
+                {!create && <Button
+                    onClick={ () => deleteObj(modifiedObj) }
+                    className="btn btn-danger pull-right">
+                        elimina {objName}
+                </Button>}
             </ButtonGroup>
-            }
-            </Form>
-        <br />
-        <p style={{align: "right"}}>
-            Creato da <b>{obj.createdBy?.username || '???'}</b> 
-            {' '}il <b>{myDateFormat(obj.createdAt)}</b>
-        <br />
-            Modificato da <b>{obj.updatedBy?.username || '???'}</b> 
-            {' '}il <b>{myDateFormat(obj.updatedAt)}</b>
-        </p>
-        </Card.Body>
-    </Card>
-    { Details && !edit && <Details obj={obj} /> }
+        </Form>
     </>
 }
