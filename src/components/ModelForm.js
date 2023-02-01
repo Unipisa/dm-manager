@@ -82,7 +82,6 @@ export default function ModelForm({ Model, original }) {
     const objName = Model.name
     const oa = Model.oa 
     const describe = Model.describe.bind(Model)
-    const navigate = useNavigate()
 
     if (edit) return <>
         <Card>
@@ -139,7 +138,6 @@ function ModelView({Model, obj, setEdit}) {
 }
 
 function ModelEdit({Model, obj, setEdit}) {
-    const edit = true
     const create = (obj._id === undefined)
     const [modifiedObj, setModifiedObj] = useState(obj)
     const objCode = Model.code
@@ -151,7 +149,6 @@ function ModelEdit({Model, obj, setEdit}) {
     const ModelName = Model.ModelName
     const engine = useEngine()
     const [ redirect, setRedirect ] = useState(null)
-    const navigate = useNavigate()
     const putObj = engine.usePut(objCode, (obj) => {
         engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
         setRedirect(indexUrl)
