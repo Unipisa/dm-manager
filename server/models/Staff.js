@@ -25,6 +25,7 @@ const staffSchema = new Schema({
     startDate,
     endDate,
     SSD,
+    photoUrl: {type: String, label: 'URL foto'},
     publish: {type: Boolean, label: 'pubblica sul web', default: true},
     wordpressId: String,
     cn_ldap: {type: String, label: 'cn_ldap'},

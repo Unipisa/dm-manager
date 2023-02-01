@@ -21,6 +21,7 @@ const personSchema = new Schema({
     arxiv_orcid: {type: Boolean, default: false, label: 'arxiv_orcid'},
     google_scholar: {type: String, label: 'google_scholar'},
     mathscinet: {type: String, label: 'mathscinet'},
+    photoUrl: {type: String, label: 'URL foto'},
     createdBy,
     updatedBy,
 }, {

@@ -448,7 +448,55 @@ const migrations = {
         await groups.updateMany({"endDate": { $exists: false }},
             { $set: { endDate: null } })
         return true
-    }
+    },
+
+    D020230201_import_photo_links_from_wp_2: async function(db) {
+        const staffs = db.collection('staffs')
+        const people = db.collection('people')
+        const axios = require('axios')
+        let page = []
+        let count = 1
+        const per_page = 99
+        let failed = []
+        function failure(record, msg) {
+            console.log(`############# FAIL: ${msg}`)
+            failed.push(`${record.slug}: ${msg}`)
+        }
+        do {
+            const URL=`https://www.dm.unipi.it/wp-json/wp/v2/people?_embed=&per_page=${per_page}&page=${count}`
+            console.log(`fetch: ${URL}`)
+            const response = await axios.get(URL)
+            count++
+            page = response.data
+            console.log(`page.length: ${page.length}`)
+            for (let record of page) {
+                const acf = record.acf
+                try {
+                    const person = await findPerson(people, acf.nome, acf.cognome, 'Università di Pisa')
+                    const links = record._links
+                    const feature = links['wp:featuredmedia']
+                    if (feature) {
+                        const href = feature[0].href
+                        console.log(`fetch: ${href}`)
+                        const response = await axios.get(href)
+                        const media = response.data
+                        const photoUrl = `https://www.dm.unipi.it/wp-content/uploads/${media.media_details.file}`
+                        console.log(`photoUrl: ${photoUrl} for ${person.lastName}`)
+                        await people.updateOne({ _id: person._id }, { $set: { photoUrl } })
+                        await staffs.updateMany({ person: person._id }, { $set: { photoUrl } })
+                    }
+                } catch (e) {
+                    failure(record, e.message)
+                }
+            }
+        } while(page.length >= per_page)
+        if (failed.length) {
+            console.log(`==> migration failures:`)
+            failed.forEach(msg => console.log(`- ${msg}`))
+        }
+        return true
+    },
+
 }
 
 async function migrate(db) {
