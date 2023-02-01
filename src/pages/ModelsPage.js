@@ -4,6 +4,7 @@ import { useNavigate, Link } from 'react-router-dom'
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
+import Loading from '../components/Loading'
 
 export default function ModelsPage({ Model, columns }) {
     const filter = useQueryFilter(Model.indexDefaultFilter)
@@ -13,7 +14,7 @@ export default function ModelsPage({ Model, columns }) {
     const navigateTo = useCallback((obj) => navigate(
         Model.pageUrl(obj._id), {replace: false}), [navigate, Model])
 
-    if (query.isLoading) return <span>loading...</span>
+    if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
 
     const data = query.data.data

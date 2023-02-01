@@ -3,6 +3,7 @@ import { Table, Button } from 'react-bootstrap'
 
 import { ListInput, StringInput } from '../components/Input'
 import { useEngine, myDateFormat } from '../Engine'
+import Loading from '../components/Loading'
 
 export default function TokensPage() {
     const engine = useEngine()
@@ -11,7 +12,7 @@ export default function TokensPage() {
     const deleteToken = engine.useDelete('token', (response, token) => engine.addInfoMessage(`token ${token.name} rimosso`))
     const putToken = engine.usePut('token', (token) => engine.addInfoMessage(`token ${token.name} creato`))
 
-    if (query.isLoading) return <span>loading....</span>
+    if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
 
     const setter = field => value => setObj(obj => ({...obj, [field]: value}))

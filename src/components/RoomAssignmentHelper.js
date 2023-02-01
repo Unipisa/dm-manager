@@ -1,6 +1,7 @@
 import { Card, Button } from 'react-bootstrap'
 
 import { myDateFormat, useEngine, minDate, maxDate } from '../Engine'
+import Loading from './Loading'
 
 function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     const engine = useEngine()
@@ -14,7 +15,7 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     const roomsQuery = engine.useIndex('room', {})
     const putRoomAssignment = engine.usePut('roomAssignment')
     const deleteRoomAssignment = engine.useDelete('roomAssignment')
-    if (!(assignmentsQuery.isSuccess && roomsQuery.isSuccess)) return <p>loading ...</p>
+    if (!(assignmentsQuery.isSuccess && roomsQuery.isSuccess)) return <Loading />
     const rooms = roomsQuery.data.data
     const assignments = assignmentsQuery.data.data
     const roomWithId = Object.fromEntries(rooms
