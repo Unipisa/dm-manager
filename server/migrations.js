@@ -319,6 +319,14 @@ const migrations = {
 
         return true
     },
+
+    D20230202_clean_photo_urls_1: async function(db) {
+        const staffs = db.collection('staffs')
+        staffs.updateMany(
+            { photoUrl: "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png"}, 
+            { $set: { photoUrl: { $concat: "" } } })
+        return true
+    },
 }
 
 async function migrate(db, options) {
