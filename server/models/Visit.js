@@ -19,7 +19,6 @@ const visitSchema = new Schema({
     // fundingAgency: {type: String, label: 'ente finanziatore'},
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,
-    publish: {type: Boolean, label: 'pubblica sul web', default: true},
     notes: {type: String, label: 'note', widget: 'text'},
     tags: {type:[String], label: 'tags', default: [], enum: ["INdAM Visiting Fellow", "UniPi Visiting Fellow"]},
     createdBy,
