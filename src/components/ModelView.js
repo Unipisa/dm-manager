@@ -62,7 +62,7 @@ export function emptyObject(Model) {
     return empty
 }
 
-export default function ModelView({Model, obj, setEdit}) {
+export default function ModelView({Model, obj}) {
     const navigate = useNavigate()
 
     return <>
@@ -73,12 +73,12 @@ export default function ModelView({Model, obj, setEdit}) {
             />
         <ButtonGroup>
             <Button 
-                onClick={ () => setEdit(true) }
+                onClick={ () => navigate('edit') }
                 className="btn-warning">
                 modifica
             </Button>
             <Button 
-                onClick={ () => navigate(-1) }
+                onClick={ () => navigate(Model.indexUrl()) }
                 className="btn btn-secondary">
                     torna all'elenco
             </Button>

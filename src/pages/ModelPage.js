@@ -8,11 +8,10 @@ import ModelEdit from '../components/ModelEdit'
 import Timestamps from '../components/Timestamps'
 import Loading from '../components/Loading'
 
-export default function ModelPage({ Model }) {
+export default function ModelPage({ Model, edit }) {
     const params = useParams()
     const id = params.id
     const create = (id === 'new')
-    const [ edit, setEdit ] = useState(create)
     const engine = useEngine()
     const query = engine.useGet(Model.code, id)
 
@@ -36,7 +35,7 @@ export default function ModelPage({ Model }) {
                 }</h3>
             </Card.Header>
             <Card.Body>
-                <ModelEdit Model={Model} obj={original} setEdit={setEdit}/>
+                <ModelEdit Model={Model} obj={original}/>
             </Card.Body>
             <Card.Footer>
                 <Timestamps obj={original} />
@@ -50,7 +49,7 @@ export default function ModelPage({ Model }) {
                 <h3>{ `${objName} ${describe(original)}` }</h3>
             </Card.Header>
             <Card.Body>
-                <ModelView Model={Model} create={create} edit={edit} obj={original} setEdit={setEdit}/>
+                <ModelView Model={Model} create={create} edit={edit} obj={original}/>
             </Card.Body>
             <Card.Footer>
                 <Timestamps obj={original} />

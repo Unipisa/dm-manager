@@ -62,7 +62,7 @@ export function emptyObject(Model) {
     return empty
 }
 
-export default function ModelEdit({Model, obj, setEdit}) {
+export default function ModelEdit({Model, obj}) {
     const create = (obj._id === undefined)
     const [modifiedObj, setModifiedObj] = useState(obj)
     const objCode = Model.code
@@ -76,11 +76,11 @@ export default function ModelEdit({Model, obj, setEdit}) {
     const [ redirect, setRedirect ] = useState(null)
     const putObj = engine.usePut(objCode, (obj) => {
         engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
-        setRedirect(indexUrl)
+        setRedirect(Model.viewUrl(obj._id))
     })
     const patchObj = engine.usePatch(objCode, (response) => {
         engine.addInfoMessage(`${objName} ${describe(modifiedObj)} modificat${oa}`)
-        setRedirect(indexUrl)
+        setRedirect(Model.viewUrl(modifiedObj._id))
     })
     const deleteObj = engine.useDelete(objCode, (response, obj) => {
         engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
@@ -115,12 +115,12 @@ export default function ModelEdit({Model, obj, setEdit}) {
                     onClick={ submit } 
                     className="btn-primary"
                     disabled= { !changed }>
-                    {create?`aggiungi ${objName}`:`salva modifiche`}
+                    {create ? `aggiungi ${objName}` : `salva modifiche`}
                 </Button>
                 <Button 
-                    onClick={ () => setRedirect(indexUrl)}
+                    onClick={ () => setRedirect(create ? Model.indexUrl(obj._id) : Model.viewUrl(obj._id)) }
                     className="btn btn-secondary">
-                    { changed ? `annulla modifiche` : `torna all'elenco`}
+                    annulla modifiche
                 </Button>
                 {!create && <Button
                     onClick={ () => deleteObj(modifiedObj) }
