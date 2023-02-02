@@ -304,15 +304,25 @@ async function serve() {
   console.log("options (configure using environment variables or .env file):")
   for(let [key, val] of Object.entries(config)) {
     if (key.search(/SECRET|PASSWORD/) >= 0) val = "*****"
-    console.log(`  ${key}: ${val}`)
+    console.log(`    ${key}: ${val}`)
   }
 
   await setupDatabase()
+
+  console.log(`available command line options:`)
+  console.log(` --clear-sessions, -c: clear sessions collection`)
+  console.log(` --clean-migrations: clean removed migrations`)
+
+  console.log(`command line arguments: ${JSON.stringify(process.argv.slice(2))}`)
 
   for (let arg of process.argv.slice(2)) {
     if (arg === '--clear-sessions' || arg === '-c') {
       console.log('clear sessions collection')
       await mongoose.connection.db.collection('sessions').deleteMany({})
+      process.exit(0)
+    } else if (arg === '--clean-migrations') {
+      console.log('clean migrations collection')
+      await migrations.migrate(mongoose.connection.db, {clean: true})
       process.exit(0)
     } else {
       console.log(`invalid argument: ${arg}`)
@@ -325,7 +335,7 @@ async function serve() {
   
   const app = createApp()
 
-  if (!await migrations.migrate(mongoose.connection.db)) {
+  if (!await migrations.migrate(mongoose.connection.db, {apply: true})) {
     console.log(`server aborting`)
     process.exit(123)
   }
