@@ -3,7 +3,7 @@ import { Form, Button, ButtonGroup } from 'react-bootstrap'
 import { Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
-import { ModelInputs, emptyObject } from '../components/ModelInput'
+import { ModelInputs } from '../components/ModelInput'
 
 export default function ModelEdit({Model, obj}) {
     const create = (obj._id === undefined)
