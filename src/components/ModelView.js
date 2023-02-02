@@ -1,17 +1,15 @@
 import { Button, ButtonGroup } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
-import { ModelInputs } from './ModelInput'
-
+import { ModelOutputs } from './ModelInput'
 
 export default function ModelView({Model, obj}) {
     const navigate = useNavigate()
 
     return <>
-        <ModelInputs 
+        <ModelOutputs 
                 schema={Model.schema.fields} 
                 obj={obj} 
-                edit={false}
             />
         <ButtonGroup>
             <Button 

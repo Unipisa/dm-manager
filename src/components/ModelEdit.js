@@ -52,7 +52,7 @@ export default function ModelEdit({Model, obj}) {
 
     return <>
         <Form onSubmit={ (event) => event.preventDefault() }>
-            <ModelInputs schema={engine.Models[ModelName].schema.fields} obj={modifiedObj} setObj={setModifiedObj} onChange={onChange && onChange(setModifiedObj)} edit={true}/>
+            <ModelInputs schema={engine.Models[ModelName].schema.fields} obj={modifiedObj} setObj={setModifiedObj} onChange={onChange && onChange(setModifiedObj)} />
             <ButtonGroup className="mt-3">
                 <Button 
                     onClick={ submit } 
