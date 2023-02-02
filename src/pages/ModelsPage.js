@@ -12,7 +12,7 @@ export default function ModelsPage({ Model, columns }) {
     const query = engine.useIndex(Model.code, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        Model.pageUrl(obj._id), {replace: false}), [navigate, Model])
+        Model.viewUrl(obj._id), {replace: false}), [navigate, Model])
 
     if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
@@ -63,7 +63,7 @@ export default function ModelsPage({ Model, columns }) {
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
-                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link>}
+                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>}
             </div>
             <Table hover>
                 <thead className="thead-dark">
