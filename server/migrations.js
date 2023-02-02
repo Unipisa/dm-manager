@@ -497,19 +497,19 @@ const migrations = {
         return true
     },
 
-    D20230201_set_internal_flag_in_staffs_3: async function(db) {
+    D20230201_set_internal_flag_in_staffs_4: async function(db) {
         const people = db.collection('people')
         const staffs = db.collection('staffs')
 
         staffs.updateMany({}, {$set: 
-            { internal: false}})
+            { isInternal: false}})
 
         people.find({affiliation: "Università di Pisa"}).forEach(person => {
-            staffs.updateMany({ person: person._id }, { $set: { internal: true } })
+            staffs.updateMany({ person: person._id }, { $set: { isInternal: true } })
         })
 
         return true
-    }
+    },
 
 }
 
