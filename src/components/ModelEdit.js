@@ -62,82 +62,7 @@ export function emptyObject(Model) {
     return empty
 }
 
-function Timestamps({ obj, oa }) {
-    oa = oa || 'o'
-    return <>
-        <p style={{align: "right"}}>
-            Creat{oa} da <b>{obj.createdBy?.username || '???'}</b> 
-            {' '}il <b>{myDateFormat(obj.createdAt)}</b>
-        <br />
-            Modificat{oa} da <b>{obj.updatedBy?.username || '???'}</b> 
-            {' '}il <b>{myDateFormat(obj.updatedAt)}</b>
-        </p>
-    </>
-}
-
-export default function ModelForm({ Model, original }) {
-    const create = (original._id === undefined)
-    const [ edit, setEdit ] = useState(create)
-    const Details = Model.ObjectDetails
-    const objName = Model.name
-    const oa = Model.oa 
-    const describe = Model.describe.bind(Model)
-
-    if (edit) return <>
-        <Card>
-            <Card.Header>
-                <h3>{ `nuov${oa} ${objName}` }</h3>
-            </Card.Header>
-            <Card.Body>
-                <ModelEdit Model={Model} obj={original} setEdit={setEdit}/>
-            </Card.Body>
-            <Card.Footer>
-                <Timestamps obj={original} />
-            </Card.Footer>
-        </Card>
-    </>
-    
-    if (!edit) return <>
-        <Card>
-            <Card.Header>
-                <h3>{ `${objName} ${describe(original)}` }</h3>
-            </Card.Header>
-            <Card.Body>
-                <ModelView Model={Model} create={create} edit={edit} obj={original} setEdit={setEdit}/>
-            </Card.Body>
-            <Card.Footer>
-                <Timestamps obj={original} />
-            </Card.Footer>
-        </Card>
-        { Details && <Details obj={original} /> }
-    </>
-}
-
-function ModelView({Model, obj, setEdit}) {
-    const navigate = useNavigate()
-
-    return <>
-        <SchemaInputs 
-                schema={Model.schema.fields} 
-                obj={obj} 
-                edit={false}
-            />
-        <ButtonGroup>
-            <Button 
-                onClick={ () => setEdit(true) }
-                className="btn-warning">
-                modifica
-            </Button>
-            <Button 
-                onClick={ () => navigate(-1) }
-                className="btn btn-secondary">
-                    torna all'elenco
-            </Button>
-        </ButtonGroup>
-    </>
-}
-
-function ModelEdit({Model, obj, setEdit}) {
+export default function ModelEdit({Model, obj}) {
     const create = (obj._id === undefined)
     const [modifiedObj, setModifiedObj] = useState(obj)
     const objCode = Model.code
@@ -151,11 +76,11 @@ function ModelEdit({Model, obj, setEdit}) {
     const [ redirect, setRedirect ] = useState(null)
     const putObj = engine.usePut(objCode, (obj) => {
         engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
-        setRedirect(indexUrl)
+        setRedirect(Model.viewUrl(obj._id))
     })
     const patchObj = engine.usePatch(objCode, (response) => {
         engine.addInfoMessage(`${objName} ${describe(modifiedObj)} modificat${oa}`)
-        setRedirect(indexUrl)
+        setRedirect(Model.viewUrl(modifiedObj._id))
     })
     const deleteObj = engine.useDelete(objCode, (response, obj) => {
         engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
@@ -190,12 +115,12 @@ function ModelEdit({Model, obj, setEdit}) {
                     onClick={ submit } 
                     className="btn-primary"
                     disabled= { !changed }>
-                    {create?`aggiungi ${objName}`:`salva modifiche`}
+                    {create ? `aggiungi ${objName}` : `salva modifiche`}
                 </Button>
                 <Button 
-                    onClick={ () => setRedirect(indexUrl)}
+                    onClick={ () => setRedirect(create ? Model.indexUrl(obj._id) : Model.viewUrl(obj._id)) }
                     className="btn btn-secondary">
-                    { changed ? `annulla modifiche` : `torna all'elenco`}
+                    annulla modifiche
                 </Button>
                 {!create && <Button
                     onClick={ () => deleteObj(modifiedObj) }

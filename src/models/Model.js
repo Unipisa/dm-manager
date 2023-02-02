@@ -63,7 +63,10 @@ export default class Model {
     indexUrl() {return `/${this.code}`}
     
     // absolute url of object with given id
-    pageUrl(id) {return `/${this.code}/${id}`}
+    viewUrl(id) {return `/${this.code}/${id}`}
+
+    // absolute url of object with given id
+    editUrl(id) {return `/${this.code}/${id}/edit`}
 
     onObjectChange(setObj) {}
 
@@ -82,9 +85,11 @@ export default class Model {
 
         const indexRouter = MyIndex
             && <Route path={this.indexUrl()} element={<MyIndex Model={this}/>} />
-        const pageRouter = this.ViewPage 
-            && <Route path={this.pageUrl(":id")} element={<this.ViewPage Model={this}/>} />
+        const viewRouter = this.ViewPage 
+            && <Route path={this.viewUrl(":id")} element={<this.ViewPage Model={this}/>} edit={false} />
+        const editRouter = this.ViewPage 
+            && <Route path={this.editUrl(":id")} element={<this.ViewPage Model={this} edit={true}/>} />
 
-        return [indexRouter, pageRouter].filter(x => x)
+        return [indexRouter, viewRouter, editRouter].filter(x => x)
     }    
 }
