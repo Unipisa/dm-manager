@@ -307,12 +307,15 @@ class Controller {
                 } else {
                     if (key_parts.length === 1) {
                         $matches.push({ [key0]: value })
-                    }
+                    } 
                     else {
                         if (key_parts[1] == 'regex') {
                             // We do case-insensitive regexp by default
                             $matches.push({ [key0]: { $regex: new RegExp(value, "i") } })
-                        }
+                        } 
+                        else if (key_parts[1] == 'in') {
+                            $matches.push({ [key0]: { $in: value.split("|") } })
+                        } 
                         else {
                             return sendBadRequest(res, `Unsupported field modifier in '${key}'`)
                         }
