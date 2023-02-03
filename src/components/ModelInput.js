@@ -68,7 +68,14 @@ export function ModelOutput({ field, schema, value}) {
         if (schema.enum) return value
         if (schema.type === 'string') {
             if (value === undefined || value === null) return '???'
-            if (schema.widget === 'text') return value.split('\n').map((line,i) => <p key={i}>{line}</p>)
+            if (schema.widget === 'text') {
+                var lst = []
+                value.split('\n').forEach((line ,i) => {
+                    if (i) lst.push(<br key={i} />)
+                    lst.push(line)
+                })
+                return lst 
+            }
             else return value
         } 
         if (schema.type === 'number') {
@@ -84,10 +91,10 @@ export function ModelOutputs({ schema, obj}) {
     for (let [field, field_schema] of Object.entries(schema)) {
         if (RESERVED_FIELDS.includes(field)) continue
         const label = field_schema.items?.label || field_schema.label || field
-        lst.push(<div key={field}>
+        lst.push(<p key={field}>
             <b>{label}: </b>
             <ModelOutput key={field} field={field} schema={field_schema} value={obj[field]} />
-        </div>)
+        </p>)
     }        
     return lst
 }
