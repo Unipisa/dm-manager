@@ -9,10 +9,6 @@ import api from '../api'
 import { myDateFormat, useEngine } from '../Engine'
 import Loading from './Loading'
 
-export function StringOutput({ label, value }) {
-    return <p><b>{label}:</b> {value}</p>
-}
-
 export function StringInput({ label, value, setValue }) {
     const id = useId()
     return <Form.Group className="row my-2">
@@ -44,10 +40,6 @@ export function NumberInput({ label, value, setValue }) {
     </Form.Group>
 }
 
-export function DateOutput({ label, value }) {
-    return <p><b>{label}:</b> {myDateFormat(value)}</p>
-}
-
 export function DateInput({ label, value, setValue }) {
     const id = useId()
     return <Form.Group className="row my-2">
@@ -61,10 +53,6 @@ export function DateInput({ label, value, setValue }) {
                 onChange={ date => setValue(date) } />
         </div>
     </Form.Group>
-}
-
-export function ListOutput({ label, value }) {
-    return <p><b>{label}:</b> {value.join(', ')}</p>
 }
 
 export function ListInput({ label, value, setValue, separator }) {
@@ -89,10 +77,6 @@ export function ListInput({ label, value, setValue, separator }) {
     </Form.Group>
 }
 
-export function TextOutput({ label, value }) {
-    return <p><b>{label}:</b> {value}</p>
-}
-
 export function TextInput({ label, value, setValue }) {
     const id = useId()
     return <Form.Group className="row my-2">
@@ -108,15 +92,6 @@ export function TextInput({ label, value, setValue }) {
             />
         </div>
     </Form.Group>
-}
-
-export function ObjectOutput({ render, label, value, multiple }) {
-    if (multiple === undefined) {
-        multiple = false
-    }
-
-    const values = multiple ? value : [ value ]
-    return <StringOutput label={ label } value = {Array.from(values).map(render).join(", ")} />
 }
 
 //
@@ -289,13 +264,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     </Form.Group>
 }
 
-export function PersonOutput({ label, value, multiple }) {
-    return <ObjectOutput 
-        label={label} value={value} multiple={multiple} 
-        render={_ => `${_.firstName} ${_.lastName} (${_.affiliation})`}
-        />
-}
-
 export function PersonInput({ label, value, setValue, multiple }) {
     return <ObjectInput 
         label={label} value={value} setValue={setValue} multiple={multiple} 
@@ -313,13 +281,6 @@ export function PersonInput({ label, value, setValue, multiple }) {
         />
 }
 
-export function GrantOutput({ label, value, multiple }) {
-    return <ObjectOutput 
-        label={label} value={value} multiple={multiple} 
-        render={_ => `${_.name} (${_.pi ? _.pi.lastName : ''} - ${_.identifier})`}
-        />
-}
-
 export function GrantInput({ label, value, setValue, multiple }) {
     return <ObjectInput 
         label={label} value={value} setValue={setValue} multiple={multiple} 
@@ -333,10 +294,6 @@ export function GrantInput({ label, value, setValue, multiple }) {
         }}
         placeholder="grant"
         />
-}
-
-export function SelectOutput({ label, value, displayFunction }) {
-    return <StringOutput label={label} value={displayFunction?displayFunction(value):value} />
 }
 
 export function SelectInput({ options, label, value, setValue, displayFunction }) {
@@ -356,10 +313,6 @@ export function SelectInput({ options, label, value, setValue, displayFunction }
     </Form.Group>
 }
 
-export function BooleanOutput({label, value}) {
-    return <StringOutput label={label} value={value?'sì':'no'}/>
-}
-
 export function BooleanInput({ label, value, setValue }) {
     const id = useId()
     return <Form.Group className="row my-2">
@@ -374,10 +327,6 @@ export function BooleanInput({ label, value, setValue }) {
             />                 
         </div>
     </Form.Group>
-}
-
-export function MultipleSelectOutput({ label, value}) {
-    return <StringOutput label={label} value={value.join(",")}/>
 }
 
 export function MultipleSelectInput({ options, label, value, setValue}) {
@@ -398,10 +347,6 @@ export function MultipleSelectInput({ options, label, value, setValue}) {
             </select>
         </div>
     </Form.Group>
-}
-
-export function RoomOutput({ label, value }) {
-    return <StringOutput label={label} value={value.code} />
 }
 
 export function RoomInput({ label, value, setValue }) {
