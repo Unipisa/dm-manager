@@ -319,6 +319,26 @@ const migrations = {
 
         return true
     },
+
+    D20230203_set_empty_fields_in_grants_5: async function(db) {
+        const grants = db.collection('grants')
+        await grants.updateMany(
+            { createdAt: { $exists: false }},
+            { $set: { createdAt: null } })
+        await grants.updateMany(
+            { createdBy: { $exists: false }},
+            { $set: { createdBy: null }}
+        )
+        await grants.updateMany(
+            { description: { $exists: false }},
+            { $set: { description: "" }}
+        )
+        await grants.updateMany(
+            { notes: { $exists: false }},
+            { $set: { notes: "" }}
+        )
+        return true
+    }
 }
 
 async function migrate(db, options) {
