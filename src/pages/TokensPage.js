@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 
-import { ListInput, StringInput, StringOutput} from '../components/Input'
+import { ListInput, StringInput } from '../components/Input'
 import { useEngine, myDateFormat } from '../Engine'
 import Loading from '../components/Loading'
 

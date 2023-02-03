@@ -2,7 +2,6 @@ import { useParams } from 'react-router-dom'
 import { Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
-import ModelView from '../components/ModelView'
 import ModelEdit from '../components/ModelEdit'
 import Timestamps from '../components/Timestamps'
 import Loading from '../components/Loading'

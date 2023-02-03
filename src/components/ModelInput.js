@@ -1,10 +1,9 @@
 import { myDateFormat } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, MultipleSelectOutput } from './Input'
+import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput } from './Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
 export function ModelInput({ field, schema, value, setValue}) {
-    const edit = true
     if (schema.type === 'array') {
         const label = schema.items.label || field
         if (schema.enum) {
