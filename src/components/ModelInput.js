@@ -58,12 +58,16 @@ export function ModelOutput({ field, schema, value}) {
         if (schema.enum) {
             return value.join(', ')
         }
-        return value.map(v => <>{render(v, schema.items['x-ref'])} </>)
+        if (value === undefined || value === null) return '???'
+        return value
+            .map(v => render(v, schema.items['x-ref']))
+            .join(', ')
     } else {
         if (schema['x-ref']) return render(value, schema['x-ref'])
         if (schema.format === 'date-time') return myDateFormat(value)
         if (schema.enum) return value
         if (schema.type === 'string') {
+            if (value === undefined || value === null) return '???'
             if (schema.widget === 'text') return value.split('\n').map((line,i) => <p key={i}>{line}</p>)
             else return value
         } 
