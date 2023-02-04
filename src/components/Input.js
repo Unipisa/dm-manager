@@ -23,7 +23,7 @@ export function NumberInput({ id, value, setValue }) {
         className="form-control col-sm-10"
         id={ id } 
         type="number"
-        value={ value || "" } 
+        value={ value===null ? "" : value } 
         onChange={ (evt) => {setValue(evt.target.value)} }
     />
 }
