@@ -58,8 +58,8 @@ export default function ModelEdit({Model, obj}) {
     const submit = async (evt) => {
         console.log(`SUBMIT. obj: ${JSON.stringify(obj)} obj: ${JSON.stringify(modifiedObj)}`)
         if (modifiedObj._id) {
-            let payload = Object.fromEntries(Object.keys(obj)
-                .filter(key => modifiedObj[key]!==obj[key])
+            let payload = Object.fromEntries(
+                modifiedFields
                 .map(key => ([key, modifiedObj[key]])))
             payload._id = modifiedObj._id
             patchObj(payload)
