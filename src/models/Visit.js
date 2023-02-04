@@ -1,5 +1,5 @@
 import Model from './Model'
-import VisitDetails from '../pages/VisitDetails'
+import VisitViewPage from '../pages/VisitViewPage'
 
 export default class Visit extends Model {
     constructor() {
@@ -23,7 +23,7 @@ export default class Visit extends Model {
             'roomAssignment': "stanza",
             'updatedAt': "modificato",
         }
-        this.ObjectDetails = VisitDetails
+        this.ViewPage = VisitViewPage
     }
 
     describe(obj) { return `${obj?.person?.lastName}` }
