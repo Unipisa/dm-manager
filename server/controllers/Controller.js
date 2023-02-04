@@ -6,6 +6,10 @@ function sendBadRequest(res, message) {
     res.send({error: message})
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 class Controller {
     constructor(Model=null) {
         // every controller must define a unique path
@@ -222,11 +226,16 @@ class Controller {
                     })
                 }
             } else if (key == '_search') {
-                // Implement a custom filter over searchable fields
-                for (let field of this.searchFields) {
-                    search_conditions.push({
-                        [field]: { $regex: value, $options: 'i' }
-                    })
+                try {
+                    const $regex = new RegExp(escapeRegExp(value), 'i')
+                    // Implement a custom filter over searchable fields
+                    for (let field of this.searchFields) {
+                        search_conditions.push({
+                            [field]: { $regex }
+                        })
+                    }
+                } catch (err) {
+                    return sendBadRequest(res, `invalid _search value ${value} [${err}]`)
                 }
             } else if (fields[key0] && fields[key0].can_filter) {
                 const field = fields[key0];
@@ -310,8 +319,13 @@ class Controller {
                     } 
                     else {
                         if (key_parts[1] == 'regex') {
-                            // We do case-insensitive regexp by default
-                            $matches.push({ [key0]: { $regex: new RegExp(value, "i") } })
+                            try {
+                                const $regex = new RegExp(value, "i")
+                                // We do case-insensitive regexp by default
+                                $matches.push({ [key0]: { $regex } })
+                            } catch(err) {
+                                return sendBadRequest(res, `invalid regex "${value}"`)
+                            }
                         } 
                         else if (key_parts[1] == 'in') {
                             $matches.push({ [key0]: { $in: value.split("|") } })

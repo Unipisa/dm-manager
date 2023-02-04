@@ -1,37 +1,55 @@
+import { useId } from 'react'
+import { Form } from 'react-bootstrap'
+
 import { myDateFormat } from '../Engine'
 import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput } from './Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function ModelInput({ field, schema, value, setValue}) {
+export function ModelInput({ field, modified, schema, value, setValue}) {
+    const id = useId()
+    function element(Element, opts = {}) {
+        const {options, multiple} = opts
+        const label = schema.items?.label || schema.label || field
+        return <Form.Group className="row my-2">
+            <Form.Label className={ modified ? "col-sm-2 bg-warning" : "col-sm-2"} htmlFor={ id }>
+                { label }
+            </Form.Label>
+            <div className="col-sm-10">
+                <Element 
+                    id={id}
+                    value={value} 
+                    setValue={setValue} 
+                    options={options}
+                    multiple={multiple}
+                />                         
+            </div>
+        </Form.Group>
+    }
+
     if (schema.type === 'array') {
-        const label = schema.items.label || field
-        if (schema.enum) {
-            return <MultipleSelectInput options={schema.enum} label={label} value={value} setValue={setValue} />
-        }
-        if (!schema.items['x-ref']) return <ListInput label={label} value={value} setValue={setValue} />
-        if (schema.items['x-ref'] === 'Person') return <PersonInput multiple label={label} value={value} setValue={setValue} />
-        if (schema.items['x-ref'] === 'Grant') return <GrantInput multiple label={label} value={value} setValue={setValue} />        
+        if (schema.enum) return element(MultipleSelectInput, {options: schema.enum})
+        if (!schema.items['x-ref']) return element(ListInput)
+        if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true})
+        if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true})        
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
-        const label = schema.label || field
-        if (schema['x-ref'] === 'Person') return <PersonInput label={label} value={value} setValue={setValue} />
-        if (schema['x-ref'] === 'Room') return <RoomInput label={label} value={value} setValue={setValue} />
+        if (schema['x-ref'] === 'Person') return element(PersonInput)
+        if (schema['x-ref'] === 'Room') return element(RoomInput)
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
-        if (schema.format === 'date-time') return <DateInput label={label} value={value} setValue={setValue} />
-        if (schema.enum) return <SelectInput options={schema.enum} label={label} value={value} setValue={setValue} />
+        if (schema.format === 'date-time') return element(DateInput)
+        if (schema.enum) return element(SelectInput, {options: schema.enum})
+        if (schema.type === 'number') return element(NumberInput)
+        if (schema.type === 'boolean') return element(BooleanInput)
         if (schema.type === 'string') {
-            if (schema.widget === 'text') return <TextInput label={label} value={value} setValue={setValue} />
-            else return <StringInput label={label} value={value} setValue={setValue} />
-        } else if (schema.type === 'number') {
-            return <NumberInput label={label} value={value} setValue={setValue} />
-        }
-        if (schema.type === 'boolean') return <BooleanInput label={label} value={value} setValue={setValue} />
+            if (schema.widget === 'text') return element(TextInput)
+            else return element(StringInput)
+        } 
         return <span>unknown input type {JSON.stringify(schema)}</span>
     }
 }
 
-export function ModelInputs({ schema, obj, setObj, onChange}) {
+export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
     let lst = []
     for (let [field, field_schema] of Object.entries(schema)) {
         if (RESERVED_FIELDS.includes(field)) continue
@@ -40,7 +58,8 @@ export function ModelInputs({ schema, obj, setObj, onChange}) {
             if (onChange && onChange(field, value)) return
             setObj(obj => ({...obj, [field]: value}))
         }
-        lst.push(<ModelInput key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} edit={true} />)
+        const modified = modifiedFields.includes(field)
+        lst.push(<ModelInput modified={modified} key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} edit={true} />)
     }        
     return lst
 }

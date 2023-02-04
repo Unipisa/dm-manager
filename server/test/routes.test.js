@@ -91,7 +91,12 @@ describe('test visit-manager', () => {
   })
   it('can search people', async () => {
     await app
-      .get('/api/v0/person/search?_search=foo')
+      .get('/api/v0/person/search?q=foo')
+      .expect(200)
+  })
+  it('can deal with malformed regex', async () => {
+    await app
+      .get('/api/v0/person/search?q=foo(')
       .expect(200)
   })
 })

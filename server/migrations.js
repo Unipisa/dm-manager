@@ -376,17 +376,18 @@ const migrations = {
         return true
     },
 
-    D20230204_set_empty_fields_in_people_1: async function(db) {
+    D20230204_set_empty_fields_in_people_2: async function(db) {
         const people = db.collection('people')
-        await people.updateMany(
-            { country: { $exists: false }},
-            { $set: { country: "" }})
-        await people.updateMany(
-            { notes: { $exists: false }},
-            { $set: { notes: "" }})
-        await people.updateMany(
-            { photoUrl: { $exists: false }},
-            { $set: { photoUrl: "" }})
+        for (let field of ['country', 'notes', 'photoUrl']) {
+            await people.updateMany(
+                { [field]: { $exists: false }},
+                { $set: { [field]: "" }})
+        }
+        for (let field of ['createdAt', 'createdBy', 'updatedAt', 'updatedBy']) {
+            await people.updateMany(
+                { [field]: { $exists: false }},
+                { $set: { [field]: null }})
+        }
         return true
     },
 }

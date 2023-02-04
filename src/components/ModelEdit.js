@@ -30,14 +30,36 @@ export default function ModelEdit({Model, obj}) {
         setRedirect(indexUrl)
     })
 
-    const changed = Object.entries(modifiedObj).some(([key, val])=>{
-            return val !== obj[key]})
+    function compareValue(v1, v2) {
+        // capita di confrontare una stringa con una data
+        if (JSON.stringify(v1) === JSON.stringify(v2)) return true
+        if (typeof(v1) !== typeof(v2)) return false
+        if (Array.isArray(v1)) {
+            if (v1.length !== v2.length) return false
+            for (let i=0; i<v1.length; i++) {
+                if (!compareValue(v1[i], v2[i])) return false
+            }
+            return true
+        }
+        if (typeof(v1) === 'object') return (v1?._id && v1?._id === v2?._id)
+        return v1 === v2
+    }
+
+    const modifiedFields = Object.keys(modifiedObj)
+        .filter(key => !compareValue(modifiedObj[key], obj[key]))
+
+    const changed = modifiedFields.length > 0
+    /*
+    modifiedFields.forEach(key => {
+        console.log(`modified field: ${key} ${typeof(obj[key])}:${JSON.stringify(obj[key])} -> ${typeof(modifiedObj[key])}:${JSON.stringify(modifiedObj[key])}`)
+    })
+    */
 
     const submit = async (evt) => {
         console.log(`SUBMIT. obj: ${JSON.stringify(obj)} obj: ${JSON.stringify(modifiedObj)}`)
         if (modifiedObj._id) {
-            let payload = Object.fromEntries(Object.keys(obj)
-                .filter(key => modifiedObj[key]!==obj[key])
+            let payload = Object.fromEntries(
+                modifiedFields
                 .map(key => ([key, modifiedObj[key]])))
             payload._id = modifiedObj._id
             patchObj(payload)
@@ -52,7 +74,13 @@ export default function ModelEdit({Model, obj}) {
 
     return <>
         <Form onSubmit={ (event) => event.preventDefault() }>
-            <ModelInputs schema={engine.Models[ModelName].schema.fields} obj={modifiedObj} setObj={setModifiedObj} onChange={onChange && onChange(setModifiedObj)} />
+            <ModelInputs 
+                schema={Model.schema.fields} 
+                obj={modifiedObj} 
+                setObj={setModifiedObj} 
+                modifiedFields={modifiedFields}
+                onChange={onChange && onChange(setModifiedObj)} 
+                />
             <ButtonGroup className="mt-3">
                 <Button 
                     onClick={ submit } 
