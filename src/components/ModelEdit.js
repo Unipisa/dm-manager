@@ -14,7 +14,6 @@ export default function ModelEdit({Model, obj}) {
     const oa = Model.oa 
     const describe = Model.describe.bind(Model)
     const onChange = Model.onObjectChange.bind(Model)
-    const ModelName = Model.ModelName
     const engine = useEngine()
     const [ redirect, setRedirect ] = useState(null)
     const putObj = engine.usePut(objCode, (obj) => {
