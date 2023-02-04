@@ -1,7 +1,10 @@
+import { Card } from 'react-bootstrap'
 import { myDateFormat } from '../Engine'
 
-export default function RelatedDetails({related}) {
-    return <>
+export default function RelatedDetails({ related, title }) {
+    return <Card className="mt-2">
+        <Card.Header><h4>{ title || "elementi correlati" }</h4></Card.Header>
+        <Card.Body>
         {related.filter(info => info.data !== null && info.data.length > 0).map((info, i) => 
             <div key={i}>
                 <b>{info.modelName} {info.field}:</b>
@@ -29,6 +32,7 @@ export default function RelatedDetails({related}) {
                 </ul>
             </div>
         )}
-    </>
+        </Card.Body>
+    </Card>
 }
 

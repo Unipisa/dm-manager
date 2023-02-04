@@ -320,6 +320,25 @@ const migrations = {
         return true
     },
 
+    D20230202_clean_photo_urls_8: async function(db) {
+        const staffs = db.collection('staffs')
+        const people = db.collection('people')
+        staffs.updateMany(
+            { photoUrl: "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png"}, 
+            { $set: { photoUrl: "" }})
+        // clear photoUrl if it is not a string
+        staffs.updateMany(
+            { photoUrl: {$not: {$type: 7 }}},
+            { $set: { photoUrl: "" } })
+        people.updateMany(
+            { photoUrl: {$not: {$type: 7 }}},
+            { $set: { photoUrl: "" } })
+        people.updateMany(
+        { photoUrl: "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png"}, 
+        { $set: { photoUrl: "" } })
+        return true
+    },
+    
     D20230203_set_empty_fields_in_grants_5: async function(db) {
         const grants = db.collection('grants')
         await grants.updateMany(
