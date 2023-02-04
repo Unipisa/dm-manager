@@ -20,7 +20,6 @@ function RoomListing({rooms, createAssignment}) {
         rooms.sort((a,b) => (a.code.localeCompare(b.code)))
     }
     return <>
-        <h4>Elenco stanze</h4>
         <select onChange={event => setFloor(event.target.value)}>
             <option value='free'>stanze con posti liberi</option>
             {floors.map(f => <option key={f} value={f}>{f}</option>)}
@@ -29,9 +28,10 @@ function RoomListing({rooms, createAssignment}) {
         <ul>
             {rooms.map(room => <li key={room._id}>
                 <b><a href={`/room/${room._id}`}>{room.code}</a></b>
-                {} <b>posti:</b> {room.nSeats},
-                {} <b>occupati:</b> {room.occupiedSeats},
-                {} <b>liberi:</b> {room.freeSeats}
+                {} <b>posti liberi: </b> 
+                    <b className={room.freeSeats>0?"text-success":"text-danger"}>
+                        {room.freeSeats}
+                    </b>/{room.nSeats}
                 {} <Button className='mb-1' size='sm' variant='warning' onClick={() => createAssignment(room)}>
                     assegna
                     </Button>

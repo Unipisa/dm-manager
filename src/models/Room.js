@@ -1,5 +1,5 @@
 import Model from './Model'
-import RoomDetails from '../pages/RoomDetails'
+import RoomViewPage from '../pages/RoomViewPage'
 
 export default class Room extends Model {
     constructor() {
@@ -25,7 +25,7 @@ export default class Room extends Model {
             'updatedAt': "modificato",
             'notes': "note",
         }
-        this.ObjectDetails = RoomDetails
+        this.ViewPage = RoomViewPage
     }
 
     describe(room) { return `${room.number} ${room.floor} ${room.building}` }
