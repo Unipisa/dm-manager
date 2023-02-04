@@ -338,7 +338,38 @@ const migrations = {
             { $set: { notes: "" }}
         )
         return true
-    }
+    },
+
+    D20230204_set_empty_fields_in_groups_1: async function(db) {
+        const groups = db.collection('groups')
+        await groups.updateMany(
+            { createdAt: { $exists: false }},
+            { $set: { createdAt: null } })
+        await groups.updateMany(
+            { createdBy: { $exists: false }},
+            { $set: { createdBy: null }})
+        await groups.updateMany(
+            { updatedAt: { $exists: false }},
+            { $set: { updatedAt: null }})
+        await groups.updateMany(
+            { updatedBy: { $exists: false }},
+            { $set: { updatedBy: null }})
+        return true
+    },
+
+    D20230204_set_empty_fields_in_people_1: async function(db) {
+        const people = db.collection('people')
+        await people.updateMany(
+            { country: { $exists: false }},
+            { $set: { country: "" }})
+        await people.updateMany(
+            { notes: { $exists: false }},
+            { $set: { notes: "" }})
+        await people.updateMany(
+            { photoUrl: { $exists: false }},
+            { $set: { photoUrl: "" }})
+        return true
+    },
 }
 
 async function migrate(db, options) {
