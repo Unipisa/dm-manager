@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useRef } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 
@@ -15,11 +15,21 @@ export default function ModelsPage({ Model, columns }) {
         Model.viewUrl(obj._id), {replace: false}), [navigate, Model])
     const scrollRef = useRef(null)
 
+    /*
+     * infite loop!
     useEffect(() => {
-        const observer = new IntersectionObserver(filter.extendLimit)
+        const observer = new IntersectionObserver(() => {
+            console.log(`Intersection observer fired`)
+            if (!query.isSuccess) return
+            if (query.data.data.length >= query.data.total) return
+            if (filter._limit >= query.data.total) return
+            console.log(`extendLimit (${query.data.data.length} / ${query.data.total})`)
+            filter.extendLimit()
+        })
         if (scrollRef.current) observer.observe(scrollRef.current)
-        return () => observer.disconnect()
-    }, [scrollRef, filter.extendLimit])
+        //return () => observer.unobserve(scrollRef.current)
+    }, [scrollRef])
+    */
 
     if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
