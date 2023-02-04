@@ -1,7 +1,51 @@
+import { useState } from 'react'
 import { Card, Button } from 'react-bootstrap'
 
 import { myDateFormat, useEngine, minDate, maxDate } from '../Engine'
 import Loading from './Loading'
+
+function RoomListing({rooms, createAssignment}) {
+    const [floor, setFloor] = useState('free')
+    const floors = rooms
+        .map(room => `${room.building}${room.floor}`)
+        .filter((label, i, self) => self.indexOf(label) === i)
+    floors.sort()
+    if (floor === 'free') {
+        rooms = rooms.filter(room => room.freeSeats > 0)
+        rooms.sort((a,b) => (b.freeSeats-a.freeSeats))
+    } else {
+        if (floor !== 'all') {
+            rooms = rooms.filter(room => `${room.building}${room.floor}` === floor)
+        }
+        rooms.sort((a,b) => (a.code.localeCompare(b.code)))
+    }
+    return <>
+        <h4>Elenco stanze</h4>
+        <select onChange={event => setFloor(event.target.value)}>
+            <option value='free'>stanze con posti liberi</option>
+            {floors.map(f => <option key={f} value={f}>{f}</option>)}
+            <option value='all'>tutte</option>
+        </select>
+        <ul>
+            {rooms.map(room => <li key={room._id}>
+                <b><a href={`/room/${room._id}`}>{room.code}</a></b>
+                {} <b>posti:</b> {room.nSeats},
+                {} <b>occupati:</b> {room.occupiedSeats},
+                {} <b>liberi:</b> {room.freeSeats}
+                {} <Button className='mb-1' size='sm' variant='warning' onClick={() => createAssignment(room)}>
+                    assegna
+                    </Button>
+                <ul>
+                    {room.periods.map(period =>
+                        <li key={period.startDate}>
+                            <i>{myDateFormat(period.startDate)}-{myDateFormat(period.endDate)}: </i>
+                            {period.assignments.map((a,i) => <span key={a._id}>{i?', ':''}<a href={`/roomassignment/${a._id}`}>{a.person.lastName}</a></span>)}
+                        </li>)}
+                </ul>
+            </li>)}
+        </ul>
+    </>
+}
 
 function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     const engine = useEngine()
@@ -99,8 +143,6 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
         })
     }
 
-    rooms.sort((a,b) => (b.freeSeats-a.freeSeats))
-
     const user_assignments = assignments.filter(assignment => assignment.person._id === person._id)
 
     return <>
@@ -114,33 +156,15 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
                 {} <Button className='mb-1' size='sm' variant='danger' onClick={() => deleteRoomAssignment(assignment)}>rimuovi</Button>
             </li>)}
         </ul>
-        <h4>Elenco stanze e posti liberi nel periodo</h4>
-        <ul>
-            {rooms.map(room => <li key={room._id}>
-                <b><a href={`/room/${room._id}`}>{room.code}</a></b>
-                {} <b>posti:</b> {room.nSeats},
-                {} <b>occupati:</b> {room.occupiedSeats},
-                {} <b>liberi:</b> {room.freeSeats}
-                {} <Button className='mb-1' size='sm' variant='warning' onClick={() => createAssignment(room)}>
-                    assegna
-                    </Button>
-                <ul>
-                    {room.periods.map(period =>
-                        <li key={period.startDate}>
-                            <i>{myDateFormat(period.startDate)}-{myDateFormat(period.endDate)}: </i>
-                            {period.assignments.map((a,i) => <span key={a._id}>{i?', ':''}<a href={`/roomassignment/${a._id}`}>{a.person.lastName}</a></span>)}
-                        </li>)}
-                </ul>
-            </li>)}
-        </ul>
+        <RoomListing rooms={rooms} createAssignment={createAssignment} />
     </>
 }
 
 export default function RoomAssignmentHelper({ person, startDate, endDate }) {
     return <Card className='mt-3'>
         <Card.Header>
-            <h3>Assegnazione stanza {person.lastName} {person.firstName}</h3>
-            <h4>{myDateFormat(startDate)}-{myDateFormat(endDate)}</h4>
+            <h4>Assegnazione stanza {person.lastName} {person.firstName}</h4>
+            <h5>{myDateFormat(startDate)}-{myDateFormat(endDate)}</h5>
         </Card.Header>
         <Card.Body>
             <RoomAssignmentHelperBody person={person} startDate={startDate} endDate={endDate} />
