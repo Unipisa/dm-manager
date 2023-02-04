@@ -6,13 +6,13 @@ import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput,
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function ModelInput({ field, schema, value, setValue}) {
+export function ModelInput({ field, modified, schema, value, setValue}) {
     const id = useId()
     function element(Element, opts = {}) {
         const {options, multiple} = opts
         const label = schema.items?.label || schema.label || field
         return <Form.Group className="row my-2">
-            <Form.Label className="col-sm-2" htmlFor={ id }>
+            <Form.Label className={ modified ? "col-sm-2 bg-warning" : "col-sm-2"} htmlFor={ id }>
                 { label }
             </Form.Label>
             <div className="col-sm-10">
@@ -49,7 +49,7 @@ export function ModelInput({ field, schema, value, setValue}) {
     }
 }
 
-export function ModelInputs({ schema, obj, setObj, onChange}) {
+export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
     let lst = []
     for (let [field, field_schema] of Object.entries(schema)) {
         if (RESERVED_FIELDS.includes(field)) continue
@@ -58,7 +58,8 @@ export function ModelInputs({ schema, obj, setObj, onChange}) {
             if (onChange && onChange(field, value)) return
             setObj(obj => ({...obj, [field]: value}))
         }
-        lst.push(<ModelInput key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} edit={true} />)
+        const modified = modifiedFields.includes(field)
+        lst.push(<ModelInput modified={modified} key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} edit={true} />)
     }        
     return lst
 }
