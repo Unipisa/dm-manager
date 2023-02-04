@@ -19,7 +19,7 @@ export default function ModelsPage({ Model, columns }) {
         const observer = new IntersectionObserver(filter.extendLimit)
         if (scrollRef.current) observer.observe(scrollRef.current)
         return () => observer.disconnect()
-    }, [scrollRef])
+    }, [scrollRef, filter.extendLimit])
 
     if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
