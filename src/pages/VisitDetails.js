@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { Button, Tabs, Tab } from 'react-bootstrap'
+import { Tabs, Tab } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
 import PersonDetails from './PersonDetails'
