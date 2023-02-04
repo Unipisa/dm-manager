@@ -101,10 +101,13 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
 
     rooms.sort((a,b) => (b.freeSeats-a.freeSeats))
 
+    const user_assignments = assignments.filter(assignment => assignment.person._id === person._id)
+
     return <>
         <h4>Assegnazioni già inserite</h4>
+        {user_assignments.length === 0 && <i>nessuna stanza assegnata</i>}
         <ul>
-            {assignments.filter(assignment => assignment.person._id === person._id).map(assignment =>
+            { user_assignments.map(assignment =>
             <li key={assignment._id}>
                 {} in <a href={`/room/${assignment.room._id}`}>{assignment.room.code}</a> 
                 {} assegnazione <a href={`/roomassignment/${assignment._id}`}>{myDateFormat(assignment.startDate)}-{myDateFormat(assignment.endDate)}</a>

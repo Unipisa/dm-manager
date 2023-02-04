@@ -1,6 +1,7 @@
 import { Route } from 'react-router-dom'
 
-import ModelPage from '../pages/ModelPage'
+import ModelViewPage from '../pages/ModelViewPage'
+import ModelEditPage from '../pages/ModelEditPage'
 import ModelsPage from '../pages/ModelsPage'
 import ModelHomeElement from '../components/ModelHomeElement'
 import ModelMenuElement from '../components/ModelMenuElement'
@@ -45,7 +46,10 @@ export default class Model {
         this.IndexPage = ModelsPage
 
         // react element of object view
-        this.ViewPage = ModelPage
+        this.ViewPage = ModelViewPage
+
+        // react element of object edit
+        this.EditPage = ModelEditPage
 
         // react element to be inserted 
         // in the home page
@@ -63,7 +67,10 @@ export default class Model {
     indexUrl() {return `/${this.code}`}
     
     // absolute url of object with given id
-    pageUrl(id) {return `/${this.code}/${id}`}
+    viewUrl(id) {return `/${this.code}/${id}`}
+
+    // absolute url of object with given id
+    editUrl(id) {return `/${this.code}/${id}/edit`}
 
     onObjectChange(setObj) {}
 
@@ -82,9 +89,11 @@ export default class Model {
 
         const indexRouter = MyIndex
             && <Route path={this.indexUrl()} element={<MyIndex Model={this}/>} />
-        const pageRouter = this.ViewPage 
-            && <Route path={this.pageUrl(":id")} element={<this.ViewPage Model={this}/>} />
+        const viewRouter = this.ViewPage 
+            && <Route path={this.viewUrl(":id")} element={<this.ViewPage Model={this}/>} />
+        const editRouter = this.EditPage  
+            && <Route path={this.editUrl(":id")} element={<this.EditPage Model={this}/>} />
 
-        return [indexRouter, pageRouter].filter(x => x)
+        return [indexRouter, viewRouter, editRouter].filter(x => x)
     }    
 }

@@ -6,12 +6,11 @@ import { useState, useRef, useId } from 'react';
 import { useQuery } from 'react-query'
 
 import api from '../api'
-import { myDateFormat, useEngine } from '../Engine'
+import { useEngine } from '../Engine'
 import Loading from './Loading'
 
-export function StringInput({ label, value, setValue, edit }) {
+export function StringInput({ label, value, setValue }) {
     const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -25,9 +24,8 @@ export function StringInput({ label, value, setValue, edit }) {
     </Form.Group>
 }
 
-export function NumberInput({ label, value, setValue, edit }) {
+export function NumberInput({ label, value, setValue }) {
     const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -42,9 +40,8 @@ export function NumberInput({ label, value, setValue, edit }) {
     </Form.Group>
 }
 
-export function DateInput({ label, value, setValue, edit }) {
+export function DateInput({ label, value, setValue }) {
     const id = useId()
-    if (!edit) return <p><b>{label}:</b> {myDateFormat(value)}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -58,10 +55,9 @@ export function DateInput({ label, value, setValue, edit }) {
     </Form.Group>
 }
 
-export function ListInput({ label, value, setValue, separator, edit }) {
+export function ListInput({ label, value, setValue, separator }) {
     const id = useId()
     if (separator === undefined) separator = ','    
-    if (!edit) return <p><b>{label}:</b> {value.join(', ')}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>{ label }</Form.Label>
             <div className="col-sm-10">
@@ -81,9 +77,8 @@ export function ListInput({ label, value, setValue, separator, edit }) {
     </Form.Group>
 }
 
-export function TextInput({ label, value, setValue, edit }) {
+export function TextInput({ label, value, setValue }) {
     const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -104,7 +99,7 @@ export function TextInput({ label, value, setValue, edit }) {
 //
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
-export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, label, value, setValue, edit, multiple }) {
+export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, label, value, setValue, multiple }) {
     const engine = useEngine()
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -130,13 +125,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
             return ""
 
         return render(x)
-    }
-
-    if (! edit) {
-        const values = multiple ? value : [ value ]
-        return <p>
-            <strong>{ label }: </strong>{Array.from(values).map(labelDisplayFunction).join(", ")}
-        </p> 
     }
 
     function handleClose() {
@@ -276,9 +264,9 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     </Form.Group>
 }
 
-export function PersonInput({ label, value, setValue, edit, multiple }) {
+export function PersonInput({ label, value, setValue, multiple }) {
     return <ObjectInput 
-        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        label={label} value={value} setValue={setValue} multiple={multiple} 
         objCode="person"
         objName="persona"
         oa="a"
@@ -293,9 +281,9 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
         />
 }
 
-export function GrantInput({ label, value, setValue, edit, multiple }) {
+export function GrantInput({ label, value, setValue, multiple }) {
     return <ObjectInput 
-        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        label={label} value={value} setValue={setValue} multiple={multiple} 
         objCode="grant"
         objName="grant"
         oa="o"
@@ -308,10 +296,9 @@ export function GrantInput({ label, value, setValue, edit, multiple }) {
         />
 }
 
-export function SelectInput({ options, label, value, setValue, edit, displayFunction }) {
+export function SelectInput({ options, label, value, setValue, displayFunction }) {
     const id = useId()
     console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
-    if (!edit) return <p><b>{label}:</b> {displayFunction?displayFunction(value):value}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -326,9 +313,8 @@ export function SelectInput({ options, label, value, setValue, edit, displayFunc
     </Form.Group>
 }
 
-export function BooleanInput({ label, value, setValue, edit }) {
+export function BooleanInput({ label, value, setValue }) {
     const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value?'sì':'no'}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -341,12 +327,10 @@ export function BooleanInput({ label, value, setValue, edit }) {
             />                 
         </div>
     </Form.Group>
-
 }
 
-export function MultipleSelectInput({ options, label, value, setValue, edit }) {
+export function MultipleSelectInput({ options, label, value, setValue}) {
     const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value.join(",")}</p>
     return <Form.Group className="row my-2">
         <Form.Label className="col-sm-2" htmlFor={ id }>
             { label }</Form.Label>
@@ -365,7 +349,7 @@ export function MultipleSelectInput({ options, label, value, setValue, edit }) {
     </Form.Group>
 }
 
-export function RoomInput({ label, value, setValue, edit }) {
+export function RoomInput({ label, value, setValue }) {
     const engine = useEngine()
     const path = 'room'
     const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_sort: 'code', _limit: 1000}), {
@@ -383,6 +367,6 @@ export function RoomInput({ label, value, setValue, edit }) {
             if (room === undefined) return '???' // database inconsistency
             return room.code
         }}
-        label={label} value={value} setValue={value => setValue(value?data.get(value):null)} edit={edit}
+        label={label} value={value} setValue={value => setValue(value?data.get(value):null)}
     />
 }

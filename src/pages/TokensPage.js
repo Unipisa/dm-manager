@@ -47,8 +47,8 @@ export default function TokensPage() {
                 </tbody>
             </Table>
         </div>
-        <StringInput value={obj.name} setValue={setter("name")} label="nome" edit={true}/>
-        <ListInput value={obj.roles} setValue={setter("roles")} label="ruoli" separator=" " edit={true}/>
+        <StringInput value={obj.name} setValue={setter("name")} label="nome" />
+        <ListInput value={obj.roles} setValue={setter("roles")} label="ruoli" separator=" " />
                 <Button onClick={ () => putToken(obj) } className="btn btn-primary">
                     crea token
                 </Button>
