@@ -6,7 +6,7 @@ const {
     endDate,
     createdBy, 
     updatedBy, 
-    notes
+    notes,
 } = require('./Model')
 
 const schema = new Schema({
@@ -14,6 +14,7 @@ const schema = new Schema({
     startDate,
     endDate,
     members: [{ type: ObjectId, label: 'membri', ref: 'Person' }],
+    notes,
     createdBy,
     updatedBy,
 }, {
