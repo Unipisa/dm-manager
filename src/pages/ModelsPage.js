@@ -1,4 +1,4 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 
@@ -13,6 +13,13 @@ export default function ModelsPage({ Model, columns }) {
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
         Model.viewUrl(obj._id), {replace: false}), [navigate, Model])
+    const scrollRef = useRef(null)
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(filter.extendLimit)
+        if (scrollRef.current) observer.observe(scrollRef.current)
+        return () => observer.disconnect()
+    }, [scrollRef])
 
     if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
@@ -64,8 +71,7 @@ export default function ModelsPage({ Model, columns }) {
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
                 { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>}
-            </div>
-            <Table hover>
+            </div>            <Table hover>
                 <thead className="thead-dark">
                     <tr>
                         {
@@ -104,7 +110,7 @@ export default function ModelsPage({ Model, columns }) {
             </Table>
             <p>Visualizzat{Model.oa === "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
             { query.data.limit < query.data.total
-                && <Button onClick={ filter.extendLimit }>visualizza altri</Button>
+                && <Button ref={scrollRef} onClick={ filter.extendLimit }>visualizza altri</Button>
             }
         </div>
     </>
