@@ -8,7 +8,7 @@ import Loading from '../components/Loading'
 
 export default function ModelEditPage({ Model }) {
     const params = useParams()
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
     const id = params.id
     const clone_id = searchParams.get('clone')
     const create = (id === 'new')
