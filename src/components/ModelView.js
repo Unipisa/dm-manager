@@ -17,6 +17,11 @@ export default function ModelView({Model, obj}) {
                 className="btn-warning">
                 modifica
             </Button>
+            <Button
+                onClick={ () => navigate(`${Model.editUrl('new')}?clone=${obj._id}`) }
+                className="btn-primary">
+                duplica
+            </Button>
             <Button 
                 onClick={ () => navigate(Model.indexUrl()) }
                 className="btn btn-secondary">

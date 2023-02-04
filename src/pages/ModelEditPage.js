@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
@@ -7,10 +7,15 @@ import Timestamps from '../components/Timestamps'
 import Loading from '../components/Loading'
 
 export default function ModelEditPage({ Model }) {
-    const id = useParams().id
+    const params = useParams()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const id = params.id
+    const clone_id = searchParams.get('clone')
     const create = (id === 'new')
     const engine = useEngine()
-    const query = engine.useGet(Model.code, id)
+    const query = engine.useGet(Model.code, clone_id ? clone_id : id)
+
+    console.log(`clone_id: ${clone_id} id: ${id} create: ${create}`)
 
     if (query.isError) return <div>errore caricamento</div>
     if (!query.isSuccess) return <Loading />
