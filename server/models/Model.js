@@ -114,6 +114,7 @@ function field_from_model_info(info) {
         }
     } else {
         switch(info.type) {
+            case Number: // fall through
             case String: return {
                     can_sort: true,
                     can_filter: true,

@@ -422,11 +422,12 @@ class Controller {
             const was = await this.Model.findById(id)
             log(req, was, payload)
             was.set({...was, ...payload})
-            was.save()
+            await was.save()
             res.send(was)
         } catch(error) {
+            console.log(`error: ${error.message}}`)
             console.error(error)
-            res.status(400).send({error: err.message})
+            res.status(400).send({error: error.message})
         }
     }
 
