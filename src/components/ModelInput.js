@@ -1,7 +1,8 @@
 import { useId } from 'react'
 import { Form } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 
-import { myDateFormat } from '../Engine'
+import { myDateFormat, useEngine } from '../Engine'
 import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput } from './Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
@@ -65,23 +66,24 @@ export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
 }
 
 export function ModelOutput({ field, schema, value}) {
+    const engine = useEngine()
+    const Models = engine.Models
     if (value === null) return '---'
     if (value === undefined) return '???'
     function render(value, xref) {
         if (!xref) return value
-        if (xref === 'Person') return `${value.firstName} ${value.lastName} (${value.affiliation})`
-        if (xref === 'Grant') return `${value.name} (${value.pi ? value.pi.lastName : ''} - ${value.identifier})`
-        if (xref === 'Room') return `${value.code}`
+        const Model = Models[xref]
+        if (Model) return <Link key={value._id} to={Model.viewUrl(value._id)}>{Model.describe(value)}</Link>
         return `x-ref to ${xref} not yet implemented`
     }
     if (schema.type === 'array') {
-        if (schema.enum) {
-            return value.join(', ')
-        }
-        if (value === undefined || value === null) return '???'
-        return value
-            .map(v => render(v, schema.items['x-ref']))
-            .join(', ')
+        if (schema.enum) return value.join(', ')
+        let lst = []
+        value.forEach((v, i) => {
+            if (i>0) lst.push(', ')
+            lst.push(render(v, schema.items['x-ref']))
+        })
+        return lst
     } else {
         if (schema['x-ref']) return render(value, schema['x-ref'])
         if (schema.format === 'date-time') return myDateFormat(value)
@@ -106,8 +108,9 @@ export function ModelOutput({ field, schema, value}) {
     }
 }
 
-export function ModelOutputs({ schema, obj}) {
+export function ModelOutputs({ Model, obj}) {
     let lst = []
+    const schema = Model.schema.fields
     for (let [field, field_schema] of Object.entries(schema)) {
         if (RESERVED_FIELDS.includes(field)) continue
         const label = field_schema.items?.label || field_schema.label || field

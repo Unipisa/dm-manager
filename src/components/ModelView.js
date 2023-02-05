@@ -17,7 +17,7 @@ export default function ModelView({Model}) {
             </Card.Header>
             <Card.Body>
         <ModelOutputs 
-                schema={Model.schema.fields} 
+                Model={Model} 
                 obj={obj} 
             />
         <ButtonGroup>

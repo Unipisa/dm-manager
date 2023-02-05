@@ -5,3 +5,7 @@
 .react-datepicker-popper {
   z-index: 2 !important;
 }
+
+a {
+  text-decoration: none;
+}

@@ -25,5 +25,5 @@ export default class Person extends Model {
         }
     }
 
-    describe(obj) { return `${obj?.lastName}, ${obj?.firstName}` }
+    describe(obj) { return `${obj?.firstName} ${obj?.lastName}` }
 }
