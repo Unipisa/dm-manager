@@ -20,7 +20,7 @@ export default function RelatedDetails({ related, title }) {
                             case 'Visit':
                                 return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: visita</a>
                             case 'RoomAssignment':
-                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} stanza {obj.room.number}, Piano {obj.room.floor}, Edificio {obj.room.building}</a>
+                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} stanza {obj.room.code}</a>
                             case 'Staff':
                                 return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} {obj.qualification }</a>
                             case 'Group':
