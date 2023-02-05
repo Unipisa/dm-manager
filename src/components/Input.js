@@ -269,7 +269,7 @@ export function GrantInput({ id, value, setValue, multiple }) {
 }
 
 export function SelectInput({ id, options, value, setValue, displayFunction }) {
-    console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
+    //console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
     return <select 
         className="form-control col-sm-10"
         id={ id } 

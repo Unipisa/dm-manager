@@ -75,6 +75,11 @@ describe('test admin user', () => {
       .get('/api/v0/person/search?_search=foo')
       .expect(200)
   })
+  it('can deal with malformed _id', async () => {
+    await app
+      .get('/api/v0/room/undefined')
+      .expect(404)
+  })
 })
 
 describe('test visit-manager', () => {

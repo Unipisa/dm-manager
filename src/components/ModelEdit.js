@@ -77,9 +77,9 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
              * unable to get the result from putObj
              * we should return after that
              */
-            await putObj(obj)
-            engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
-            onSave(obj)
+            const resultObj = await putObj(obj)
+            engine.addInfoMessage(`nuov${oa} ${objName} ${describe(resultObj)} inserit${oa}`)
+            onSave(resultObj)
         }
     }
 
@@ -109,7 +109,7 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
                     {create ? `aggiungi ${objName}` : `salva modifiche`}
                 </Button>
                 <Button 
-                    onClick={ onCancel }
+                    onClick={ () => onCancel(originalObj) }
                     className="btn btn-secondary">
                     annulla modifiche
                 </Button>

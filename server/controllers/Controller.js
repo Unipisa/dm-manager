@@ -171,7 +171,7 @@ class Controller {
             }
             res.send(obj)
         } catch(error) {
-            console.error(error)
+            console.log(`invalid _id: ${id}`)
             res.status(404).send({error: `invalid id ${id}`})
         }
     }

@@ -32,7 +32,7 @@ const multipleSSDs = {
     can_filter: true,
 }
 
-const notes = {type: String, label: 'note', widget: 'text'}
+const notes = {type: String, label: 'note', widget: 'text', default: ''}
 const createdBy = { type: ObjectId, ref: 'User' }
 const updatedBy = { type: ObjectId, ref: 'User' }
 const startDate = {type: Date, label: 'data inizio', default: null}
