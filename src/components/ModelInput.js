@@ -65,6 +65,8 @@ export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
 }
 
 export function ModelOutput({ field, schema, value}) {
+    if (value === null) return '---'
+    if (value === undefined) return '???'
     function render(value, xref) {
         if (!xref) return value
         if (xref === 'Person') return `${value.firstName} ${value.lastName} (${value.affiliation})`

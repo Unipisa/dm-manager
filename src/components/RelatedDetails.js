@@ -1,9 +1,14 @@
 import { Card } from 'react-bootstrap'
-import { myDateFormat } from '../Engine'
+import { myDateFormat, useEngine } from '../Engine'
+import { useObject } from './ObjectProvider'
 
-export default function RelatedDetails({ related, title }) {
+export default function RelatedDetails({ Model, related, title }) {
+    const obj = useObject()
+    const engine = useEngine()
+    related = related || engine.useGetRelated(Model.ModelName, obj._id)
+
     return <Card className="mt-2">
-        <Card.Header><h4>{ title || "elementi correlati" }</h4></Card.Header>
+        <Card.Header><h4>{ title || `elementi correlati` }</h4></Card.Header>
         <Card.Body>
         {related.filter(info => info.data !== null && info.data.length > 0).map((info, i) => 
             <div key={i}>
@@ -18,7 +23,7 @@ export default function RelatedDetails({ related, title }) {
                             case 'Grant':
                                 return <a href={`/${info.url}/${obj._id}`}>grant {obj.identifier || obj.name}</a>
                             case 'Visit':
-                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: visita</a>
+                                return <><a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: visita</a> di {obj?.person?.lastName} {obj?.person?.firstName}</>
                             case 'RoomAssignment':
                                 return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} stanza {obj.room.code}</a>
                             case 'Staff':

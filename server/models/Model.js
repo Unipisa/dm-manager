@@ -87,8 +87,8 @@ function field_from_model_info(info) {
     if (Array.isArray(info)) {
         if (info.length !== 1) return
         info = info[0]
-        if (info.ref === 'Person') {
-            // elenco di ObjectId di Person
+        if (info.ref) {
+            // elenco di ObjectId di documenti correlati
             return {
                 can_filter: true,
                 related_field: true,

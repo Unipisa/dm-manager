@@ -335,6 +335,8 @@ class Controller {
                         }
                     }
                 }
+            } else {
+                return sendBadRequest(res, `Unknown filter field '${key}'`)
             }
         }
 

@@ -1,12 +1,21 @@
-import { Button, ButtonGroup } from 'react-bootstrap'
+import { Button, ButtonGroup, Card } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
 import { ModelOutputs } from './ModelInput'
+import { useObject } from './ObjectProvider'
+import Timestamps from './Timestamps'
 
-export default function ModelView({Model, obj}) {
+
+export default function ModelView({Model}) {
+    const obj = useObject()
     const navigate = useNavigate()
 
     return <>
+        <Card>
+            <Card.Header>
+                <h3>{ `${Model.name} ${Model.describe(obj)}` }</h3>
+            </Card.Header>
+            <Card.Body>
         <ModelOutputs 
                 schema={Model.schema.fields} 
                 obj={obj} 
@@ -28,5 +37,10 @@ export default function ModelView({Model, obj}) {
                     torna all'elenco
             </Button>
         </ButtonGroup>
+            </Card.Body>
+            <Card.Footer>
+                <Timestamps obj={obj} />
+            </Card.Footer>
+        </Card>
     </>
 }

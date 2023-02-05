@@ -1,5 +1,5 @@
 import Model from './Model'
-import StaffDetails from '../pages/StaffDetails'
+import StaffViewPage from '../pages/StaffViewPage'
 
 export default class Staff extends Model {
     constructor() {
@@ -21,7 +21,7 @@ export default class Staff extends Model {
             'roomAssignment': "stanza",
             'updatedAt': "modificato",
         }
-        this.ObjectDetails = StaffDetails
+        this.ViewPage = StaffViewPage
     }
 
     describe(obj) { return `${obj?.person?.lastName} ${obj?.person?.firstName}` }

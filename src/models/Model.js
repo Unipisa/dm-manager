@@ -34,10 +34,6 @@ export default class Model {
         // columns in index page: {key: label}
         this.columns = {}
 
-        // the react component used to render
-        // object details
-        this.ObjectDetails = null
-
         // lo schema caricato dal server al momento 
         // della connessione (vedi Engine.js connect)
         this.schema = null

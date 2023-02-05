@@ -1,41 +1,26 @@
 import { useParams } from 'react-router-dom'
-import { Card, Tabs, Tab } from 'react-bootstrap'
+import { Tabs, Tab } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
 import ModelView from '../components/ModelView'
-import Timestamps from '../components/Timestamps'
-import Loading from '../components/Loading'
-import PersonDetails from './PersonDetails'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
+import { ObjectProvider, useObject } from '../components/ObjectProvider'
+import RelatedDetails from '../components/RelatedDetails'
 
-export default function VisitViewPage({ Model }) {
+export default function VisitViewPage() {
     const params = useParams()
     const id = params.id
     const engine = useEngine()
-    const query = engine.useGet(Model.code, id)
+    const Visit = engine.Models.Visit
 
-    if (query.isError) return <div>errore caricamento</div>
-    if (!query.isSuccess) return <Loading />
-
-    const visit = query.data
-
-    return <>
-        <Card>
-            <Card.Header>
-                <h3>{ `${Model.name} ${Model.describe(visit)}` }</h3>
-            </Card.Header>
-            <Card.Body>
-                <ModelView Model={Model} obj={visit}/>
-            </Card.Body>
-            <Card.Footer>
-                <Timestamps obj={visit} />
-            </Card.Footer>
-        </Card>
-        <VisitDetails visit={visit} />
-    </>
+    return <ObjectProvider path={Visit.code} id={id} >
+        <ModelView Model={Visit} />
+        <VisitDetails />
+    </ObjectProvider>
 }
 
-function VisitDetails({visit}) {
+function VisitDetails() {
+    const visit = useObject()
     const engine = useEngine()
     const person = visit.person
     if (visit.person === null) return
@@ -55,8 +40,10 @@ function VisitDetails({visit}) {
 
     if (person && engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
         tabs.push(<Tab key="related" eventKey="related" title={`dati correlati a ${person.lastName}`}>
-            <PersonDetails key='PersonDetails' obj={visit.person} />
-        </Tab>)
+            <ObjectProvider path={Person.code} id={person._id} >
+                <RelatedDetails Model={Person}/>
+            </ObjectProvider>
+      </Tab>)
     }
 
     if (tabs.length === 0) return
