@@ -78,8 +78,6 @@ export default function ModelsPage({ Model, columns }) {
     }
 
     function handleMouseDown(evt, obj) {
-        console.dir(evt)
-
         function openInNewTab(obj) {
             // It is currently unclear if this can be handled with React router
             // directly, or we can simply call window.open.
@@ -99,10 +97,8 @@ export default function ModelsPage({ Model, columns }) {
         } else if (evt.altKey || evt.metaKey) {
             if (evt.button ===0) openInNewTab(obj)
         } else {
-            switch (evt.button) {
-                case 0: navigateTo(obj); break
-                case 1: openInNewTab(obj); break
-            }
+            if (evt.button === 0) navigateTo(obj)
+            else if (evt.button === 1) openInNewTab(obj)
         }
     }
 
