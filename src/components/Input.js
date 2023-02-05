@@ -69,6 +69,7 @@ export function TextInput({ id, value, setValue }) {
 //
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
+// TODO: valutare widget alternativo: https://react-select.com/home
 export function ObjectInput({ id, placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple }) {
     const engine = useEngine()
     const [options, setOptions] = useState([])
