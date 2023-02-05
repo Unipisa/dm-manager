@@ -72,9 +72,9 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
     })
 
     assignments.forEach(assignment => {
-        const room = roomWithId[assignment.room._id]
+        const room = roomWithId[assignment.room?._id]
         if (room === undefined) {
-            console.log(`internal error: room ${assignment.room._id} not found`)
+            console.log(`internal error: room ${assignment.room?._id} not found in assignment ${assignment._id}`)
             return
         }
         let start = assignment.startDate ? new Date(assignment.startDate) : minDate

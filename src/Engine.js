@@ -155,50 +155,62 @@ export function useCreateEngine() {
             return query
         },
 
-        usePut: (path, cb) => {
-            const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload))
-            return object => mutation.mutate(object, {
-                    onSuccess: (result) => {
-                        queryClient.invalidateQueries([path])
-                        if (cb) cb(result)
-                    },
-                    onError: (err) => {
-                        addMessage(err.message, 'error')
-                    }
-                })
-        },
-
-        usePatch: (path, cb) => {
-            const mutation = useMutation(payload => api.patch(`/api/v0/${path}/${payload._id}`, payload))
+        usePut: (path) => {
+            const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries([path])
+                }
+            })
             return async (object) => {
-                mutation.mutate(object, {
-                    onSuccess: (result, object) => {
-                        queryClient.invalidateQueries([path])
-                        if (cb) cb(result, object)
-                    },
-                    onError: (err) => {
-                        addMessage(err.message, 'error')
-                    }
-                })
+                try {
+                    const res = await mutation.mutateAsync(object)
+                    return res 
+                } catch(err) {
+                    addMessage(err.message, 'error')
+                    return null
+                }
             }
         },
 
-        useDelete: (path, cb) => { 
-            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`))
-            return async (object) => {
-                mutation.mutate(object, {
-                    onSuccess: (result, object) => {
+        usePatch: (path) => {
+            const mutation = useMutation(
+                payload => api.patch(`/api/v0/${path}/${payload._id}`, payload), {
+                    onSuccess: () => {
                         queryClient.invalidateQueries([path])
-                        // NOTA: sembra che a seguito di questa chiamata
-                        // il queryClient decida di chiedere l'oggetto
-                        // cancellato ottenendo, giustamente, un 404
-                        // causando un messaggio di errore sulla console
-                        if (cb) cb(result, object)
-                    },
-                    onError: (err) => {
-                        addMessage(err.message, 'error')
                     }
                 })
+            return async (payload) => {
+                try {
+                    const res = await mutation.mutateAsync(payload)
+                    // await queryClient.invalidateQueries([path])
+                    return res
+                } catch(err) {
+                    addMessage(err.message, 'error')
+                    return null
+                }
+            }
+        },
+
+        useDelete: (path) => { 
+            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`),{
+                onSuccess: () => {
+                    queryClient.invalidateQueries([path])
+                    /**
+                     * sembra che l'invalidazione 
+                     * causi una richiesta all'oggetto
+                     * e quindi, giustamente, un errore 404 
+                     * sulla console
+                     */
+                }
+            })
+            return async (object) => {
+                try {
+                    const res = await mutation.mutateAsync(object)
+                    return res
+                } catch(err) {
+                    addMessage(err.message, 'error')
+                    return null
+                }
             }
         },
 

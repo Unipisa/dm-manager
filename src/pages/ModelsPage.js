@@ -45,8 +45,10 @@ export default function ModelsPage({ Model, columns }) {
 
     function displayField(obj, key) {
         let value = obj[key]
-        if (value === undefined) return ''
+        if (value === undefined) return '???'
         if (value === null) return '---'
+        if (key === 'roomAssignment') return `${value.room.code}`
+        if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
         const field = modelFields[key]
         if (field && field.type === 'array') {
             if (field.items['x-ref'] === 'Person') {
@@ -55,7 +57,6 @@ export default function ModelsPage({ Model, columns }) {
             return value.join(', ')
         }
         if (field && field.format === 'date-time') return myDateFormat(value)
-        if (key === 'roomAssignment') return `${value.room.code}`
         const xref = field && field['x-ref'] 
         if (xref === 'Person') {
             return `${value.lastName} ${value.firstName}`
@@ -64,6 +65,7 @@ export default function ModelsPage({ Model, columns }) {
         } else if (xref) {
             return `${xref} not implemented`
         }
+        if (typeof value === 'object') return JSON.stringify(value)
         return value
     }
 

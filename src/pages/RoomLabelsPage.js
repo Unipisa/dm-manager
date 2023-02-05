@@ -200,8 +200,8 @@ export default function RoomLabelsPage() {
         putRoomLabel(roomLabel)
     }
 
-    const onDone = (roomLabel) => {
-        patchRoomLabel({_id: roomLabel._id, state: 'managed'})
+    const onDone = async (roomLabel) => {
+        await patchRoomLabel({_id: roomLabel._id, state: 'managed'})
     }
 
     const onClick = (roomLabel) => {

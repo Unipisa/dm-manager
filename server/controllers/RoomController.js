@@ -1,4 +1,5 @@
 const Room = require('../models/Room')
+const RoomAssignment = require('../models/RoomAssignment')
 const Controller = require('./Controller')
 
 class RoomController extends Controller {
@@ -9,6 +10,16 @@ class RoomController extends Controller {
         this.supervisorRoles.push('room-manager', 'room-supervisor', 'assignment-manager', 'assignment-supervisor')
         this.searchFields = ['code', 'notes']
         this.searchRoles = ['room-manager', 'room-supervisor', 'assignment-manager']
+
+        // inserisce le assegnazioni
+        this.queryPipeline.push(
+            // inserisce startDate e endDate con la data odierna
+            {$addFields: {
+                startDate: new Date(),
+                endDate: new Date(),
+            }},
+            ...RoomAssignment.roomRoomAssignmentPipeline()
+        ) 
     }
 }
 

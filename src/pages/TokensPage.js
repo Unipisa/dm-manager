@@ -10,7 +10,13 @@ export default function TokensPage() {
     const [obj, setObj ] = useState({roles: engine.user.roles})
     const query = engine.useIndex('token')
     const deleteToken = engine.useDelete('token', (response, token) => engine.addInfoMessage(`token ${token.name} rimosso`))
-    const putToken = engine.usePut('token', (token) => engine.addInfoMessage(`token ${token.name} creato`))
+    const enginePutToken = engine.usePut('token')
+    
+    async function putToken(token) {
+        await enginePutToken(token)
+        engine.addInfoMessage(`token ${token.name} creato`)
+        setObj({roles: engine.user.roles})
+    }
 
     if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null

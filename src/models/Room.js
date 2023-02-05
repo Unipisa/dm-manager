@@ -22,12 +22,15 @@ export default class Room extends Model {
             'number': "numero",
             'floor': "piano",
             'building': "edificio",
-            'updatedAt': "modificato",
             'notes': "note",
+            'roomAssignments': "assegnazioni",
+            'updatedAt': "modificato",
         }
         this.ViewPage = RoomViewPage
     }
 
-    describe(room) { return `${room.code}` }
+    describe(room) { 
+        return `${room.building}${room.floor}:${room.number}` 
+    }
 }
 

@@ -16,19 +16,16 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
     const describe = Model.describe.bind(Model)
     const onChange = Model.onObjectChange.bind(Model)
     const engine = useEngine()
-    const putObj = engine.usePut(objCode, (obj) => {
-        engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
-        onSave(obj)
-        console.log(`putObj return: ${JSON.stringify(obj)}`)
-    })
-    const patchObj = engine.usePatch(objCode, (response, obj) => {
-        engine.addInfoMessage(`${objName} ${describe(obj)} modificat${oa}`)
-        onSave(obj)
-    })
-    const deleteObj = engine.useDelete(objCode, (response, obj) => {
+    const putObj = engine.usePut(objCode)
+    const patchObj = engine.usePatch(objCode)
+    const engineDeleteObj = engine.useDelete(objCode)
+
+    async function deleteObj(obj) {
+        await engineDeleteObj(obj)
         engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
         onDelete ? onDelete() : onCancel()
-    })
+    }
+
     const query = engine.useGet(Model.code, id)
     const queryClone = engine.useGet(Model.code, clone_id ? clone_id : null)
 
@@ -60,8 +57,8 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
 
     const changed = modifiedFields.length > 0
 
-    const submit = (evt) => {
-        console.log(`SUBMIT. originalObj: ${JSON.stringify(originalObj)} ModifiedObj: ${JSON.stringify(modifiedObj)}`)
+    const submit = async (evt) => {
+        // console.log(`SUBMIT. originalObj: ${JSON.stringify(originalObj)} ModifiedObj: ${JSON.stringify(modifiedObj)}`)
         let obj = modifiedObj
         if (obj._id) {
             let payload = Object.fromEntries(
@@ -72,13 +69,17 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
              * unable to get the result from patchObj
              * we should return after that
              */
-            patchObj(payload)
+            await patchObj(payload)
+            engine.addInfoMessage(`${objName} ${describe(obj)} modificat${oa}`)
+            onSave(obj)
         } else {
             /**
              * unable to get the result from putObj
              * we should return after that
              */
-            putObj(obj)
+            await putObj(obj)
+            engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
+            onSave(obj)
         }
     }
 
