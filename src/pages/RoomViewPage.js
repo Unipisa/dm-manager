@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom'
 import { useEngine, myDateFormat } from '../Engine'
 import ModelView from '../components/ModelView'
 import Loading from '../components/Loading'
-import RelatedDetails from '../components/RelatedDetails'
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
 import { Card } from 'react-bootstrap'
 
