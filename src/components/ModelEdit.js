@@ -1,33 +1,42 @@
 import { useState } from 'react'
 import { Form, Button, ButtonGroup } from 'react-bootstrap'
-import { Navigate } from 'react-router-dom'
+import { Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
 import { ModelInputs } from '../components/ModelInput'
+import Timestamps from '../components/Timestamps'
+import Loading from '../components/Loading'
 
-export default function ModelEdit({Model, obj}) {
-    const create = (obj._id === undefined)
-    const [modifiedObj, setModifiedObj] = useState(obj)
+export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDelete}) {
+    const create = (id === 'new')
+    const [modifiedObj, setModifiedObj] = useState(null)
     const objCode = Model.code
     const objName = Model.name
-    const indexUrl = Model.indexUrl()
     const oa = Model.oa 
     const describe = Model.describe.bind(Model)
     const onChange = Model.onObjectChange.bind(Model)
     const engine = useEngine()
-    const [ redirect, setRedirect ] = useState(null)
     const putObj = engine.usePut(objCode, (obj) => {
         engine.addInfoMessage(`nuov${oa} ${objName} ${describe(obj)} inserit${oa}`)
-        setRedirect(Model.viewUrl(obj._id))
+        onSave(obj)
+        console.log(`putObj return: ${JSON.stringify(obj)}`)
     })
-    const patchObj = engine.usePatch(objCode, (response) => {
-        engine.addInfoMessage(`${objName} ${describe(modifiedObj)} modificat${oa}`)
-        setRedirect(Model.viewUrl(modifiedObj._id))
+    const patchObj = engine.usePatch(objCode, (response, obj) => {
+        engine.addInfoMessage(`${objName} ${describe(obj)} modificat${oa}`)
+        onSave(obj)
     })
     const deleteObj = engine.useDelete(objCode, (response, obj) => {
         engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
-        setRedirect(indexUrl)
+        onDelete ? onDelete() : onCancel()
     })
+    const query = engine.useGet(Model.code, clone_id ? clone_id : id)
+
+    if (query.isError) return <div>errore caricamento</div>
+    if (modifiedObj === null) {
+        if (query.isSuccess) setModifiedObj({...query.data})
+        return <Loading />
+    }
+    const originalObj = query.data
 
     function compareValue(v1, v2) {
         // capita di confrontare una stringa con una data
@@ -45,34 +54,43 @@ export default function ModelEdit({Model, obj}) {
     }
 
     const modifiedFields = Object.keys(modifiedObj)
-        .filter(key => !compareValue(modifiedObj[key], obj[key]))
+        .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
 
     const changed = modifiedFields.length > 0
-    /*
-    modifiedFields.forEach(key => {
-        console.log(`modified field: ${key} ${typeof(obj[key])}:${JSON.stringify(obj[key])} -> ${typeof(modifiedObj[key])}:${JSON.stringify(modifiedObj[key])}`)
-    })
-    */
 
-    const submit = async (evt) => {
-        console.log(`SUBMIT. obj: ${JSON.stringify(obj)} obj: ${JSON.stringify(modifiedObj)}`)
-        if (modifiedObj._id) {
+    const submit = (evt) => {
+        console.log(`SUBMIT. originalObj: ${JSON.stringify(originalObj)} ModifiedObj: ${JSON.stringify(modifiedObj)}`)
+        let obj = modifiedObj
+        if (obj._id) {
             let payload = Object.fromEntries(
                 modifiedFields
-                .map(key => ([key, modifiedObj[key]])))
-            payload._id = modifiedObj._id
+                .map(key => ([key, obj[key]])))
+            payload._id = obj._id
+            /**
+             * unable to get the result from patchObj
+             * we should return after that
+             */
             patchObj(payload)
         } else {
-            putObj(modifiedObj)
+            /**
+             * unable to get the result from putObj
+             * we should return after that
+             */
+            putObj(obj)
         }
     }
 
-    if (redirect !== null) return <Navigate to={redirect} />
-
     // console.log(`ModelPage obj: ${JSON.stringify(obj)}`)
 
-    return <>
-        <Form onSubmit={ (event) => event.preventDefault() }>
+    return <Card>
+        <Card.Header>
+            <h3>{ create 
+                    ? `nuov${Model.oa} ${Model.name}` 
+                    : `modifica ${Model.name} ${Model.describe(modifiedObj)}`
+            }</h3>
+        </Card.Header>
+        <Card.Body>
+          <Form onSubmit={ (event) => event.preventDefault() }>
             <ModelInputs 
                 schema={Model.schema.fields} 
                 obj={modifiedObj} 
@@ -88,7 +106,7 @@ export default function ModelEdit({Model, obj}) {
                     {create ? `aggiungi ${objName}` : `salva modifiche`}
                 </Button>
                 <Button 
-                    onClick={ () => setRedirect(create ? Model.indexUrl(obj._id) : Model.viewUrl(obj._id)) }
+                    onClick={ onCancel }
                     className="btn btn-secondary">
                     annulla modifiche
                 </Button>
@@ -98,6 +116,10 @@ export default function ModelEdit({Model, obj}) {
                         elimina {objName}
                 </Button>}
             </ButtonGroup>
-        </Form>
-    </>
+          </Form>
+        </Card.Body>
+        <Card.Footer>
+            <Timestamps obj={originalObj} />
+        </Card.Footer>
+    </Card>
 }
