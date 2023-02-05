@@ -47,7 +47,7 @@ function RoomListing({rooms, createAssignment}) {
     </>
 }
 
-function RoomAssignmentHelperBody({ person, startDate, endDate }) {
+export default function RoomAssignmentHelper({ person, startDate, endDate }) {
     const engine = useEngine()
     startDate = startDate ? new Date(startDate) : minDate
     endDate = endDate ? new Date(endDate) : maxDate
@@ -146,7 +146,7 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
     const user_assignments = assignments.filter(assignment => assignment.person._id === person._id)
 
     return <>
-        <h4>Assegnazioni già inserite</h4>
+        <h5>Assegnazioni inserite</h5>
         {user_assignments.length === 0 && <i>nessuna stanza assegnata</i>}
         <ul>
             { user_assignments.map(assignment =>
@@ -159,7 +159,7 @@ function RoomAssignmentHelperBody({ person, startDate, endDate }) {
         <RoomListing rooms={rooms} createAssignment={createAssignment} />
     </>
 }
-
+/*
 export default function RoomAssignmentHelper({ person, startDate, endDate }) {
     return <Card className='mt-3'>
         <Card.Header>
@@ -171,3 +171,4 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
         </Card.Body>
     </Card>
 }
+*/

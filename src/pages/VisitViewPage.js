@@ -28,7 +28,7 @@ function VisitDetails() {
     const Person = engine.Models.Person
 
     if (visit.person && visit.startDate && engine.user.hasSomeRole(...engine.Models.RoomAssignment.schema.supervisorRoles)) {
-        tabs.push(<Tab key="rooms" eventKey="rooms" title="assegnazione stanze">
+        tabs.push(<Tab key="rooms" eventKey="rooms" title="assegnazione stanza">
             <RoomAssignmentHelper 
                 key={RoomAssignmentHelper} 
                 person={visit.person}
