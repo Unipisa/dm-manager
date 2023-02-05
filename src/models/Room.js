@@ -22,6 +22,7 @@ export default class Room extends Model {
             'number': "numero",
             'floor': "piano",
             'building': "edificio",
+            'nSeats': "posti",
             'notes': "note",
             'roomAssignments': "assegnazioni",
             'updatedAt': "modificato",

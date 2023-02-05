@@ -167,7 +167,7 @@ export function useCreateEngine() {
                     return res 
                 } catch(err) {
                     addMessage(err.message, 'error')
-                    return null
+                    throw err
                 }
             }
         },
@@ -186,7 +186,7 @@ export function useCreateEngine() {
                     return res
                 } catch(err) {
                     addMessage(err.message, 'error')
-                    return null
+                    throw err
                 }
             }
         },
@@ -209,7 +209,7 @@ export function useCreateEngine() {
                     return res
                 } catch(err) {
                     addMessage(err.message, 'error')
-                    return null
+                    throw err
                 }
             }
         },
