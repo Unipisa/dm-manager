@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 
@@ -14,6 +14,7 @@ export default function ModelsPage({ Model, columns }) {
     const navigateTo = useCallback((obj) => navigate(
         Model.viewUrl(obj._id), {replace: false}), [navigate, Model])
     const scrollRef = useRef(null)
+    const [selectedIds, setSelectedIds] = useState([])
 
     /*
      * infite loop!
@@ -76,12 +77,49 @@ export default function ModelsPage({ Model, columns }) {
         }))
     }
 
+    function handleMouseDown(evt, obj) {
+        console.dir(evt)
+
+        function openInNewTab(obj) {
+            // It is currently unclear if this can be handled with React router
+            // directly, or we can simply call window.open.
+            window.open(Model.viewUrl(obj._id), '_blank')
+        }
+
+        if (evt.ctrlKey) {
+            if (evt.button === 0) {
+                setSelectedIds(lst => {
+                    if (lst.includes(obj._id)) {
+                        return lst.filter(id => id !== obj._id)
+                    } else {
+                        return [...lst, obj._id]
+                    }
+                })
+            }
+        } else if (evt.altKey || evt.metaKey) {
+            if (evt.button ===0) openInNewTab(obj)
+        } else {
+            switch (evt.button) {
+                case 0: navigateTo(obj); break
+                case 1: openInNewTab(obj); break
+            }
+        }
+    }
+
     return <>
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
                 { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>}
-            </div>            <Table hover>
+            </div>            
+            <div className="d-flex mb-4">
+                { selectedIds.length>0 
+                    ? <>
+                    {selectedIds.length} righe selezionate
+                    </>
+                    : `usa ctrl-click per selezionare una riga` && ''}
+            </div>
+            <Table hover>
                 <thead className="thead-dark">
                     <tr>
                         {
@@ -91,31 +129,13 @@ export default function ModelsPage({ Model, columns }) {
                     </tr>
                 </thead>
                 <tbody>
-                    { 
-                    data.map(obj => {
-                            const handleMouseDown = (evt) => {
-                                switch (evt.button) {
-                                    case 0:
-                                        navigateTo(obj)
-                                        break
-                                    case 1:
-                                        // It is currently unclear if this can be handled with React router
-                                        // directly, or we can simply call window.open.
-                                        window.open(Model.pageUrl(obj._id), '_blank')
-                                        break
-                                    default:
-                                        // NOOP
-                                }
+                    { data.map(obj => 
+                        <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onMouseDown={evt => handleMouseDown(evt, obj)} >
+                            {
+                                Object.entries(columns).map(([key, label]) =>
+                                <td key={key}>{ displayField(obj, key) }</td>)
                             }
-
-                            return <tr key={obj._id} onMouseDown={handleMouseDown} >
-                                {
-                                    Object.entries(columns).map(([key, label]) =>
-                                    <td key={key}>{ displayField(obj, key) }</td>)
-                                }
-                            </tr>
-                        })
-                    }
+                        </tr>)}
                 </tbody>
             </Table>
             <p>Visualizzat{Model.oa === "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
