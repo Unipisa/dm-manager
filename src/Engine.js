@@ -297,3 +297,14 @@ export function myDateFormat(date) {
     return moment(date).format('D.M.YYYY')
 }
 
+export function notNullStartDate(date) {
+    if (date === null) return minDate
+    if (typeof date === 'string') return new Date(date)
+    return date
+}
+
+export function notNullEndDate(date) {
+    if (date === null) return maxDate
+    if (typeof date === 'string') return new Date(date)
+    return date
+}

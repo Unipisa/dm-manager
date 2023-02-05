@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { useState } from 'react'
 
-import { useEngine, myDateFormat } from '../Engine'
+import { useEngine, myDateFormat, notNullStartDate, notNullEndDate } from '../Engine'
 import ModelView from '../components/ModelView'
 import Loading from '../components/Loading'
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
@@ -30,12 +30,13 @@ function RoomAssignments() {
     const today = new Date()
 
     const filteredAssignments = assignments.filter(assignment => {
+        const start = notNullStartDate(assignment.startDate)
+        const end = notNullEndDate(assignment.endDate)
         switch(filter) {
             case 'all': return true
-            case 'current': return (assignment.startDate===null || assignment.starDate <= today) 
-                && (assignment.endDate===null || today <= assignment.endDate)
-            case 'past': return assignment.endDate !== null && assignment.endDate < today
-            case 'future': return assignment.startDate !== null && assignment.startDate > today
+            case 'current': return start <= today && today <= end
+            case 'past': return end < today
+            case 'future': return start > today
             default:
                 return false
         }
