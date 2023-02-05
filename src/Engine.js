@@ -149,7 +149,7 @@ export function useCreateEngine() {
                 [path, id], 
                 () => api.get(`/api/v0/${path}/${id}`), 
                 {
-                 //   enabled: id !== 'new',
+                    enabled: id !== null,
                     onError: (err) => addMessage(err.message, 'error'),
                 })
             return query
@@ -157,8 +157,7 @@ export function useCreateEngine() {
 
         usePut: (path, cb) => {
             const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload))
-            return async (object) => {
-                mutation.mutate(object, {
+            return object => mutation.mutate(object, {
                     onSuccess: (result) => {
                         queryClient.invalidateQueries([path])
                         if (cb) cb(result)
@@ -167,7 +166,6 @@ export function useCreateEngine() {
                         addMessage(err.message, 'error')
                     }
                 })
-            }
         },
 
         usePatch: (path, cb) => {
@@ -191,6 +189,10 @@ export function useCreateEngine() {
                 mutation.mutate(object, {
                     onSuccess: (result, object) => {
                         queryClient.invalidateQueries([path])
+                        // NOTA: sembra che a seguito di questa chiamata
+                        // il queryClient decida di chiedere l'oggetto
+                        // cancellato ottenendo, giustamente, un 404
+                        // causando un messaggio di errore sulla console
                         if (cb) cb(result, object)
                     },
                     onError: (err) => {

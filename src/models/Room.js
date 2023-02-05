@@ -28,6 +28,6 @@ export default class Room extends Model {
         this.ViewPage = RoomViewPage
     }
 
-    describe(room) { return `${room.number} ${room.floor} ${room.building}` }
+    describe(room) { return `${room.code}` }
 }
 
