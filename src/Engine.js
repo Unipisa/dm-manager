@@ -149,7 +149,7 @@ export function useCreateEngine() {
                 [path, id], 
                 () => api.get(`/api/v0/${path}/${id}`), 
                 {
-                 //   enabled: id !== 'new',
+                    enabled: id !== null,
                     onError: (err) => addMessage(err.message, 'error'),
                 })
             return query

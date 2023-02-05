@@ -29,11 +29,13 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
         engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
         onDelete ? onDelete() : onCancel()
     })
-    const query = engine.useGet(Model.code, clone_id ? clone_id : id)
+    const query = engine.useGet(Model.code, id)
+    const queryClone = engine.useGet(Model.code, clone_id ? clone_id : null)
 
-    if (query.isError) return <div>errore caricamento</div>
+    if (query.isError || queryClone.isError) return <div>errore caricamento</div>
     if (modifiedObj === null) {
-        if (query.isSuccess) setModifiedObj({...query.data})
+        if (query.isSuccess && !clone_id) setModifiedObj({...query.data})
+        if (clone_id && queryClone.isSuccess) setModifiedObj({...queryClone.data, _id: undefined})
         return <Loading />
     }
     const originalObj = query.data
