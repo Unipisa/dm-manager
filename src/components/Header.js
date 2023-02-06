@@ -31,17 +31,21 @@ export default function Header() {
                 {user.hasSomeRole('disguised-admin') && <NavDropdown.Item onClick={ () => engine.impersonate_role('admin') }>ritorna admin</NavDropdown.Item>}
                 {user.hasSomeRole('admin', 'disguised-admin') && 
                   ['supervisor', 
-                  'label-manager',
-                  'grant-manager',
-                  'grant-supervisor',
-                  'person-manager',
-                  'person-supervisor',
-                  'visit-manager', 
-                  'visit-supervisor',
-                  'room-manager',
-                  'room-supervisor',
                   'assignment-manager',
                   'assignment-supervisor',
+                  'grant-manager',
+                  'grant-supervisor',
+                  'group-manager',
+                  'group-supervisor',
+                  'label-manager',
+                  'person-manager',
+                  'person-supervisor',
+                  'room-manager',
+                  'room-supervisor',
+                  'staff-manager',
+                  'staff-supervisor',
+                  'visit-manager',
+                  'visit-supervisor',
                   ].map(role => <NavDropdown.Item 
                     key={role} 
                     onClick={ async () => {
