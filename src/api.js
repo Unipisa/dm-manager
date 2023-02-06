@@ -1,8 +1,7 @@
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
 
 async function api_fetch(url, options) {
-    const options_json = options ? `- ${JSON.stringify(options)}` : ''
-    console.log(`API_FETCH ${url} ${options_json}`)
+    // console.log(`fetching ${url} starting`)
     options = {credentials: 'include', ...options}
     const response = await fetch(BASE_URL + url, options)
     if (response.status === 401) throw new Error("invalid credentials")
@@ -20,6 +19,7 @@ async function api_fetch(url, options) {
     }
     if (response.status !== 200) throw new Error("server error")
     const data = await response.json()
+    // console.log(`fetching ${url} done`)
     return data
 }
 

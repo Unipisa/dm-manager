@@ -43,58 +43,108 @@ Room.relatedModels.push({
     field: 'room',
 })
 
-
-RoomAssignment.personRoomAssignmentPipeline = () => ([{$lookup: {
-    from: "roomassignments",
-    let: { start: "$startDate", end: "$endDate" },
-    localField: 'person._id',
-    foreignField: "person",
-    as: 'roomAssignments',
-    pipeline: [
-        // inserisce i dati della stanza
-        {$lookup: {
-            from: "rooms",
-            localField: "room",
-            foreignField: "_id",
-            as: "room",
-        }},
-        {$project: {
-            "startDate": 1,
-            "endDate": 1,
-            "room._id": 1,
-            "room.building": 1,
-            "room.floor": 1,
-            "room.number": 1,
-        }},
-        // tiene solo le assegnazioni che includono il periodo [start, end] 
-        {$match: {
-            $expr: {
-                $and: [
-                    { $or: [
-                        { $eq: ["$$end", null] },
-                        { $eq: ["$startDate", null] },
-                        { $lte: ["$startDate", "$$end"] } ]},
-                    { $or: [
-                        { $eq: ["$$start", null] },
-                        { $eq: ["$endDate", null] },
-                        { $gte: ["$endDate", "$$start"] } ]}
-                ]},
+RoomAssignment.personRoomAssignmentPipeline = () => ([
+    {$lookup: {
+        from: "roomassignments",
+        let: { start: "$startDate", end: "$endDate" },
+        localField: 'person._id',
+        foreignField: "person",
+        as: 'roomAssignments',
+        pipeline: [
+            // inserisce i dati della stanza
+            {$lookup: {
+                from: "rooms",
+                localField: "room",
+                foreignField: "_id",
+                as: "room",
+            }},
+            {$project: {
+                "startDate": 1,
+                "endDate": 1,
+                "room._id": 1,
+                "room.code": 1,
+                "room.building": 1,
+                "room.floor": 1,
+                "room.number": 1,
+            }},
+            // tiene solo le assegnazioni che includono il periodo [start, end] 
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$$end", null] },
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$end"] } ]},
+                        { $or: [
+                            { $eq: ["$$start", null] },
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$start"] } ]}
+                    ]},
+                },
             },
-        },
-        {$unwind: {
-            path: "$room",
-            preserveNullAndEmptyArrays: true
-        }},
-        // ordina per data finale...
-        // l'ultima assegnazione dovrebbe essere quella attuale
-        {$sort: {"endDate": 1}},
-    ]
-}},
-{ $addFields: {
-    roomAssignment: {
-        $ifNull: [
-            { $arrayElemAt: ["$roomAssignments", -1] },
-            null
+            {$unwind: {
+                path: "$room",
+                preserveNullAndEmptyArrays: true
+            }},
+            // ordina per data finale...
+            // l'ultima assegnazione dovrebbe essere quella attuale
+            {$sort: {"endDate": 1}},
         ]
-    }
-}}])
+    }},
+    { $addFields: {
+        roomAssignment: {
+            $ifNull: [
+                { $arrayElemAt: ["$roomAssignments", -1] },
+                null
+            ]
+        }
+    }}
+])
+
+RoomAssignment.roomRoomAssignmentPipeline = () => ([
+    {$lookup: {
+        from: "roomassignments",
+        let: { start: "$startDate", end: "$endDate" },
+        localField: '_id',
+        foreignField: "room",
+        as: 'roomAssignments',
+        pipeline: [
+            // inserisce i dati della persona
+            {$lookup: {
+                from: "people",
+                localField: "person",
+                foreignField: "_id",
+                as: "person",
+            }},
+            {$project: {
+                "startDate": 1,
+                "endDate": 1,
+                "person._id": 1,
+                "person.firstName": 1,
+                "person.lastName": 1,
+            }},
+            // tiene solo le assegnazioni che includono il periodo [start, end] 
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$$end", null] },
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$end"] } ]},
+                        { $or: [
+                            { $eq: ["$$start", null] },
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$start"] } ]}
+                    ]},
+                },
+            },
+            {$unwind: {
+                path: "$person",
+                preserveNullAndEmptyArrays: true
+            }},
+            // ordina per data finale...
+            // l'ultima assegnazione dovrebbe essere quella attuale
+            {$sort: {"endDate": 1}},
+        ]
+    }}
+])

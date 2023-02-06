@@ -6,6 +6,10 @@ function sendBadRequest(res, message) {
     res.send({error: message})
 }
 
+function escapeRegExp(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
 class Controller {
     constructor(Model=null) {
         // every controller must define a unique path
@@ -50,20 +54,15 @@ class Controller {
 
         if (this.Model) {
             // inspect Model to populate controller properties
-            this.add_fields_from_model()
+            this.fields = Model._schema_info.properties
             this.add_fields_population_from_model()
         }
     }
 
     getSchema() {
-        const schema = this.Model.jsonSchema()
+        const schema = this.Model._schema_info
         const related = this.Model.relatedModels || []
-        const fields = Object.fromEntries(
-            Object.entries(schema.properties)
-            .map(([field,info]) => {
-                const myInfo = this.fields[field] || {}
-                return [field, {...info, ...myInfo}]
-            }))
+        const fields = schema.properties
         return {
             fields,
             related: related.map(related => ({
@@ -74,83 +73,6 @@ class Controller {
             path: this.path,
             managerRoles: this.managerRoles,
             supervisorRoles: this.supervisorRoles,
-        }
-    }
-
-    add_fields_from_model() {
-        /***
-         * Try to construct the fields information structure
-         * needed by controller to build the queries
-         * by inspecting the Model.
-         * The derived class will have the ability 
-         * to ignore or override these settings
-         ***/
-        function field_from_model_info(info) {
-            if (Array.isArray(info)) {
-                if (info.length !== 1) return
-                info = info[0]
-                if (info.ref === 'Person') {
-                    // elenco di ObjectId di Person
-                    return {
-                        can_filter: true,
-                        related_field: true,
-                        related_many: true,
-                    }
-                }
-                return
-            }
-            if (typeof info !== 'object') {
-                return
-            }
-            if (info.ref === 'Person') {
-                return {
-                    can_sort: ['lastName', 'firstName'],
-                    can_filter: true,
-                    related_field: true,
-                }
-            } else if (info.ref === 'Room') {
-                return {
-                    can_sort: ['building', 'floor', 'number'],
-                    can_filter: true,
-                    related_field: true,
-                }
-            } else {
-                switch(info.type) {
-                    case String: return {
-                            can_sort: true,
-                            can_filter: true,
-                        }
-                    case Date: return {
-                            can_sort: true,
-                            can_filter: true,
-                            match_date: true,
-                        }
-                    case Boolean: return {
-                        can_sort: true,
-                        can_filter: true,
-                        match_boolean: true,
-                    }
-                }
-            }
-        }
-
-        this.fields['_id'] = {
-            can_sort: true,
-            can_filter: true,
-            match_ids: true,
-        }
-
-        Object.entries(this.Model.schema.obj)
-            .forEach(([field, info]) => {
-                if (field === 'updatedBy') return
-                if (field === 'createdBy') return
-                const field_info = field_from_model_info(info)
-                if (field_info) this.fields[field] = field_info 
-            })
-
-        if (this.Model.schema.options.timestamps) {
-            this.fields['updatedAt'] = { can_sort: true }
-            this.fields['createdAt'] = { can_sort: true }
         }
     }
 
@@ -212,7 +134,7 @@ class Controller {
                 } else if (info.ref === 'Room') {
                     this.populateFields.push({
                         path: field,
-                        select: ['number', 'floor', 'building']
+                        select: ['code', 'number', 'floor', 'building']
                     })
                     this.queryPipeline.push(
                         {$lookup: {
@@ -235,6 +157,11 @@ class Controller {
     }
 
     async get(req, res, id) {
+        if (id === 'new') {
+            const obj = (new this.Model()).toObject()
+            obj._id = undefined
+            return res.send(obj)
+        }
         try {
             let obj = await this.Model
                 .findById(id)
@@ -244,28 +171,12 @@ class Controller {
             }
             res.send(obj)
         } catch(error) {
-            console.error(error)
+            console.log(`invalid _id: ${id}`)
             res.status(404).send({error: `invalid id ${id}`})
         }
     }
 
-    async search(req, res) {
-        const $search = req.query.q || ''
-        const $escapedsearch = $search.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
-
-        var data = []
-        for (var field of this.searchFields) {
-            data = [ ...data, 
-                ...await this.Model.find({ [field]: { $regex: new RegExp($escapedsearch, "i") }}).limit(10)
-            ]
-        }
-
-        return res.send({ data })
-    }
-
-    async index (req, res) {
-        console.log(`INDEX ${req.path} ${JSON.stringify(req.query)}`)
-
+    async performQuery(query, res) {
         let $matches = []
         let $match_lookups = {}
         let $sort = {_id: 1}
@@ -277,8 +188,8 @@ class Controller {
 
         const fields = this.fields
 
-        for (let key in req.query) {
-            let value = req.query[key];
+        for (let key in query) {
+            let value = query[key];
             const key_parts = key.split('__')
             const key0 = key_parts[0]
 
@@ -314,13 +225,17 @@ class Controller {
                         $sort[`${value}.${field}`] = direction
                     })
                 }
-            }
-            else if (key == '_search') {
-                // Implement a custom filter over searchable fields
-                for (let field of this.searchFields) {
-                    search_conditions.push({
-                        [field]: { $regex: value, $options: 'i' }
-                    })
+            } else if (key == '_search') {
+                try {
+                    const $regex = new RegExp(escapeRegExp(value), 'i')
+                    // Implement a custom filter over searchable fields
+                    for (let field of this.searchFields) {
+                        search_conditions.push({
+                            [field]: { $regex }
+                        })
+                    }
+                } catch (err) {
+                    return sendBadRequest(res, `invalid _search value ${value} [${err}]`)
                 }
             } else if (fields[key0] && fields[key0].can_filter) {
                 const field = fields[key0];
@@ -401,17 +316,27 @@ class Controller {
                 } else {
                     if (key_parts.length === 1) {
                         $matches.push({ [key0]: value })
-                    }
+                    } 
                     else {
                         if (key_parts[1] == 'regex') {
-                            // We do case-insensitive regexp by default
-                            $matches.push({ [key0]: { $regex: new RegExp(value, "i") } })
-                        }
+                            try {
+                                const $regex = new RegExp(value, "i")
+                                // We do case-insensitive regexp by default
+                                $matches.push({ [key0]: { $regex } })
+                            } catch(err) {
+                                return sendBadRequest(res, `invalid regex "${value}"`)
+                            }
+                        } 
+                        else if (key_parts[1] == 'in') {
+                            $matches.push({ [key0]: { $in: value.split("|") } })
+                        } 
                         else {
                             return sendBadRequest(res, `Unsupported field modifier in '${key}'`)
                         }
                     }
                 }
+            } else {
+                return sendBadRequest(res, `Unknown filter field '${key}'`)
             }
         }
 
@@ -460,6 +385,16 @@ class Controller {
         })
     }
 
+    async search(req, res) {
+        console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
+        return this.performQuery({_search: req.query.q || ''}, res)
+    }
+
+    async index (req, res) {
+        console.log(`*** INDEX ${req.path} ${JSON.stringify(req.query)}`)
+        return this.performQuery(req.query, res)
+    }
+
     async put(req, res) {
         let payload = {
             ...req.body,
@@ -468,7 +403,9 @@ class Controller {
         }
         delete payload.createdAt
         delete payload.updatedAt
-    
+
+        console.log(`*** PUT ${JSON.stringify(payload)}`)
+
         try {
             log(req, {}, payload)
             const obj = await this.Model.create(payload)
@@ -480,15 +417,17 @@ class Controller {
     }
 
     async patch(req, res, id, payload) {    
-        console.log(`***PATCH ${id} ${JSON.stringify(payload)}`)
+        console.log(`*** PATCH ${id} ${JSON.stringify(payload)}`)
         try {
             const was = await this.Model.findById(id)
             log(req, was, payload)
-            const obj = await this.Model.findByIdAndUpdate(id, payload)
-            res.send(obj)
+            was.set({...was, ...payload})
+            await was.save()
+            res.send(was)
         } catch(error) {
+            console.log(`error: ${error.message}}`)
             console.error(error)
-            res.status(400).send({error: err.message})
+            res.status(400).send({error: error.message})
         }
     }
 

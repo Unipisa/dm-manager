@@ -3,6 +3,7 @@ import {Table, Button, Badge, ButtonGroup} from 'react-bootstrap'
 import ReactToPrint from 'react-to-print'
 
 import {useEngine} from '../Engine'
+import Loading from '../components/Loading'
 
 function Display({roomLabel, onSave}) {
     const namesRef = useRef(null)
@@ -159,7 +160,7 @@ function RoomLabels({onClick, onDone, onDelete}) {
     const query = engine.useIndex('roomLabel')
 
     let data = []
-    if (query.isLoading) return <span>loading...</span>
+    if (query.isLoading) return <Loading />
     if (query.isSuccess) data = query.data.data
 
     return <>
@@ -199,8 +200,8 @@ export default function RoomLabelsPage() {
         putRoomLabel(roomLabel)
     }
 
-    const onDone = (roomLabel) => {
-        patchRoomLabel({_id: roomLabel._id, state: 'managed'})
+    const onDone = async (roomLabel) => {
+        await patchRoomLabel({_id: roomLabel._id, state: 'managed'})
     }
 
     const onClick = (roomLabel) => {

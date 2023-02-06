@@ -3,15 +3,22 @@ import { Table, Button } from 'react-bootstrap'
 
 import { ListInput, StringInput } from '../components/Input'
 import { useEngine, myDateFormat } from '../Engine'
+import Loading from '../components/Loading'
 
 export default function TokensPage() {
     const engine = useEngine()
     const [obj, setObj ] = useState({roles: engine.user.roles})
     const query = engine.useIndex('token')
     const deleteToken = engine.useDelete('token', (response, token) => engine.addInfoMessage(`token ${token.name} rimosso`))
-    const putToken = engine.usePut('token', (token) => engine.addInfoMessage(`token ${token.name} creato`))
+    const enginePutToken = engine.usePut('token')
+    
+    async function putToken(token) {
+        await enginePutToken(token)
+        engine.addInfoMessage(`token ${token.name} creato`)
+        setObj({roles: engine.user.roles})
+    }
 
-    if (query.isLoading) return <span>loading....</span>
+    if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
 
     const setter = field => value => setObj(obj => ({...obj, [field]: value}))
@@ -46,8 +53,8 @@ export default function TokensPage() {
                 </tbody>
             </Table>
         </div>
-        <StringInput value={obj.name} setValue={setter("name")} label="nome" edit={true}/>
-        <ListInput value={obj.roles} setValue={setter("roles")} label="ruoli" separator=" " edit={true}/>
+        <StringInput value={obj.name} setValue={setter("name")} label="nome" />
+        <ListInput value={obj.roles} setValue={setter("roles")} label="ruoli" separator=" " />
                 <Button onClick={ () => putToken(obj) } className="btn btn-primary">
                     crea token
                 </Button>

@@ -1,5 +1,5 @@
 import Model from './Model'
-import RoomDetails from '../pages/RoomDetails'
+import RoomViewPage from '../pages/RoomViewPage'
 
 export default class Room extends Model {
     constructor() {
@@ -18,15 +18,20 @@ export default class Room extends Model {
         this.indexDefaultFilter = {'_sort': 'number', '_limit': 10}
         this.managerRoles = ['admin','room-manager']
         this.columns = {
+            'code': 'codice',
             'number': "numero",
             'floor': "piano",
             'building': "edificio",
-            'updatedAt': "modificato",
+            'nSeats': "posti",
             'notes': "note",
+            'roomAssignments': "assegnazioni",
+            'updatedAt': "modificato",
         }
-        this.ObjectDetails = RoomDetails
+        this.ViewPage = RoomViewPage
     }
 
-    describe(room) { return `${room.number} ${room.floor} ${room.building}` }
+    describe(room) { 
+        return `${room.building}${room.floor}:${room.number}` 
+    }
 }
 

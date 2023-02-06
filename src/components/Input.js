@@ -1,101 +1,67 @@
-import { Form, Modal, Button } from 'react-bootstrap'
+import { Modal, Button } from 'react-bootstrap'
 import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import { useState, useRef, useId } from 'react';
+import { useState, useRef } from 'react';
 import { useQuery } from 'react-query'
 
 import api from '../api'
-import { myDateFormat, useEngine } from '../Engine'
+import { useEngine } from '../Engine'
+import Loading from './Loading'
 
-export function StringInput({ label, value, setValue, edit }) {
-    const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <input className="form-control col-sm-10"
-                id={ id } 
-                value={ value || "" } 
-                onChange={ (evt) => {setValue(evt.target.value)} }
-            />                 
-        </div>
-    </Form.Group>
+export function StringInput({ id, value, setValue }) {
+    return <input 
+        className="form-control col-sm-10"
+        id={ id } 
+        value={ value || "" } 
+        onChange={ (evt) => {setValue(evt.target.value)} }
+    />
 }
 
-export function NumberInput({ label, value, setValue, edit }) {
-    const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <input className="form-control col-sm-10"
-                id={ id } 
-                type="number"
-                value={ value || "" } 
-                onChange={ (evt) => {setValue(evt.target.value)} }
-            />                 
-        </div>
-    </Form.Group>
+export function NumberInput({ id, value, setValue }) {
+    return <input 
+        className="form-control col-sm-10"
+        id={ id } 
+        type="number"
+        value={ value===null ? "" : value } 
+        onChange={ (evt) => {setValue(evt.target.value)} }
+    />
 }
 
-export function DateInput({ label, value, setValue, edit }) {
-    const id = useId()
-    if (!edit) return <p><b>{label}:</b> {myDateFormat(value)}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <UtcDatePicker 
-                className="form-control"
-                selected={ value ? new Date(value) : null }  
-                dateFormat="d.MM.yyyy"
-                onChange={ date => setValue(date) } />
-        </div>
-    </Form.Group>
+export function DateInput({ id, value, setValue }) {
+    return <UtcDatePicker 
+        id={ id }
+        className="form-control"
+        selected={ value ? new Date(value) : null }  
+        dateFormat="d.MM.yyyy"
+        onChange={ date => setValue(date) } 
+    />
 }
 
-export function ListInput({ label, value, setValue, separator, edit }) {
-    const id = useId()
+export function ListInput({ id, value, setValue, separator }) {
     if (separator === undefined) separator = ','    
-    if (!edit) return <p><b>{label}:</b> {value.join(', ')}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>{ label }</Form.Label>
-            <div className="col-sm-10">
-                <input 
-                    id={ id } 
-                    value={ value.join(separator) || "" } 
-                    onChange={ (evt) => {
-                            const val = evt.target.value
-                                .split(separator)
-                                .map( x => x.trim())
-                            setValue(val) 
-                        } 
-                    }
-                    className="form-control" 
-                />
-        </div>
-    </Form.Group>
+    return <input 
+        id={ id } 
+        value={ value.join(separator) || "" } 
+        onChange={ (evt) => {
+                const val = evt.target.value
+                    .split(separator)
+                    .map( x => x.trim())
+                setValue(val) 
+            } 
+        }
+        className="form-control" 
+    />
 }
 
-export function TextInput({ label, value, setValue, edit }) {
-    const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <textarea 
-                id={ id } 
-                value={ value || "" }
-                rows={10}
-                onChange={ (evt) => setValue(evt.target.value) }
-                className="form-control" 
-            />
-        </div>
-    </Form.Group>
+export function TextInput({ id, value, setValue }) {
+    return <textarea 
+        id={ id } 
+        value={ value || "" }
+        rows={10}
+        onChange={ (evt) => setValue(evt.target.value) }
+        className="form-control" 
+    />
 }
 
 //
@@ -103,13 +69,13 @@ export function TextInput({ label, value, setValue, edit }) {
 //
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
-export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, label, value, setValue, edit, multiple }) {
+// TODO: valutare widget alternativo: https://react-select.com/home
+export function ObjectInput({ id, placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple }) {
     const engine = useEngine()
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
     const [show, setShow] = useState(false)
     const typeaheadref = useRef(null)
-    const id = useId()
 
     // Data used for the new person create
     const [newObject, setNewObject] = useState({})
@@ -129,13 +95,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
             return ""
 
         return render(x)
-    }
-
-    if (! edit) {
-        const values = multiple ? value : [ value ]
-        return <p>
-            <strong>{ label }: </strong>{Array.from(values).map(labelDisplayFunction).join(", ")}
-        </p> 
     }
 
     function handleClose() {
@@ -179,7 +138,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        api.get(`/api/v0/${objCode}`, {_search: query}).then((data) => {
+        api.get(`/api/v0/${objCode}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
             })
@@ -233,7 +192,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
         }
     }
 
-    return <Form.Group className="row my-2">
+    return <>
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>{`Crea nuov${oa} ${objName}`}</Modal.Title>
@@ -252,9 +211,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
           </Button>
         </Modal.Footer>
       </Modal>
-       <Form.Label className="col-sm-2">
-            { label }
-        </Form.Label>
         <AsyncTypeahead
           ref={typeaheadref}
           className="col-sm-10"
@@ -272,12 +228,15 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
           renderMenuItemChildren={menuRenderFunction}
           multiple={multiple}
         />
-    </Form.Group>
+    </>
 }
 
-export function PersonInput({ label, value, setValue, edit, multiple }) {
+export function PersonInput({ id, value, setValue, multiple }) {
     return <ObjectInput 
-        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        id={id} 
+        value={value} 
+        setValue={setValue} 
+        multiple={multiple} 
         objCode="person"
         objName="persona"
         oa="a"
@@ -289,12 +248,15 @@ export function PersonInput({ label, value, setValue, edit, multiple }) {
                 affiliation: 'Affiliazione',
         }}
         placeholder="cognome"
-        />
+    />
 }
 
-export function GrantInput({ label, value, setValue, edit, multiple }) {
+export function GrantInput({ id, value, setValue, multiple }) {
     return <ObjectInput 
-        label={label} value={value} setValue={setValue} edit={edit} multiple={multiple} 
+        id={id} 
+        value={value} 
+        setValue={setValue} 
+        multiple={multiple} 
         objCode="grant"
         objName="grant"
         oa="o"
@@ -304,84 +266,64 @@ export function GrantInput({ label, value, setValue, edit, multiple }) {
                 identifier: 'Identificativo',
         }}
         placeholder="grant"
-        />
+    />
 }
 
-export function SelectInput({ options, label, value, setValue, edit, displayFunction }) {
-    const id = useId()
-    console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
-    if (!edit) return <p><b>{label}:</b> {displayFunction?displayFunction(value):value}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <select className="form-control col-sm-10"
-                id={ id } 
-                value={ value || "" } 
-                onChange={ (evt) => setValue(evt.target.value) }>
-           { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
-            </select>
-        </div>
-    </Form.Group>
+export function SelectInput({ id, options, value, setValue, displayFunction }) {
+    //console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
+    return <select 
+        className="form-control col-sm-10"
+        id={ id } 
+        value={ value || "" } 
+        onChange={ (evt) => setValue(evt.target.value) }>
+        { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
+    </select>
 }
 
-export function BooleanInput({ label, value, setValue, edit }) {
-    const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value?'sì':'no'}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <input className="form-check-input col-sm-10"
-                type='checkbox' 
-                id={ id } 
-                checked={ !!value } 
-                onChange={ (evt) => {setValue(!!evt.target.checked)} }
-            />                 
-        </div>
-    </Form.Group>
-
+export function BooleanInput({ id, value, setValue }) {
+    return <input 
+        className="form-check-input col-sm-10"
+        type='checkbox' 
+        id={ id } 
+        checked={ !!value } 
+        onChange={ (evt) => {setValue(!!evt.target.checked)} }
+    />                 
 }
 
-export function MultipleSelectInput({ options, label, value, setValue, edit }) {
-    const id = useId()
-    if (!edit) return <p><b>{label}:</b> {value.join(",")}</p>
-    return <Form.Group className="row my-2">
-        <Form.Label className="col-sm-2" htmlFor={ id }>
-            { label }</Form.Label>
-        <div className="col-sm-10">
-            <select multiple className="form-control col-sm-10"
-                id={ id }
-                value={ value || [] }
-                onChange={ (evt) => {
-                    const opts = Array.from(evt.target.options)
-                    const selectedOpts = opts.filter(x => x.selected).map(x => x.value)
-                    setValue(selectedOpts)
-                }}>
-            { options.map(value => <option key={value} value={value}>{ value }</option>)}
-            </select>
-        </div>
-    </Form.Group>
+export function MultipleSelectInput({ id, options, value, setValue}) {
+    return <select 
+        multiple className="form-control col-sm-10"
+        id={ id }
+        value={ value || [] }
+        onChange={ (evt) => {
+            const opts = Array.from(evt.target.options)
+            const selectedOpts = opts.filter(x => x.selected).map(x => x.value)
+            setValue(selectedOpts)
+        }}>
+        { options.map(value => <option key={value} value={value}>{ value }</option>)}
+    </select>
 }
 
-export function RoomInput({ label, value, setValue, edit }) {
+export function RoomInput({ id, value, setValue }) {
     const engine = useEngine()
     const path = 'room'
-    const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_limit: 300}), {
+    const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_sort: 'code', _limit: 1000}), {
         onError: (err) => {
             engine.addMessage(err.message, 'error') },
         })
-    if (query.isLoading) return <span>loading...</span>
+    if (query.isLoading) return <Loading />
     const data = new Map(query.data.data.map(room => ([room._id, room])))
     if (value && value._id) value = value._id
     return <SelectInput 
+        id={id}
         options = {Array.from(data.keys())}
         displayFunction = {id => {
             if (id === null) return '---'
             const room = data.get(id)
             if (room === undefined) return '???' // database inconsistency
-            return `${room.building} piano ${room.floor} stanza ${room.number}`
+            return room.code
         }}
-        label={label} value={value} setValue={value => setValue(value?data.get(value):null)} edit={edit}
+        value={value} 
+        setValue={value => setValue(value?data.get(value):null)}
     />
 }

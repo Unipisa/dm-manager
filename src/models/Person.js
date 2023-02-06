@@ -1,5 +1,4 @@
 import Model from './Model'
-import PersonDetails from '../pages/PersonDetails'
 
 export default class Person extends Model {
     constructor() {
@@ -24,8 +23,7 @@ export default class Person extends Model {
             'email': "email",
             'updatedAt': "modificato",
         }
-        this.ObjectDetails = PersonDetails
     }
 
-    describe(obj) { return `${obj?.lastName}, ${obj?.firstName}` }
+    describe(obj) { return `${obj?.firstName} ${obj?.lastName}` }
 }

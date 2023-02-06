@@ -26,7 +26,7 @@ export default function Messages({ messages, acknowledge }) {
                     </div>
                     { messages.map(([type, msg], i) =>
                         <div key={ i } className={'border-start border-3 ps-2 border-' + {
-                                    'error': 'success',
+                                    'error': 'danger',
                                     'warning': 'warning',
                                     'info': 'info',
                                 }[type]}>

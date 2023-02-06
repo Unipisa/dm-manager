@@ -7,6 +7,7 @@ class RoomAssignmentController extends Controller {
         this.path = 'roomAssignment'
         this.managerRoles.push('assignment-manager')
         this.supervisorRoles.push('assignment-manager', 'assignment-supervisor')
+        this.searchFields = ['notes', 'room.code', 'room.notes', 'person.lastName', 'person.firstName']
     }
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "0.14.2",
+  "version": "0.15.23",
   "private": true,
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.1.2",
@@ -16,7 +16,7 @@
     "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "express-session": "^1.17.3",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
     "mongoose": "^6.5.2",
     "mongoose-permissions": "^1.0.0",
@@ -45,7 +45,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test-api": "node server/test.js",
-    "test": "mocha",
+    "test": "jest",
     "test-react": "react-scripts test (not implemented yet)",
     "eject": "react-scripts eject"
   },
@@ -69,8 +69,14 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.20.12",
+    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-typescript": "^7.18.6",
+    "babel-jest": "^29.4.1",
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
-    "mocha": "^10.1.0"
+    "jest": "^27.5.1",
+    "mocha": "^10.1.0",
+    "supertest": "^6.3.3"
   }
 }

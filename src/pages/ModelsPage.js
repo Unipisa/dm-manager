@@ -1,9 +1,10 @@
-import { useCallback } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate, Link } from 'react-router-dom'
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import { Th } from '../components/Table'
+import Loading from '../components/Loading'
 
 export default function ModelsPage({ Model, columns }) {
     const filter = useQueryFilter(Model.indexDefaultFilter)
@@ -11,9 +12,27 @@ export default function ModelsPage({ Model, columns }) {
     const query = engine.useIndex(Model.code, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        Model.pageUrl(obj._id), {replace: false}), [navigate, Model])
+        Model.viewUrl(obj._id), {replace: false}), [navigate, Model])
+    const scrollRef = useRef(null)
+    const [selectedIds, setSelectedIds] = useState([])
 
-    if (query.isLoading) return <span>loading...</span>
+    /*
+     * infite loop!
+    useEffect(() => {
+        const observer = new IntersectionObserver(() => {
+            console.log(`Intersection observer fired`)
+            if (!query.isSuccess) return
+            if (query.data.data.length >= query.data.total) return
+            if (filter._limit >= query.data.total) return
+            console.log(`extendLimit (${query.data.data.length} / ${query.data.total})`)
+            filter.extendLimit()
+        })
+        if (scrollRef.current) observer.observe(scrollRef.current)
+        //return () => observer.unobserve(scrollRef.current)
+    }, [scrollRef])
+    */
+
+    if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
 
     const data = query.data.data
@@ -26,22 +45,27 @@ export default function ModelsPage({ Model, columns }) {
 
     function displayField(obj, key) {
         let value = obj[key]
-        if (value === undefined) return ''
+        if (value === undefined) return '???'
         if (value === null) return '---'
+        if (key === 'roomAssignment') return `${value.room.code}`
+        if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
         const field = modelFields[key]
         if (field && field.type === 'array') {
+            if (field.items['x-ref'] === 'Person') {
+                return value.map(person => `${person.lastName}`).join(', ')
+            }
             return value.join(', ')
         }
         if (field && field.format === 'date-time') return myDateFormat(value)
-        if (key === 'roomAssignment') return `${value.room.building}${value.room.floor} ${value.room.number}`
         const xref = field && field['x-ref'] 
         if (xref === 'Person') {
             return `${value.lastName} ${value.firstName}`
         } else if (xref === 'Room') {
-            return `${value.building}${value.floor} ${value.number}`
+            return `${value.code}`
         } else if (xref) {
             return `${xref} not implemented`
         }
+        if (typeof value === 'object') return JSON.stringify(value)
         return value
     }
 
@@ -55,11 +79,43 @@ export default function ModelsPage({ Model, columns }) {
         }))
     }
 
+    function handleMouseDown(evt, obj) {
+        function openInNewTab(obj) {
+            // It is currently unclear if this can be handled with React router
+            // directly, or we can simply call window.open.
+            window.open(Model.viewUrl(obj._id), '_blank')
+        }
+
+        if (evt.ctrlKey) {
+            if (evt.button === 0) {
+                setSelectedIds(lst => {
+                    if (lst.includes(obj._id)) {
+                        return lst.filter(id => id !== obj._id)
+                    } else {
+                        return [...lst, obj._id]
+                    }
+                })
+            }
+        } else if (evt.altKey || evt.metaKey) {
+            if (evt.button ===0) openInNewTab(obj)
+        } else {
+            if (evt.button === 0) navigateTo(obj)
+            else if (evt.button === 1) openInNewTab(obj)
+        }
+    }
+
     return <>
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
-                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.pageUrl('new')}>aggiungi {Model.name}</Link>}
+                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>}
+            </div>            
+            <div className="d-flex mb-4">
+                { selectedIds.length>0 
+                    ? <>
+                    {selectedIds.length} righe selezionate
+                    </>
+                    : `usa ctrl-click per selezionare una riga` && ''}
             </div>
             <Table hover>
                 <thead className="thead-dark">
@@ -71,36 +127,18 @@ export default function ModelsPage({ Model, columns }) {
                     </tr>
                 </thead>
                 <tbody>
-                    { 
-                    data.map(obj => {
-                            const handleMouseDown = (evt) => {
-                                switch (evt.button) {
-                                    case 0:
-                                        navigateTo(obj)
-                                        break
-                                    case 1:
-                                        // It is currently unclear if this can be handled with React router
-                                        // directly, or we can simply call window.open.
-                                        window.open(Model.pageUrl(obj._id), '_blank')
-                                        break
-                                    default:
-                                        // NOOP
-                                }
+                    { data.map(obj => 
+                        <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onMouseDown={evt => handleMouseDown(evt, obj)} >
+                            {
+                                Object.entries(columns).map(([key, label]) =>
+                                <td key={key}>{ displayField(obj, key) }</td>)
                             }
-
-                            return <tr key={obj._id} onMouseDown={handleMouseDown} >
-                                {
-                                    Object.entries(columns).map(([key, label]) =>
-                                    <td key={key}>{ displayField(obj, key) }</td>)
-                                }
-                            </tr>
-                        })
-                    }
+                        </tr>)}
                 </tbody>
             </Table>
             <p>Visualizzat{Model.oa === "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
             { query.data.limit < query.data.total
-                && <Button onClick={ filter.extendLimit }>visualizza altri</Button>
+                && <Button ref={scrollRef} onClick={ filter.extendLimit }>visualizza altri</Button>
             }
         </div>
     </>

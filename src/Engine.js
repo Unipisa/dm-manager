@@ -81,7 +81,6 @@ export function useCreateEngine() {
 
                 setState(s => ({...s, config, user, Models}))
 
-                console.log(`config read: ${JSON.stringify(config)}`)
                 return config
             } catch(err) {
                 console.error(err)
@@ -150,54 +149,68 @@ export function useCreateEngine() {
                 [path, id], 
                 () => api.get(`/api/v0/${path}/${id}`), 
                 {
-                    enabled: id !== 'new',
+                    enabled: id !== null,
                     onError: (err) => addMessage(err.message, 'error'),
                 })
             return query
         },
 
-        usePut: (path, cb) => {
-            const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload))
+        usePut: (path) => {
+            const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload), {
+                onSuccess: () => {
+                    queryClient.invalidateQueries([path])
+                }
+            })
             return async (object) => {
-                mutation.mutate(object, {
-                    onSuccess: (result) => {
-                        queryClient.invalidateQueries([path])
-                        if (cb) cb(result)
-                    },
-                    onError: (err) => {
-                        addMessage(err.message, 'error')
-                    }
-                })
+                try {
+                    const res = await mutation.mutateAsync(object)
+                    return res 
+                } catch(err) {
+                    addMessage(err.message, 'error')
+                    throw err
+                }
             }
         },
 
-        usePatch: (path, cb) => {
-            const mutation = useMutation(payload => api.patch(`/api/v0/${path}/${payload._id}`, payload))
-            return async (object) => {
-                mutation.mutate(object, {
-                    onSuccess: (result, object) => {
+        usePatch: (path) => {
+            const mutation = useMutation(
+                payload => api.patch(`/api/v0/${path}/${payload._id}`, payload), {
+                    onSuccess: () => {
                         queryClient.invalidateQueries([path])
-                        if (cb) cb(result, object)
-                    },
-                    onError: (err) => {
-                        addMessage(err.message, 'error')
                     }
                 })
+            return async (payload) => {
+                try {
+                    const res = await mutation.mutateAsync(payload)
+                    // await queryClient.invalidateQueries([path])
+                    return res
+                } catch(err) {
+                    addMessage(err.message, 'error')
+                    throw err
+                }
             }
         },
 
-        useDelete: (path, cb) => { 
-            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`))
+        useDelete: (path) => { 
+            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`),{
+                onSuccess: () => {
+                    queryClient.invalidateQueries([path])
+                    /**
+                     * sembra che l'invalidazione 
+                     * causi una richiesta all'oggetto
+                     * e quindi, giustamente, un errore 404 
+                     * sulla console
+                     */
+                }
+            })
             return async (object) => {
-                mutation.mutate(object, {
-                    onSuccess: (result, object) => {
-                        queryClient.invalidateQueries([path])
-                        if (cb) cb(result, object)
-                    },
-                    onError: (err) => {
-                        addMessage(err.message, 'error')
-                    }
-                })
+                try {
+                    const res = await mutation.mutateAsync(object)
+                    return res
+                } catch(err) {
+                    addMessage(err.message, 'error')
+                    throw err
+                }
             }
         },
 
@@ -272,7 +285,26 @@ export function useQueryFilter(initial) {
     }
 }
 
+export const minDate = new Date(-8640000000000000)
+export const maxDate = new Date(8640000000000000)
+
 export function myDateFormat(date) {
-    return date ? moment(date).format('D.M.YYYY') : "---"
+    if (date === undefined) return '???'
+    if (date === null) return '---'
+    date = moment(date)
+    if (date < minDate) return '---'
+    if (date > maxDate) return '---'
+    return moment(date).format('D.M.YYYY')
 }
 
+export function notNullStartDate(date) {
+    if (date === null) return minDate
+    if (typeof date === 'string') return new Date(date)
+    return date
+}
+
+export function notNullEndDate(date) {
+    if (date === null) return maxDate
+    if (typeof date === 'string') return new Date(date)
+    return date
+}
