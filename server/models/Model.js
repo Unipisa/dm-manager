@@ -8,6 +8,7 @@ const fieldOptionsMapping = {
     can_sort: 'can_sort',
     can_filter: 'can_filter',
     match_ids: 'match_ids',
+    help: 'help'
 }
   
 config({ fieldOptionsMapping })

@@ -13,7 +13,7 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
         const {options, multiple} = opts
         const label = schema.items?.label || schema.label || field
         return <Form.Group className="row my-2">
-            <Form.Label className={ modified ? "col-sm-2 bg-warning" : "col-sm-2"} htmlFor={ id }>
+            <Form.Label className={ "col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id } style={{textAlign: "right"}}>
                 { label }
             </Form.Label>
             <div className="col-sm-10">
@@ -25,6 +25,8 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
                     multiple={multiple}
                 />                         
             </div>
+            <div className="col-sm-2"></div>
+            <div className="col-sm-10 form-text">{schema.help}</div>
         </Form.Group>
     }
 

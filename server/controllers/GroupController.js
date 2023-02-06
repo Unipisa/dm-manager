@@ -7,7 +7,7 @@ class GroupController extends Controller {
         this.path = 'group'
         this.managerRoles.push('group-manager')
         this.supervisorRoles.push('group-manager', 'group-supervisor')
-        this.searchFields = [ 'person.lastName', 'person.firstName', 'affiliation' ]
+        this.searchFields = [ 'members.lastName', 'members.firstName', 'affiliation', 'name' ]
     }
 }
 
