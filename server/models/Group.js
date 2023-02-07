@@ -38,5 +38,16 @@ Person.relatedModels.push({
     modelName: 'Group',
     url: 'group',
     field: 'members',
-})
+}, {
+    model: Group,
+    modelName: 'Group',
+    url: 'group',
+    field: 'chair',
+}, {
+    model: Group,
+    modelName: 'Group',
+    url: 'group',
+    field: 'vice',
+}
+)
 

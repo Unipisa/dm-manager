@@ -39,7 +39,7 @@ function VisitDetails() {
     }
 
     if (person && engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
-        tabs.push(<Tab key="related" eventKey="related" title={`dati correlati a ${person.lastName}`}>
+        tabs.push(<Tab key="related" eventKey="related" title={`elementi collegati a ${person.lastName}`}>
             <ObjectProvider path={Person.code} id={person._id} >
                 <RelatedDetails Model={Person}/>
             </ObjectProvider>

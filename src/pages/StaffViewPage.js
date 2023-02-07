@@ -41,7 +41,7 @@ function StaffDetails() {
     }
 
     if (engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
-        tabs.push(<Tab key="related" eventKey="related" title="dati correlati">
+        tabs.push(<Tab key="related" eventKey="related" title="elementi collegati">
             <ObjectProvider key='related' path={Person.code} id={person._id} >
                 <RelatedDetails Model={Person} />
             </ObjectProvider>

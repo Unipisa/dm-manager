@@ -89,7 +89,7 @@ function field_from_model_info(info) {
         if (info.length !== 1) return
         info = info[0]
         if (info.ref) {
-            // elenco di ObjectId di documenti correlati
+            // elenco di ObjectId di documenti collegati
             return {
                 can_filter: true,
                 related_field: true,

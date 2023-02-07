@@ -7,8 +7,8 @@ export default function RelatedDetails({ Model, related, title }) {
     const engine = useEngine()
     related = related || engine.useGetRelated(Model.ModelName, obj._id)
 
-    return <Card className="mt-2">
-        <Card.Header><h4>{ title || `elementi correlati` }</h4></Card.Header>
+    return <Card className="my-2">
+        <Card.Header><h4>{ title || `elementi collegati` }</h4></Card.Header>
         <Card.Body>
         {related.filter(info => info.data !== null && info.data.length > 0).map((info, i) => 
             <div key={i}>
