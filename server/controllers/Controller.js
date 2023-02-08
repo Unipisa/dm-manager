@@ -10,6 +10,16 @@ function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
+/**
+ * @class Controller
+ * @classdesc Base class for all controllers
+ * @param {Model} Model - the mongoose Model of the managed objects
+ * 
+ * extend this class to create a new controller
+ * then register it in server/api.js
+ * 
+ */
+
 class Controller {
     constructor(Model=null) {
         // every controller must define a unique path
