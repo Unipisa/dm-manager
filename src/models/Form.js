@@ -1,6 +1,7 @@
 import { Route } from 'react-router-dom'
 
 import Model from './Model'
+import FormData from './FormData'
 import FormViewPage from '../pages/FormViewPage'
 import FormFillPage from '../pages/FormFillPage'
 
@@ -25,6 +26,8 @@ export default class Form extends Model {
             'updatedAt': "modificato",
         }
         this.ViewPage = FormViewPage
+
+        this.FormDataModel = new FormData()
     }
 
     describe(form) { 

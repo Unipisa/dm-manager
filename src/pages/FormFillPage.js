@@ -1,21 +1,21 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { Button } from 'react-bootstrap'
+import { Button, Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
 import api from '../api'
 import Models from '../models/Models'
 import { useObject, ObjectProvider } from '../components/ObjectProvider'
 
-export default function FormFillPage() {
+export default function FormFillPage({enabled = true, showData = false}) {
     const id = useParams().id
     if (!id) return <p>Invalid id ({id})</p>
     return <ObjectProvider Model={ Models.Form } id={id}>
-        <FormFillPageInner />
+        <FormFillPageInner enabled={enabled} showData={showData}/>
     </ObjectProvider>
 }
 
-function FormFillPageInner() {
+function FormFillPageInner({enabled, showData}) {
     const engine = useEngine()
     const user = engine.user
     const vars = {
@@ -27,9 +27,14 @@ function FormFillPageInner() {
     const [data, setData] = useState({})
     const form = useObject()
     const [thanks, setThanks] = useState(false)
+    const put = engine.usePut(`${Models.Form.viewUrl(form._id)}/fill`)
 
     async function submit() {
-        const res = await api.put(`${Models.Form.viewUrl(form._id)}/fill`, data)
+        if (!enabled) {
+            engine.addWarningMessage('Modulo disabilitato')
+            return
+        }
+        const res = await put(data)
         setThanks(true)
     }
 
@@ -40,10 +45,32 @@ function FormFillPageInner() {
         puoi chiudere questa pagina.</p>
 
     return <>
-        <h1>{form.name}</h1>
-        <RenderHtml text={form.text} vars={vars} 
-            data={data} setData={setData} />
-        <Button onClick={submit}>invia modulo</Button>
+        <Card>
+            <Card.Header>{form.name}</Card.Header>
+            <Card.Body>
+                <RenderHtml text={form.text} vars={vars} 
+                    data={data} setData={setData} />
+            </Card.Body>
+            <Card.Footer>
+                <Button onClick={submit}>invia modulo</Button>       
+            </Card.Footer>
+        </Card>
+        <table style={{display: showData?'block':'none'}}>
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>value</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Object.entries(data).map(([field, value]) =>
+                    <tr key={field}>
+                        <td>{field}</td>
+                        <td>{value}</td>
+                    </tr>  
+                )}  
+            </tbody>
+        </table>
     </>
 
 }
@@ -59,29 +86,44 @@ function Error({key, children}) {
     return <span key={key} className='text-danger bg-warning'>{'<'}{children}{'>'}</span>
 }
 
-function RenderElement({el, key, vars, data, setData}) {
-const nodeName = el.nodeName.toLowerCase()
-if (nodeName === '#text') return el.textContent
-const children = [...el.childNodes].map((child, i) => 
-    <RenderElement el={child} key={i} vars={vars} 
-        data={data} setData={setData} />)
-//return <>({nodeName}){children}(/{nodeName})</>
-if (nodeName == 'var') {
-    if (!vars) return <Error key={key}>internal error: no vars</Error>
-    const varName = el.textContent
-    if (!vars[varName]) return <Error key={key}>invalid var: {`"${varName}"`}</Error>
-    return <span key={key}>{vars[varName]}</span>
+function RenderElement({el, vars, data, setData}) {
+    const nodeName = el.nodeName.toLowerCase()
+    if (nodeName === '#text') return el.textContent
+    const children = [...el.childNodes].map((child, i) => 
+        <RenderElement el={child} key={i} vars={vars} 
+            data={data} setData={setData} />)
+    //return <>({nodeName}){children}(/{nodeName})</>
+    if (nodeName == 'var') {
+        if (!vars) return <Error>internal error: no vars</Error>
+        const varName = el.textContent
+        if (!vars[varName]) return <Error>invalid var: {`"${varName}"`}</Error>
+        return <span>{vars[varName]}</span>
+    }
+    if (nodeName === 'br') return <br />
+    if (nodeName === 'p') return <p>{children}</p>
+    if (nodeName === 'b') return <b>{children}</b>
+    if (nodeName === 'i') return <i>{children}</i>
+    if (nodeName === 'select') return <RenderSelect el={el} data={data} setData={setData}>
+            {children}
+        </RenderSelect>
+    if (nodeName === 'option') return <option value={el.value}>{children}</option>
+    return <>{children}</>
 }
-if (nodeName === 'br') return <br key={key} />
-if (nodeName === 'p') return <p key={key}>{children}</p>
-if (nodeName === 'b') return <b key={key}>{children}</b>
-if (nodeName === 'i') return <i key={key}>{children}</i>
-if (nodeName === 'select') return <select 
-    name={el.name} value={data[el.name]}
-    onChange={ evt => setData(data => ({
-        ...data, [el.name]: evt.target.value}))}>
-    {children}
-</select>
-if (nodeName === 'option') return <option value={el.value}>{children}</option>
-return <>{children}</>
+
+function RenderSelect({el, data, setData, children}) {
+    const name = el.name
+    const value = data[el.name] || el.value
+    useEffect(() => {
+        if (data[el.name] != value) {
+            setData(data => ({...data, [name]: value}))
+        }
+    }, [data])
+    if (!name) return <Error>select without name</Error>
+    if (el.value && !data[el.name]) return <>...loading...</> 
+    return <select 
+        name={name} value={value}
+        onChange={ evt => setData(data => ({
+            ...data, [name]: evt.target.value}))}>
+        {children}
+    </select>
 }

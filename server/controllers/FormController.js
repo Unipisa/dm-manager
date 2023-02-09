@@ -22,6 +22,7 @@ class FormController extends Controller {
         })
         try {
             const data = new FormData({
+                form,
                 data: map,
                 email: user.email || null,
                 lastName: user.lastName || null,
@@ -36,12 +37,26 @@ class FormController extends Controller {
         }
     }
 
+    async getData(req, res) {
+        const id = req.params.id
+        const user = req.user
+        const form = await this.Model.findById(id)
+        if (!form) return res.status(404).send({error: 'Form not found'})
+        if (!form.createdBy._id.equals(user._id)) return res.status(403).send({error: 'Forbidden'})
+        return this.performQuery(req.query, res, {
+            Model: FormData,
+        })   
+    }
+
     register(router) {
         return [
             ...super.register(router),
             this.register_path(router, 'put', `/${this.path}/:id/fill`,
                 null, // require user
                 (req, res) => this.putFill(req, res)),
+            this.register_path(router, 'get', `/${this.path}/:id/data`,
+                null, // require user, user will be checked in end-point 
+                (req, res) => this.getData(req, res)),
         ]
     }
 }

@@ -14,6 +14,10 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         viewUrl(obj), {replace: false}), [navigate, viewUrl])
     const scrollRef = useRef(null)
     const [selectedIds, setSelectedIds] = useState([])
+    columns ||= []
+    if (Array.isArray(columns)) {
+        columns = Object.fromEntries(columns.map(key => [key, key]))
+    }
     /*
      * infite loop!
     useEffect(() => {
@@ -65,10 +69,10 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                 })
             }
         } else if (evt.altKey || evt.metaKey) {
-            if (evt.button ===0) openInNewTab(obj)
+            if (evt.button === 0 && viewUrl) openInNewTab(obj)
         } else {
-            if (evt.button === 0) navigateTo(obj)
-            else if (evt.button === 1) openInNewTab(obj)
+            if (evt.button === 0 && viewUrl) navigateTo(obj)
+            if (evt.button === 1 && viewUrl) openInNewTab(obj)
         }
     }
 
@@ -113,6 +117,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
 }
 
 function displayField(obj, key, fieldsInfo={}) {
+    if (key === '*') return JSON.stringify(obj)
     let value = obj[key]
     if (value === undefined) return '???'
     if (value === null) return '---'
