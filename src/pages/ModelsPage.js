@@ -7,15 +7,30 @@ import { Th } from '../components/Table'
 import Loading from '../components/Loading'
 
 export default function ModelsPage({ Model, columns }) {
-    const filter = useQueryFilter(Model.indexDefaultFilter || {})
     const engine = useEngine()
-    const query = engine.useIndex(Model.code, filter.filter)
+    const showAddButton = engine.user.hasSomeRole(...Model.schema.managerRoles)
+    const addButton = showAddButton 
+        ? <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>
+        : null
+    return <IndexPage 
+        path={Model.code}
+        defaultFilter={Model.defaultFilter}
+        viewUrl={(obj) => Model.viewUrl(obj._id)}
+        fieldsInfo={Model.schema.fields}
+        addButton={addButton}
+        columns={columns || Model.columns}
+    />
+}
+
+export function IndexPage({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns}) {
+    const engine = useEngine()
+    const filter = useQueryFilter(defaultFilter || {})
+    const query = engine.useIndex(path, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        Model.viewUrl(obj._id), {replace: false}), [navigate, Model])
+        viewUrl(obj), {replace: false}), [navigate, viewUrl])
     const scrollRef = useRef(null)
     const [selectedIds, setSelectedIds] = useState([])
-
     /*
      * infite loop!
     useEffect(() => {
@@ -37,11 +52,7 @@ export default function ModelsPage({ Model, columns }) {
 
     const data = query.data.data
 
-    const modelFields = Model.schema.fields
-    
-    // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
-
-    columns = columns || Model.columns
+    // console.log(`MODELFIELDS: ${JSON.stringify(fieldsInfo)}`)
 
     function updateFilter(evt) {
         let text = evt.target.value
@@ -57,7 +68,7 @@ export default function ModelsPage({ Model, columns }) {
         function openInNewTab(obj) {
             // It is currently unclear if this can be handled with React router
             // directly, or we can simply call window.open.
-            window.open(Model.viewUrl(obj._id), '_blank')
+            window.open(viewUrl(obj), '_blank')
         }
 
         if (evt.ctrlKey) {
@@ -82,7 +93,7 @@ export default function ModelsPage({ Model, columns }) {
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
-                { engine.user.hasSomeRole(...Model.schema.managerRoles) && <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>}
+                { addButton }
             </div>            
             <div className="d-flex mb-4">
                 { selectedIds.length>0 
@@ -105,26 +116,26 @@ export default function ModelsPage({ Model, columns }) {
                         <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onMouseDown={evt => handleMouseDown(evt, obj)} >
                             {
                                 Object.entries(columns).map(([key, label]) =>
-                                <td key={key}>{ displayField(obj, key, modelFields) }</td>)
+                                <td key={key}>{ displayField(obj, key, fieldsInfo) }</td>)
                             }
                         </tr>)}
                 </tbody>
             </Table>
-            <p>Visualizzat{Model.oa === "o" ? "i" : "e"} {data.length}/{query.data.total} {Model.names}.</p>
+            <p>Visualizzate {data.length}/{query.data.total} righe.</p>
             { query.data.limit < query.data.total
-                && <Button ref={scrollRef} onClick={ filter.extendLimit }>visualizza altri</Button>
+                && <Button ref={scrollRef} onClick={ filter.extendLimit }>visualizza altre</Button>
             }
         </div>
     </>
 }
 
-function displayField(obj, key, modelFields) {
+function displayField(obj, key, fieldsInfo={}) {
     let value = obj[key]
     if (value === undefined) return '???'
     if (value === null) return '---'
     if (key === 'roomAssignment') return `${value.room.code}`
     if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
-    const field = modelFields[key]
+    const field = fieldsInfo[key]
     if (field && field.type === 'array') {
         if (field.items['x-ref'] === 'Person') {
             return value.map(person => `${person.lastName}`).join(', ')
