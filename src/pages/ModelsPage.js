@@ -7,7 +7,7 @@ import { Th } from '../components/Table'
 import Loading from '../components/Loading'
 
 export default function ModelsPage({ Model, columns }) {
-    const filter = useQueryFilter(Model.indexDefaultFilter)
+    const filter = useQueryFilter(Model.indexDefaultFilter || {})
     const engine = useEngine()
     const query = engine.useIndex(Model.code, filter.filter)
     const navigate = useNavigate()
@@ -37,37 +37,11 @@ export default function ModelsPage({ Model, columns }) {
 
     const data = query.data.data
 
-    const modelFields = engine.Models[Model.ModelName].schema.fields
+    const modelFields = Model.schema.fields
     
     // console.log(`MODELFIELDS: ${JSON.stringify(modelFields)}`)
 
     columns = columns || Model.columns
-
-    function displayField(obj, key) {
-        let value = obj[key]
-        if (value === undefined) return '???'
-        if (value === null) return '---'
-        if (key === 'roomAssignment') return `${value.room.code}`
-        if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
-        const field = modelFields[key]
-        if (field && field.type === 'array') {
-            if (field.items['x-ref'] === 'Person') {
-                return value.map(person => `${person.lastName}`).join(', ')
-            }
-            return value.join(', ')
-        }
-        if (field && field.format === 'date-time') return myDateFormat(value)
-        const xref = field && field['x-ref'] 
-        if (xref === 'Person') {
-            return `${value.lastName} ${value.firstName}`
-        } else if (xref === 'Room') {
-            return `${value.code}`
-        } else if (xref) {
-            return `${xref} not implemented`
-        }
-        if (typeof value === 'object') return JSON.stringify(value)
-        return value
-    }
 
     function updateFilter(evt) {
         let text = evt.target.value
@@ -131,7 +105,7 @@ export default function ModelsPage({ Model, columns }) {
                         <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onMouseDown={evt => handleMouseDown(evt, obj)} >
                             {
                                 Object.entries(columns).map(([key, label]) =>
-                                <td key={key}>{ displayField(obj, key) }</td>)
+                                <td key={key}>{ displayField(obj, key, modelFields) }</td>)
                             }
                         </tr>)}
                 </tbody>
@@ -142,4 +116,30 @@ export default function ModelsPage({ Model, columns }) {
             }
         </div>
     </>
+}
+
+function displayField(obj, key, modelFields) {
+    let value = obj[key]
+    if (value === undefined) return '???'
+    if (value === null) return '---'
+    if (key === 'roomAssignment') return `${value.room.code}`
+    if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
+    const field = modelFields[key]
+    if (field && field.type === 'array') {
+        if (field.items['x-ref'] === 'Person') {
+            return value.map(person => `${person.lastName}`).join(', ')
+        }
+        return value.join(', ')
+    }
+    if (field && field.format === 'date-time') return myDateFormat(value)
+    const xref = field && field['x-ref'] 
+    if (xref === 'Person') {
+        return `${value.lastName} ${value.firstName}`
+    } else if (xref === 'Room') {
+        return `${value.code}`
+    } else if (xref) {
+        return `${xref} not implemented`
+    }
+    if (typeof value === 'object') return JSON.stringify(value)
+    return value
 }
