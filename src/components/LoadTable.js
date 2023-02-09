@@ -3,10 +3,9 @@ import { Table, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
-import { Th } from './Table'
 import Loading from './Loading'
 
-export default function IndexPage({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns}) {
+export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns}) {
     const engine = useEngine()
     const filter = useQueryFilter(defaultFilter || {})
     const query = engine.useIndex(path, filter.filter)
@@ -137,4 +136,10 @@ function displayField(obj, key, fieldsInfo={}) {
     }
     if (typeof value === 'object') return JSON.stringify(value)
     return value
+}
+
+export function Th({ filter, children }) {
+    return <th scope="col" onClick={ filter.onClick }>
+        {children}{filter.sortIcon}
+    </th>
 }
