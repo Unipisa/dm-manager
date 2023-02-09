@@ -107,7 +107,7 @@ function setup_routes(app) {
     function(req, res) {
       const user = req.user.toObject()
       console.log(`login ${JSON.stringify(user)}`)
-      res.redirect(config.BASE_URL || `http://localhost:3000`)
+      res.redirect(config.BASE_URL)
     }
   )
   
