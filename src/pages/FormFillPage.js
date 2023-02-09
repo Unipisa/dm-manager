@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom'
 import { Button, Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
-import api from '../api'
 import Models from '../models/Models'
 import { useObject, ObjectProvider } from '../components/ObjectProvider'
 
@@ -34,7 +33,7 @@ function FormFillPageInner({enabled, showData}) {
             engine.addWarningMessage('Modulo disabilitato')
             return
         }
-        const res = await put(data)
+        await put(data)
         setThanks(true)
     }
 
@@ -93,7 +92,7 @@ function RenderElement({el, vars, data, setData}) {
         <RenderElement el={child} key={i} vars={vars} 
             data={data} setData={setData} />)
     //return <>({nodeName}){children}(/{nodeName})</>
-    if (nodeName == 'var') {
+    if (nodeName === 'var') {
         if (!vars) return <Error>internal error: no vars</Error>
         const varName = el.textContent
         if (!vars[varName]) return <Error>invalid var: {`"${varName}"`}</Error>
@@ -114,13 +113,13 @@ function RenderSelect({el, data, setData, children}) {
     const name = el.name
     const value = data[el.name] || el.value
     useEffect(() => {
-        if (data[el.name] != value) {
+        if (data[name] !== value) {
             setData(data => ({...data, [name]: value}))
         }
-    }, [data])
+    }, [data, name, value, setData])
     if (!name) return <Error>select without name</Error>
     if (el.value && !data[el.name]) return <>...loading...</> 
-    return <select 
+    return <select
         name={name} value={value}
         onChange={ evt => setData(data => ({
             ...data, [name]: evt.target.value}))}>
