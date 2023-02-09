@@ -30,7 +30,9 @@ export default function Header() {
                 <NavDropdown.Item onClick={ () => engine.logout() }>logout</NavDropdown.Item>
                 {user.hasSomeRole('disguised-admin') && <NavDropdown.Item onClick={ () => engine.impersonate_role('admin') }>ritorna admin</NavDropdown.Item>}
                 {user.hasSomeRole('admin', 'disguised-admin') && 
-                  ['supervisor', 
+                  [
+                  '', // nessun ruolo
+                  'supervisor', 
                   'assignment-manager',
                   'assignment-supervisor',
                   'grant-manager',
@@ -53,7 +55,7 @@ export default function Header() {
                       engine.addMessage(`devi ricaricare la pagina perché il nuovo ruolo venga assimilato`, 'warning')
                       // FIXME: la pagina non si aggiorna con i nuovi ruoli
                       navigate('/') // FIXME: non sembra funzionare
-                    }}>impersona {role}</NavDropdown.Item>)}
+                    }}>impersona {role || 'utente senza ruoli'}</NavDropdown.Item>)}
                 {}
             </NavDropdown>
          </Nav>
