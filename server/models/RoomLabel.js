@@ -1,10 +1,8 @@
 const {
     Schema, 
     model, 
-    ObjectId,
     createdBy, 
-    updatedBy, 
-    notes
+    updatedBy,
 } = require('./Model')
 
 const RoomLabel = model('RoomLabel', new Schema({
