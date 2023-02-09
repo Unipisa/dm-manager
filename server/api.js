@@ -28,6 +28,7 @@ let ModelSchemas = {}
     GroupController,
     PersonController,
     StaffController,
+    require('./controllers/FormController'),
 ].forEach(Controller => {
     const controller = new Controller()
     const schema = controller.getSchema()

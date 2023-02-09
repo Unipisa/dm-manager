@@ -107,7 +107,7 @@ function setup_routes(app) {
     function(req, res) {
       const user = req.user.toObject()
       console.log(`login ${JSON.stringify(user)}`)
-      res.redirect(config.BASE_URL || `http://localhost:3000`)
+      res.redirect(config.BASE_URL)
     }
   )
   
@@ -121,14 +121,15 @@ function setup_routes(app) {
   
   app.post('/impersonate', function(req, res) {
     const role = req.body.role
-    if (role) {
+    if (role || role==='') {
       if (req.user && req.user.roles && (req.user.roles.includes('admin') || req.user.roles.includes('disguised-admin'))) {
         // user want to add role
         // if role is admin it is the only role we need
+        // if role is '' we remove all roles
         // otherwise remove admin and add disguised-admin
-        let roles = [role]
+        let roles = role==='' ? [] : [role]
         if (role !== 'admin') {
-          roles.push(...req.user.roles)
+          if (role !== '') roles.push(...req.user.roles)
           roles = roles.filter(x => x!=='admin')
           if (!roles.includes('disguised-admin')) roles.push('disguised-admin')
         }

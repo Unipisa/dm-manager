@@ -8,9 +8,11 @@ import User from './User'
 import Token from './Token'
 import Staff from './Staff'
 import Group from './Group'
+import Form from './Form'
 
 const Models = { 
     RoomLabel: new RoomLabel(),
+    Form: new Form(),
     Room: new Room(),
     RoomAssignment: new RoomAssignment(),
     Visit: new Visit(),

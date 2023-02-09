@@ -10,6 +10,16 @@ function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
+/**
+ * @class Controller
+ * @classdesc Base class for all controllers
+ * @param {Model} Model - the mongoose Model of the managed objects
+ * 
+ * extend this class to create a new controller
+ * then register it in server/api.js
+ * 
+ */
+
 class Controller {
     constructor(Model=null) {
         // every controller must define a unique path
@@ -176,7 +186,7 @@ class Controller {
         }
     }
 
-    async performQuery(query, res) {
+    async performQuery(query, res, { fields, searchFields, queryPipeline, path, Model } = {}) {
         let $matches = []
         let $match_lookups = {}
         let $sort = {_id: 1}
@@ -186,7 +196,11 @@ class Controller {
         let limit = 0
         let search_conditions = []
 
-        const fields = this.fields
+        fields ||= this.fields
+        searchFields ||= this.searchFields
+        queryPipeline ||= this.queryPipeline
+        path ||= this.path
+        Model ||= this.Model
 
         for (let key in query) {
             let value = query[key];
@@ -229,7 +243,7 @@ class Controller {
                 try {
                     const $regex = new RegExp(escapeRegExp(value), 'i')
                     // Implement a custom filter over searchable fields
-                    for (let field of this.searchFields) {
+                    for (let field of searchFields) {
                         search_conditions.push({
                             [field]: { $regex }
                         })
@@ -352,7 +366,7 @@ class Controller {
 
         const pipeline = [
             ...$matches.map(x => ({$match: x})),
-            ...this.queryPipeline,
+            ...queryPipeline,
             {$match: $match_lookups},
             {$match: search_conditions.length > 0 ? {$or: search_conditions }: {}},
             {$sort},
@@ -364,9 +378,9 @@ class Controller {
             }}
         ]
         
-        console.log(`${this.path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
+        console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
         
-        let result = await this.Model.aggregate(pipeline)
+        let result = await Model.aggregate(pipeline)
         if (result.length === 0) {
             total = 0;
             data = result;
@@ -444,9 +458,12 @@ class Controller {
     }
 
     register_path(router, method, path, roles, callback) {
-        router[method](path, 
-            roles===null ? requireUser : requireSomeRole(...roles), 
-            callback)
+        const requireMiddleware = roles === null 
+            ? requireUser
+            : typeof(roles) === 'function'
+                ? roles
+                : requireSomeRole(...roles)
+        router[method](path, requireMiddleware, callback)
  
         // brief JSON description of path
         return {
