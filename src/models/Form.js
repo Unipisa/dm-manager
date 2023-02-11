@@ -37,7 +37,7 @@ export default class Form extends Model {
     routers() {
         return [
             ...super.routers(),
-            <Route path={`${this.viewUrl(":id")}/fill`} element={<FormFillPage />} />
+            <Route path={`/fill/:id`} element={<FormFillPage />} />
         ]
     }
 }

@@ -9,7 +9,7 @@ import { useObject, ObjectProvider } from '../components/ObjectProvider'
 export default function FormFillPage({enabled = true, showData = false}) {
     const id = useParams().id
     if (!id) return <p>Invalid id ({id})</p>
-    return <ObjectProvider Model={ Models.Form } id={id}>
+    return <ObjectProvider path="fill" id={id}>
         <FormFillPageInner enabled={enabled} showData={showData}/>
     </ObjectProvider>
 }
@@ -26,7 +26,9 @@ function FormFillPageInner({enabled, showData}) {
     const [data, setData] = useState({})
     const form = useObject()
     const [thanks, setThanks] = useState(false)
-    const put = engine.usePut(`${Models.Form.viewUrl(form._id)}/fill`)
+    const put = engine.usePut(`fill/${form._id}`)
+
+    console.log(`FormFillPageInner: ${form._id}`)
 
     async function submit() {
         if (!enabled) {

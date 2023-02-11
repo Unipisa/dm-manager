@@ -17,7 +17,7 @@ export default function FormViewPage() {
         <ModelView Model={Form} buttons={[
             'edit', 
             'clone', 
-            <Link key='fill' className='btn btn-success' to='fill'>compila</Link>,
+            <Link key='fill' className='btn btn-success' to={`/fill/${id}`}>compila</Link>,
             'index'
             ]} />
         <Tabs className='my-2'>
