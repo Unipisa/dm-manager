@@ -9,6 +9,7 @@ import Token from './Token'
 import Staff from './Staff'
 import Group from './Group'
 import Form from './Form'
+import Log from './Log'
 
 const Models = { 
     RoomLabel: new RoomLabel(),
@@ -22,6 +23,7 @@ const Models = {
     Person: new Person(),
     User: new User(),
     Token: new Token(),
+    Log: new Log(),
 }
 
 export default Models
