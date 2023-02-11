@@ -63,7 +63,9 @@ class FormController extends Controller {
         const user = req.user
         const form = await this.Model.findById(id)
         if (!form) return res.status(404).send({error: 'Form not found'})
-        if (!form.createdBy._id.equals(user._id)) return res.status(403).send({error: 'Forbidden'})
+        if (!req.user.roles.includes('admin') 
+            && !form.createdBy._id.equals(user._id)) 
+                return res.status(403).send({error: 'Forbidden'})
         return this.performQuery(req.query, res, {
             Model: FormData,
         })   
