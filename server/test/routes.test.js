@@ -83,7 +83,7 @@ describe('test admin user', () => {
   it('can deal with malformed _id (put fill)', async () => {
     await app
       .put('/api/v0/fill/undefined')
-      .expect(404)
+      .expect(400)
   })
 })
 
