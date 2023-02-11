@@ -1,16 +1,6 @@
 var express = require('express')
 
 const config = require('./config')
-const RoomController = require('./controllers/RoomController')
-const RoomLabelController = require('./controllers/RoomLabelController')
-const RoomAssignmentController = require('./controllers/RoomAssignmentController')
-const VisitController = require('./controllers/VisitController')
-const GrantController = require('./controllers/GrantController')
-const UserController = require('./controllers/UserController')
-const TokenController = require('./controllers/TokenController')
-const PersonController = require('./controllers/PersonController')
-const StaffController = require('./controllers/StaffController')
-const GroupController = require('./controllers/GroupController')
 
 var router = express.Router()
 
@@ -18,16 +8,17 @@ let paths = []
 let ModelSchemas = {}
 
 ;[
-    RoomLabelController, 
-    RoomController,
-    RoomAssignmentController,
-    VisitController, 
-    GrantController,
-    UserController,
-    TokenController,
-    GroupController,
-    PersonController,
-    StaffController,
+    require('./controllers/RoomLabelController'), 
+    require('./controllers/RoomController'),
+    require('./controllers/RoomAssignmentController'),
+    require('./controllers/VisitController'),
+    require('./controllers/GrantController'),
+    require('./controllers/UserController'),
+    require('./controllers/TokenController'),
+    require('./controllers/GroupController'),
+    require('./controllers/PersonController'),
+    require('./controllers/StaffController'),
+    require('./controllers/LogController'),
     require('./controllers/FormController'),
 ].forEach(Controller => {
     const controller = new Controller()
