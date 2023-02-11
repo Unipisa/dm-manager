@@ -1,6 +1,7 @@
 const Form = require('../models/Form')
 const FormData = require('../models/FormData')
 const Controller = require('./Controller')
+const { log } = require('./middleware')
 
 class FormController extends Controller {
     constructor() {
@@ -42,7 +43,7 @@ class FormController extends Controller {
             Object.entries(req.body).forEach(([key, value]) => {
                 map.set(key, value)
             })
-            const data = new FormData({
+            const payload = {
                 form,
                 data: map,
                 email: user.email || null,
@@ -50,7 +51,9 @@ class FormController extends Controller {
                 firstName: user.firstName || null,
                 createdBy: user._id,
                 updatedBy: user._id,
-            })
+            }
+            const data = new FormData(payload)
+            log(req, {}, payload)
             const obj = await data.save()
             return res.send(obj)
         } catch (err) {
