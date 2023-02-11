@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
@@ -7,14 +8,19 @@ export default function Home() {
   const engine = useEngine()
   const user = engine.user
 
-  const redirect_after_login = sessionStorage.getItem("redirect_after_login")
-  if (redirect_after_login) {
+  const [redirectAfterLogin, setRedirectAfterLogin] = useState()
+  useEffect(() => {
+        const url = sessionStorage.getItem("redirect_after_login")
+        console.log(`Home: redirect_after_login=${url}`)
+        setRedirectAfterLogin(url)
+  }, [])
+
+  if (redirectAfterLogin) {
+      console.log(`Home: redirecting to ${redirectAfterLogin}`)
       sessionStorage.removeItem("redirect_after_login")
-      //sessionStorage.setItem("redirect_after_login", 'fatto')
-      return <Navigate to={redirect_after_login} />
+      return <Navigate to={redirectAfterLogin} />
   }
   
-
   const modelElements = Object.values(Models)
     .filter(Model => Model.HomeElement !== null)
     .map(Model => [Model, Model.HomeElement({Model, user})])
