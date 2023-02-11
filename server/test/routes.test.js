@@ -80,6 +80,11 @@ describe('test admin user', () => {
       .get('/api/v0/room/undefined')
       .expect(404)
   })
+  it('can deal with malformed _id (put fill)', async () => {
+    await app
+      .put('/api/v0/fill/undefined')
+      .expect(400)
+  })
 })
 
 describe('test visit-manager', () => {

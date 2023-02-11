@@ -111,6 +111,7 @@ export function useCreateEngine() {
         start_oauth2: async () => {
             let url = api.BASE_URL + '/login/oauth2'
             console.log(`start_oauth2: redirecting to ${url}`)
+            sessionStorage.setItem('redirect_after_login', window.location.pathname)
             window.location.href = url
         },
 
