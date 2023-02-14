@@ -113,6 +113,6 @@ describe('test visit-manager', () => {
     await app
       .post('/invalid-url')    
       .send({ name: 'test' })
-      .expect(403)
+      .expect(404)
   })
 })
