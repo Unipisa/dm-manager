@@ -30,9 +30,13 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
     const queryClone = engine.useGet(Model.code, clone_id ? clone_id : null)
 
     if (query.isError || queryClone.isError) return <div>errore caricamento</div>
+    if (query.isLoading || queryClone.isLoading) return <Loading />
     if (modifiedObj === null) {
-        if (query.isSuccess && !clone_id) setModifiedObj({...query.data})
-        if (clone_id && queryClone.isSuccess) setModifiedObj({...queryClone.data, _id: undefined})
+        if (clone_id) {
+            if (queryClone.isSuccess) setModifiedObj({...queryClone.data, _id: undefined})
+        } else {
+            if (query.isSuccess) setModifiedObj({...query.data})
+        }
         return <Loading />
     }
     const originalObj = query.data
