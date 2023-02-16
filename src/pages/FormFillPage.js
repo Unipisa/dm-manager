@@ -103,9 +103,12 @@ function RenderElement({el, vars, data, setData}) {
     if (nodeName === 'p') return <p>{children}</p>
     if (nodeName === 'b') return <b>{children}</b>
     if (nodeName === 'i') return <i>{children}</i>
+    if (nodeName === 'ul') return <ul>{children}</ul>
+    if (nodeName === 'li') return <li>{children}</li>
     if (nodeName === 'select') return <RenderSelect el={el} data={data} setData={setData}>
             {children}
         </RenderSelect>
+    if (nodeName === 'textarea') return <RenderTextarea el={el} data={data} setData={setData} />
     if (nodeName === 'option') return <option value={el.value}>{children}</option>
     return <>{children}</>
 }
@@ -126,4 +129,22 @@ function RenderSelect({el, data, setData, children}) {
             ...data, [name]: evt.target.value}))}>
         {children}
     </select>
+}
+
+function RenderTextarea({el, data, setData}) {
+    const name = el.name
+    const value = data[el.name] || el.value
+    useEffect(() => {
+        if (data[name] !== value) {
+            setData(data => ({...data, [name]: value}))
+        }
+    }, [data, name, value, setData])
+    if (!name) return <Error>textarea without name</Error>
+    if (el.value && !data[el.name]) return <>...loading...</> 
+    return <textarea
+        name={name}
+        onChange={ evt => setData(data => ({
+            ...data, [name]: evt.target.value}))}>
+        {value}
+    </textarea>
 }
