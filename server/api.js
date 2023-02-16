@@ -20,6 +20,7 @@ let ModelSchemas = {}
     require('./controllers/StaffController'),
     require('./controllers/LogController'),
     require('./controllers/FormController'),
+    require('./controllers/ThesisController'),
 ].forEach(Controller => {
     const controller = new Controller()
     const schema = controller.getSchema()

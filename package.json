@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.2.3",
     "bootstrap": "^5.2.0",
+    "cheerio": "^1.0.0-rc.12",
     "connect-ensure-login": "^0.1.1",
     "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
