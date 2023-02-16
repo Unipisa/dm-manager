@@ -123,7 +123,7 @@ function RenderSelect({el, data, setData, children}) {
     }, [data, name, value, setData])
     if (!name) return <Error>select without name</Error>
     if (el.value && !data[el.name]) return <>...loading...</> 
-    return <select
+    return <select className="form form-control"
         name={name} value={value}
         onChange={ evt => setData(data => ({
             ...data, [name]: evt.target.value}))}>
@@ -142,6 +142,7 @@ function RenderTextarea({el, data, setData}) {
     if (!name) return <Error>textarea without name</Error>
     if (el.value && !data[el.name]) return <>...loading...</> 
     return <textarea
+        className="form form-control"
         name={name}
         onChange={ evt => setData(data => ({
             ...data, [name]: evt.target.value}))}>
