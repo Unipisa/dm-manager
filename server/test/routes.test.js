@@ -109,4 +109,10 @@ describe('test visit-manager', () => {
       .get('/api/v0/person/search?q=foo(')
       .expect(200)
   })
+  it('refuse random POST', async () => {
+    await app
+      .post('/invalid-url')    
+      .send({ name: 'test' })
+      .expect(404)
+  })
 })

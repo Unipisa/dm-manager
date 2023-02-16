@@ -257,9 +257,6 @@ const migrations = {
     },
 
     D20230201_import_photo_links_from_wp_2: async function(db) {
-        // renamed, we have already applied this migration
-        return true
-
         const staffs = db.collection('staffs')
         const people = db.collection('people')
         const axios = require('axios')
@@ -390,6 +387,41 @@ const migrations = {
         }
         return true
     },
+
+    D20230215_import_thesis_1: async function(db) {
+        return true // skip this migration, not yet completed
+
+        const axios = require('axios')
+        const cheerio = require('cheerio')
+        // read data from file "phd.txt"
+        const fs = require('fs')
+        const data = fs.readFileSync('phd.txt', 'utf8')
+        const lines = data.split('\n')
+        let count = 0
+        for (let line of lines) {
+            count ++
+            if (count > 10) break
+            const fields = line.split('|')
+            const firstName = fields[0]
+            const lastName = fields[1]
+            const url = fields[2]
+            console.log(`url: ${url} for ${firstName} ${lastName}`)
+            const response = await axios.get(url)
+            const data = response.data
+            const $ = cheerio.load(data)
+            // extract affiliation from <span> with style="font-size: 1.2em;"
+            const style="color: #006633; margin-left: 0.5em"
+            const affiliation = $('span').filter((i, el) => $(el).attr('style').startsWith('color:\n')).text().trim()
+            const thesis = {
+                firstName,
+                lastName,
+                affiliation,
+            }
+            console.log(JSON.stringify(thesis))
+            //await db.collection('theses').insertOne(thesis)
+        }
+        return false
+    }
 }
 
 async function migrate(db, options) {

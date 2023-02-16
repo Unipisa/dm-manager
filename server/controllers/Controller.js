@@ -410,6 +410,7 @@ class Controller {
     }
 
     async put(req, res) {
+        console.log(`*** PUT ${req.path} ${JSON.stringify(req.body)}`)
         let payload = {
             ...req.body,
             createdBy: req.user._id,
@@ -446,6 +447,7 @@ class Controller {
     }
 
     async delete(req, res, id) {
+        console.log(`*** DELETE ${req.path}`)
         try {
             const obj = await this.Model.findById(id)
             log(req, obj, {})
