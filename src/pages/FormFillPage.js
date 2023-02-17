@@ -105,12 +105,29 @@ function RenderElement({el, vars, data, setData}) {
     if (nodeName === 'i') return <i>{children}</i>
     if (nodeName === 'ul') return <ul>{children}</ul>
     if (nodeName === 'li') return <li>{children}</li>
-    if (nodeName === 'select') return <RenderSelect el={el} data={data} setData={setData}>
-            {children}
-        </RenderSelect>
+    if (nodeName === 'input') return <RenderInput el={el} data={data} setData={setData} />
+    if (nodeName === 'select') return <RenderSelect el={el} data={data} setData={setData}>{children}</RenderSelect>
     if (nodeName === 'textarea') return <RenderTextarea el={el} data={data} setData={setData} />
     if (nodeName === 'option') return <option value={el.value}>{children}</option>
     return <>{children}</>
+}
+
+function RenderInput({el, data, setData}) {
+    const name = el.name
+    const value = data[el.name] || el.value
+    useEffect(() => {
+        if (data[name] !== value) {
+            setData(data => ({...data, [name]: value}))
+        }
+    }, [data, name, value, setData])
+    if (!name) return <Error>input without name</Error>
+    if (el.value && !data[el.name]) return <>...loading...</> 
+    return <input
+        className="form form-control"
+        name={name}
+        value={value}
+        onChange={ evt => setData(data => ({
+            ...data, [name]: evt.target.value}))} />
 }
 
 function RenderSelect({el, data, setData, children}) {

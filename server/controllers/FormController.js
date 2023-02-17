@@ -69,7 +69,17 @@ class FormController extends Controller {
         if (!req.user.roles.includes('admin') 
             && !form.createdBy._id.equals(user._id)) 
                 return res.status(403).send({error: 'Forbidden'})
-        return this.performQuery(req.query, res, {
+        return this.performQuery({
+            ...req.query,
+            form: id,
+        }, res, {
+            fields: {
+                form: {
+                    can_sort: true,
+                    can_filter: true,
+                    match_ids: true,
+                }
+            },
             Model: FormData,
         })   
     }
