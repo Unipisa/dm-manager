@@ -416,9 +416,10 @@ const migrations = {
         return true
     },
 
-    D20230215_import_thesis_8: async function(db) {
+    D20230215_import_thesis_9: async function(db) {
         const people = db.collection('people')
         const theses = db.collection('theses')
+        const path = require('path')
 
         // clear collection!!!!
         await theses.deleteMany({})
@@ -427,8 +428,9 @@ const migrations = {
         const cheerio = require('cheerio')
         // read data from file "phd.txt"
         const fs = require('fs')
-        const data = fs.readFileSync('phd.txt', 'utf8')
+        const data = fs.readFileSync(path.resolve(__dirname,'phd.txt'), 'utf8')
         const lines = data.split('\n')
+
         let count = 0
         const warnings = []
         for (let line of lines) {
