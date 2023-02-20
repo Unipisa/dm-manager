@@ -36,8 +36,9 @@ const multipleSSDs = {
 const notes = {type: String, label: 'note', widget: 'text', default: ''}
 const createdBy = { type: ObjectId, ref: 'User' }
 const updatedBy = { type: ObjectId, ref: 'User' }
-const startDate = {type: Date, label: 'data inizio', default: null}
-const endDate = {type: Date, label: 'data fine', default: null}
+const date = {type: Date, label: 'data', default: null}
+const startDate = {...date, label: 'data inizio'}
+const endDate = {...date, label: 'data fine'}
 
 const model = function(name, schema) {
     const M = mongoose.model(name, schema)
@@ -140,6 +141,7 @@ module.exports = {
     Schema, 
     ObjectId, 
     notes, 
+    date,
     startDate, 
     endDate, 
     createdBy, 

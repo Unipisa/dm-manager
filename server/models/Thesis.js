@@ -2,9 +2,8 @@ const {
     model, 
     Schema, 
     ObjectId, 
-    startDate, 
-    endDate,
-    SSD, 
+    date,
+    notes,
     createdBy, 
     updatedBy,
 } = require('./Model')
@@ -12,11 +11,11 @@ const {
 const thesisSchema = new Schema({
     person: { type: ObjectId, label: 'persona', ref: 'Person', required: true},
     title: { type: String, label: 'titolo', default: ''},
-    supervisors: [{ type: ObjectId, label: 'supervisori', ref: 'Person' }],
-    startDate,
-    endDate,
+    advisors: [{ type: ObjectId, label: 'relatori', ref: 'Person' }],
+    date,
     institution: { type: String, label: 'affiliazione', default: ''},
     fileUrl: {type: String, label: 'URL file'},
+    notes,
     createdBy,
     updatedBy,
 }, {

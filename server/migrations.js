@@ -19,6 +19,34 @@ async function findPerson(people, firstName, lastName, affiliazione) {
     return p
 }
 
+async function findPerson2(people, fullName, affiliazione) {
+    const names = fullName.split(' ').filter(n => n !== '')
+    let p = null
+    if (names.length === 2) {
+        return await findPerson(people, names[0], names[1], affiliazione)
+    } else {
+        // find people where firstName + lastName equals fullName        
+        p = await people.aggregate([
+            {   $project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    fullName: { $concat: ['$firstName', ' ', '$lastName'] }
+                },                    
+            },
+            { $match: { fullName } },
+        ]).toArray()
+        if (p.length === 1) {
+            console.log(`found ${fullName} as ${p[0].firstName}+${p[0].lastName}`)
+            return p[0]
+        } else {
+            console.log(`*** not found ${fullName}: cannot distinguish firstName by lastName`)
+            p = null
+        }
+    }
+    return p
+}
+
 const migrations = { 
     D20221112_migration_test: async (db) => {
         return true
@@ -388,8 +416,12 @@ const migrations = {
         return true
     },
 
-    D20230215_import_thesis_2: async function(db) {
-        // return true // skip this migration, not yet completed
+    D20230215_import_thesis_7: async function(db) {
+        const people = db.collection('people')
+        const theses = db.collection('theses')
+
+        // clear collection!!!!
+        await theses.deleteMany({})
 
         const axios = require('axios')
         const cheerio = require('cheerio')
@@ -398,51 +430,78 @@ const migrations = {
         const data = fs.readFileSync('phd.txt', 'utf8')
         const lines = data.split('\n')
         let count = 0
+        const warnings = []
         for (let line of lines) {
             count ++
-            if (count > 10) break
-            const fields = line.split('|')
-            const firstName = fields[0]
-            const lastName = fields[1]
-            const url = fields[2]
-            console.log(`url: ${url} for ${firstName} ${lastName}`)
-            const response = await axios.get(url)
-            const data = response.data
-            const $ = cheerio.load(data)
-            // extract affiliation from <span> with style="font-size: 1.2em;"
-            const style="color: #006633; margin-left: 0.5em"
-            const affiliation = $('span').filter((i, el) => $(el).attr('style').startsWith('color:\n')).text().trim()
-            const year = $('#paddingWrapper').children()[6].children[1].children[2].data.trim()
-            const title = $('#thesisTitle').text().trim()
+            console.log(`>>> importing entry ${count}/${lines.length} <<<<`)
+            // if (count > 10) break
+            try {
+                const fields = line.split('|')
+                const firstName = fields[0]
+                const lastName = fields[1]
+                const url = fields[2]
+                console.log(`url: ${url} for ${firstName} ${lastName}`)
+                if (!url) continue
+                const response = await axios.get(url)
+                const data = response.data
+                const $ = cheerio.load(data)
+                // extract affiliation from <span> with style="font-size: 1.2em;"
+                const style="color: #006633; margin-left: 0.5em"
+                const affiliation = $('span').filter((i, el) => $(el).attr('style').startsWith('color:\n')).text().trim()
+                const year = $('#paddingWrapper').children()[6].children[1].children[2].data.trim()
+                const title = $('#thesisTitle').text().trim()
+                const person = await findPerson(people, firstName, lastName, affiliation)
 
-            const advisors_list = $('p').filter((i, el) => ( $(el).attr('style')  && $(el).attr('style').includes('2.75ex') )).children().map(
-                (j, x) => {
-                    if (x.children[0]) {
-                        const yy = JSON.stringify(x.children[0].data)
-                        return yy
+                if (person===null) {
+                    warnings.push(`person not found: ${firstName} ${lastName} ${affiliation}`)
+                    continue
+                }
+
+                const advisors_list = $('p').filter((i, el) => ( $(el).attr('style')  && $(el).attr('style').includes('2.75ex') )).children().map(
+                    (j, x) => {
+                        if (x.children[0]) {
+                            const yy = JSON.stringify(x.children[0].data)
+                            return yy
+                        }
+                        return null
+                    }).filter(
+                        (x) => x !== null
+                    )
+
+                let notes = ''
+                notes += `genealogy url: ${url}\n`
+                let advisors = []
+                for (j = 0; j < advisors_list.length; j++) {
+                    const fullAdvisorName = advisors_list[j].toString().replaceAll('"', '')
+                    const p = await findPerson2(people, fullAdvisorName)
+                    if (p === null) {
+                        notes += `advisor: ${fullAdvisorName}\n`
+                        warnings.push(`advisor not found: ${fullAdvisorName} for ${firstName} ${lastName} ${affiliation}`)
+                    } else {
+                        advisors.push(p._id)
                     }
-                    return null
-                }).filter(
-                    (x) => x !== null
-                )
+                }
 
-            let advisors = []
-            for (j = 0; j < advisors_list.length; j++) {
-                advisors.push(advisors_list[j.toString()].replaceAll('"', ''))
-            }
+                const thesis = {
+                    person: person._id,
+                    affiliation,
+                    date: new Date(`${year}-01-01`),
+                    title,
+                    advisors,
+                    notes,
+                }
 
-            const thesis = {
-                firstName,
-                lastName,
-                affiliation,
-                year,
-                title,
-                advisors
+                console.log(JSON.stringify(thesis))
+                await db.collection('theses').insertOne(thesis)
+            } catch (e) {
+                console.log(e.stack)
+                warnings.push(`error: ${e}`)
             }
-            console.log(JSON.stringify(thesis))
-            //await db.collection('theses').insertOne(thesis)
         }
-        return false
+        console.log(`++++++++++++++ migration imported ${count} theses`)
+        console.log(`++++++++++++++ found ${warnings.length} warnings:`)
+        warnings.forEach(w => console.log(`* ${w}`))
+        return true
     }
 }
 
