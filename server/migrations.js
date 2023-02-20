@@ -416,7 +416,7 @@ const migrations = {
         return true
     },
 
-    D20230215_import_thesis_7: async function(db) {
+    D20230215_import_thesis_8: async function(db) {
         const people = db.collection('people')
         const theses = db.collection('theses')
 
@@ -437,8 +437,8 @@ const migrations = {
             // if (count > 10) break
             try {
                 const fields = line.split('|')
-                const firstName = fields[0]
-                const lastName = fields[1]
+                const firstName = fields[1]
+                const lastName = fields[0]
                 const url = fields[2]
                 console.log(`url: ${url} for ${firstName} ${lastName}`)
                 if (!url) continue

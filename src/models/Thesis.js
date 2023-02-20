@@ -15,12 +15,11 @@ export default class Thesis extends Model {
             'gli oggetti': "le tesi", 
             'un oggetto': "una tesi", 
         }
-        this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+        this.indexDefaultFilter = {'_sort': '-date', '_limit': 10}
         this.managerRoles = ['admin', 'thesis-manager']
         this.columns = {
-            'startDate': "dal",
-            'endDate': "al",
-            'person': "dottorando",
+            'date': "data",
+            'person': "persona",
             'updatedAt': "modificato",
         }
     }
