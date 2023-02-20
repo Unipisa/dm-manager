@@ -388,8 +388,8 @@ const migrations = {
         return true
     },
 
-    D20230215_import_thesis_1: async function(db) {
-        return true // skip this migration, not yet completed
+    D20230215_import_thesis_2: async function(db) {
+        // return true // skip this migration, not yet completed
 
         const axios = require('axios')
         const cheerio = require('cheerio')
@@ -412,10 +412,32 @@ const migrations = {
             // extract affiliation from <span> with style="font-size: 1.2em;"
             const style="color: #006633; margin-left: 0.5em"
             const affiliation = $('span').filter((i, el) => $(el).attr('style').startsWith('color:\n')).text().trim()
+            const year = $('#paddingWrapper').children()[6].children[1].children[2].data.trim()
+            const title = $('#thesisTitle').text().trim()
+
+            const advisors_list = $('p').filter((i, el) => ( $(el).attr('style')  && $(el).attr('style').includes('2.75ex') )).children().map(
+                (j, x) => {
+                    if (x.children[0]) {
+                        const yy = JSON.stringify(x.children[0].data)
+                        return yy
+                    }
+                    return null
+                }).filter(
+                    (x) => x !== null
+                )
+
+            let advisors = []
+            for (j = 0; j < advisors_list.length; j++) {
+                advisors.push(advisors_list[j.toString()].replaceAll('"', ''))
+            }
+
             const thesis = {
                 firstName,
                 lastName,
                 affiliation,
+                year,
+                title,
+                advisors
             }
             console.log(JSON.stringify(thesis))
             //await db.collection('theses').insertOne(thesis)
