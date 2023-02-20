@@ -30,6 +30,8 @@ export default function RelatedDetails({ Model, related, title }) {
                                 return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.person.lastName} {obj.person.firstName} {obj.qualification }</a>
                             case 'Group':
                                 return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.startDate)} - {myDateFormat(obj.endDate)}: {obj.name}</a>
+                            case 'Thesis':
+                                return <a href={`/${info.url}/${obj._id}`}>{myDateFormat(obj.date)}: {obj.person.lastName} {obj.person.firstName}</a>
                             default:
                                 return <span>not implemented {JSON.stringify(info)}</span>
                         }
