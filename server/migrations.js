@@ -416,7 +416,7 @@ const migrations = {
         return true
     },
 
-    D20230215_import_thesis_9: async function(db) {
+    D20230215_import_thesis_10: async function(db) {
         const people = db.collection('people')
         const theses = db.collection('theses')
         const path = require('path')
@@ -453,11 +453,15 @@ const migrations = {
                 const year = $('#paddingWrapper').children()[6].children[1].children[2].data.trim()
                 const title = $('#thesisTitle').text().trim()
                 const person = await findPerson(people, firstName, lastName, affiliation)
+                const gene_id = url.split('id=')[1]
 
                 if (person===null) {
                     warnings.push(`person not found: ${firstName} ${lastName} ${affiliation}`)
                     continue
                 }
+
+                // insert gene_id in person
+                await people.updateOne({ _id: person._id }, { $set: { genealogyId: gene_id } })
 
                 const advisors_list = $('p').filter((i, el) => ( $(el).attr('style')  && $(el).attr('style').includes('2.75ex') )).children().map(
                     (j, x) => {

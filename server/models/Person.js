@@ -22,6 +22,7 @@ const personSchema = new Schema({
     google_scholar: {type: String, label: 'google_scholar'},
     mathscinet: {type: String, label: 'mathscinet'},
     photoUrl: {type: String, label: 'URL foto'},
+    genealogyId: {type: String, label: 'math genealogy id'},
     createdBy,
     updatedBy,
 }, {

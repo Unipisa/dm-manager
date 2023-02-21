@@ -92,6 +92,7 @@ export function ModelOutput({ field, schema, value}) {
         if (schema.enum) return value
         if (schema.type === 'string') {
             if (value === undefined || value === null) return '???'
+            if (field === 'genealogyId') return <a href={`https://genealogy.math.ndsu.nodak.edu/id.php?id=${value}`}>{value}</a>
             if (schema.widget === 'text') {
                 var lst = []
                 value.split('\n').forEach((line ,i) => {
