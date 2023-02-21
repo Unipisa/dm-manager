@@ -10,6 +10,7 @@ import Staff from './Staff'
 import Group from './Group'
 import Form from './Form'
 import Log from './Log'
+import Thesis from './Thesis'
 
 const Models = { 
     RoomLabel: new RoomLabel(),
@@ -19,6 +20,7 @@ const Models = {
     Visit: new Visit(),
     Grant: new Grant(),
     Staff: new Staff(),
+    Thesis: new Thesis(),
     Group: new Group(),
     Person: new Person(),
     User: new User(),

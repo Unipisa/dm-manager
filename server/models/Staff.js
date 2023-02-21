@@ -20,7 +20,8 @@ const staffSchema = new Schema({
             'Professore Emerito',
             'Collaboratore',
             'Docente Esterno',
-            'Dottorando Esterno'
+            'Dottorando Esterno',
+            'Personale in quiescenza',
         ]},
     isInternal: {type: Boolean, label: 'interno al dipartimento', default: true},
     startDate,

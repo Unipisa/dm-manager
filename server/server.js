@@ -166,7 +166,7 @@ function setup_routes(app) {
   })
   
   // all unhandled requests are sent to the react application
-  app.all('*', function(req, res) {
+  app.get('/', function(req, res) {
     res.sendFile(`${config.STATIC_FILES_PATH}/index.html`, { 
       root: `${__dirname}/../` })
   })
