@@ -20,6 +20,7 @@ export default class Thesis extends Model {
         this.columns = {
             'date': "data",
             'person': "persona",
+            'SSD': "SSD",
             'updatedAt': "modificato",
         }
     }
