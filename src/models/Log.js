@@ -14,6 +14,7 @@ export default class Log extends Model {
             'un oggetto': "una log",
         }
         this.ModelName = 'Log' 
+        this.ModelCategory = 'amministrazione'
         this.columns = {
             'when': "quando",
             'who': "chi",

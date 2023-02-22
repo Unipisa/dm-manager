@@ -38,6 +38,7 @@ class Options {
             REACT_APP_SERVER_URL: null,
             BASE_URL: "http://localhost:3000",
             SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
+            UPLOAD_DIRECTORY: __dirname + '/../uploads'
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val

@@ -21,10 +21,13 @@ let ModelSchemas = {}
     require('./controllers/LogController'),
     require('./controllers/FormController'),
     require('./controllers/ThesisController'),
+    require('./controllers/UploadController')
 ].forEach(Controller => {
     const controller = new Controller()
-    const schema = controller.getSchema()
-    ModelSchemas[schema.modelName] = schema 
+    if (controller.getSchema) {
+        const schema = controller.getSchema()
+        ModelSchemas[schema.modelName] = schema 
+    }
     paths = [...paths, ...controller.register(router)]
 })
 

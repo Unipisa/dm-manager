@@ -7,6 +7,7 @@ export default class Grant extends Model {
         this.name = "grant"
         this.names = "grants"
         this.ModelName = 'Grant'
+        this.ModelCategory = 'ricerca'
         this.oa = 'o'
         this.articulation = {
             'oggetto': "grant", 

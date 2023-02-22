@@ -14,6 +14,7 @@ export default class RoomAssignment extends Model {
             'un oggetto': "una assegnazione stanza", 
         }
         this.ModelName = 'RoomAssignment'
+        this.ModelCategory = 'stanze'
         this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
         this.managerRoles = ['admin', 'assignment-manager'] 
         this.columns = {

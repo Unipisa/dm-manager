@@ -1,4 +1,5 @@
-import { NavLink } from 'react-router-dom'
+import { NavDropdown } from "react-bootstrap"
+import { NavLink } from "react-router-dom"
 
 function capitalize(x) {
     if (x) {
@@ -8,11 +9,11 @@ function capitalize(x) {
     }
 }
 
-export default function ModelMenuElement({ Model, user }) {
+export default function ModelNavDropdownElement({ Model, user }) {
     if (user && user.hasSomeRole(...Model.schema.supervisorRoles)) {
-        return <NavLink key={Model.code} to={Model.indexUrl()} className="nav-link">
+        return <NavDropdown.Item as={NavLink} key={Model.code} to={Model.indexUrl()}>
             {capitalize(Model.articulation['oggetti'])}
-        </NavLink>
+        </NavDropdown.Item>
     } else {
         return null
     }

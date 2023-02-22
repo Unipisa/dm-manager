@@ -6,6 +6,7 @@ export default class RoomLabel extends Model {
         super()
         this.code = 'roomLabel'
         this.ModelName = 'RoomLabel'
+        this.ModelCategory = 'stanze'
         this.name = "cartellino stanza"
         this.articulation = {
             'oggetto': "cartellino stanza", 

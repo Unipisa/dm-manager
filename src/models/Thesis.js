@@ -7,6 +7,7 @@ export default class Thesis extends Model {
         this.name = "tesi"
         this.names = "tesi"
         this.ModelName = 'Thesis'
+        this.ModelCategory = 'ricerca'
         this.oa = 'a'
         this.articulation = {
             'oggetto': "tesi", 

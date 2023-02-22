@@ -37,7 +37,7 @@ function Internal() {
      <BrowserRouter>
       <Header/>
       <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
-      <Container>
+      <Container className="p-5">
         <Routes>  
           <Route path="/" element={<Home />} />
           {  Object.values(Models).map(x => x.routers()) }

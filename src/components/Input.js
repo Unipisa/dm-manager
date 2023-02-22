@@ -18,6 +18,50 @@ export function StringInput({ id, value, setValue }) {
     />
 }
 
+export function AttachmentInput({ id, value, setValue }) {
+    // const [uploading, setUploading] = useState(false)
+    const engine = useEngine()
+
+    function getNewAttachment() {
+        const input = document.createElement('input')
+        input.type = 'file'
+        input.onchange = e => {
+            const file = e.target.files[0]
+            if (file) {
+                var reader = new FileReader()
+                reader.onload = () => {
+                    const data = {
+                        filename: file.name, 
+                        mimetype: file.type, 
+                        data: btoa(reader.result)
+                    }
+                    api.post('/api/v0/upload', data).then(data => {
+                        setValue(process.env.BASE_URL + "/api/v0/upload/" + data.upload._id)
+                    }).catch(data => {
+                        engine.addMessage(data.message, 'error')
+                    })
+                }
+                reader.readAsBinaryString(file)
+            }
+        }
+        input.click()
+    }
+
+    return <div className="form-row">
+        <div className="d-inline-block col-sm-10"><input 
+        className="form-control"
+        id={ id } 
+        value={ value || "" } 
+        onChange={ (evt) => {setValue(evt.target.value)} }
+    /></div>
+    <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
+        <button onClick={getNewAttachment} className="w-100 btn btn-primary">
+            Upload
+        </button>
+    </div>
+    </div>
+}
+
 export function NumberInput({ id, value, setValue }) {
     return <input 
         className="form-control col-sm-10"
