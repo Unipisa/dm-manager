@@ -36,7 +36,7 @@ export function AttachmentInput({ id, value, setValue }) {
                         data: btoa(reader.result)
                     }
                     api.post('/api/v0/upload', data).then(data => {
-                        setValue(process.env.BASE_URL + "/api/v0/upload/" + data.upload._id)
+                        setValue(window.location.origin + "/api/v0/upload/" + data.upload._id)
                     }).catch(data => {
                         engine.addMessage(data.message, 'error')
                     })
