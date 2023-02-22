@@ -35,7 +35,7 @@ export function AttachmentInput({ id, value, setValue }) {
                         mimetype: file.type, 
                         data: btoa(reader.result)
                     }
-                    const res = api.post('/api/v0/upload', data).then(data => {
+                    api.post('/api/v0/upload', data).then(data => {
                         const upload = data.upload
                         setValue(api.BASE_URL + "/api/v0/upload/" + upload._id)
                     }).catch(data => {
