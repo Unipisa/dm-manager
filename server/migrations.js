@@ -549,7 +549,37 @@ const migrations = {
         }
         return true
     },
+
+    D20230222_fill_theses_affiliation: async function(db) {
+        const people = db.collection('people')
+        const theses = db.collection('theses')
+        const path = require('path')
+        
+        // read data from file "phd.txt"
+        const fs = require('fs')
+        const data = fs.readFileSync(path.resolve(__dirname,'phd.txt'), 'utf8')
+        const lines = data.split('\n')
+    
+        let count = 0
+        for (let line of lines) {
+            const fields = line.split('|')
+            const firstName = fields[1]
+            const lastName = fields[0]
+            const url = fields[2]
+            if (!url) continue
+            count ++
+            const gene_id = url.split('id=')[1]
+
+            const person = await people.findOne({ genealogyId: gene_id })
+            const thesis = await theses.findOne({ person: person._id, affiliation: "" })
+            if (!thesis) continue
+            console.log(`setting affiliation of thesis: ${thesis._id}`)
+            await theses.updateOne({ _id: thesis._id }, { $set: { affiliation: {$exists: false} } })
+        }
+        return true
+    },
 }
+
 
 async function migrate(db, options) {
     const {apply, clean} = {
