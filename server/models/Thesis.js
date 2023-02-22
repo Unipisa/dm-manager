@@ -14,7 +14,7 @@ const thesisSchema = new Schema({
     title: { type: String, label: 'titolo', default: ''},
     advisors: [{ type: ObjectId, label: 'relatori', ref: 'Person' }],
     date,
-    institution: { type: String, label: 'affiliazione', default: ''},
+    institution: { type: String, label: 'istituto', default: ''},
     fileUrl: {type: String, label: 'URL file'},
     SSD,
     notes,

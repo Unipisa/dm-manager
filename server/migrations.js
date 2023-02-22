@@ -550,7 +550,7 @@ const migrations = {
         return true
     },
 
-    D20230222_fill_theses_affiliation: async function(db) {
+    D20230222_fill_theses_affiliation_2: async function(db) {
         const people = db.collection('people')
         const theses = db.collection('theses')
         const path = require('path')
@@ -571,11 +571,14 @@ const migrations = {
             const gene_id = url.split('id=')[1]
 
             const person = await people.findOne({ genealogyId: gene_id })
-            const thesis = await theses.findOne({ person: person._id, affiliation: "" })
+            console.log(`person: ${person._id} ${person.firstName} ${person.lastName}`)
+            // find all thesis with missing or empty affiliation
+            const thesis = await theses.findOne({ person: person._id })
             if (!thesis) continue
-            console.log(`setting affiliation of thesis: ${thesis._id}`)
-            await theses.updateOne({ _id: thesis._id }, { $set: { affiliation: {$exists: false} } })
+            console.log(`setting affiliation of thesis: ${thesis._id} was ${thesis.institution}`)
+            await theses.updateOne({ _id: thesis._id }, { $set: { institution: 'Università di Pisa' } })
         }
+        await theses.updateMany({}, { $unset: { affiliation: '' } })
         return true
     },
 }
