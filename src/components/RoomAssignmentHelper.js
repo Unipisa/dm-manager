@@ -144,6 +144,7 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
     }
 
     const user_assignments = assignments.filter(assignment => assignment.person._id === person._id)
+    
 
     return <>
         <h5>Assegnazioni inserite</h5>

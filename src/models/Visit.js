@@ -15,6 +15,7 @@ export default class Visit extends Model {
             'un oggetto': "una visita", 
         }
         this.ModelName = 'Visit' 
+        this.ModelCategory = 'ricerca'
         this.columns = {
             'startDate': "dal",
             'endDate': "al",

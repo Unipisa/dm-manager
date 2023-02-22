@@ -28,7 +28,7 @@ function VisitDetails() {
     const Person = engine.Models.Person
 
     if (visit.person && visit.startDate && engine.user.hasSomeRole(...engine.Models.RoomAssignment.schema.supervisorRoles)) {
-        tabs.push(<Tab key="rooms" eventKey="rooms" title="assegnazione stanza">
+        tabs.push(<Tab className="p-3 border border-top-0" key="rooms" eventKey="rooms" title="assegnazione stanza">
             <RoomAssignmentHelper 
                 key={RoomAssignmentHelper} 
                 person={visit.person}
@@ -39,7 +39,7 @@ function VisitDetails() {
     }
 
     if (person && engine.user.hasSomeRole(...Person.schema.supervisorRoles)) {
-        tabs.push(<Tab key="related" eventKey="related" title={`elementi collegati a ${person.lastName}`}>
+        tabs.push(<Tab className="p-3 border border-top-0" key="related" eventKey="related" title={`elementi collegati a ${person.lastName}`}>
             <ObjectProvider path={Person.code} id={person._id} >
                 <RelatedDetails Model={Person}/>
             </ObjectProvider>
@@ -49,7 +49,7 @@ function VisitDetails() {
     if (tabs.length === 0) return
 
     return <>
-        <Tabs className="mt-2">
+        <Tabs className="mt-4">
             {tabs}
         </Tabs>
     </>   

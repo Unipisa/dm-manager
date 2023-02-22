@@ -7,6 +7,7 @@ export default class Token extends Model {
         this.code = 'token'
         this.name = "token"
         this.ModelName = 'Token'
+        this.ModelCategory = 'amministrazione'
         this.articulation = {
             'oggetto': "token", 
             'oggetti': "token",

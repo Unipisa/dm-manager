@@ -3,6 +3,7 @@ import Navbar from 'react-bootstrap/Navbar'
 import NavDropdown from 'react-bootstrap/NavDropdown'
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import ModelNavDropdownElement from './ModelNavDropdownElement'
 
 import { useEngine } from '../Engine'
 import Models from '../models/Models'
@@ -13,15 +14,34 @@ export default function Header() {
   const user = engine.user
   const navigate = useNavigate()
 
+  const objectCategories = [...new Set(Object.values(Models).filter(
+    Model => Model.MenuElement !== null && Model.ModelCategory !== null && (user.hasSomeRole(...Model.schema.supervisorRoles))
+  ).map(
+    Model => Model.ModelCategory
+  )) ].sort()
+
   return (
-      <Navbar bg="light" expand="lg" className="mb-4">
+      <Navbar bg="light" expand="lg" className="mb-5 mr-4 shadow border-primary border-bottom" variant="pills">
         <Container>
-          <Navbar.Brand href="/">{ engine.config.SERVER_NAME } { package_json.version }</Navbar.Brand>
+          <Navbar.Brand href="/">
+            <div className="small"><strong>{ engine.config.SERVER_NAME }</strong></div>
+            <div className="text-muted text-end small">Release { package_json.version }</div>
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
+            {objectCategories.map(Category => <NavDropdown title={Category.charAt(0).toUpperCase() + Category.slice(1)} key={Category} className="mx-2 py-2">
+              { Object.values(Models).filter(
+                  Model => Model.MenuElement !== null && Model.ModelCategory === Category
+                ).sort(
+                  (ModelA, ModelB) => ModelA.articulation['oggetti'] < ModelB.articulation['oggetti'] ? -1 : 1
+                ).map(
+                  Model => <ModelNavDropdownElement key={Model.code} Model={Model} user={user}/>
+                )
+              }
+            </NavDropdown>)}
             <Nav className="me-auto">
               { Object.values(Models)
-                .filter(Model => Model.MenuElement !== null)
+                .filter(Model => Model.MenuElement !== null && Model.ModelCategory === null)
                 .map(Model => <Model.MenuElement key={Model.code} Model={Model} user={user}/>)}
             </Nav>
           </Navbar.Collapse>

@@ -14,6 +14,7 @@ export default class Person extends Model {
             'un oggetto': "una persona", 
         }
         this.ModelName = 'Person'
+        this.ModelCategory = 'personale'
         this.managerRoles = ['admin', 'person-manager']
         this.indexDefaultFilter = {'_sort': 'lastName', '_limit': 10}
         this.columns = {

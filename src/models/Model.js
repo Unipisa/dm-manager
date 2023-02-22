@@ -54,6 +54,9 @@ export default class Model {
         // react element to be inserted
         // in the header bar
         this.MenuElement = ModelMenuElement
+
+        // Category to use in the navbar 
+        this.ModelCategory = null
     }
 
     // brief description of given object
