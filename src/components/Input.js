@@ -22,7 +22,7 @@ export function AttachmentInput({ id, value, setValue }) {
     // const [uploading, setUploading] = useState(false)
     const engine = useEngine()
 
-    function getNewImage() {
+    function getNewAttachment() {
         const input = document.createElement('input')
         input.type = 'file'
         input.onchange = e => {
@@ -55,7 +55,7 @@ export function AttachmentInput({ id, value, setValue }) {
         onChange={ (evt) => {setValue(evt.target.value)} }
     /></div>
     <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
-        <button onClick={getNewImage} className="w-100 btn btn-primary">
+        <button onClick={getNewAttachment} className="w-100 btn btn-primary">
             Upload
         </button>
     </div>
