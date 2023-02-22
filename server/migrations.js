@@ -508,7 +508,47 @@ const migrations = {
         console.log(`++++++++++++++ found ${warnings.length} warnings:`)
         warnings.forEach(w => console.log(`* ${w}`))
         return true
-    }
+    },
+
+    D20230222_thesis_add_missing_SSDs: async function(db) {
+        const staff = db.collection('staffs')
+        // load all staff members with startDate and endDate
+        // null or enclosing today
+        const today = new Date()
+        const staff_members = await staff.find({
+            $or: [
+                { startDate: { $lte: today } },
+                { startDate: null },
+            ],
+            $or: [
+                { endDate: { $gte: today } },
+                { endDate: null },
+            ]
+        }).toArray()
+        const ssds = Object.fromEntries([...staff_members]
+            .map(x => [x.person, x.SSD])
+            .filter(x => x[1]))
+        // console.log(ssds)
+        const theses = db.collection('theses')
+        const all_theses = await theses.find({ 
+                advisors: { $exists: true, $ne: [] }, 
+                SSD: { $exists: false } })
+            .toArray()
+        for (let thesis of all_theses) {
+            let SSD = null
+            for (let advisor of thesis.advisors) {
+                if (ssds[advisor]) {
+                    SSD = ssds[advisor]
+                    break
+                }
+            }
+            if (SSD) {
+                console.log(`setting SSD ${SSD} for thesis ${thesis._id}`)
+                await theses.updateOne({ _id: thesis._id }, { $set: { SSD } })
+            }
+        }
+        return true
+    },
 }
 
 async function migrate(db, options) {
