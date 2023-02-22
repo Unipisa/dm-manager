@@ -122,7 +122,7 @@ class Controller {
                 } else if (info.ref === 'Person') {
                     this.populateFields.push({
                         path: field, 
-                        select: ['firstName', 'lastName', 'affiliation', 'email']
+                        select: ['firstName', 'lastName', 'affiliation', 'email', 'photoUrl']
                     })
                     this.queryPipeline.push(
                         {$lookup: {
@@ -139,7 +139,7 @@ class Controller {
                 } else if (info.ref === 'User') {
                     this.populateFields.push({
                         path: field,
-                        select: ['firstName', 'lastName', 'username', 'email']
+                        select: ['firstName', 'lastName', 'username', 'email', 'photoUrl']
                     })
                 } else if (info.ref === 'Room') {
                     this.populateFields.push({
