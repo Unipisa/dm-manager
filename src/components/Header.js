@@ -24,7 +24,7 @@ export default function Header() {
       <Navbar bg="light" expand="lg" className="mb-0 mr-4 shadow border-primary border-bottom border-3" variant="pills">
         <Container>
           <Navbar.Brand href="/">
-            <div className="small"><strong>{ engine.config.SERVER_NAME }</strong></div>
+            <div className="small text-end"><strong>{ engine.config.SERVER_NAME }</strong></div>
             <div className="text-muted text-end small">Release { package_json.version }</div>
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
