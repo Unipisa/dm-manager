@@ -21,7 +21,7 @@ export default function Header() {
   )) ].sort()
 
   return (
-      <Navbar bg="light" expand="lg" className="mb-5 mr-4 shadow border-primary border-bottom" variant="pills">
+      <Navbar bg="light" expand="lg" className="mb-0 mr-4 shadow border-primary border-bottom border-3" variant="pills">
         <Container>
           <Navbar.Brand href="/">
             <div className="small"><strong>{ engine.config.SERVER_NAME }</strong></div>
@@ -46,7 +46,7 @@ export default function Header() {
             </Nav>
           </Navbar.Collapse>
           <Nav className="right">
-            <NavDropdown title={ user ? user.username : "user"}>
+            <NavDropdown title={ user ? (<span className="me-2">{user.firstName} {user.lastName}<br />{user.username}</span>) : "user"}>
                 <NavDropdown.Item onClick={ () => engine.logout() }>logout</NavDropdown.Item>
                 {user.hasSomeRole('disguised-admin') && <NavDropdown.Item onClick={ () => engine.impersonate_role('admin') }>ritorna admin</NavDropdown.Item>}
                 {user.hasSomeRole('admin', 'disguised-admin') && 

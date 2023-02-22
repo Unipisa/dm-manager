@@ -9,14 +9,14 @@ export default class Form extends Model {
     constructor() {
         super()
         this.code = 'form'
-        this.name = "modello"
+        this.name = "moduli"
         this.oa = "o"
         this.articulation = {
-            'oggetto': "modello", 
-            'oggetti': "modelli",
-            'l\'oggetto': "il modello",
-            'gli oggetti': "i modelli", 
-            'un oggetto': "un modello", 
+            'oggetto': "modulo", 
+            'oggetti': "moduli",
+            'l\'oggetto': "il modulo",
+            'gli oggetti': "i moduli", 
+            'un oggetto': "un modulo", 
         }
         this.ModelName = 'Form'
         this.ModelCategory = null

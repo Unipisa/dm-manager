@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 import { myDateFormat, useEngine } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput } from './Input'
+import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, AttachmentInput } from './Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
@@ -45,8 +45,14 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
         if (schema.type === 'number') return element(NumberInput)
         if (schema.type === 'boolean') return element(BooleanInput)
         if (schema.type === 'string') {
-            if (schema.widget === 'text') return element(TextInput)
-            else return element(StringInput)
+            switch (schema.widget) {
+                case 'text':
+                    return element(TextInput)
+                case 'attachment':
+                    return element(AttachmentInput)
+                default:
+                    return element(StringInput)
+            }            
         } 
         return <span>unknown input type {JSON.stringify(schema)}</span>
     }

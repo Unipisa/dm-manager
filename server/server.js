@@ -52,7 +52,7 @@ function setup_routes(app) {
   }
   app.use(express.static(config.STATIC_FILES_PATH))
   
-  app.use(express.json()) // parse request data into req.body
+  app.use(express.json({limit: '50mb'})) // parse request data into req.body
   
   app.use(session({
     secret: config.SESSION_SECRET,
