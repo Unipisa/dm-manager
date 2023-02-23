@@ -71,8 +71,7 @@ function setup_routes(app) {
   
   app.use(passport.session())
   
-  
-  app.use('/api/v0', api)
+  app.use(config.API_PATH, api)
   
   app.get('/config', (req, res) => {
     const user = req.user || null
