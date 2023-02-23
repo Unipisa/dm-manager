@@ -50,7 +50,7 @@ export function AttachmentInput({ id, value, setValue, image }) {
     return <div className="form-row">
         <div className="d-inline-block col-sm-10">
             { image 
-            ? (value ? <img src={value} style={{maxWidth: '10em'}} /> : '---')
+            ? (value ? <img src={value} style={{maxWidth: '10em'}} alt="" /> : '---')
             : <input 
                 className="form-control"
                 id={ id } 
