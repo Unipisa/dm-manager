@@ -113,7 +113,7 @@ export function ModelOutput({ field, schema, value}) {
                 return <a href={value} target="_blank" rel="noreferrer">{value}</a>
             }
             if (schema.widget === 'image') {
-                return <img src={value} alt={value} style={{maxWidth: '10em'}} />
+                return <img src={value} alt={value} className="mx-4 rounded" style={{maxWidth: '10em'}} />
             }
             else return value
         } 
@@ -132,7 +132,7 @@ export function ModelOutputs({ Model, obj}) {
         if (RESERVED_FIELDS.includes(field)) continue
         const label = field_schema.items?.label || field_schema.label || field
         lst.push(<p key={field}>
-            <b>{label}: </b>
+            <strong className="align-top">{label}: </strong>
             <ModelOutput key={field} field={field} schema={field_schema} value={obj[field]} />
         </p>)
     }        
