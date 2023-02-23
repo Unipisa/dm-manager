@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 import { myDateFormat, useEngine } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, AttachmentInput } from './Input'
+import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, AttachmentInput, ImageInput } from './Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
@@ -50,6 +50,8 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
                     return element(TextInput)
                 case 'attachment':
                     return element(AttachmentInput)
+                case 'image':
+                    return element(ImageInput)
                 default:
                     return element(StringInput)
             }            
@@ -107,6 +109,12 @@ export function ModelOutput({ field, schema, value}) {
                 })
                 return lst 
             }
+            if (schema.widget === 'attachment' || schema.widget === 'url') {
+                return <a href={value} target="_blank" rel="noreferrer">{value}</a>
+            }
+            if (schema.widget === 'image') {
+                return <img src={value} alt={value} className="mx-4 rounded" style={{maxWidth: '10em'}} />
+            }
             else return value
         } 
         if (schema.type === 'number') {
@@ -124,7 +132,7 @@ export function ModelOutputs({ Model, obj}) {
         if (RESERVED_FIELDS.includes(field)) continue
         const label = field_schema.items?.label || field_schema.label || field
         lst.push(<p key={field}>
-            <b>{label}: </b>
+            <strong className="align-top">{label}: </strong>
             <ModelOutput key={field} field={field} schema={field_schema} value={obj[field]} />
         </p>)
     }        

@@ -3,6 +3,7 @@
 server/.dotenv
 
 /logs
+/uploads
 
 # custom
 /database

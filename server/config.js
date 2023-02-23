@@ -55,6 +55,7 @@ class Options {
         this.MONGO_PORT = parseInt(parsedUrl.port)
         const pathname = parsedUrl.pathname
         this.MONGO_DB = pathname.split('/')[1]
+        this.API_PATH = '/api/v0'
     }
 }
 

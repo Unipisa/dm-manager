@@ -73,7 +73,7 @@ class UploadController {
                 return
             }
 
-            res.send({ upload })
+            res.send({ upload, url: `${config.REACT_APP_SERVER_URL}${config.API_PATH}/upload/${upload._id}` })
         }
     }
 
