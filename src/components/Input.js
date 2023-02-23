@@ -18,7 +18,7 @@ export function StringInput({ id, value, setValue }) {
     />
 }
 
-export function AttachmentInput({ id, value, setValue }) {
+export function AttachmentInput({ id, value, setValue, image }) {
     // const [uploading, setUploading] = useState(false)
     const engine = useEngine()
 
@@ -48,18 +48,26 @@ export function AttachmentInput({ id, value, setValue }) {
     }
 
     return <div className="form-row">
-        <div className="d-inline-block col-sm-10"><input 
-        className="form-control"
-        id={ id } 
-        value={ value || "" } 
-        onChange={ (evt) => {setValue(evt.target.value)} }
-    /></div>
+        <div className="d-inline-block col-sm-10">
+            { image 
+            ? (value ? <img src={value} style={{maxWidth: '10em'}} /> : '---')
+            : <input 
+                className="form-control"
+                id={ id } 
+                value={ value || "" } 
+                onChange={ (evt) => {setValue(evt.target.value)} }
+            /> }
+        </div>
     <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
         <button onClick={getNewAttachment} className="w-100 btn btn-primary">
             Upload
         </button>
     </div>
     </div>
+}
+
+export function ImageInput({ id, value, setValue }) {
+    return <AttachmentInput id={id} value={value} setValue={setValue} image={true} />
 }
 
 export function NumberInput({ id, value, setValue }) {
