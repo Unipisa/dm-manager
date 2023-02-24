@@ -20,8 +20,7 @@ export default class Log extends Model {
             'who': "chi",
             'where': "dove",
             'what': "cosa",
-//            'was': "era",
-            'will': "info"
+            'will': {label: "info", render: obj => JSON.stringify(obj.will||obj.was)},
         }
         this.indexDefaultFilter = {_limit: 10, _sort: '-when'}
     }

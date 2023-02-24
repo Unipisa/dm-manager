@@ -422,8 +422,8 @@ class Controller {
         console.log(`*** PUT ${JSON.stringify(payload)}`)
 
         try {
-            log(req, {}, payload)
             const obj = await this.Model.create(payload)
+            log(req, {}, obj)
             res.send(obj)
         } catch(err) {
             console.error(err)
@@ -450,7 +450,7 @@ class Controller {
         console.log(`*** DELETE ${req.path}`)
         try {
             const obj = await this.Model.findById(id)
-            log(req, obj, {})
+            log(req, obj.toObject(), {})
             obj.delete()
             res.send({})
         } catch(err) {

@@ -18,6 +18,11 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
     if (Array.isArray(columns)) {
         columns = Object.fromEntries(columns.map(key => [key, key]))
     }
+    // convert strings to objects with label
+    columns = Object.fromEntries(Object.entries(columns).map((
+        [key, label]) => (typeof label === 'string') 
+            ? [key, {label}]
+            : [key, label]))
     /*
      * infite loop!
     useEffect(() => {
@@ -93,8 +98,8 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                 <thead className="thead-dark">
                     <tr>
                         {
-                            Object.entries(columns).map(([key, label]) => 
-                                <Th key={key} filter={filter.header(key)}>{label}</Th>)
+                            Object.entries(columns).map(([key, opts]) => 
+                                <Th key={key} filter={filter.header(key)}>{opts.label}</Th>)
                         }
                     </tr>
                 </thead>
@@ -102,8 +107,8 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                     { data.map(obj => 
                         <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onMouseDown={evt => handleMouseDown(evt, obj)} >
                             {
-                                Object.entries(columns).map(([key, label]) =>
-                                <td key={key}>{ displayField(obj, key, fieldsInfo) }</td>)
+                                Object.entries(columns).map(([key, opts]) =>
+                                <td key={key}>{ opts.render ? opts.render(obj) : displayField(obj, key, fieldsInfo) }</td>)
                             }
                         </tr>)}
                 </tbody>
