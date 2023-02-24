@@ -49,14 +49,14 @@ export function AttachmentInput({ id, value, setValue, image }) {
 
     return <div className="form-row">
         <div className="d-inline-block col-sm-10">
-            { image 
-            ? (value ? <img src={value} style={{maxWidth: '10em'}} /> : '---')
-            : <input 
+            {   image && value && 
+                <img src={value} style={{maxWidth: '10em'}} />}
+            <input 
                 className="form-control"
                 id={ id } 
                 value={ value || "" } 
                 onChange={ (evt) => {setValue(evt.target.value)} }
-            /> }
+            />
         </div>
     <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
         <button onClick={getNewAttachment} className="w-100 btn btn-primary">
