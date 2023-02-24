@@ -11,7 +11,6 @@ const valid_mimetypes = [
 class UploadController {
 
     register(router) {
-        console.log(router)
         router.get('/upload/:id', (req, res) => this.getPhoto(req, res, req.params.id))
         router.post('/upload', (req, res) => this.postPhoto(req, res))
         return []
