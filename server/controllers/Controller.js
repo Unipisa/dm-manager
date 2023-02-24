@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongoose').Types
-const {log, requireSomeRole, requireUser} = require('./middleware') 
+const {log, requireSomeRole, requireUser, allowAnonymous} = require('./middleware') 
 
 function sendBadRequest(res, message) {
     res.status(400)
@@ -460,12 +460,12 @@ class Controller {
     }
 
     register_path(router, method, path, roles, callback) {
-        const requireMiddleware = roles === null 
-            ? requireUser
-            : typeof(roles) === 'function'
-                ? roles
-                : requireSomeRole(...roles)
-        router[method](path, requireMiddleware, callback)
+        const middleware = 
+            roles === true ? requireUser 
+            : roles === false ? allowAnonymous 
+            : typeof(roles) === 'function' ? roles
+            : requireSomeRole(...roles)
+        router[method](path, middleware, callback)
  
         // brief JSON description of path
         return {
