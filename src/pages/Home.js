@@ -32,7 +32,7 @@ export default function Home() {
   if (items.length === 0) items.push(<li>
           Nulla. 
           Scrivi a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>
-          se questo ti sembra un errore.
+          {/* spacer */} se questo ti sembra un errore.
     </li>)
 
   return <>

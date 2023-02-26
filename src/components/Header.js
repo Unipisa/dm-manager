@@ -14,7 +14,17 @@ export default function Header() {
   const user = engine.user
   const navigate = useNavigate()
 
-  const objectCategories = [...new Set(Object.values(Models).filter(
+  const menuElements = Object.fromEntries(Object.values(Models)
+    .map(Model => ({ 
+        Model, 
+        Element: Model.MenuElement,
+        sort: Model.articulation['oggetti'] })
+    .filter(({ Element }) => Element))
+
+  **** COMPLETARE
+
+  const objectCategories = [...new Set(Object.keys(menuElements)
+    .map(Model => Model.ModelCategory) Object.values(Models).filter(
     Model => Model.MenuElement !== null && Model.ModelCategory !== null && (user.hasSomeRole(...Model.schema.supervisorRoles))
   ).map(
     Model => Model.ModelCategory
