@@ -1,9 +1,7 @@
-import Nav from 'react-bootstrap/Nav'
-import Navbar from 'react-bootstrap/Navbar'
-import NavDropdown from 'react-bootstrap/NavDropdown'
+import { Nav, Navbar, NavDropdown } from "react-bootstrap"
+import { NavLink } from "react-router-dom"
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import ModelNavDropdownElement from './ModelNavDropdownElement'
 
 import { useEngine } from '../Engine'
 import Models from '../models/Models'
@@ -14,21 +12,22 @@ export default function Header() {
   const user = engine.user
   const navigate = useNavigate()
 
-  const menuElements = Object.fromEntries(Object.values(Models)
-    .map(Model => ({ 
-        Model, 
-        Element: Model.MenuElement,
-        sort: Model.articulation['oggetti'] })
-    .filter(({ Element }) => Element))
-
-  **** COMPLETARE
-
-  const objectCategories = [...new Set(Object.keys(menuElements)
-    .map(Model => Model.ModelCategory) Object.values(Models).filter(
-    Model => Model.MenuElement !== null && Model.ModelCategory !== null && (user.hasSomeRole(...Model.schema.supervisorRoles))
-  ).map(
-    Model => Model.ModelCategory
-  )) ].sort()
+  let objectCategories = {}
+  let otherObjects = []
+  
+  Object.values(Models)
+    .forEach(Model => {
+      Model.menuElements(user).forEach( x => {
+        if (x.category) {
+          if (!objectCategories[x.category]) {
+            objectCategories[x.category] = []
+          }
+          objectCategories[x.category].push(x)
+        } else {
+          otherObjects.push(x)
+        }
+      })
+    })
 
   return (
       <Navbar bg="light" expand="lg" className="mb-0 mr-4 shadow border-primary border-bottom border-3" variant="pills">
@@ -39,20 +38,21 @@ export default function Header() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            {objectCategories.map(Category => <NavDropdown title={Category.charAt(0).toUpperCase() + Category.slice(1)} key={Category} className="mx-2 py-2">
-              { Object.values(Models).filter(
-                  Model => Model.MenuElement !== null && Model.ModelCategory === Category
-                ).sort(
-                  (ModelA, ModelB) => ModelA.articulation['oggetti'] < ModelB.articulation['oggetti'] ? -1 : 1
-                ).map(
-                  Model => <ModelNavDropdownElement key={Model.code} Model={Model} user={user}/>
-                )
-              }
-            </NavDropdown>)}
+            {Object.entries(objectCategories).map(([category,items]) => 
+              <NavDropdown title={category.charAt(0).toUpperCase() + category.slice(1)} key={category} className="mx-2 py-2">
+                { items.map(item => 
+                    <NavDropdown.Item as={NavLink} key={item.key} to={item.url}>
+                      {item.text}
+                    </NavDropdown.Item>)
+                }
+              </NavDropdown>)}
             <Nav className="me-auto">
-              { Object.values(Models)
-                .filter(Model => Model.MenuElement !== null && Model.ModelCategory === null)
-                .map(Model => <Model.MenuElement key={Model.code} Model={Model} user={user}/>)}
+              { otherObjects
+                .map(item => 
+                <NavLink key={item.code} to={item.url} className="nav-link">
+                  {item.text}
+                </NavLink>)
+              }
             </Nav>
           </Navbar.Collapse>
           <Nav className="right">

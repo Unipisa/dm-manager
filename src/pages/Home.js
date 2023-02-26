@@ -21,13 +21,15 @@ export default function Home() {
       return <Navigate to={redirectAfterLogin} />
   }
   
-  const modelElements = Object.values(Models)
-    .filter(Model => Model.HomeElement !== null)
-    .map(Model => [Model, Model.HomeElement({Model, user})])
-    .filter(([Model, Element]) => Element)
+  let modelElements = []
+  Object.values(Models).forEach(Model => {
+      Model.homeElements(user).forEach(
+        Element => modelElements.push([Model, Element])
+      )
+  })
 
-  let items = modelElements.map(([Model, Element]) =>
-    <li key={Model.code}>{Element}</li>)
+  let items = modelElements.map(([Model, Element], i) =>
+    <li key={i}>{Element}</li>)
 
   if (items.length === 0) items.push(<li>
           Nulla. 

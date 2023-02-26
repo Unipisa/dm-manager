@@ -19,25 +19,26 @@ export default class RoomLabel extends Model {
             'un oggetto': "un cartellino stanza", 
         }
         this.IndexPage = RoomLabelsPage
-        this.HomeElement = LabelHomeElement
-        this.MenuElement = LabelMenuElement
     }
-}
 
-function LabelHomeElement({ Model, user }) {
-    if (user.hasSomeRole(...Model.schema.managerRoles)) {
-        return <Link to={Model.indexUrl()}>gestire {Model.articulation['gli oggetti']}</Link>
-    } else {
-        return <Link to={Model.indexUrl()}>visualizzare {Model.articulation['gli oggetti']}</Link>
-    } 
-}
+    menuElements(user) {
+        if (user) {
+            return [{
+                key: this.code,
+                url: this.indexUrl(),
+                text: 'Cartellini stanze',
+                category: this.ModelCategory,
+            }]
+        } else {
+            return []
+        }
+    }
 
-function LabelMenuElement({ Model, user }) {
-    if (user) {
-        return <NavLink key={Model.code} to={Model.indexUrl()} className="nav-link">
-            Cartellini stanze
-        </NavLink>
-    } else {
-        return null
+    homeElements(user) {
+        if (user.hasSomeRole(...this.schema.managerRoles)) {
+            return [<Link key={this.code} to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>]
+        } else {
+            return [<Link key={this.code} to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>]
+        } 
     }
 }
