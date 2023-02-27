@@ -109,6 +109,7 @@ function RenderElement({el, vars, data, setData}) {
     if (nodeName === 'select') return <RenderSelect el={el} data={data} setData={setData}>{children}</RenderSelect>
     if (nodeName === 'textarea') return <RenderTextarea el={el} data={data} setData={setData} />
     if (nodeName === 'option') return <option value={el.value}>{children}</option>
+    if (nodeName === 'a') return <a href={el.href}>{children}</a>
     return <>{children}</>
 }
 
