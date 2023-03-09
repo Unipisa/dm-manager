@@ -16,7 +16,6 @@ const staffSchema = new Schema({
         enum: [
             'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
             'Assegnista', 'Dottorando', 'PTA', 
-            'Collaboratore e Docente Esterno',
             'Professore Emerito',
             'Collaboratore',
             'Docente Esterno',
