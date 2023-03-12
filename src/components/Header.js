@@ -48,8 +48,8 @@ export default function Header() {
               </NavDropdown>)}
             <Nav className="me-auto">
               { otherObjects
-                .map(item => 
-                <NavLink key={item.code} to={item.url} className="nav-link">
+                .map((item, key) => 
+                <NavLink key={key} to={item.url} className="nav-link">
                   {item.text}
                 </NavLink>)
               }
