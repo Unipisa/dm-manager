@@ -11,6 +11,11 @@ const log = (req, was, will) => {
         will})
 }
 
+const allowAnonymous = (req, res, next) => {
+    req.log_who = '<anonymous>'
+    next() 
+}
+
 const requireUser = (req, res, next) => {
     if (!req.user) {
         res.status(401)
@@ -66,4 +71,4 @@ const requireSomeRole = (...roles) => ((req, res, next) => {
     }
 )})
 
-module.exports = {log, requireUser, hasSomeRole, requireRoles, requireSomeRole}
+module.exports = {log, requireUser, hasSomeRole, allowAnonymous, requireRoles, requireSomeRole}

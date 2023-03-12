@@ -9,7 +9,7 @@ export default class Form extends Model {
     constructor() {
         super()
         this.code = 'form'
-        this.name = "moduli"
+        this.name = "modulo"
         this.oa = "o"
         this.articulation = {
             'oggetto': "modulo", 

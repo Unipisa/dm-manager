@@ -121,6 +121,7 @@ export function ModelOutput({ field, schema, value}) {
             return value
         }
         if (schema.type === 'boolean') return value ? "sì" : "no"
+        if (schema.type === 'object') return JSON.stringify(value)
         return <span>unknown output type {JSON.stringify(schema)}</span>
     }
 }

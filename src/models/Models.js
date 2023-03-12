@@ -13,19 +13,28 @@ import Log from './Log'
 import Thesis from './Thesis'
 
 const Models = { 
-    RoomLabel: new RoomLabel(),
-    Form: new Form(),
-    Room: new Room(),
-    RoomAssignment: new RoomAssignment(),
-    Visit: new Visit(),
-    Grant: new Grant(),
-    Staff: new Staff(),
-    Thesis: new Thesis(),
-    Group: new Group(),
-    Person: new Person(),
-    User: new User(),
+    // amministrazione:
     Token: new Token(),
+    User: new User(),
     Log: new Log(),
+
+    // personale:
+    Person: new Person(),
+    Group: new Group(),
+    Staff: new Staff(),
+
+    // ricerca:
+    Grant: new Grant(),
+    Thesis: new Thesis(),
+    Visit: new Visit(),
+
+    // stanze:
+    RoomAssignment: new RoomAssignment(),
+    RoomLabel: new RoomLabel(),
+    Room: new Room(),
+
+    // altro:
+    Form: new Form(),
 }
 
 export default Models

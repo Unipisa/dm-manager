@@ -17,6 +17,8 @@ export default class Staff extends Model {
         this.ModelName = 'Staff' 
         this.ModelCategory = 'personale'
         this.columns = {
+            'startDate': "dal",
+            'endDate': "al",
             'qualification': "qualifica",
             'person': "persona",
             'roomAssignment': "stanza",

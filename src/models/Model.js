@@ -1,10 +1,18 @@
 import { Route } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
 import ModelViewPage from '../pages/ModelViewPage'
 import ModelEditPage from '../pages/ModelEditPage'
 import ModelsPage from '../pages/ModelsPage'
 import ModelHomeElement from '../components/ModelHomeElement'
-import ModelMenuElement from '../components/ModelMenuElement'
+
+function capitalize(x) {
+    if (x) {
+        return x.charAt(0).toUpperCase() + x.slice(1);
+    } else {
+        return x
+    }
+}
 
 export default class Model {
     constructor() {
@@ -47,16 +55,36 @@ export default class Model {
         // react element of object edit
         this.EditPage = ModelEditPage
 
-        // react element to be inserted 
-        // in the home page
         this.HomeElement = ModelHomeElement
 
-        // react element to be inserted
-        // in the header bar
-        this.MenuElement = ModelMenuElement
-
-        // Category to use in the navbar 
+        // Category to be used in the navbar 
         this.ModelCategory = null
+    }
+
+    // info about elements to be added into the menu bar
+    menuElements(user) {
+        if (user && user.hasSomeRole(...this.schema.supervisorRoles)) {
+            return [{
+                key: this.code,
+                url: this.indexUrl(), 
+                text: capitalize(this.articulation['oggetti']),
+                category: this.ModelCategory,
+            }]
+        } else {
+            return []
+        }    
+    }
+
+    // react elements to be inserted 
+    // in the home page
+    homeElements(user) {
+        if (user.hasSomeRole(...this.schema.managerRoles)) {
+            return [<Link to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>]
+        } else if (user.hasSomeRole(...this.schema.supervisorRoles)) {
+            return [<Link to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>]
+        } else {
+            return []
+        }    
     }
 
     // brief description of given object

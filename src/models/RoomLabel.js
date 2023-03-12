@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import Model from './Model'
 import RoomLabelsPage from '../pages/RoomLabelsPage'
 
@@ -17,5 +19,25 @@ export default class RoomLabel extends Model {
         }
         this.IndexPage = RoomLabelsPage
     }
-}
 
+    menuElements(user) {
+        if (user) {
+            return [{
+                key: this.code,
+                url: this.indexUrl(),
+                text: 'Cartellini stanze',
+                category: this.ModelCategory,
+            }]
+        } else {
+            return []
+        }
+    }
+
+    homeElements(user) {
+        if (user.hasSomeRole(...this.schema.managerRoles)) {
+            return [<Link key={this.code} to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>]
+        } else {
+            return [<Link key={this.code} to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>]
+        } 
+    }
+}

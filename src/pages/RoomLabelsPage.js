@@ -113,7 +113,7 @@ function Display({roomLabel, onSave}) {
 function RoomsTable({onClick, onDone, onDelete, data}) {
     const engine = useEngine()
     // visibility of manager elements
-    const visibility = engine.user.hasSomeRole('admin', 'room-manager') ? "visible" : "hidden"
+    const visibility = engine.user.hasSomeRole('admin', 'label-manager', 'room-manager') ? "visible" : "hidden"
 
     if (data.length === 0) return <p>nessuno</p>
 
@@ -193,7 +193,7 @@ export default function RoomLabelsPage() {
     const putRoomLabel = engine.usePut('roomLabel')
     const patchRoomLabel = engine.usePatch('roomLabel')
     const onDelete = engine.useDelete('roomLabel')
-    const isSupervisor = engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor')
+    const isSupervisor = engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor', 'label-manager')
 
     const onSave = (roomLabel) => {
         setRoomLabel(roomLabel)
@@ -214,7 +214,7 @@ export default function RoomLabelsPage() {
             roomLabel={roomLabel}
             onSave={isSupervisor?onSave:null}/>
         <div style={{marginTop: "1cm"}}/>
-        { engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor') && 
+        { engine.user.hasSomeRole('admin', 'supervisor', 'label-manager', 'label-supervisor') && 
             <RoomLabels onClick={onClick} onDone={onDone} onDelete={onDelete} />
         }
     </>

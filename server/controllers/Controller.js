@@ -1,5 +1,5 @@
 const { ObjectId } = require('mongoose').Types
-const {log, requireSomeRole, requireUser} = require('./middleware') 
+const {log, requireSomeRole, requireUser, allowAnonymous} = require('./middleware') 
 
 function sendBadRequest(res, message) {
     res.status(400)
@@ -422,8 +422,8 @@ class Controller {
         console.log(`*** PUT ${JSON.stringify(payload)}`)
 
         try {
-            log(req, {}, payload)
             const obj = await this.Model.create(payload)
+            log(req, {}, obj)
             res.send(obj)
         } catch(err) {
             console.error(err)
@@ -450,7 +450,7 @@ class Controller {
         console.log(`*** DELETE ${req.path}`)
         try {
             const obj = await this.Model.findById(id)
-            log(req, obj, {})
+            log(req, obj.toObject(), {})
             obj.delete()
             res.send({})
         } catch(err) {
@@ -460,12 +460,12 @@ class Controller {
     }
 
     register_path(router, method, path, roles, callback) {
-        const requireMiddleware = roles === null 
-            ? requireUser
-            : typeof(roles) === 'function'
-                ? roles
-                : requireSomeRole(...roles)
-        router[method](path, requireMiddleware, callback)
+        const middleware = 
+            roles === true ? requireUser 
+            : roles === false ? allowAnonymous 
+            : typeof(roles) === 'function' ? roles
+            : requireSomeRole(...roles)
+        router[method](path, middleware, callback)
  
         // brief JSON description of path
         return {
