@@ -28,6 +28,16 @@ async function getFormAndCheckAccess(req, res) {
                 return null 
             }
         }
+        today = new Date()
+        if ((obj.startDate && obj.startDate > today) || 
+            (obj.endDate && obj.endDate < today)) {
+            if (req.method === 'GET') {
+                return {_id: obj._id, name: obj.name, closed: true, text: "form closed"}
+            } else {
+                res.status(403).send({error: `form closed`})
+                return null
+            }
+        }
         return obj
     } catch(error) {
         console.log(`invalid _id: ${id}`)
@@ -58,6 +68,7 @@ class FormController extends Controller {
             startDate: obj.startDate,
             endDate: obj.endDate,
             publish: obj.publish,
+            closed: obj?.closed,
             canChangeAnswers: obj.canChangeAnswers,
         })
     }

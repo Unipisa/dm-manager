@@ -341,7 +341,8 @@ async function serve() {
   }
 
   app.listen(parseInt(config.PORT), () => {
-    console.log(`server started: ${config.SERVER_URL}`)
+    console.log(`server started listening on port: ${config.PORT}`)
+    console.log(`should be accessible from url: ${config.SERVER_URL}`)
   })
 }
 

@@ -13,7 +13,7 @@ export default function FormFillPage({enabled = true, showData = false}) {
     </ObjectProvider>
 }
 
-function FormFillPageInner({enabled, showData}) {
+export function FormFillPageInner({enabled, showData}) {
     const engine = useEngine()
     const user = engine.user
     const vars = {
@@ -27,8 +27,6 @@ function FormFillPageInner({enabled, showData}) {
     const [thanks, setThanks] = useState(false)
     const put = engine.usePut(`fill/${form._id}`)
 
-    console.log(`FormFillPageInner: ${form._id}`)
-
     async function submit() {
         if (!enabled) {
             engine.addWarningMessage('Modulo disabilitato')
@@ -36,6 +34,15 @@ function FormFillPageInner({enabled, showData}) {
         }
         await put(data)
         setThanks(true)
+    }
+
+    if (form.closed) {
+        return <Card>
+            <Card.Header>{form.name}</Card.Header>
+            <Card.Body>
+                <b>Il modulo è chiuso.</b>
+            </Card.Body>
+        </Card>
     }
 
     if (thanks) return <p>
@@ -52,7 +59,7 @@ function FormFillPageInner({enabled, showData}) {
                     data={data} setData={setData} />
             </Card.Body>
             <Card.Footer>
-                <Button onClick={submit}>invia modulo</Button>       
+                <Button disabled={!enabled} onClick={submit}>invia modulo</Button>       
             </Card.Footer>
         </Card>
         <table style={{display: showData?'block':'none'}}>

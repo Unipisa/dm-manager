@@ -5,6 +5,7 @@ import { useEngine } from '../Engine'
 import ModelView from '../components/ModelView'
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
 import FormFillPage from './FormFillPage'
+import { FormFillPageInner } from './FormFillPage'
 import LoadTable from '../components/LoadTable'
 
 export default function FormViewPage() {
@@ -22,7 +23,7 @@ export default function FormViewPage() {
             ]} />
         <Tabs className='my-2'>
             <Tab eventKey="fill" title="anteprima">
-                <FormFillPage enabled={false} showData={true}/>
+                <FormFillPageInner enabled={false} showData={true}/>
             </Tab>
             <Tab eventKey="data" title="dati">
                 <FormDataView />
@@ -37,7 +38,7 @@ function FormDataView() {
     const Form = engine.Models.Form
 
     return <LoadTable 
-        path={`${Form.viewUrl(form._id)}/data`}
+        path={`${Form.code}/${form._id}/data`}
         columns={['createdAt', 'email', 'firstName', 'lastName', 'data']}
     />
 }
