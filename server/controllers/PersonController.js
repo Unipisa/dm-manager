@@ -1,6 +1,11 @@
 const Person = require('../models/Person')
 const Controller = require('./Controller')
-const { ObjectId } = require('mongoose').Types
+
+PERSON_SEARCH_ROLES = [
+    'person-manager', 
+    'person-supervisor', 
+    'visit-manager', 
+    'grant-manager']
 
 class PersonController extends Controller {
     constructor() {
@@ -9,8 +14,9 @@ class PersonController extends Controller {
         this.managerRoles.push('person-manager')
         this.supervisorRoles.push('person-manager', 'person-supervisor')
         this.searchFields = [ 'lastName', 'firstName', 'affiliation' ]
-        this.searchRoles.push('person-manager', 'person-supervisor', 'visit-manager', 'grant-manager')
+        this.searchRoles.push(...PERSON_SEARCH_ROLES)
     }
 }
 
 module.exports = PersonController
+module.exports.PERSON_SEARCH_ROLES = PERSON_SEARCH_ROLES

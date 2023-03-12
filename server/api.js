@@ -17,6 +17,7 @@ let ModelSchemas = {}
     require('./controllers/TokenController'),
     require('./controllers/GroupController'),
     require('./controllers/PersonController'),
+    require('./controllers/InstitutionController'),
     require('./controllers/StaffController'),
     require('./controllers/LogController'),
     require('./controllers/FormController'),

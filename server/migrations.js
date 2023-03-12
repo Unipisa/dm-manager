@@ -581,6 +581,33 @@ const migrations = {
         await theses.updateMany({}, { $unset: { affiliation: '' } })
         return true
     },
+
+    D20230312_fill_institutions_3: async function(db) {
+        const institutions = db.collection('institutions')
+        const people = db.collection('people')
+        const theses = db.collection('theses')
+        console.log(`clearing institutions collection`)
+        await institutions.deleteMany({})
+        const all_people = await people.find({}).toArray()
+        let all_institutions = new Set()
+        for (person of all_people) {
+            if (person.affiliation) {
+                affiliations = person.affiliation.split(' and ')
+                affiliations.forEach(aff => all_institutions.add(aff))
+            }
+        }
+        const all_theses = await theses.find({}).toArray()
+        for (thesis of all_theses) {
+            if (thesis.institution) {
+                all_institutions.add(thesis.institution)
+            }
+        }
+        console.log(`found ${all_institutions.size} institutions`)
+        for (institution of all_institutions) {
+            await db.collection('institutions').insertOne({ name: institution })
+        }
+        return true
+    },
 }
 
 
