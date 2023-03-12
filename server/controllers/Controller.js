@@ -281,7 +281,6 @@ class Controller {
                             return sendBadRequest(res, `invalid date '${value}' for field '${key0}'`)
                         }
                     }
-                    console.log(`date_value: ${date_value}`)
                     if (key_parts.length === 1) {
                         $matches.push({ [key0]: date_value })
                     } else if (key_parts.length === 2) {
@@ -344,7 +343,9 @@ class Controller {
                         else if (key_parts[1] == 'in') {
                             $matches.push({ [key0]: { $in: value.split("|") } })
                         } 
-                        else {
+                        else if (key_parts[1] == 'ne') {
+                            $matches.push({ [key0]: { $ne: value } })
+                        } else {
                             return sendBadRequest(res, `Unsupported field modifier in '${key}'`)
                         }
                     }
