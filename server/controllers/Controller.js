@@ -20,6 +20,15 @@ function escapeRegExp(string) {
  * 
  */
 
+const $PersonProject = { 
+    $project: {
+        firstName: 1,
+        lastName: 1,
+        affiliation: 1,
+        email: 1,
+        phone: 1, 
+    }}
+
 class Controller {
     constructor(Model=null) {
         // every controller must define a unique path
@@ -100,9 +109,16 @@ class Controller {
                         this.queryPipeline.push(
                             {$lookup: {
                                 from: "people",
-                                localField: field,
-                                foreignField: "_id",
+                                //localField: field,
+                                //foreignField: "_id",
+                                let: {field: '$'+field},
                                 as: field,
+                                pipeline: [
+                                    {$match: { $expr: {
+                                        $in: ['$_id', '$$field']
+                                    }}},
+                                    $PersonProject,
+                                ],
                             }},
                         )
                     } else if (info.ref === 'Grant') {
@@ -127,9 +143,16 @@ class Controller {
                     this.queryPipeline.push(
                         {$lookup: {
                             from: "people",
-                            localField: field,
-                            foreignField: "_id",
+                            //localField: field,
+                            //foreignField: "_id",
+                            let: {field: '$'+field},
                             as: field,
+                            pipeline: [
+                                {$match: {$expr: {
+                                    $eq: ['$_id', '$$field']
+                                }}},
+                                $PersonProject,
+                            ],
                         }},
                         {$unwind: {
                             "path": '$'+field,
