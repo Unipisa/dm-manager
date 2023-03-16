@@ -391,7 +391,7 @@ export function InstitutionInput({ id, value, setValue, multiple }) {
         objName="institution"
         oa="o"
         render={_ => `${_.name} ${_.city ? '('+_.city + ')' : ''}`}
-        new_object={q => ({identifier: q})}
+        new_object={q => ({name: q})}
         inputs={{
                 name: 'nome',
         }}
