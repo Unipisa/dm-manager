@@ -380,3 +380,22 @@ export function RoomInput({ id, value, setValue }) {
         setValue={value => setValue(value?data.get(value):null)}
     />
 }
+
+export function InstitutionInput({ id, value, setValue, multiple }) {
+    return <ObjectInput 
+        id={id} 
+        value={value} 
+        setValue={setValue} 
+        multiple={multiple} 
+        objCode="institution"
+        objName="institution"
+        oa="o"
+        render={_ => `${_.name} ${_.city ? '('+_.city + ')' : ''}`}
+        new_object={q => ({identifier: q})}
+        inputs={{
+                name: 'nome',
+        }}
+        placeholder="affiliazione"
+    />
+}
+

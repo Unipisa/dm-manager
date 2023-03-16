@@ -10,6 +10,7 @@ const personSchema = new Schema({
     firstName:  {type: String, label: 'nome'},
     lastName: {type: String, label: 'cognome'},
     affiliation: {type: String, label: 'affiliazione'}, 
+    currentAffiliations: [{ type: ObjectId, label: 'prova affiliazioni', ref: 'Institution' }],
     gender: {type: String, label: 'genere', 
         enum: ['Uomo', 'Donna', 'Non Specificato'],
         default: 'Non Specificato'},

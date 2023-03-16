@@ -22,3 +22,13 @@ const Institution = model('Institution', schema)
 module.exports = Institution
 
 Institution.relatedModels = []
+
+const Person = require('./Person')
+Person.relatedModels.push({
+    model: Institution,
+    modelName: 'Institution',
+    url: 'institution',
+    field: 'currentAffiliations',
+    multiple: true,
+})
+

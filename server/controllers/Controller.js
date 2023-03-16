@@ -134,7 +134,21 @@ class Controller {
                                 as: field,
                             }},
                         )
+                    } else if (info.ref === 'Institution') {
+                        this.populateFields.push({
+                            path: field,
+                            select: ['name', 'name']
+                        })
+                        this.queryPipeline.push(
+                            {$lookup: {
+                                from: "institutions",
+                                localField: field,
+                                foreignField: "_id",
+                                as: field,
+                            }},
+                        )
                     }
+
                 } else if (info.ref === 'Person') {
                     this.populateFields.push({
                         path: field, 
