@@ -613,19 +613,22 @@ const migrations = {
         const people = db.collection('people')
         const institutions = db.collection('institutions')
         for (person of await people.find({}).toArray()) {
-            const affiliations = person.affiliation.split(' and ')
-            const institution_ids = []
-            for (affiliation of affiliations) {
-                const aff_id = await institutions.findOne({ name: affiliation })
-                if (aff_id) {
-                    institution_ids.push(aff_id._id)
-                } else {
-                    console.log(`cannot find institution ${affiliation} for person ${person.lastName}`)
+            const aff = person.affiliation
+            if (aff) {
+                const affiliations = aff.split(' and ')
+                const institution_ids = []
+                for (affiliation of affiliations) {
+                    const aff_id = await institutions.findOne({ name: affiliation })
+                    if (aff_id) {
+                        institution_ids.push(aff_id._id)
+                    } else {
+                        console.log(`cannot find institution ${affiliation} for person ${person.lastName}`)
+                    }
                 }
-            }
-            if (institution_ids.length > 0) {
-                console.log(`setting affiliation for ${person.lastName} to ${institution_ids}`)
-                await people.updateOne({ _id: person._id }, { $set: { affiliations: institution_ids } })
+                if (institution_ids.length > 0) {
+                    console.log(`setting affiliation for ${person.lastName} to ${institution_ids}`)
+                    await people.updateOne({ _id: person._id }, { $set: { affiliations: institution_ids } })
+                }
             }
         }
         return true
