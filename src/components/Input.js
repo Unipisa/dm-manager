@@ -316,12 +316,14 @@ export function PersonInput({ id, value, setValue, multiple }) {
         objCode="person"
         objName="persona"
         oa="a"
-        render={_ => `${_.firstName} ${_.lastName} (${_.affiliation})`}
+        render={_ => {
+            console.log(_);
+            return `${_.firstName} ${_.lastName} (${_.affiliations})`}}
         new_object={q => ({firstName: "", lastName: q, affiliation: ""})}
         inputs={{
                 firstName: 'Nome',
                 lastName: 'Cognome',
-                affiliation: 'Affiliazione',
+                affiliations: 'Affiliazione',
         }}
         placeholder="cognome"
     />
