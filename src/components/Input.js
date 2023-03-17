@@ -152,6 +152,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
 
     function handleClose() {
         // Add a new person with the given data
+        console.log(`Creating new object (${objCode})`, newObject)
         api.put(`/api/v0/${objCode}`, newObject).then(data => {      
             if (multiple) {
                 setSelected([ ...value, data ])
@@ -245,15 +246,37 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
         }
     }
 
+    function renderInput([key, label]) {
+        // TODO: this is very fragile!
+        if (label === 'Affiliazione') {
+            return <InstitutionInput 
+                id={`affiliazione-${key}`}
+                key={key} 
+                value={newObject[key]} 
+                setValue={x => {
+                    console.log(`Setting ${key} to`, x)
+                    setNewObject(o => ({...o, [key]: x}))
+                }}
+                >
+            </InstitutionInput>
+        } else {
+            return <input 
+                key={key} 
+                className="mb-2 form-control" 
+                placeholder={label} 
+                value={newObject[key]} 
+                onChange={x => setNewObject(o => ({...o, [key]: x.target.value}))}>
+            </input>
+        }
+    }
+
     return <>
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>{`Crea nuov${oa} ${objName}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            {Object.entries(inputs).map(([key, label]) => 
-                <input key={key} className="mb-2 form-control" placeholder={label} value={newObject[key]} onChange={x => setNewObject(o => ({...o, [key]: x.target.value}))}></input>
-            )}
+            {Object.entries(inputs).map(renderInput)}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={x => setShow(false)}>
