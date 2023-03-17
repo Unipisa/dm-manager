@@ -48,3 +48,41 @@ Person.relatedModels.push({
 })
 
 module.exports = Staff
+
+Staff.personStaffPipeline = () => ([
+    {$lookup: {
+        from: "staffs",
+        let: { start: new Date(), end: new Date() },
+        localField: 'person._id',
+        foreignField: "person",
+        as: 'staffs',
+        pipeline: [
+            // tiene solo le attribuzioni che includono il periodo [start, end] 
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$$end", null] },
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$end"] } ]},
+                        { $or: [
+                            { $eq: ["$$start", null] },
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$start"] } ]}
+                    ]},
+                },
+            },
+            // ordina per data finale...
+            // l'ultima assegnazione dovrebbe essere quella attuale
+            {$sort: {"endDate": 1}},
+        ]
+    }},
+    { $addFields: {
+        staff: {
+            $ifNull: [
+                { $arrayElemAt: ["$staffs", -1] },
+                null
+            ]
+        }
+    }}
+])
