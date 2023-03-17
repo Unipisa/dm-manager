@@ -53,7 +53,7 @@ Staff.personStaffPipeline = () => ([
     {$lookup: {
         from: "staffs",
         let: { start: new Date(), end: new Date() },
-        localField: 'person._id',
+        localField: '_id',
         foreignField: "person",
         as: 'staffs',
         pipeline: [
@@ -65,6 +65,7 @@ Staff.personStaffPipeline = () => ([
                             { $eq: ["$$end", null] },
                             { $eq: ["$startDate", null] },
                             { $lte: ["$startDate", "$$end"] } ]},
+                        // FIXME: The following part of the query does not appear to work
                         { $or: [
                             { $eq: ["$$start", null] },
                             { $eq: ["$endDate", null] },

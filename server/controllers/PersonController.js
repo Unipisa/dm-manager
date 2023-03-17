@@ -1,4 +1,5 @@
 const Person = require('../models/Person')
+const Staff = require('../models/Staff')
 const Controller = require('./Controller')
 
 PERSON_SEARCH_ROLES = [
@@ -15,6 +16,7 @@ class PersonController extends Controller {
         this.supervisorRoles.push('person-manager', 'person-supervisor')
         this.searchFields = [ 'lastName', 'firstName', 'affiliation' ]
         this.searchRoles.push(...PERSON_SEARCH_ROLES)
+        this.queryPipeline.push(...Staff.personStaffPipeline())
     }
 }
 
