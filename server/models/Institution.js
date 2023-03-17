@@ -28,7 +28,7 @@ Person.relatedModels.push({
     model: Institution,
     modelName: 'Institution',
     url: 'institution',
-    field: 'currentAffiliations',
+    field: 'affiliations',
     multiple: true,
 })
 

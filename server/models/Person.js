@@ -9,7 +9,6 @@ const {
 const personSchema = new Schema({
     firstName:  {type: String, label: 'nome'},
     lastName: {type: String, label: 'cognome'},
-    affiliation: {type: String, label: 'affiliazione (non usare: in dismissione)'}, 
     affiliations: [{ type: ObjectId, label: 'affiliazioni correnti', ref: 'Institution' }],
     gender: {type: String, label: 'genere', 
         enum: ['Uomo', 'Donna', 'Non Specificato'],
@@ -25,6 +24,7 @@ const personSchema = new Schema({
     mathscinet: {type: String, label: 'mathscinet'},
     photoUrl: {type: String, label: 'foto', widget: 'image'},
     genealogyId: {type: String, label: 'math genealogy id'},
+    affiliation: {type: String, label: 'vecchio campo affiliazione'}, 
     createdBy,
     updatedBy,
 }, {
