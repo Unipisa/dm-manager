@@ -321,7 +321,8 @@ export function PersonInput({ id, value, setValue, multiple }) {
         oa="a"
         render={_ => {
             console.log(_);
-            return `${_.firstName} ${_.lastName} (${_.affiliations})`}}
+            const affiliations = _.affiliations.map(x => x.name).join(" and ")
+            return `${_.firstName} ${_.lastName} (${affiliations})`}}
         new_object={q => ({firstName: "", lastName: q, affiliation: ""})}
         inputs={{
                 firstName: 'Nome',
@@ -352,11 +353,18 @@ export function GrantInput({ id, value, setValue, multiple }) {
 
 export function SelectInput({ id, options, value, setValue, displayFunction }) {
     //console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
+    value = value || ""
+    if (! options.includes(value)) {
+        options = [value, ...options]
+    }
     return <select 
         className="form-control col-sm-10"
         id={ id } 
         value={ value || "" } 
-        onChange={ (evt) => setValue(evt.target.value) }>
+        onChange={ (evt) => {
+            console.log(`OnChange ${evt.target.value}`)
+            setValue(evt.target.value) 
+        }}>
         { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
     </select>
 }
