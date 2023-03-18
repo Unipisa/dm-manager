@@ -7,7 +7,6 @@ class TokenController extends Controller {
         super(Token)
         this.path = 'token'
         this.Model = Token
-        this.populateFields = ['createdBy', 'updatedBy']
         this.fields = {} // disable queries on tokens
     }
 
