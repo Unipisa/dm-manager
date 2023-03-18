@@ -24,7 +24,7 @@ const $PersonProject = {
     $project: {
         firstName: 1,
         lastName: 1,
-        affiliation: 1,
+        affiliations: 1,
         email: 1,
         phone: 1, 
     }}
@@ -152,7 +152,7 @@ class Controller {
                 } else if (info.ref === 'Person') {
                     this.populateFields.push({
                         path: field, 
-                        select: ['firstName', 'lastName', 'affiliation', 'email', 'photoUrl']
+                        select: ['firstName', 'lastName', 'affiliations', 'email', 'photoUrl']
                     })
                     this.queryPipeline.push(
                         {$lookup: {

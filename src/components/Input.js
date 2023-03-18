@@ -154,6 +154,8 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
         // Add a new person with the given data
         console.log(`Creating new object (${objCode})`, newObject)
         api.put(`/api/v0/${objCode}`, newObject).then(data => {      
+            console.log("New object created", data)
+            console.log("value", value)
             if (multiple) {
                 setSelected([ ...value, data ])
                 setValue([ ...value, data ])
@@ -248,11 +250,12 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
 
     function renderInput([key, label]) {
         // TODO: this is very fragile!
-        if (label === 'Affiliazione') {
+        if (label === 'Affiliazioni') {
             return <InstitutionInput 
                 id={`affiliazione-${key}`}
                 key={key} 
-                value={newObject[key]} 
+                value={newObject[key] || []} 
+                multiple={true}
                 setValue={x => {
                     console.log(`Setting ${key} to`, x)
                     setNewObject(o => ({...o, [key]: x}))
@@ -323,7 +326,7 @@ export function PersonInput({ id, value, setValue, multiple }) {
         inputs={{
                 firstName: 'Nome',
                 lastName: 'Cognome',
-                affiliations: 'Affiliazione',
+                affiliations: 'Affiliazioni',
         }}
         placeholder="cognome"
     />
