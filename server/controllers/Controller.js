@@ -178,34 +178,6 @@ class Controller {
         res.send(this.getSchema())
     }
 
-    async get(req, res, id) {
-        if (id === 'new') {
-            const obj = (new this.Model()).toObject()
-            obj._id = undefined
-            return res.send(obj)
-        }
-        try {
-            const pipeline = [
-                {$match: {_id: ObjectId(id)}},
-                ...this.queryPipeline
-            ]
-            console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
-            let obj = await this.Model
-                .aggregate(pipeline)
-            if (obj === []) {
-                return res.status(404).send({error: `not found ${id}`})
-            }
-            if (obj.length > 1) {
-                console.log(`INTERNAL ERROR: found more than one object ${this.path} with id ${id}`)
-                return res.status(404).send({error: `not found ${id}`})
-            }
-            res.send(obj[0])
-        } catch(error) {
-            console.log(`invalid _id: ${id}`)
-            res.status(404).send({error: `invalid id ${id}`})
-        }
-    }
-
     async performQuery(query, res, { fields, searchFields, queryPipeline, path, Model } = {}) {
         let $matches = []
         let $match_lookups = {}
@@ -420,6 +392,34 @@ class Controller {
         })
     }
 
+    async get(req, res, id) {
+        if (id === 'new') {
+            const obj = (new this.Model()).toObject()
+            obj._id = undefined
+            return res.send(obj)
+        }
+        try {
+            const pipeline = [
+                {$match: {_id: ObjectId(id)}},
+                ...this.queryPipeline
+            ]
+            console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
+            let obj = await this.Model
+                .aggregate(pipeline)
+            if (obj === []) {
+                return res.status(404).send({error: `not found ${id}`})
+            }
+            if (obj.length > 1) {
+                console.log(`INTERNAL ERROR: found more than one object ${this.path} with id ${id}`)
+                return res.status(404).send({error: `not found ${id}`})
+            }
+            res.send(obj[0])
+        } catch(error) {
+            console.log(`invalid _id: ${id}`)
+            res.status(404).send({error: `invalid id ${id}`})
+        }
+    }
+
     async search(req, res) {
         console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
         return this.performQuery({_search: req.query.q || ''}, res)
@@ -440,12 +440,10 @@ class Controller {
         delete payload.createdAt
         delete payload.updatedAt
 
-        console.log(`*** PUT ${JSON.stringify(payload)}`)
-
         try {
             const obj = await this.Model.create(payload)
             log(req, {}, obj)
-            res.send(obj)
+            this.get(req, res, obj._id)
         } catch(err) {
             console.error(err)
             res.status(400).send({ error: err.message })
