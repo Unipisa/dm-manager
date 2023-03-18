@@ -143,6 +143,8 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     // Determine the value of selected that should be initialized
     const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
 
+    console.log(`SELECTED: ${JSON.stringify(selected)}`)
+
     const labelDisplayFunction = x => {
         if (!x || x.noObjectSelected || x.newObjectEntry)
             return ""
@@ -320,7 +322,6 @@ export function PersonInput({ id, value, setValue, multiple }) {
         objName="persona"
         oa="a"
         render={_ => {
-            console.log(_);
             const affiliations = _.affiliations.map(x => x.name).join(" and ")
             return `${_.firstName} ${_.lastName} (${affiliations})`}}
         new_object={q => ({firstName: "", lastName: q, affiliation: ""})}

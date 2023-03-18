@@ -31,7 +31,8 @@ export default class Visit extends Model {
     
     onObjectChange = setObj => (field, value) => {
         if (field === 'person') {
-            setObj(obj => ({...obj, affiliation: value ? value.affiliation : ""}))
+            const person = value
+            setObj(obj => ({...obj, affiliations: person ? [...person.affiliations] : []}))
         }}
 }
 

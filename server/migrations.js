@@ -633,6 +633,32 @@ const migrations = {
         }
         return true
     },
+
+    D20230318_fill_visit_affiliations: async function(db) {
+        const visits = db.collection('visits')
+        const institutions = db.collection('institutions')
+        for (visit of await visits.find({}).toArray()) {
+            const aff = visit.affiliation
+            if (aff) {
+                const affiliations = aff.split(' and ')
+                const institution_ids = []
+                for (affiliation of affiliations) {
+                    let aff_id = await institutions.findOne({ name: affiliation })
+                    if (!aff_id) {
+                        const res = await institutions.insertOne({ name: affiliation })
+                        aff_id = res.insertedId
+                        console.log(`added institution ${affiliation} ${aff_id} for visit ${visit._id}`)
+                    }
+                    institution_ids.push(aff_id._id)
+                }
+                if (institution_ids.length > 0) {
+                    console.log(`setting affiliations for visit ${visit._id} to ${institution_ids}`)
+                    await visits.updateOne({ _id: visit._id }, { $set: { affiliations: institution_ids } })
+                }
+            }
+        }
+        return true
+    },
 }
 
 
