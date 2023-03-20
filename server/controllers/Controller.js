@@ -107,8 +107,19 @@ class Controller {
                                 lastName: 1,
                                 affiliations: 1,
                                 email: 1,
-                                phone: 1, 
-                            }}],
+                                phone: 1,
+                                affiliation: 1,
+                            }},
+                            {$lookup: {
+                                from: "institutions",
+                                localField: "affiliations",
+                                foreignField: "_id",
+                                as: "affiliations",
+                                pipeline: [{ $project: {
+                                    name: 1,
+                                }}]
+                            }},    
+                            ],
                         }},
                     )
                     if (single) unwind(field)
