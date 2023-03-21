@@ -118,7 +118,31 @@ class Controller {
                                 pipeline: [{ $project: {
                                     name: 1,
                                 }}]
-                            }},    
+                            }},
+                            {$lookup: {
+                                from: "staffs",
+                                localField: "_id",  
+                                foreignField: "person",
+                                as: "staffs",
+                                pipeline: [ 
+                                    { $match: 
+                                        { $expr: 
+                                            { $and: [ 
+                                                { $or: [ 
+                                                    { $eq: [ "$endDate", null ] },
+                                                    { $gte: [ "$endDate", "$$NOW" ] }
+                                                ]}, 
+                                                { $or: [
+                                                    { $eq: [ "$startDate", null ] },
+                                                    { $lte: [ "$startDate", "$$NOW" ] }
+                                                ]
+                                                }]}}
+                                    }, 
+                                    { $project: {
+                                        qualification: 1,
+                                    }
+                                }]
+                            }},
                             ],
                         }},
                     )
