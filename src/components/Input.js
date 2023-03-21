@@ -141,9 +141,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     }
 
     // Determine the value of selected that should be initialized
-    const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
-
-    console.log(`SELECTED: ${JSON.stringify(selected)}`)
+    const selected = multiple ? value : (value ? [value] : [])
 
     const labelDisplayFunction = x => {
         if (!x || x.noObjectSelected || x.newObjectEntry)
@@ -159,11 +157,9 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
             console.log("New object created", data)
             console.log("value", value)
             if (multiple) {
-                setSelected([ ...value, data ])
                 setValue([ ...value, data ])
             }   
             else {
-                setSelected([ data ])
                 setValue(data)
             }
 
@@ -182,7 +178,6 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
         // Filter the entries removing the "No Object selected entries, if any"
         evt = Array.from(evt).filter(x => ! (x.noObjectSelected || x.newObjectEntry))
 
-        setSelected(evt)
         typeaheadref.current.hideMenu()
 
         if (evt.length > 0) {
@@ -229,13 +224,6 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     }
 
     const onBlurHandler = x => {
-        if (multiple) {
-            setSelected(value)
-        }
-        else {
-            setSelected(value ? [value] : [])
-        }
-
         if (! value) {
             typeaheadref.current.clear()
         }
