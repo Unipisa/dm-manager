@@ -23,12 +23,4 @@ module.exports = Institution
 
 Institution.relatedModels = []
 
-const Person = require('./Person')
-Person.relatedModels.push({
-    model: Institution,
-    modelName: 'Institution',
-    url: 'institution',
-    field: 'affiliations',
-    multiple: true,
-})
 

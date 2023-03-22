@@ -14,9 +14,10 @@ const thesisSchema = new Schema({
     title: { type: String, label: 'titolo', default: ''},
     advisors: [{ type: ObjectId, label: 'relatori', ref: 'Person' }],
     date,
-    institution: { type: String, label: 'istituto', default: ''},
+    institution: { type: ObjectId, label: 'istituto', ref: 'Institution'},
     fileUrl: {type: String, label: 'URL file'},
     SSD,
+    old_institution: { type: String, label: 'vecchio istituto (non usare)', default: ''},
     notes,
     createdBy,
     updatedBy,
@@ -26,8 +27,9 @@ const thesisSchema = new Schema({
 
 const Thesis = model('Thesis', thesisSchema)
 
-const Person = require('./Person')
+module.exports = Thesis
 
+const Person = require('./Person')
 Person.relatedModels.push({
     model: Thesis,
     modelName: 'Thesis',
@@ -41,4 +43,11 @@ Person.relatedModels.push({
     multiple: true,
 })
 
-module.exports = Thesis
+const Institution = require('./Institution')
+Institution.relatedModels.push({
+    model: Thesis,
+    modelName: 'Thesis',
+    url: 'thesis',
+    field: 'institution',
+    multiple: false,
+})

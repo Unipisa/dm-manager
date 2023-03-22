@@ -302,8 +302,29 @@ const migrations = {
         }
         return true
     },
-}
 
+    D20230322_fill_thesis_affiliations: async function(db) {
+        const theses = db.collection('theses')
+        const institutions = db.collection('institutions')
+        await theses.updateMany({}, { $rename: { institution: 'old_institution' } })
+        for (thesis of await theses.find({}).toArray()) {
+            const affiliation = thesis.old_institution
+            if (affiliation) {
+                let aff_id = await institutions.findOne({ name: affiliation })
+                if (!aff_id) {
+                    const res = await institutions.insertOne({ name: affiliation })
+                    aff_id = res.insertedId
+                    console.log(`added institution ${affiliation} ${aff_id} for thesis ${thesis._id}`)
+                } else {
+                    aff_id = aff_id._id
+                }
+                console.log(`setting affiliation for thesis ${thesis._id} to ${aff_id}`)
+                await theses.updateOne({ _id: thesis._id }, { $set: { institution: aff_id } })
+            }
+        }
+        return true
+    }
+}
 
 async function migrate(db, options) {
     const {apply, clean} = {

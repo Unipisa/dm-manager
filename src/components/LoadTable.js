@@ -130,10 +130,14 @@ function displayField(obj, key, fieldsInfo={}) {
     if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
     const field = fieldsInfo[key]
     if (field && field.type === 'array') {
+        if (!field.items['x-ref']) return value.join(', ')
         if (field.items['x-ref'] === 'Person') {
             return value.map(person => `${person.lastName}`).join(', ')
+        } else if (field.items['x-ref'] === 'Institution') {
+            return value.map(inst => `${inst.name}`).join(' and ')
+        } else {
+            return `array of ${field.items['x-ref']} not implemented`
         }
-        return value.join(', ')
     }
     if (field && field.format === 'date-time') return myDateFormat(value)
     const xref = field && field['x-ref'] 
