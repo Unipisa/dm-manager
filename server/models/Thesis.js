@@ -17,7 +17,6 @@ const thesisSchema = new Schema({
     institution: { type: ObjectId, label: 'istituto', ref: 'Institution'},
     fileUrl: {type: String, label: 'URL file'},
     SSD,
-    old_institution: { type: String, label: 'vecchio istituto (non usare)', default: ''},
     notes,
     createdBy,
     updatedBy,

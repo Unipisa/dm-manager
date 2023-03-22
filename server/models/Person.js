@@ -24,7 +24,6 @@ const personSchema = new Schema({
     mathscinet: {type: String, label: 'mathscinet'},
     photoUrl: {type: String, label: 'foto', widget: 'image'},
     genealogyId: {type: String, label: 'math genealogy id'},
-    affiliation: {type: String, label: 'vecchio campo affiliazione'}, 
     createdBy,
     updatedBy,
 }, {

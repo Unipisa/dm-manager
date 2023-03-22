@@ -19,7 +19,6 @@ const visitSchema = new Schema({
     SSD,
     notes: {type: String, label: 'note', widget: 'text'},
     tags: {type:[String], label: 'tags', default: [], enum: ["INdAM Visiting Fellow", "UniPi Visiting Fellow"]},
-    affiliation: {type: String, label: 'vecchia affiliazione (non usare)'},
     createdBy,
     updatedBy,
 }, {
