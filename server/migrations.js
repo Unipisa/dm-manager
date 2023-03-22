@@ -331,7 +331,15 @@ const migrations = {
             notes: { $regex: /^genealogy url: https:..www.genealogy.math.ndsu.nodak.edu.id.php.id=\d+$/ }
         }, { $set: { notes: '' } })
         return true
-    }
+    },
+
+    D20230322_strip_staff_notes_2: async function(db) {
+        const staffs = db.collection('staffs')
+        await staffs.updateMany({
+            notes: { $regex: /^wordpressLink: https:..www.dm.unipi.it.people.[^\s]*$/ }
+        }, { $set: { notes: '' } })
+        return true
+    },
 }
 
 async function migrate(db, options) {

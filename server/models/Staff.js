@@ -28,7 +28,6 @@ const staffSchema = new Schema({
     SSD,
     photoUrl: {type: String, label: 'URL foto'},
     wordpressId: String,
-    cn_ldap: {type: String, label: 'cn_ldap'},
     notes: {type: String, label: 'note', widget: 'text'},
     createdBy,
     updatedBy,
