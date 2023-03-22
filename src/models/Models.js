@@ -4,6 +4,7 @@ import Room from './Room'
 import RoomAssignment from './RoomAssignment'
 import Visit from './Visit'
 import Person from './Person'
+import Institution from './Institution'
 import User from './User'
 import Token from './Token'
 import Staff from './Staff'
@@ -27,6 +28,7 @@ const Models = {
     Grant: new Grant(),
     Thesis: new Thesis(),
     Visit: new Visit(),
+    Institution: new Institution(),
 
     // stanze:
     RoomAssignment: new RoomAssignment(),

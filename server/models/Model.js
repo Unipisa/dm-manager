@@ -114,6 +114,12 @@ function field_from_model_info(info) {
             can_filter: true,
             related_field: true,
         }
+    } else if (info.ref === 'Institution') {
+        return {
+            can_sort: ['name'],
+            can_filter: true,
+            related_field: true,
+        }
     } else {
         switch(info.type) {
             case Number: // fall through

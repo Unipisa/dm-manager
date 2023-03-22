@@ -9,7 +9,7 @@ const {
 const personSchema = new Schema({
     firstName:  {type: String, label: 'nome'},
     lastName: {type: String, label: 'cognome'},
-    affiliation: {type: String, label: 'affiliazione'}, 
+    affiliations: [{ type: ObjectId, label: 'affiliazioni correnti', ref: 'Institution' }],
     gender: {type: String, label: 'genere', 
         enum: ['Uomo', 'Donna', 'Non Specificato'],
         default: 'Non Specificato'},
@@ -41,3 +41,12 @@ const Person = model('Person', personSchema)
 Person.relatedModels = []
 
 module.exports = Person
+
+const Institution = require('./Institution')
+Institution.relatedModels.push({
+    model: Person,
+    modelName: 'Person',
+    url: 'person',
+    field: 'affiliations',
+    multiple: true,
+})

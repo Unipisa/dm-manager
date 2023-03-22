@@ -40,10 +40,6 @@ class Controller {
         // the pipeline used in aggregate query of this.index
         this.queryPipeline = []
 
-        // these fields contain foreignkey ids which 
-        // are going to be expanded with the referred objects
-        this.populateFields = []
-
         // Fields used in the search endpoint
         this.searchFields = []
         this.abc = []
@@ -63,9 +59,9 @@ class Controller {
         this.fields = {}
 
         if (this.Model) {
-            // inspect Model to populate controller properties
             this.fields = Model._schema_info.properties
-            this.add_fields_population_from_model()
+            // inspect Model to add aggregation pipelines
+            this.add_fields_aggregations_from_model()
         }
     }
 
@@ -86,104 +82,135 @@ class Controller {
         }
     }
 
-    add_fields_population_from_model() {
+    add_fields_aggregations_from_model() {
         Object.entries(this.Model.schema.obj)
             .forEach(([field, info]) => {
+                let single = true
                 if (Array.isArray(info) && info.length === 1) {
-                    // descrive un array
+                    single = false
                     info = info[0]
-                    if (info.ref === 'Person') {
-                        this.populateFields.push({
-                            path: field,
-                            select: ['firstName', 'lastName', 'affiliation', 'email']
-                        })
-                        this.queryPipeline.push(
-                            {$lookup: {
-                                from: "people",
-                                localField: field,
-                                foreignField: "_id",
-                                as: field,
-                            }},
-                        )
-                    } else if (info.ref === 'Grant') {
-                        this.populateFields.push({
-                            path: field,
-                            select: ['identifier', 'name']
-                        })
-                        this.queryPipeline.push(
-                            {$lookup: {
-                                from: "grants",
-                                localField: field,
-                                foreignField: "_id",
-                                as: field,
-                            }},
-                        )
-                    }
-                } else if (info.ref === 'Person') {
-                    this.populateFields.push({
-                        path: field, 
-                        select: ['firstName', 'lastName', 'affiliation', 'email', 'photoUrl']
-                    })
+                }
+                const unwind = field => this.queryPipeline.push(
+                    {$unwind: {
+                        "path": '$'+field,
+                        "preserveNullAndEmptyArrays": true,
+                    }})
+                if (info.ref === 'Person') {
                     this.queryPipeline.push(
                         {$lookup: {
                             from: "people",
                             localField: field,
                             foreignField: "_id",
                             as: field,
-                        }},
-                        {$unwind: {
-                            "path": '$'+field,
-                            "preserveNullAndEmptyArrays": true,
+                            pipeline: [{ $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                affiliations: 1,
+                                email: 1,
+                                phone: 1,
+                                affiliation: 1,
+                            }},
+                            {$lookup: {
+                                from: "institutions",
+                                localField: "affiliations",
+                                foreignField: "_id",
+                                as: "affiliations",
+                                pipeline: [{ $project: {
+                                    name: 1,
+                                }}]
+                            }},
+                            {$lookup: {
+                                from: "staffs",
+                                localField: "_id",  
+                                foreignField: "person",
+                                as: "staffs",
+                                pipeline: [ 
+                                    { $match: 
+                                        { $expr: 
+                                            { $and: [ 
+                                                { $or: [ 
+                                                    { $eq: [ "$endDate", null ] },
+                                                    { $gte: [ "$endDate", "$$NOW" ] }
+                                                ]}, 
+                                                { $or: [
+                                                    { $eq: [ "$startDate", null ] },
+                                                    { $lte: [ "$startDate", "$$NOW" ] }
+                                                ]
+                                                }]}}
+                                    }, 
+                                    { $project: {
+                                        qualification: 1,
+                                    }
+                                }]
+                            }},
+                            ],
                         }},
                     )
+                    if (single) unwind(field)
+                } else if (info.ref === 'Grant') {
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "grants",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                            pipeline: [{ $project: {
+                                identifier: 1,
+                                name: 1,
+                            }}],
+                        }},
+                    )
+                    if (single) unwind(field)
+                } else if (info.ref === 'Institution') {
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "institutions",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                            pipeline: [{ $project: {
+                                name: 1,
+                            }}]
+                        }},
+                    )
+                    if (single) unwind(field)
                 } else if (info.ref === 'User') {
-                    this.populateFields.push({
-                        path: field,
-                        select: ['firstName', 'lastName', 'username', 'email', 'photoUrl']
-                    })
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "users",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                            pipeline: [{ $project: {
+                                firstName: 1,
+                                lastName: 1,
+                                username: 1,
+                                email: 1,
+                                photoUrl: 1,
+                            }}]
+                        }},
+                    )
+                    if (single) unwind(field)
                 } else if (info.ref === 'Room') {
-                    this.populateFields.push({
-                        path: field,
-                        select: ['code', 'number', 'floor', 'building']
-                    })
                     this.queryPipeline.push(
                         {$lookup: {
                             from: "rooms",
                             localField: field,
                             foreignField: "_id",
                             as: field,
-                        }},
-                        {$unwind: {
-                            "path": '$'+field,
-                            "preserveNullAndEmptyArrays": true,
-                        }}, 
-                    )
-                }
-            })
+                            pipeline: [{ $project: {
+                                code: 1,
+                                number: 1,
+                                floor: 1,
+                                building: 1,
+                            }}]
+                        }})
+                if (single) unwind(field)
+            }})
     }
 
     async getModel(req, res) {
         res.send(this.getSchema())
-    }
-
-    async get(req, res, id) {
-        if (id === 'new') {
-            const obj = (new this.Model()).toObject()
-            obj._id = undefined
-            return res.send(obj)
-        }
-        try {
-            let obj = await this.Model
-                .findById(id)
-                .populate(this.populateFields)
-            if (obj === null) {
-                return res.status(404).send({error: `not found ${id}`})
-            }
-            res.send(obj)
-        } catch(error) {
-            console.log(`invalid _id: ${id}`)
-            res.status(404).send({error: `invalid id ${id}`})
-        }
     }
 
     async performQuery(query, res, { fields, searchFields, queryPipeline, path, Model } = {}) {
@@ -400,6 +427,34 @@ class Controller {
         })
     }
 
+    async get(req, res, id) {
+        if (id === 'new') {
+            const obj = (new this.Model()).toObject()
+            obj._id = undefined
+            return res.send(obj)
+        }
+        try {
+            const pipeline = [
+                {$match: {_id: ObjectId(id)}},
+                ...this.queryPipeline
+            ]
+            console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
+            let obj = await this.Model
+                .aggregate(pipeline)
+            if (obj === []) {
+                return res.status(404).send({error: `not found ${id}`})
+            }
+            if (obj.length > 1) {
+                console.log(`INTERNAL ERROR: found more than one object ${this.path} with id ${id}`)
+                return res.status(404).send({error: `not found ${id}`})
+            }
+            res.send(obj[0])
+        } catch(error) {
+            console.log(`invalid _id: ${id}`)
+            res.status(404).send({error: `invalid id ${id}`})
+        }
+    }
+
     async search(req, res) {
         console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
         return this.performQuery({_search: req.query.q || ''}, res)
@@ -420,12 +475,10 @@ class Controller {
         delete payload.createdAt
         delete payload.updatedAt
 
-        console.log(`*** PUT ${JSON.stringify(payload)}`)
-
         try {
             const obj = await this.Model.create(payload)
             log(req, {}, obj)
-            res.send(obj)
+            this.get(req, res, obj._id)
         } catch(err) {
             console.error(err)
             res.status(400).send({ error: err.message })

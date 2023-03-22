@@ -28,7 +28,6 @@ const staffSchema = new Schema({
     SSD,
     photoUrl: {type: String, label: 'URL foto'},
     wordpressId: String,
-    cn_ldap: {type: String, label: 'cn_ldap'},
     notes: {type: String, label: 'note', widget: 'text'},
     createdBy,
     updatedBy,
@@ -48,3 +47,42 @@ Person.relatedModels.push({
 })
 
 module.exports = Staff
+
+Staff.personStaffPipeline = () => ([
+    {$lookup: {
+        from: "staffs",
+        let: { start: new Date(), end: new Date() },
+        localField: '_id',
+        foreignField: "person",
+        as: 'staffs',
+        pipeline: [
+            // tiene solo le attribuzioni che includono il periodo [start, end] 
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$$end", null] },
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$end"] } ]},
+                        // FIXME: The following part of the query does not appear to work
+                        { $or: [
+                            { $eq: ["$$start", null] },
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$start"] } ]}
+                    ]},
+                },
+            },
+            // ordina per data finale...
+            // l'ultima assegnazione dovrebbe essere quella attuale
+            {$sort: {"endDate": 1}},
+        ]
+    }},
+    { $addFields: {
+        staff: {
+            $ifNull: [
+                { $arrayElemAt: ["$staffs", -1] },
+                null
+            ]
+        }
+    }}
+])

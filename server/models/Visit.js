@@ -11,12 +11,10 @@ const {
 
 const visitSchema = new Schema({
     person: { type: ObjectId, label: 'visitatore', ref: 'Person' },
-    affiliation: {type: String, label: 'affiliazione'},
-    // country: {type: String, label: 'nazione'},
+    affiliations: [{ type: ObjectId, label: 'affiliazioni al tempo della visita', ref: 'Institution' }],
     startDate,
     endDate,
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
-    // fundingAgency: {type: String, label: 'ente finanziatore'},
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,
     notes: {type: String, label: 'note', widget: 'text'},

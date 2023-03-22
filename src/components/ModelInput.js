@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 import { myDateFormat, useEngine } from '../Engine'
-import { BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, AttachmentInput, ImageInput } from './Input'
+import { InstitutionInput, BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, AttachmentInput, ImageInput } from './Input'
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
@@ -35,6 +35,7 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
         if (!schema.items['x-ref']) return element(ListInput)
         if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true})
         if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true})        
+        if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true})
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
         if (schema['x-ref'] === 'Person') return element(PersonInput)

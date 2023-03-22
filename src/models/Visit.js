@@ -20,7 +20,7 @@ export default class Visit extends Model {
             'startDate': "dal",
             'endDate': "al",
             'person': "persona",
-            'affiliation': "affiliazione",
+            'affiliations': "affiliazioni",
             'roomAssignment': "stanza",
             'updatedAt': "modificato",
         }
@@ -31,7 +31,8 @@ export default class Visit extends Model {
     
     onObjectChange = setObj => (field, value) => {
         if (field === 'person') {
-            setObj(obj => ({...obj, affiliation: value ? value.affiliation : ""}))
+            const person = value
+            setObj(obj => ({...obj, affiliations: person ? [...person.affiliations] : []}))
         }}
 }
 

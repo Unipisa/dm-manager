@@ -141,7 +141,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     }
 
     // Determine the value of selected that should be initialized
-    const [selected, setSelected] = useState(multiple ? value : (value ? [value] : []))
+    const selected = multiple ? value : (value ? [value] : [])
 
     const labelDisplayFunction = x => {
         if (!x || x.noObjectSelected || x.newObjectEntry)
@@ -152,13 +152,14 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
 
     function handleClose() {
         // Add a new person with the given data
+        console.log(`Creating new object (${objCode})`, newObject)
         api.put(`/api/v0/${objCode}`, newObject).then(data => {      
+            console.log("New object created", data)
+            console.log("value", value)
             if (multiple) {
-                setSelected([ ...value, data ])
                 setValue([ ...value, data ])
             }   
             else {
-                setSelected([ data ])
                 setValue(data)
             }
 
@@ -177,7 +178,6 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
         // Filter the entries removing the "No Object selected entries, if any"
         evt = Array.from(evt).filter(x => ! (x.noObjectSelected || x.newObjectEntry))
 
-        setSelected(evt)
         typeaheadref.current.hideMenu()
 
         if (evt.length > 0) {
@@ -224,13 +224,6 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     }
 
     const onBlurHandler = x => {
-        if (multiple) {
-            setSelected(value)
-        }
-        else {
-            setSelected(value ? [value] : [])
-        }
-
         if (! value) {
             typeaheadref.current.clear()
         }
@@ -245,15 +238,38 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
         }
     }
 
+    function renderInput([key, label]) {
+        // TODO: this is very fragile!
+        if (label === 'Affiliazioni') {
+            return <InstitutionInput 
+                id={`affiliazione-${key}`}
+                key={key} 
+                value={newObject[key] || []} 
+                multiple={true}
+                setValue={x => {
+                    console.log(`Setting ${key} to`, x)
+                    setNewObject(o => ({...o, [key]: x}))
+                }}
+                >
+            </InstitutionInput>
+        } else {
+            return <input 
+                key={key} 
+                className="mb-2 form-control" 
+                placeholder={label} 
+                value={newObject[key]} 
+                onChange={x => setNewObject(o => ({...o, [key]: x.target.value}))}>
+            </input>
+        }
+    }
+
     return <>
        <Modal show={show} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>{`Crea nuov${oa} ${objName}`}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-            {Object.entries(inputs).map(([key, label]) => 
-                <input key={key} className="mb-2 form-control" placeholder={label} value={newObject[key]} onChange={x => setNewObject(o => ({...o, [key]: x.target.value}))}></input>
-            )}
+            {Object.entries(inputs).map(renderInput)}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={x => setShow(false)}>
@@ -293,12 +309,14 @@ export function PersonInput({ id, value, setValue, multiple }) {
         objCode="person"
         objName="persona"
         oa="a"
-        render={_ => `${_.firstName} ${_.lastName} (${_.affiliation})`}
+        render={_ => {
+            const affiliations = _.affiliations.map(x => x.name).join(" and ")
+            return `${_.firstName} ${_.lastName} (${affiliations})`}}
         new_object={q => ({firstName: "", lastName: q, affiliation: ""})}
         inputs={{
                 firstName: 'Nome',
                 lastName: 'Cognome',
-                affiliation: 'Affiliazione',
+                affiliations: 'Affiliazioni',
         }}
         placeholder="cognome"
     />
@@ -324,11 +342,18 @@ export function GrantInput({ id, value, setValue, multiple }) {
 
 export function SelectInput({ id, options, value, setValue, displayFunction }) {
     //console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
+    value = value || ""
+    if (! options.includes(value)) {
+        options = [value, ...options]
+    }
     return <select 
         className="form-control col-sm-10"
         id={ id } 
         value={ value || "" } 
-        onChange={ (evt) => setValue(evt.target.value) }>
+        onChange={ (evt) => {
+            console.log(`OnChange ${evt.target.value}`)
+            setValue(evt.target.value) 
+        }}>
         { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
     </select>
 }
@@ -380,3 +405,22 @@ export function RoomInput({ id, value, setValue }) {
         setValue={value => setValue(value?data.get(value):null)}
     />
 }
+
+export function InstitutionInput({ id, value, setValue, multiple }) {
+    return <ObjectInput 
+        id={id} 
+        value={value} 
+        setValue={setValue} 
+        multiple={multiple} 
+        objCode="institution"
+        objName="institution"
+        oa="o"
+        render={_ => `${_.name} ${_.city ? '('+_.city + ')' : ''}`}
+        new_object={q => ({name: q})}
+        inputs={{
+                name: 'nome',
+        }}
+        placeholder="affiliazione"
+    />
+}
+
