@@ -323,6 +323,14 @@ const migrations = {
             }
         }
         return true
+    },
+
+    D20230322_strip_theses_notes_2: async function(db) {
+        const theses = db.collection('theses')
+        await theses.updateMany({
+            notes: { $regex: /^genealogy url: https:..www.genealogy.math.ndsu.nodak.edu.id.php.id=\d+$/ }
+        }, { $set: { notes: '' } })
+        return true
     }
 }
 
