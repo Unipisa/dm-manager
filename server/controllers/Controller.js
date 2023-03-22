@@ -343,15 +343,22 @@ class Controller {
                         return sendBadRequest(res, `too many (${key_parts.length}) field modifiers in key '${key}'`)
                     }
                 } else if (field.related_field) {
-                    if (key_parts[1] === '_id' || key_parts.length === 1) { 
+                    if (key_parts.length === 1) { 
                         try {
                             $matches.push({ [key0]: new ObjectId(value) })
                         } catch(err) {
                             console.error(err)
                             return sendBadRequest(res, `invalid id "${value}"`)
                         }
+                    } else if (key_parts[1] === 'ne') {
+                        try {
+                            $matches.push({ [key0]: { $ne: new ObjectId(value) } })
+                        } catch(err) {
+                            console.error(err)
+                            return sendBadRequest(res, `invalid id "${value}"`)
+                        }
                     } else {
-                        return sendBadRequest(res, `related field query not yet supported [${key0}.${key_parts[1]}]`)
+                        return sendBadRequest(res, `related field query not yet supported [${key0}__${key_parts[1]}]`)
                     }
                 } else {
                     if (key_parts.length === 1) {
