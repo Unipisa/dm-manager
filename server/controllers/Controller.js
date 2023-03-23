@@ -107,8 +107,43 @@ class Controller {
                                 lastName: 1,
                                 affiliations: 1,
                                 email: 1,
-                                phone: 1, 
-                            }}],
+                                phone: 1,
+                                affiliation: 1,
+                            }},
+                            {$lookup: {
+                                from: "institutions",
+                                localField: "affiliations",
+                                foreignField: "_id",
+                                as: "affiliations",
+                                pipeline: [{ $project: {
+                                    name: 1,
+                                }}]
+                            }},
+                            {$lookup: {
+                                from: "staffs",
+                                localField: "_id",  
+                                foreignField: "person",
+                                as: "staffs",
+                                pipeline: [ 
+                                    { $match: 
+                                        { $expr: 
+                                            { $and: [ 
+                                                { $or: [ 
+                                                    { $eq: [ "$endDate", null ] },
+                                                    { $gte: [ "$endDate", "$$NOW" ] }
+                                                ]}, 
+                                                { $or: [
+                                                    { $eq: [ "$startDate", null ] },
+                                                    { $lte: [ "$startDate", "$$NOW" ] }
+                                                ]
+                                                }]}}
+                                    }, 
+                                    { $project: {
+                                        qualification: 1,
+                                    }
+                                }]
+                            }},
+                            ],
                         }},
                     )
                     if (single) unwind(field)

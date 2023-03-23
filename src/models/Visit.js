@@ -20,7 +20,7 @@ export default class Visit extends Model {
             'startDate': "dal",
             'endDate': "al",
             'person': "persona",
-            'affiliation': "affiliazione",
+            'affiliations': "affiliazioni",
             'roomAssignment': "stanza",
             'updatedAt': "modificato",
         }

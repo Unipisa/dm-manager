@@ -20,7 +20,7 @@ export default class Person extends Model {
         this.columns = {
             'lastName': "cognome",
             'firstName': "nome",
-            'affiliation': "affiliazione",
+            'affiliations': "affiliazioni",
             'email': "email",
             'updatedAt': "modificato",
         }

@@ -23,7 +23,6 @@ const personSchema = new Schema({
     mathscinet: {type: String, label: 'mathscinet'},
     photoUrl: {type: String, label: 'foto', widget: 'image'},
     genealogyId: {type: String, label: 'math genealogy id'},
-    affiliation: {type: String, label: 'vecchio campo affiliazione'}, 
     createdBy,
     updatedBy,
 }, {
@@ -41,3 +40,12 @@ const Person = model('Person', personSchema)
 Person.relatedModels = []
 
 module.exports = Person
+
+const Institution = require('./Institution')
+Institution.relatedModels.push({
+    model: Person,
+    modelName: 'Person',
+    url: 'person',
+    field: 'affiliations',
+    multiple: true,
+})
