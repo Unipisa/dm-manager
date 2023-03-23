@@ -38,7 +38,14 @@ const createdBy = { type: ObjectId, ref: 'User' }
 const updatedBy = { type: ObjectId, ref: 'User' }
 const date = {type: Date, label: 'data', default: null}
 const startDate = {...date, label: 'data inizio'}
-const endDate = {...date, label: 'data fine'}
+const endDate = {...date, label: 'data fine',
+    validate: {
+        validator: function(v) {
+            return v >= this.startDate
+        },
+        message: props => `endDate must be greater than startDate`
+    }
+}
 
 const model = function(name, schema) {
     const M = mongoose.model(name, schema)
