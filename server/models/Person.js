@@ -13,7 +13,6 @@ const personSchema = new Schema({
     gender: {type: String, label: 'genere', 
         enum: ['Uomo', 'Donna', 'Non Specificato'],
         default: 'Non Specificato'},
-    country: {type: String, label: 'nazione'}, 
     email: {type: String, label: 'email'}, 
     phone: {type: String, label: 'telefono'}, 
     notes: {type: String, label: 'note', widget: 'text'},
