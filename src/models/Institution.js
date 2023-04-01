@@ -5,7 +5,7 @@ export default class Institution extends Model {
         super()
         this.code = 'institution'
         this.name = "istituzione"
-        this.oa = ""
+        this.oa = "a"
         this.articulation = {
             'oggetto': "istituzione", 
             'oggetti': "istituzioni",
