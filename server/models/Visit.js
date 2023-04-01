@@ -26,9 +26,9 @@ const visitSchema = new Schema({
 })
 
 const Visit = model('Visit', visitSchema)
+module.exports = Visit
 
 const Person = require('./Person')
-
 Person.relatedModels.push({
     model: Visit,
     modelName: 'Visit',
@@ -43,7 +43,6 @@ Person.relatedModels.push({
 })
 
 const Grant = require('./Grant')
-
 Grant.relatedModels.push({
     model: Visit,
     modelName: 'Visit',
@@ -52,4 +51,11 @@ Grant.relatedModels.push({
     multiple: true,
 })
 
-module.exports = Visit
+const Institution = require('./Institution')
+Institution.relatedModels.push({
+    model: Visit,
+    modelName: 'Visit',
+    url: 'visit',
+    field: 'affiliations',
+    multiple: true,
+})
