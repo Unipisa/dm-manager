@@ -340,6 +340,19 @@ const migrations = {
         }, { $set: { notes: '' } })
         return true
     },
+
+    D20230418_create_indexes_1: async function(db) {
+        db.collection('staffs').createIndex({startDate: 1, endDate: 1})
+        db.collection('grants').createIndex({startDate: 1, endDate: 1})
+        db.collection('forms').createIndex({startDate: 1, endDate: 1})
+        db.collection('visits').createIndex({startDate: 1, endDate: 1})
+        db.collection('logs').createIndex({when: 1})
+        db.collection('formdatas').createIndex({form: 1})
+        db.collection('roomassignments').createIndex({startDate: 1, endDate: 1})
+        db.collection('theses').createIndex({date: 1})
+
+        return true
+    }
 }
 
 async function migrate(db, options) {
