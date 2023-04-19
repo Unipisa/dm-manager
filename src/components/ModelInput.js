@@ -40,6 +40,7 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
     } else {
         if (schema['x-ref'] === 'Person') return element(PersonInput)
         if (schema['x-ref'] === 'Room') return element(RoomInput)
+        if (schema['x-ref'] === 'Institution') return element(InstitutionInput)
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
         if (schema.format === 'date-time') return element(DateInput)
         if (schema.enum) return element(SelectInput, {options: schema.enum})

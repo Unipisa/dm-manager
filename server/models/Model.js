@@ -41,7 +41,7 @@ const startDate = {...date, label: 'data inizio'}
 const endDate = {...date, label: 'data fine',
     validate: {
         validator: function(v) {
-            return v >= this.startDate
+            return v===null || this.startDate===null || v >= this.startDate
         },
         message: props => `endDate must be greater than startDate`
     }
