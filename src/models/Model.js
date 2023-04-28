@@ -63,7 +63,7 @@ export default class Model {
 
     // info about elements to be added into the menu bar
     menuElements(user) {
-        if (user && user.hasSomeRole(...this.schema.supervisorRoles)) {
+        if (user && this.schema && user.hasSomeRole(...this.schema.supervisorRoles)) {
             return [{
                 key: this.code,
                 url: this.indexUrl(), 
