@@ -23,9 +23,8 @@ export default function StaffViewPage() {
 function StaffDetails() {
     const obj = useObject()
     const engine = useEngine()
-    const visit = obj
-    const person = visit.person
-    if (visit.person === null) return
+    const person = obj.person
+    if (!person) return
     let tabs = []
     const Person = engine.Models.Person
 
