@@ -12,7 +12,7 @@ export default function Home() {
   useEffect(() => {
         const url = sessionStorage.getItem("redirect_after_login")
         console.log(`Home: redirect_after_login=${url}`)
-        setRedirectAfterLogin(url)
+        if (url && url != redirectAfterLogin) setRedirectAfterLogin(url)
   }, [])
 
   if (redirectAfterLogin) {
