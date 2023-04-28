@@ -57,6 +57,7 @@ export default function Header() {
           </Navbar.Collapse>
           <Nav className="right">
             <NavDropdown title={ user ? (<span className="me-2">{user.firstName} {user.lastName}<br />{user.username}</span>) : "user"}>
+                <NavDropdown.Item onClick={ () => navigate('/profile') }>il mio profilo</NavDropdown.Item>
                 <NavDropdown.Item onClick={ () => engine.logout() }>logout</NavDropdown.Item>
                 {user.hasSomeRole('disguised-admin') && <NavDropdown.Item onClick={ () => engine.impersonate_role('admin') }>ritorna admin</NavDropdown.Item>}
                 {user.hasSomeRole('admin', 'disguised-admin') && 

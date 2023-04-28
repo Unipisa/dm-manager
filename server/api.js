@@ -1,6 +1,7 @@
 var express = require('express')
 
 const config = require('./config')
+const profile = require('./controllers/profile')
 
 var router = express.Router()
 
@@ -47,6 +48,8 @@ router.get('/', (req, res) => {
         user
     })
 })
+
+profile(router, "/profile")
 
 module.exports = router
 module.exports.ModelSchemas = ModelSchemas
