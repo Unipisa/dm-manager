@@ -4,7 +4,7 @@ import { myDateFormat, useEngine } from '../Engine'
 
 export const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function ModelOutput({ field, schema, value}) {
+export function ModelFieldOutput({ field, schema, value}) {
     const engine = useEngine()
     const Models = engine.Models
     if (value === null) return '---'
@@ -63,7 +63,7 @@ export function ModelOutputs({ Model, obj}) {
         const label = field_schema.items?.label || field_schema.label || field
         lst.push(<p key={field}>
             <strong className="align-top">{label}: </strong>
-            <ModelOutput key={field} field={field} schema={field_schema} value={obj[field]} />
+            <ModelFieldOutput key={field} field={field} schema={field_schema} value={obj[field]} />
         </p>)
     }        
     return lst

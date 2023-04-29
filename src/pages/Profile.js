@@ -1,23 +1,39 @@
 import { Card } from "react-bootstrap"
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Button } from "react-bootstrap"
+import { useState } from "react"
 
 import { useEngine } from "../Engine"
 import Loading from "../components/Loading"
-import { ModelInput } from "../components/ModelInput"
-import { ModelOutput } from "../components/ModelOutput"
+import { ModelFieldInput } from "../components/ModelInput"
+import { ModelFieldOutput } from "../components/ModelOutput"
 
-function MyField({ name, value }) {
-    return <p><strong className="align-top">{name}: </strong>
-        {value}
-    </p>
-}
-
-export function FieldOutput({ Model, obj, field, label }) {
+export function FieldOutput({ Model, obj, field, label, editable }) {
+    const [edit, setEdit] = useState(false)
+    const [value, setValue] = useState(obj[field])
+    const modified = value != obj[field]
     const schema = Model.schema.fields
     const field_schema = schema[field]
     label ||= field_schema.items?.label || field_schema.label || field
-    return <p>
+    
+    function Field() {
+        if (edit) return <>
+            {modified && <Button>salva</Button>}
+            {edit && <Button className="btn-warning" onClick={() => {
+                setEdit(false)
+                setValue(obj[field])
+            }}>annulla</Button>}
+            <ModelFieldInput field={field} schema={field_schema} value={value} setValue={setValue} />
+        </>
+        else return <>
+            <ModelFieldOutput field={field} schema={field_schema} value={obj[field]} />
+            {editable && <Button className="btn-warning" onClick={() => setEdit(!edit)}>modifica</Button>}
+        </>
+    }
+
+    return <p key={field}>
         <strong className="align-top">{label}: </strong>
-        <ModelOutput key={field} field={field} schema={field_schema} value={obj[field]} />
+        <Field />
     </p>
 }
 
@@ -67,14 +83,14 @@ export default function Profile() {
                     <FieldOutput label="Nome" field="firstName" Model={Person} obj={person} />
                     <FieldOutput label="Cognome" field="lastName" Model={Person} obj={person} />
                     <FieldOutput label="Email" field="email" Model={Person} obj={person} />
-                    <FieldOutput label="Genere" field="gender" Model={Person} obj={person} />
-                    <FieldOutput label="Telefono" field="phone" Model={Person} obj={person} />
-                    <FieldOutput label="Url pagina personale" field="personalPage" Model={Person} obj={person} />
-                    <FieldOutput label="Orcid" field="orcid" Model={Person} obj={person} />
-                    <FieldOutput label="Arxiv" field="arxiv_orcid" Model={Person} obj={person} />
-                    <FieldOutput label="Google-scholar" field="google_scholar" Model={Person} obj={person} />
-                    <FieldOutput label="Mathscinet" field="mathscinet" Model={Person} obj={person} />
-                    <FieldOutput label="Foto" field="photoUrl" Model={Person} obj={person} />
+                    <FieldOutput label="Genere" field="gender" editable={true} Model={Person} obj={person} />
+                    <FieldOutput label="Telefono" field="phone" editable={true} Model={Person} obj={person} />
+                    <FieldOutput label="Url pagina personale" editable={true} field="personalPage" Model={Person} obj={person} />
+                    <FieldOutput label="Orcid" field="orcid" editable={true} Model={Person} obj={person} />
+                    <FieldOutput label="Arxiv" field="arxiv_orcid" editable={true} Model={Person} obj={person} />
+                    <FieldOutput label="Google-scholar" editable={true} field="google_scholar" Model={Person} obj={person} />
+                    <FieldOutput label="Mathscinet" editable={true} field="mathscinet" Model={Person} obj={person} />
+                    <FieldOutput label="Foto" editable={true} field="photoUrl" Model={Person} obj={person} />
                 </Card.Body>
                 <Card.Footer>
                     <p>
