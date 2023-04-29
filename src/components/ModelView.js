@@ -1,7 +1,7 @@
 import { Button, ButtonGroup, Card } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
-import { ModelOutputs } from './ModelInput'
+import { ModelOutputs } from './ModelOutput'
 import { useObject } from './ObjectProvider'
 import Timestamps from './Timestamps'
 

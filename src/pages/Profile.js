@@ -2,7 +2,8 @@ import { Card } from "react-bootstrap"
 
 import { useEngine } from "../Engine"
 import Loading from "../components/Loading"
-import { ModelOutput } from "../components/ModelInput"
+import { ModelInput } from "../components/ModelInput"
+import { ModelOutput } from "../components/ModelOutput"
 
 function MyField({ name, value }) {
     return <p><strong className="align-top">{name}: </strong>
