@@ -7,28 +7,19 @@ import { InstitutionInput, BooleanInput, ListInput, PersonInput, RoomInput, Gran
 
 const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function ModelInput({ field, modified, schema, value, setValue}) {
-    const id = useId()
+export function ModelFieldInput({ id, schema, value, setValue }) {
     function element(Element, opts = {}) {
         const {options, multiple} = opts
-        const label = schema.items?.label || schema.label || field
-        return <Form.Group className="row my-2">
-            <Form.Label className={ "col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id } style={{textAlign: "right"}}>
-                { label }
-            </Form.Label>
-            <div className="col-sm-10">
-                <Element 
+        return <Element 
                     id={id}
                     value={value} 
                     setValue={setValue} 
                     options={options}
                     multiple={multiple}
-                />                         
-            </div>
-            <div className="col-sm-2"></div>
-            <div className="col-sm-10 form-text">{schema.help}</div>
-        </Form.Group>
+                />
     }
+
+    if (!schema) return <p>no schema provided</p>
 
     if (schema.type === 'array') {
         if (schema.enum) return element(MultipleSelectInput, {options: schema.enum})
@@ -60,6 +51,27 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
         } 
         return <span>unknown input type {JSON.stringify(schema)}</span>
     }
+}
+
+export function ModelInput({ field, modified, schema, value, setValue}) {
+    const id = useId()
+    const label = schema.items?.label || schema.label || field
+
+    return <Form.Group className="row my-2">
+        <Form.Label className={ "col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id } style={{textAlign: "right"}}>
+            { label }
+        </Form.Label>
+        <div className="col-sm-10">
+            <ModelFieldInput
+                id={id}
+                schema={schema}
+                value={value} 
+                setValue={setValue} 
+            />                         
+        </div>
+        <div className="col-sm-2"></div>
+        <div className="col-sm-10 form-text">{schema.help}</div>
+    </Form.Group>
 }
 
 export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
