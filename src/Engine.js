@@ -176,7 +176,11 @@ export function useCreateEngine() {
 
         usePatch: (path) => {
             const mutation = useMutation(
-                payload => api.patch(`/api/v0/${path}/${payload._id}`, payload), {
+                payload => {
+                    let url = `/api/v0/${path}`
+                    if (payload._id) url += `/${payload._id}`
+                    return api.patch(url, payload)
+                }, {
                     onSuccess: () => {
                         queryClient.invalidateQueries([path])
                     }

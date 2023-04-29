@@ -11,14 +11,24 @@ import { ModelFieldOutput } from "../components/ModelOutput"
 export function FieldOutput({ Model, obj, field, label, editable }) {
     const [edit, setEdit] = useState(false)
     const [value, setValue] = useState(obj[field])
+    const engine = useEngine()
+    const patchProfile = engine.usePatch(`profile/${Model.code}`)
     const modified = value != obj[field]
     const schema = Model.schema.fields
     const field_schema = schema[field]
     label ||= field_schema.items?.label || field_schema.label || field
     
+    async function submit() {
+        await patchProfile({
+                _id: obj._id,
+                [field]: value
+        })
+        setEdit(false)
+    }
+
     function Field() {
         if (edit) return <>
-            {modified && <Button>salva</Button>}
+            {modified && <Button onClick={submit}>salva</Button>}
             {edit && <Button className="btn-warning" onClick={() => {
                 setEdit(false)
                 setValue(obj[field])
