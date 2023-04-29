@@ -1,5 +1,4 @@
 import { Card } from "react-bootstrap"
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Button } from "react-bootstrap"
 import { useState } from "react"
 
@@ -13,7 +12,7 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
     const [value, setValue] = useState(obj[field])
     const engine = useEngine()
     const patchProfile = engine.usePatch(`profile/${Model.code}`)
-    const modified = value != obj[field]
+    const modified = (value !== obj[field])
     const schema = Model.schema.fields
     const field_schema = schema[field]
     label ||= field_schema.items?.label || field_schema.label || field
@@ -55,25 +54,37 @@ const AdminEmail = function () {
 
 export default function Profile() {
     const engine = useEngine()
-    const getProfile = engine.useGet("profile")
-    if (!getProfile.isSuccess) return <Loading />
-    const profile = getProfile.data
+    const getProfileUsers = engine.useGet("profile/user")
+    const getProfilePeople = engine.useGet("profile/person")
+    const getProfileStaffs = engine.useGet("profile/staff")
+
+    if (!getProfileUsers.isSuccess) return <Loading />
+    if (!getProfilePeople.isSuccess) return <Loading />
+    if (!getProfileStaffs.isSuccess) return <Loading />
+
+    const users = getProfileUsers.data.data
+    const user_editable_fields = getProfileUsers.data.editable_fields
+    const people = getProfilePeople.data.data
+    const person_editable_fields = getProfilePeople.data.editable_fields
+    const staffs = getProfileStaffs.data.data
+    const staff_editable_fields = getProfileStaffs.data.editable_fields
     const User = engine.Models.User
-    const user = profile.user
     const Person = engine.Models.Person
     const Staff = engine.Models.Staff
 
     return <>
-        <Card>
+        {users.map(user => <Card key={user._id}>
             <Card.Header>
-                <h3>Utente: {profile.user.username}</h3>
+                <h3>Utente: {user.username}</h3>
             </Card.Header>
             <Card.Body>
-                <FieldOutput label="Nome" field="firstName" Model={User} obj={user}/>
-                <FieldOutput label="Cognome" field="lastName" Model={User} obj={user}/>
-                <FieldOutput label="Username" field="username" Model={User} obj={user}/>
-                <FieldOutput label="Email" field="email" Model={User} obj={user}/>
-                <FieldOutput label="Ruoli" field="roles" Model={User} obj={user}/>
+                { Object.entries({
+                    firstName: "Nome",
+                    lastName: "Cognome",
+                    username: "Username",
+                    email: "Email",
+                    roles: "Ruoli"
+                }).map(([field, label]) => <FieldOutput key={field} label={label} field={field} Model={User} obj={user} editable={user_editable_fields.includes(field)} />)}
             </Card.Body>
             <Card.Footer>
                 <p>
@@ -83,24 +94,28 @@ export default function Profile() {
                     { } <AdminEmail />.
                 </p>
             </Card.Footer>
-        </Card>
-        {profile.people.map(person => <div key={person._id}>
-            <Card className="mt-2">
+        </Card>)}
+        {people.map(person => <Card key={person._id} className="mt-2">
                 <Card.Header>
                     <h3>Anagrafica: {person.firstName} {person.lastName}</h3>
                 </Card.Header>
                 <Card.Body>
-                    <FieldOutput label="Nome" field="firstName" Model={Person} obj={person} />
-                    <FieldOutput label="Cognome" field="lastName" Model={Person} obj={person} />
-                    <FieldOutput label="Email" field="email" Model={Person} obj={person} />
-                    <FieldOutput label="Genere" field="gender" editable={true} Model={Person} obj={person} />
-                    <FieldOutput label="Telefono" field="phone" editable={true} Model={Person} obj={person} />
-                    <FieldOutput label="Url pagina personale" editable={true} field="personalPage" Model={Person} obj={person} />
-                    <FieldOutput label="Orcid" field="orcid" editable={true} Model={Person} obj={person} />
-                    <FieldOutput label="Arxiv" field="arxiv_orcid" editable={true} Model={Person} obj={person} />
-                    <FieldOutput label="Google-scholar" editable={true} field="google_scholar" Model={Person} obj={person} />
-                    <FieldOutput label="Mathscinet" editable={true} field="mathscinet" Model={Person} obj={person} />
-                    <FieldOutput label="Foto" editable={true} field="photoUrl" Model={Person} obj={person} />
+                {
+                    Object.entries({
+                        firstName: "Nome",
+                        lastName: "Cognome",
+                        email: "Email",
+                        gender: "Genere",
+                        phone: "Telefono",
+                        personalPage: "Url pagina personale",
+                        orcid: "Orcid",
+                        arxiv_orcid: "Arxiv",
+                        google_scholar: "Google-scholar",
+                        mathscinet: "Mathscinet",
+                        photoUrl: "Foto"
+                    }).map(([field, label]) => 
+                    <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={person_editable_fields.includes(field)} />
+                )}
                 </Card.Body>
                 <Card.Footer>
                     <p>
@@ -109,21 +124,25 @@ export default function Profile() {
                         puoi scrivere a <AdminEmail />.
                     </p>
                 </Card.Footer>
-            </Card>
-            { person.staffs.map(staff => <Card key={staff._id} className="mt-2">
-                <Card.Header>
-                    <h3>Posizione: {staff.position}</h3>
-                </Card.Header>
-                <Card.Body>
-                    <FieldOutput label="Matricola" field="matricola" Model={Staff} obj={staff} />
-                    <FieldOutput label="Qualifica" field="qualification" Model={Staff} obj={staff} />
-                    <FieldOutput label="Data inizio" field="startDate" Model={Staff} obj={staff} />
-                    <FieldOutput label="Data fine" field="endDate" Model={Staff} obj={staff} />
-                    <FieldOutput label="SSD" field="ssd" Model={Staff} obj={staff} />
-                    <FieldOutput label="Foto" field="photoUrl" Model={Staff} obj={staff} />
-                </Card.Body>
             </Card>)}
-            </div>
-        )}
+        { staffs.map(staff => <Card key={staff._id} className="mt-2">
+            <Card.Header>
+                <h3>Posizione: {staff.position}</h3>
+            </Card.Header>
+            <Card.Body>
+                {
+                    Object.entries({
+                        matricola: "Matricola",
+                        qualification: "Qualifica",
+                        startDate: "Data inizio",
+                        endDate: "Data fine",
+                        ssd: "SSD",
+                        photoUrl: "Foto",
+                    }).map(([field, label]) =>
+                        <FieldOutput key={field} label={label} field={field} Model={Staff} obj={staff} editable={staff_editable_fields.includes(field)} />
+                    )
+                }
+            </Card.Body>
+        </Card>)}
     </>
 }
