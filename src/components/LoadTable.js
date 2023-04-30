@@ -48,7 +48,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
 
     function updateFilter(evt) {
         let text = evt.target.value
-        console.log(text)
+        // console.log(text)
 
         filter.setFilter(filter => ({
             ...filter, 

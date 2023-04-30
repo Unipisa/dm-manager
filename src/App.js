@@ -11,6 +11,7 @@ import NotFound from './components/NotFound'
 import Header from './components/Header'
 
 import Home from './pages/Home'
+import Profile from './pages/Profile'
 import LoginPage from './pages/LoginPage'
 import Models from './models/Models'
 import { Container } from 'react-bootstrap'
@@ -40,6 +41,7 @@ function Internal() {
       <Container className="p-5">
         <Routes>  
           <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
           {  Object.values(Models).map(x => x.routers()) }
           <Route path="*" element={<NotFound />} />
         </Routes>

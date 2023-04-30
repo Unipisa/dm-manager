@@ -146,14 +146,15 @@ export function useCreateEngine() {
         },
 
         useGet: (path, id) => {
-            const query = useQuery(
-                [path, id], 
-                () => api.get(`/api/v0/${path}/${id}`), 
+            const pathArray = id === undefined ? [path] : [path, id]
+            const url = id === undefined ? `/api/v0/${path}` : `/api/v0/${path}/${id}`
+            return useQuery(
+                pathArray, 
+                () => api.get(url), 
                 {
                     enabled: id !== null,
                     onError: (err) => addMessage(err.message, 'error'),
                 })
-            return query
         },
 
         usePut: (path) => {
@@ -175,7 +176,11 @@ export function useCreateEngine() {
 
         usePatch: (path) => {
             const mutation = useMutation(
-                payload => api.patch(`/api/v0/${path}/${payload._id}`, payload), {
+                payload => {
+                    let url = `/api/v0/${path}`
+                    if (payload._id) url += `/${payload._id}`
+                    return api.patch(url, payload)
+                }, {
                     onSuccess: () => {
                         queryClient.invalidateQueries([path])
                     }

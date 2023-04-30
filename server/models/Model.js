@@ -7,6 +7,7 @@ const fieldOptionsMapping = {
     hidden: 'hidden',
     can_sort: 'can_sort',
     can_filter: 'can_filter',
+    can_edit_in_profile: 'can_edit_in_profile',
     match_ids: 'match_ids',
     help: 'help'
 }
@@ -52,6 +53,9 @@ const model = function(name, schema) {
     const obj = schema.obj
     const info = M.jsonSchema()
     M._schema_info = info
+    M._profile_editable_fields = Object.entries(info.properties)
+        .filter(([field, field_info]) => field_info?.can_edit_in_profile)
+        .map(([field, field_info]) => field)
 
     function set_if_undefined(obj, update) {
         for (const prop in update) {

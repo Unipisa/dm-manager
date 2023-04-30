@@ -351,7 +351,7 @@ export function SelectInput({ id, options, value, setValue, displayFunction }) {
         id={ id } 
         value={ value || "" } 
         onChange={ (evt) => {
-            console.log(`OnChange ${evt.target.value}`)
+            // console.log(`OnChange ${evt.target.value}`)
             setValue(evt.target.value) 
         }}>
         { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
