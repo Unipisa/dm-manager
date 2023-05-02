@@ -17,7 +17,6 @@ const personSchema = new Schema({
     },
     email: {type: String, label: 'email'}, 
     phone: {type: String, label: 'telefono', can_edit_in_profile: true}, 
-    notes: {type: String, label: 'note', widget: 'text'},
     personalPage: {type: String, label: 'URL pagina personale', widget: 'url', can_edit_in_profile: true},
     orcid: {type: String, label: 'orcid', can_edit_in_profile: true},
     arxiv_orcid: {type: Boolean, default: false, label: 'arxiv_orcid', can_edit_in_profile: true},
@@ -25,6 +24,8 @@ const personSchema = new Schema({
     mathscinet: {type: String, label: 'mathscinet', can_edit_in_profile: true},
     photoUrl: {type: String, label: 'foto', widget: 'image', can_edit_in_profile: true},
     genealogyId: {type: String, label: 'math genealogy id', can_edit_in_profile: true},
+    about: {type: String, label: 'about', help: 'testo pubblico che la persona scrive di se stesso. Viene pubblicato sulla pagina web.', widget: 'text', can_edit_in_profile: true},
+    notes: {type: String, label: 'note', help: 'testo libero. Questo è l\'unico campo che la persona stessa non può vedere.', widget: 'text'},
     createdBy,
     updatedBy,
 }, {

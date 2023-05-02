@@ -112,7 +112,8 @@ export default function Profile() {
                         arxiv_orcid: "Arxiv",
                         google_scholar: "Google-scholar",
                         mathscinet: "Mathscinet",
-                        photoUrl: "Foto"
+                        photoUrl: "Foto",
+                        about: "informazioni opzionali da pubblicare nella pagina web"
                     }).map(([field, label]) => 
                     <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={person_editable_fields.includes(field)} />
                 )}
