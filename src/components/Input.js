@@ -60,7 +60,7 @@ export function AttachmentInput({ id, value, setValue, image }) {
             />
         </div>
     <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
-        <button onClick={getNewAttachment} className="w-100 btn btn-primary">
+        <button type="button" onClick={getNewAttachment} className="w-100 btn btn-primary">
             Upload
         </button>
     </div>
