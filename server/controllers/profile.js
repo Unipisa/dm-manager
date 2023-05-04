@@ -1,6 +1,8 @@
 const User = require('../models/User')
 const Staff = require('../models/Staff')
 const Person = require('../models/Person')
+const RoomAssignment = require('../models/RoomAssignment')
+
 const { log } = require('./middleware')
 
 module.exports = function profile(router, path) {
@@ -54,6 +56,30 @@ module.exports = function profile(router, path) {
             data,
             editable_fields: Staff._profile_editable_fields,
         })
+    })
+
+    router.get(`${path}/roomAssignment`, async (req, res) => {
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+
+        const people = await Person.find({ email: user.email })
+
+        const data = await RoomAssignment.aggregate([
+            // match person in people
+            { $match: { person: { $in: people.map(p => p._id) } } },
+            { $project: { notes: 0 }},
+            { $lookup: {
+                from: "rooms",
+                localField: "room",
+                foreignField: "_id",
+                as: "room",
+            }},
+        ])
+
+        res.send({
+            data,
+            editable_fields: RoomAssignment._profile_editable_fields,
+        })  
     })
 
     router.patch(`${path}/person/:id`, async (req, res) => {

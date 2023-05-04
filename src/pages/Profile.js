@@ -28,10 +28,10 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
     function Field() {
         if (edit) return <>
             {modified && <Button onClick={submit}>salva</Button>}
-            {edit && <Button className="btn-warning" onClick={() => {
+            <Button className="btn-warning" onClick={() => {
                 setEdit(false)
                 setValue(obj[field])
-            }}>annulla</Button>}
+            }}>annulla</Button>
             <ModelFieldInput field={field} schema={field_schema} value={value} setValue={setValue} />
         </>
         else return <>
@@ -42,7 +42,7 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
 
     return <p key={field}>
         <strong className="align-top">{label}: </strong>
-        <Field />
+        { Field() }
     </p>
 }
 
@@ -57,10 +57,12 @@ export default function Profile() {
     const getProfileUsers = engine.useGet("profile/user")
     const getProfilePeople = engine.useGet("profile/person")
     const getProfileStaffs = engine.useGet("profile/staff")
+    const getProfileRoomAssignments = engine.useGet("profile/roomAssignment")
 
     if (!getProfileUsers.isSuccess) return <Loading />
     if (!getProfilePeople.isSuccess) return <Loading />
     if (!getProfileStaffs.isSuccess) return <Loading />
+    if (!getProfileRoomAssignments.isSuccess) return <Loading />
 
     const users = getProfileUsers.data.data
     const user_editable_fields = getProfileUsers.data.editable_fields
@@ -68,9 +70,12 @@ export default function Profile() {
     const person_editable_fields = getProfilePeople.data.editable_fields
     const staffs = getProfileStaffs.data.data
     const staff_editable_fields = getProfileStaffs.data.editable_fields
+    const roomAssignments = getProfileRoomAssignments.data.data
+    const roomAssignment_editable_fields = getProfileRoomAssignments.data.editable_fields
     const User = engine.Models.User
     const Person = engine.Models.Person
     const Staff = engine.Models.Staff
+    const RoomAssignment = engine.Models.RoomAssignment
 
     return <>
         {users.map(user => <Card key={user._id}>
@@ -112,7 +117,9 @@ export default function Profile() {
                         arxiv_orcid: "Arxiv",
                         google_scholar: "Google-scholar",
                         mathscinet: "Mathscinet",
-                        photoUrl: "Foto"
+                        photoUrl: "Foto",
+                        about_it: "informazioni opzionali (in italiano) da pubblicare nella pagina web",
+                        about_en: "informazioni opzionali (in inglese) da pubblicare nella pagina web",
                     }).map(([field, label]) => 
                     <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={person_editable_fields.includes(field)} />
                 )}
@@ -144,5 +151,22 @@ export default function Profile() {
                 }
             </Card.Body>
         </Card>)}
+        { 
+            roomAssignments.map(roomAssignment => <Card key={roomAssignment._id} className="mt-2">
+                <Card.Header>
+                    <h3>Assegnazione stanza: {roomAssignment.room.number} (edificio {roomAssignment.room.building})</h3>
+                </Card.Header>
+                <Card.Body>
+                    {
+                        Object.entries({
+                            startDate: "Data inizio",
+                            endDate: "Data fine",
+                        }).map(([field, label]) =>
+                            <FieldOutput key={field} label={label} field={field} Model={RoomAssignment} obj={roomAssignment} editable={roomAssignment_editable_fields.includes(field)} />
+                        )
+                    }
+                </Card.Body>
+            </Card>)
+        }
     </>
 }
