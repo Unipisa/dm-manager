@@ -2,7 +2,7 @@ import { Card } from "react-bootstrap"
 import { Button } from "react-bootstrap"
 import { useState } from "react"
 
-import { useEngine } from "../Engine"
+import { myDateFormat, useEngine } from "../Engine"
 import Loading from "../components/Loading"
 import { ModelFieldInput } from "../components/ModelInput"
 import { ModelFieldOutput } from "../components/ModelOutput"
@@ -11,14 +11,14 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
     const [edit, setEdit] = useState(false)
     const [value, setValue] = useState(obj[field])
     const engine = useEngine()
-    const patchProfile = engine.usePatch(`profile/${Model.code}`)
+    const patch = engine.usePatch(`profile/${Model.code}`)
     const modified = (value !== obj[field])
     const schema = Model.schema.fields
     const field_schema = schema[field]
     label ||= field_schema.items?.label || field_schema.label || field
     
     async function submit() {
-        await patchProfile({
+        await patch({
                 _id: obj._id,
                 [field]: value
         })
@@ -54,31 +54,21 @@ const AdminEmail = function () {
 
 export default function Profile() {
     const engine = useEngine()
-    const getProfileUsers = engine.useGet("profile/user")
-    const getProfilePeople = engine.useGet("profile/person")
-    const getProfileStaffs = engine.useGet("profile/staff")
-    const getProfileRoomAssignments = engine.useGet("profile/roomAssignment")
+    const getUsers = engine.useGet("profile/user")
+    const getPeople = engine.useGet("profile/person")
+    const getStaffs = engine.useGet("profile/staff")
+    const getRoomAssignments = engine.useGet("profile/roomAssignment")
+    const getGroups = engine.useGet("profile/group")
+    const getVisits = engine.useGet("profile/visit")
+    const getGrants = engine.useGet("profile/grant")
 
-    if (!getProfileUsers.isSuccess) return <Loading />
-    if (!getProfilePeople.isSuccess) return <Loading />
-    if (!getProfileStaffs.isSuccess) return <Loading />
-    if (!getProfileRoomAssignments.isSuccess) return <Loading />
-
-    const users = getProfileUsers.data.data
-    const user_editable_fields = getProfileUsers.data.editable_fields
-    const people = getProfilePeople.data.data
-    const person_editable_fields = getProfilePeople.data.editable_fields
-    const staffs = getProfileStaffs.data.data
-    const staff_editable_fields = getProfileStaffs.data.editable_fields
-    const roomAssignments = getProfileRoomAssignments.data.data
-    const roomAssignment_editable_fields = getProfileRoomAssignments.data.editable_fields
     const User = engine.Models.User
     const Person = engine.Models.Person
     const Staff = engine.Models.Staff
-    const RoomAssignment = engine.Models.RoomAssignment
 
     return <>
-        {users.map(user => <Card key={user._id}>
+        { getUsers.isSuccess 
+            ? getUsers.data.data.map(user => <Card key={user._id}>
             <Card.Header>
                 <h3>Utente: {user.username}</h3>
             </Card.Header>
@@ -89,7 +79,7 @@ export default function Profile() {
                     username: "Username",
                     email: "Email",
                     roles: "Ruoli"
-                }).map(([field, label]) => <FieldOutput key={field} label={label} field={field} Model={User} obj={user} editable={user_editable_fields.includes(field)} />)}
+                }).map(([field, label]) => <FieldOutput key={field} label={label} field={field} Model={User} obj={user} editable={getUsers.data.editable_fields.includes(field)} />)}
             </Card.Body>
             <Card.Footer>
                 <p>
@@ -99,8 +89,11 @@ export default function Profile() {
                     { } <AdminEmail />.
                 </p>
             </Card.Footer>
-        </Card>)}
-        {people.map(person => <Card key={person._id} className="mt-2">
+        </Card>)
+        : <Loading />}
+
+        {getPeople.isSuccess 
+            ? getPeople.data.data.map(person => <Card key={person._id} className="mt-2">
                 <Card.Header>
                     <h3>Anagrafica: {person.firstName} {person.lastName}</h3>
                 </Card.Header>
@@ -121,7 +114,7 @@ export default function Profile() {
                         about_it: "informazioni opzionali (in italiano) da pubblicare nella pagina web",
                         about_en: "informazioni opzionali (in inglese) da pubblicare nella pagina web",
                     }).map(([field, label]) => 
-                    <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={person_editable_fields.includes(field)} />
+                    <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={getPeople.data.editable_fields.includes(field)} />
                 )}
                 </Card.Body>
                 <Card.Footer>
@@ -131,42 +124,101 @@ export default function Profile() {
                         puoi scrivere a <AdminEmail />.
                     </p>
                 </Card.Footer>
-            </Card>)}
-        { staffs.map(staff => <Card key={staff._id} className="mt-2">
+            </Card>)
+            : <Loading />}
+
+        { getStaffs.isSuccess 
+            ? getStaffs.data.data.map(staff => <Card key={staff._id} className="mt-2">
             <Card.Header>
-                <h3>Posizione: {staff.position}</h3>
+                <h3>Qualifica: {staff.qualification}</h3>
             </Card.Header>
             <Card.Body>
                 {
                     Object.entries({
                         matricola: "Matricola",
-                        qualification: "Qualifica",
                         startDate: "Data inizio",
                         endDate: "Data fine",
-                        ssd: "SSD",
+                        SSD: "SSD",
                         photoUrl: "Foto",
                     }).map(([field, label]) =>
-                        <FieldOutput key={field} label={label} field={field} Model={Staff} obj={staff} editable={staff_editable_fields.includes(field)} />
+                        <FieldOutput key={field} label={label} field={field} Model={Staff} obj={staff} editable={getStaffs.data.editable_fields.includes(field)} />
                     )
                 }
             </Card.Body>
-        </Card>)}
-        { 
-            roomAssignments.map(roomAssignment => <Card key={roomAssignment._id} className="mt-2">
+        </Card>)
+        : <Loading />}
+
+        {   getRoomAssignments.isSuccess
+            ? getRoomAssignments.data.data.length>0 &&
+            <Card className="mt-2">
                 <Card.Header>
-                    <h3>Assegnazione stanza: {roomAssignment.room.number} (edificio {roomAssignment.room.building})</h3>
+                    <h3>Assegnazioni stanze</h3>
                 </Card.Header>
                 <Card.Body>
-                    {
-                        Object.entries({
-                            startDate: "Data inizio",
-                            endDate: "Data fine",
-                        }).map(([field, label]) =>
-                            <FieldOutput key={field} label={label} field={field} Model={RoomAssignment} obj={roomAssignment} editable={roomAssignment_editable_fields.includes(field)} />
-                        )
-                    }
+                    <ul>
+                        { getRoomAssignments.data.data.map(roomAssignment => 
+                        <li key={roomAssignment._id}>
+                            <b>stanza {roomAssignment.room.number} edificio {roomAssignment.room.building}</b>:
+                            {} dal: {myDateFormat(roomAssignment.startDate)} al: {myDateFormat(roomAssignment.endDate)}
+                        </li>
+                        )}
+                    </ul>
+                </Card.Body>
+            </Card>
+            : <Loading /> }
+
+        { getGroups.isSuccess
+            ? (getGroups.data.data.length>0 &&
+        <Card className="mt-2">
+            <Card.Header>
+                <h3>Gruppi e incarichi</h3>
+            </Card.Header>
+            <Card.Body>
+                <ul>
+                    {getGroups.data.data.map(group => <li key={group._id}>
+                        <b>{group.name}:</b>
+                        {} dal: {myDateFormat(group.startDate)} al: {myDateFormat(group.endDate)}
+                        </li>
+                    )}
+                </ul>
+            </Card.Body>
+        </Card>)
+        : <Loading /> }
+
+        {   getVisits.isSuccess 
+            ? (getVisits.data.data.length>0 &&
+            <Card className="mt-2">
+                <Card.Header>
+                    <h3>Visitatori</h3>
+                </Card.Header>
+                <Card.Body>
+                    <ul>
+                        {getVisits.data.data.map(visit => <li key={visit._id}>
+                            <b>{visit.person.lastName} {visit.person.firstName}:</b>
+                            {} dal: {myDateFormat(visit.startDate)} al: {myDateFormat(visit.endDate)}
+                        </li>
+                        )}
+                    </ul>
                 </Card.Body>
             </Card>)
-        }
+            : <Loading /> }
+
+        {   getGrants.isSuccess
+            ? (getGrants.data.data.length>0 &&
+            <Card className="mt-2">
+                <Card.Header>
+                    <h3>Grants</h3>
+                </Card.Header>
+                <Card.Body>
+                    <ul>
+                        {getGrants.data.data.map(grant => <li key={grant._id}>  
+                            <b>{grant.name}:</b>
+                            {} dal: {myDateFormat(grant.startDate)} al: {myDateFormat(grant.endDate)}
+                        </li>
+                        )}
+                    </ul>
+                </Card.Body>
+            </Card>)
+            : <Loading /> }
     </>
 }
