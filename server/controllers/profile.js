@@ -2,6 +2,9 @@ const User = require('../models/User')
 const Staff = require('../models/Staff')
 const Person = require('../models/Person')
 const RoomAssignment = require('../models/RoomAssignment')
+const Group = require('../models/Group')
+const Visit = require('../models/Visit')
+const Grant = require('../models/Grant')
 
 const { log } = require('./middleware')
 
@@ -74,6 +77,7 @@ module.exports = function profile(router, path) {
                 foreignField: "_id",
                 as: "room",
             }},
+            { $unwind: { path: "$room", preserveNullAndEmptyArrays: true } },
         ])
 
         res.send({
@@ -82,6 +86,83 @@ module.exports = function profile(router, path) {
         })  
     })
 
+    // get groups
+    router.get(`${path}/group`, async (req, res) => {
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+
+        const people = await Person.find({ email: user.email })
+        const people_ids = people.map(p => p._id)
+
+        const data = await Group.aggregate([
+            // match person in people or person in chair 
+            { $match: { $or: [
+                { members: { $in: people_ids } },
+                { chair: { $in: people_ids } },
+                { vice: { $in: people_ids } },
+            ]}},
+            { $project: { notes: 0 }},
+        ])
+
+        res.send({
+            data,
+            editable_fields: Group._profile_editable_fields,
+        })  
+    })
+
+    router.get(`${path}/visit`, async (req, res) => {
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+
+        const people = await Person.find({ email: user.email })
+        const people_ids = people.map(p => p._id)
+
+        const data = await Visit.aggregate([
+            // match person in person or in referencePeople
+            { $match: { $or: [
+                { person: { $in: people_ids } },
+                { referencePeople: { $in: people_ids } },
+            ]}},
+            // lookup person
+            { $lookup: {
+                from: "people",
+                localField: "person",
+                foreignField: "_id",
+                as: "person",
+            }},
+            { $unwind: { path: "$person", preserveNullAndEmptyArrays: true } },
+            { $project: { notes: 0 }},
+        ])
+
+        res.send({
+            data,
+            editable_fields: Visit._profile_editable_fields,
+        })
+    })
+
+    router.get(`${path}/grant`, async (req, res) => {
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+
+        const people = await Person.find({ email: user.email })
+        const people_ids = people.map(p => p._id)
+
+        const data = await Grant.aggregate([
+            // match people in pi, localCoordinator, members:
+            { $match: { $or: [
+                { pi: { $in: people_ids } },
+                { localCoordinator: { $in: people_ids } },
+                { members: { $in: people_ids } },
+            ]}},
+            { $project: { notes: 0 }},
+        ])
+
+        res.send({
+            data,
+            editable_fields: Grant._profile_editable_fields,
+        })
+    })
+    
     router.patch(`${path}/person/:id`, async (req, res) => {
         const user = req.user || null
         const id = req.params.id
