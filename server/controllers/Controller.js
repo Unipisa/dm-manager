@@ -140,6 +140,7 @@ class Controller {
                                     }, 
                                     { $project: {
                                         qualification: 1,
+                                        isInternal: 1
                                     }
                                 }]
                             }},
