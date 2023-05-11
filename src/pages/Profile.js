@@ -111,8 +111,8 @@ export default function Profile() {
                         google_scholar: "Google-scholar",
                         mathscinet: "Mathscinet",
                         photoUrl: "Foto",
-                        about_it: "informazioni opzionali (in italiano) da pubblicare nella pagina web",
-                        about_en: "informazioni opzionali (in inglese) da pubblicare nella pagina web",
+                        about_it: "informazioni opzionali (in italiano) da pubblicare nella propria scheda personale",
+                        about_en: "informazioni opzionali (in inglese) da pubblicare nella propria scheda personale",
                     }).map(([field, label]) => 
                     <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={getPeople.data.editable_fields.includes(field)} />
                 )}
