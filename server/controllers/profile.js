@@ -168,8 +168,6 @@ module.exports = function profile(router, path) {
         const id = req.params.id
         const modifiable_fields = Person._profile_editable_fields
         const payload = req.body
-        console.log(`req.body: ${JSON.stringify(req.body)}`)
-        console.log(`payload: ${JSON.stringify(payload)}`)
         try {
             const person = await Person.findById(id)
             if (person.email != user.email) {
@@ -177,6 +175,7 @@ module.exports = function profile(router, path) {
                 res.status(401).send({error: "Not authorized"})
                 return
             }
+            req.log_who = user.username
             log(req, person, payload)
             for(field of modifiable_fields) {
                 if (payload[field] !== undefined) {
@@ -184,10 +183,8 @@ module.exports = function profile(router, path) {
                 }
             }
             await person.save()
-            console.log(`person: ${JSON.stringify(person)}`)
             res.send({})
         } catch(error) {
-            console.log(`error: ${error.message}}`)
             console.error(error)
             res.status(400).send({error: error.message})
         }
