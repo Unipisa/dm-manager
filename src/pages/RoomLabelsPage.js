@@ -157,7 +157,7 @@ function RoomsTable({onClick, onDone, onDelete, data}) {
 
 function RoomLabels({onClick, onDone, onDelete}) {
     const engine = useEngine()
-    const query = engine.useIndex('roomLabel')
+    const query = engine.useIndex('roomLabel',{_sort:"updatedAt", _direction: -1})
 
     let data = []
     if (query.isLoading) return <Loading />

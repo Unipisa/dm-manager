@@ -230,15 +230,19 @@ class Controller {
         path ||= this.path
         Model ||= this.Model
 
+        if (query._direction) {
+            if (query._direction=="1") direction = 1
+            else if (query._direction=="-1") direction = -1
+            else return sendBadRequest(res, `invalid _direction ${query._direction}: 1 or -1 expected`)
+        }
+
         for (let key in query) {
             let value = query[key];
             const key_parts = key.split('__')
             const key0 = key_parts[0]
 
             if (key == '_direction') {
-                if (value=="1") direction = 1
-                else if (value=="-1") direction = -1
-                else return sendBadRequest(res, `invalid _direction ${value}: 1 or -1 expected`)
+                // already processed
             } else if (key == '_limit') {
                 limit = parseInt(value);
                 if (isNaN(limit) || limit < 0) return sendBadRequest(res, `invalid _limit ${value}: positive integer expected`)
