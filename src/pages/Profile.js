@@ -61,6 +61,7 @@ export default function Profile() {
     const getGroups = engine.useGet("profile/group")
     const getVisits = engine.useGet("profile/visit")
     const getGrants = engine.useGet("profile/grant")
+    const getTheses = engine.useGet("profile/thesis")
 
     const User = engine.Models.User
     const Person = engine.Models.Person
@@ -214,6 +215,24 @@ export default function Profile() {
                         {getGrants.data.data.map(grant => <li key={grant._id}>  
                             <b>{grant.name}:</b>
                             {} dal: {myDateFormat(grant.startDate)} al: {myDateFormat(grant.endDate)}
+                        </li>
+                        )}
+                    </ul>
+                </Card.Body>
+            </Card>)
+            : <Loading /> }
+
+        {   getTheses.isSuccess
+            ? (getTheses.data.data.length>0 &&
+            <Card className="mt-2">
+                <Card.Header>
+                    <h3>Tesi</h3>
+                </Card.Header>
+                <Card.Body>
+                    <ul>
+                        {getTheses.data.data.map(thesis => <li key={thesis._id}>
+                            <b>{thesis.person.firstName}, {thesis.person.lastName}:</b>
+                            {} <i>{thesis.title}</i> ({myDateFormat(thesis.date)})
                         </li>
                         )}
                     </ul>
