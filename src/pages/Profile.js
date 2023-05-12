@@ -27,8 +27,8 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
 
     function Field() {
         if (edit) return <>
-            {modified && <Button onClick={submit}>salva</Button>}
-            <Button className="btn-warning" onClick={() => {
+            {modified && <Button className="p-1" onClick={submit}>salva</Button>}
+            <Button className="btn-warning p-1" onClick={() => {
                 setEdit(false)
                 setValue(obj[field])
             }}>annulla</Button>
@@ -36,12 +36,12 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
         </>
         else return <>
             <ModelFieldOutput field={field} schema={field_schema} value={obj[field]} />
-            {editable && <Button className="btn-warning" onClick={() => setEdit(!edit)}>modifica</Button>}
+            {} {editable && <Button className="btn-warning p-1" onClick={() => setEdit(!edit)}>modifica</Button>}
         </>
     }
 
     return <p key={field}>
-        <strong className="align-top">{label}: </strong>
+        <strong>{label}: </strong>
         { Field() }
     </p>
 }
