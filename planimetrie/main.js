@@ -13,7 +13,10 @@ const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 const cube = new THREE.Mesh( geometry, material );
 //scene.add( cube );
 
-camera.position.z = 5;
+camera.position.x = 0;
+camera.position.y = 0;
+camera.position.z = 10;
+camera.lookAt(0, 0, 0);
 
 var loader = new ColladaLoader();
 
@@ -24,9 +27,16 @@ const filename = 'dm.dae'
 loader.load(filename, function(collada){
     dm = collada.scene     
     scene.add(dm);
-    dm.rotation.x = 1.62;
+    dm.position.x = -88;
+    dm.position.y = 20;
+    /*
+    dm.position.x = 20;
+    dm.position.y = 3;
+    dm.position.z = 60;
+    dm.rotation.x = 1.57;
     dm.rotation.y = 0;
-    dm.rotation.z = 4.86;
+    dm.rotation.z = -1.57;
+    */
 });
 
 const light = new THREE.AmbientLight( 0x404040 ); // soft white light
