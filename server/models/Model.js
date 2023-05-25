@@ -9,7 +9,8 @@ const fieldOptionsMapping = {
     can_filter: 'can_filter',
     can_edit_in_profile: 'can_edit_in_profile',
     match_ids: 'match_ids',
-    help: 'help'
+    help: 'help',
+    href: 'href',
 }
   
 config({ fieldOptionsMapping })

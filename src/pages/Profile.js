@@ -134,17 +134,11 @@ export default function Profile() {
                 <h3>Qualifica: {staff.qualification}</h3>
             </Card.Header>
             <Card.Body>
-                {
-                    Object.entries({
-                        matricola: "Matricola",
-                        startDate: "Data inizio",
-                        endDate: "Data fine",
-                        SSD: "SSD",
-                        photoUrl: "Foto",
-                    }).map(([field, label]) =>
-                        <FieldOutput key={field} label={label} field={field} Model={Staff} obj={staff} editable={getStaffs.data.editable_fields.includes(field)} />
-                    )
-                }
+                <FieldOutput field="matricola" label="Matricola" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="startDate" label="Data inizio" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="endDate" label="Data fine" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="SSD" label="SSD" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="photoUrl" label="Foto" Model={Staff} obj={staff} editable={false} />
             </Card.Body>
         </Card>)
         : <Loading />}
