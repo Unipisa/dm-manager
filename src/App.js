@@ -13,6 +13,7 @@ import Header from './components/Header'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import LoginPage from './pages/LoginPage'
+import Map from './pages/Map'
 import Models from './models/Models'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
@@ -43,6 +44,7 @@ function Internal() {
           <Route path="/" element={<Home />} />
           <Route path="/profile" element={<Profile />} />
           {  Object.values(Models).map(x => x.routers()) }
+          <Route path="/map" element={<Map />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Container>
