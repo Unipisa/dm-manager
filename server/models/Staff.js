@@ -52,7 +52,7 @@ module.exports = Staff
 Staff.personStaffPipeline = () => ([
     {$lookup: {
         from: "staffs",
-        let: { start: new Date(), end: new Date() },
+        let: { start: { $toDate: "$$NOW" }, end: { $toDate: "$$NOW" } },
         localField: '_id',
         foreignField: "person",
         as: 'staffs',
