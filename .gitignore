@@ -4,6 +4,7 @@ server/.dotenv
 
 /logs
 /uploads
+/planimetrie
 
 # custom
 /database
