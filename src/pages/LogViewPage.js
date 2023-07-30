@@ -21,9 +21,10 @@ function LogModelView({Model, key}) {
     const obj = useObject()
     const navigate = useNavigate()
     
-    return <Card key={key}>
+    return <>
+        <Card key={key}>
             <Card.Header>
-                <h3>{ `${Model.name} ${Model.describe(obj)}` }</h3>
+                <h3>Log {obj.who} {myDateFormat(obj.when)}</h3>
             </Card.Header>
             <Card.Body>
             <p>
@@ -42,14 +43,14 @@ function LogModelView({Model, key}) {
                 <strong className="align-top">where: </strong>
                 <a href={obj.where}>{ obj.where }</a>
             </p>
-            <p>
+            <div>
                 <strong className="align-top">was: </strong>
-                { JSON.stringify(obj.was) }
-            </p>
-            <p>
+                { renderObject(obj.was) }
+            </div>
+            <div>                
                 <strong className="align-top">will: </strong>
-                { JSON.stringify(obj.will) }
-            </p>
+                { renderObject(obj.will) }
+            </div>
         <ButtonGroup>
             <Button 
                     key='index'
@@ -58,8 +59,61 @@ function LogModelView({Model, key}) {
                         torna all'elenco
             </Button>
         </ButtonGroup>
+        </Card.Body>
+        </Card>
+        <Card className="my-2">
+            <Card.Header>
+                <h3>Raw</h3>
+            </Card.Header>
+            <Card.Body>
+                <pre>{ JSON.stringify(obj, null, 2) }</pre>
             </Card.Body>
-    </Card>
+        </Card>
+    </>
+}
+
+function renderObject(obj) {
+    if (obj === null) return 'null'
+    if (Array.isArray(obj)) {
+        return <>
+            {"["}
+            {obj.map((value, i) => {
+                if (i>0) return <>
+                    {", "}
+                    { renderField(i, value) }
+                </>
+                else return renderField(i, value)
+            })}
+            {"]"}
+        </>
+    }
+    if (typeof(obj) === 'object') {
+        const entries = Object.entries(obj).map(([key, value]) => {
+            return <>
+                <i className="align-top">{key}: </i>
+                <div className="mx-2">
+                    { renderField(key, value) },
+                </div>
+            </>
+        })
+        return <>
+        {"{"}
+        <div>
+            {entries}
+        </div>
+        {"}"}
+        </>
+    }
+    return JSON.stringify(obj)
 }
 
 
+function renderField(field, value) {
+    if (['person','room'].includes(field) && typeof(value) === 'string') {
+        return <a href={`/${field}/${value}`}>{value}</a>
+    }
+    if (['createdBy','updatedBy'].includes(field) && typeof(value) === 'string') {
+        return <a href={`/user/${value}`}>{value}</a>
+    }
+    return renderObject(value)
+}   
