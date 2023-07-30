@@ -25,7 +25,7 @@ module.exports = function profile(router, path) {
         
         const data = (user.email 
             ? await Person.aggregate([
-                { $match: { email: user.email } },
+                { $match: {$or: [{email: user.email }, {alternativeEmails: user.email}] } },
                 { $project: { notes: 0 }},
                 { $lookup: {
                     from: "staffs",

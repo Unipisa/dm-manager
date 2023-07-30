@@ -352,6 +352,14 @@ const migrations = {
         db.collection('theses').createIndex({date: 1})
 
         return true
+    },
+
+    D20230719_fill_person_alternative_emails: async function(db) {
+        const people = db.collection("people")
+        await people.updateMany(
+            { alternativeEmails: { $exists: false }}, 
+            { $set: { alternativeEmails: [] }})
+        return true
     }
 }
 
