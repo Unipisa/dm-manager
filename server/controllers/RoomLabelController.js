@@ -7,6 +7,7 @@ class RoomLabelController extends Controller {
         this.path = 'roomLabel'
         this.managerRoles.push('label-manager')
         this.supervisorRoles.push('label-supervisor', 'label-manager')
+        this.searchFields = ['number', 'names', 'state']
     }
 }
 
