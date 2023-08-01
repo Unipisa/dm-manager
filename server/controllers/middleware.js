@@ -1,8 +1,8 @@
 const Token = require('../models/Token')
 const Log = require('../models/Log')
 
-const log = (req, was, will) => {
-    Log.create({
+const log = async (req, was, will) => {
+    await Log.create({
         who: req.log_who,
         when: new Date(),
         what: req.method,

@@ -489,7 +489,7 @@ class Controller {
 
         try {
             const obj = await this.Model.create(payload)
-            log(req, {}, obj)
+            await log(req, {}, obj)
             this.get(req, res, obj._id)
         } catch(err) {
             console.error(err)
@@ -501,7 +501,7 @@ class Controller {
         console.log(`*** PATCH ${id} ${JSON.stringify(payload)}`)
         try {
             const was = await this.Model.findById(id)
-            log(req, was, payload)
+            await log(req, was, payload)
             was.set({...was, ...payload})
             await was.save()
             res.send(was)
@@ -516,7 +516,7 @@ class Controller {
         console.log(`*** DELETE ${req.path}`)
         try {
             const obj = await this.Model.findById(id)
-            log(req, obj.toObject(), {})
+            await log(req, obj.toObject(), {})
             obj.delete()
             res.send({})
         } catch(err) {
