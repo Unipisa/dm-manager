@@ -1,5 +1,7 @@
 import Model from './Model'
 
+import LogViewPage from '../pages/LogViewPage'
+
 export default class Log extends Model {
     constructor() {
         super()
@@ -23,6 +25,7 @@ export default class Log extends Model {
             'will': {label: "info", render: obj => JSON.stringify(obj.will||obj.was)},
         }
         this.indexDefaultFilter = {_limit: 10, _sort: '-when'}
+        this.ViewPage = LogViewPage
     }
 
     describe(obj) { return `<log>` }

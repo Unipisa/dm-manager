@@ -25,7 +25,7 @@ module.exports = function profile(router, path) {
         
         const data = (user.email 
             ? await Person.aggregate([
-                { $match: { email: user.email } },
+                { $match: {$or: [{email: user.email }, {alternativeEmails: user.email}] } },
                 { $project: { notes: 0 }},
                 { $lookup: {
                     from: "staffs",
@@ -204,13 +204,13 @@ module.exports = function profile(router, path) {
         const payload = req.body
         try {
             const person = await Person.findById(id)
-            if (person.email != user.email) {
+            if (person.email != user.email && !person.alternativeEmails.includes(user.email)) {
                 // not authorized
                 res.status(401).send({error: "Not authorized"})
                 return
             }
             req.log_who = user.username
-            log(req, person, payload)
+            await log(req, person, payload)
             for(field of modifiable_fields) {
                 if (payload[field] !== undefined) {
                     person[field] = payload[field]

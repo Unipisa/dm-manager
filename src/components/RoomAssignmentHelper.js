@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button } from 'react-bootstrap'
 
-import { myDateFormat, useEngine, minDate, maxDate } from '../Engine'
+import { myDateFormat, useEngine, minDate, maxDate, notNullEndDate, notNullStartDate } from '../Engine'
 import Loading from './Loading'
 
 function RoomListing({rooms, createAssignment}) {
@@ -58,6 +58,7 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
     const assignmentsQuery = engine.useIndex('roomAssignment', filter)
     const roomsQuery = engine.useIndex('room', {})
     const putRoomAssignment = engine.usePut('roomAssignment')
+    const patchRoomAssignment = engine.usePatch('roomAssignment')
     const deleteRoomAssignment = engine.useDelete('roomAssignment')
     if (!(assignmentsQuery.isSuccess && roomsQuery.isSuccess)) return <Loading />
     const rooms = roomsQuery.data.data
@@ -154,22 +155,20 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
             <li key={assignment._id}>
                 {} in <a href={`/room/${assignment.room._id}`}>{assignment.room.code}</a> 
                 {} assegnazione <a href={`/roomassignment/${assignment._id}`}>{myDateFormat(assignment.startDate)}-{myDateFormat(assignment.endDate)}</a>
-                {} <Button className='mb-1' size='sm' variant='danger' onClick={() => deleteRoomAssignment(assignment)}>rimuovi</Button>
+                { notNullStartDate(assignment.startDate) < notNullStartDate(startDate) && 
+                    <Button className='m-1' onClick={() => patchRoomAssignment({_id: assignment._id, startDate})}>
+                        metti data inizio {myDateFormat(startDate)}
+                    </Button>}
+                { notNullEndDate(assignment.endDate)>notNullEndDate(endDate) && 
+                    <Button className='m-1' onClick={() => patchRoomAssignment({_id: assignment._id, endDate})}>
+                        metti data fine {myDateFormat(endDate)}
+                    </Button>}
+                {} <Button className='m-1' size='sm' variant='danger' onClick={() => deleteRoomAssignment(assignment)}>
+                        rimuovi
+                    </Button>
             </li>)}
         </ul>
         <RoomListing rooms={rooms} createAssignment={createAssignment} />
     </>
 }
-/*
-export default function RoomAssignmentHelper({ person, startDate, endDate }) {
-    return <Card className='mt-3'>
-        <Card.Header>
-            <h4>Assegnazione stanza {person.lastName} {person.firstName}</h4>
-            <h5>{myDateFormat(startDate)}-{myDateFormat(endDate)}</h5>
-        </Card.Header>
-        <Card.Body>
-            <RoomAssignmentHelperBody person={person} startDate={startDate} endDate={endDate} />
-        </Card.Body>
-    </Card>
-}
-*/
+

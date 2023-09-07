@@ -16,6 +16,7 @@ const personSchema = new Schema({
         can_edit_in_profile: true,
     },
     email: {type: String, label: 'email'}, 
+    alternativeEmails: {type: [String], label:'alternative emails', widget: 'list'},
     phone: {type: String, label: 'telefono', can_edit_in_profile: true}, 
     personalPage: {type: String, label: 'URL pagina personale', widget: 'url', can_edit_in_profile: true},
     orcid: {type: String, label: 'orcid', can_edit_in_profile: true, href: 'https://orcid.org/{}'},

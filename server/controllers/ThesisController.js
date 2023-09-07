@@ -7,7 +7,7 @@ class ThesisController extends Controller {
         this.path = 'thesis'
         this.managerRoles.push('thesis-manager')
         this.supervisorRoles.push('thesis-manager', 'thesis-supervisor')
-        this.searchFields = ['title', 'person.lastName', 'supervisors.lastName']
+        this.searchFields = ['title', 'person.lastName', 'advisors.lastName']
     }
 }
 
