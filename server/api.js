@@ -23,7 +23,8 @@ let ModelSchemas = {}
     require('./controllers/LogController'),
     require('./controllers/FormController'),
     require('./controllers/ThesisController'),
-    require('./controllers/UploadController')
+    require('./controllers/UploadController'),
+    require('./controllers/EventController')
 ].forEach(Controller => {
     const controller = new Controller()
     if (controller.getSchema) {

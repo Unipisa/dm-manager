@@ -3,6 +3,7 @@ import RoomLabel from './RoomLabel'
 import Room from './Room'
 import RoomAssignment from './RoomAssignment'
 import Visit from './Visit'
+import Event from './Event'
 import Person from './Person'
 import Institution from './Institution'
 import User from './User'
@@ -37,6 +38,8 @@ const Models = {
 
     // altro:
     Form: new Form(),
+
+    Event: new Event(),
 }
 
 export default Models
