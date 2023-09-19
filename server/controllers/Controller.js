@@ -453,7 +453,7 @@ class Controller {
             console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
             let obj = await this.Model
                 .aggregate(pipeline)
-            if (obj === []) {
+            if (obj.length === 0) {
                 return res.status(404).send({error: `not found ${id}`})
             }
             if (obj.length > 1) {
