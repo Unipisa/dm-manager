@@ -14,10 +14,20 @@ export default function FormViewPage() {
     const Form = engine.Models.Form
 
     return <ObjectProvider path={Form.code} id={id}>
+        <FormViewPageInner/>
+    </ObjectProvider>
+}
+
+function FormViewPageInner({}) {
+    const engine = useEngine()
+    const Form = engine.Models.Form
+    const form = useObject()
+    const fillUrl = form.requireAuthentication ? `/fill/${form._id}` : `/pub/fill/${form._id}`
+    return <>
         <ModelView Model={Form} buttons={[
             'edit', 
             'clone', 
-            <Link key='fill' className='btn btn-success' to={`/fill/${id}`}>compila</Link>,
+            <Link key='fill' className='btn btn-success' to={fillUrl}>compila</Link>,
             'index'
             ]} />
         <Tabs className='my-2'>
@@ -28,8 +38,9 @@ export default function FormViewPage() {
                 <FormDataView />
             </Tab>
         </Tabs>
-    </ObjectProvider>
+    </>
 }
+
 
 function FormDataView() {
     const engine = useEngine()
