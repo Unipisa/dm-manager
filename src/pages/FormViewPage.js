@@ -18,7 +18,7 @@ export default function FormViewPage() {
     </ObjectProvider>
 }
 
-function FormViewPageInner({}) {
+function FormViewPageInner() {
     const engine = useEngine()
     const Form = engine.Models.Form
     const form = useObject()
