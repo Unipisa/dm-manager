@@ -118,6 +118,7 @@ class FormController extends Controller {
                 }
             },
             Model: FormData,
+            searchFields: ['email', 'firstName', 'lastName'],
         })   
     }
 
