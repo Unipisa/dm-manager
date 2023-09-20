@@ -1,12 +1,19 @@
 import { useCallback, useRef, useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
+import { CSVLink, CSVDownload } from "react-csv"
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import Loading from './Loading'
 
-export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns}) {
-    const engine = useEngine()
+const csvData = [
+    ["firstname", "lastname", "email"],
+    ["Ahmed", "Tomi", "ah@smthing.co.com"],
+    ["Raed", "Labes", "rl@smthing.co.com"],
+    ["Yezzi", "Min l3b", "ymin@cocococo.com"]
+  ]
+
+export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders}) {    const engine = useEngine()
     const filter = useQueryFilter(defaultFilter || {})
     const query = engine.useIndex(path, filter.filter)
     const navigate = useNavigate()
@@ -23,6 +30,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         [key, label]) => (typeof label === 'string') 
             ? [key, {label}]
             : [key, label]))
+    csvHeaders ||= fieldsInfo ? computeCsvHeaders(fieldsInfo): undefined
     /*
      * infite loop!
     useEffect(() => {
@@ -85,6 +93,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
+                <CSVLink data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
                 { addButton }
             </div>            
             <div className="d-flex mb-4">
@@ -156,4 +165,21 @@ export function Th({ filter, children }) {
     return <th scope="col" onClick={ filter.onClick }>
         {children}{filter.sortIcon}
     </th>
+}
+
+function computeCsvHeaders(fieldsInfo) {
+    console.log(`computeCsvHeaders: ${JSON.stringify(fieldsInfo)}`)
+    let headers = []
+    for (const [key, field] of Object.entries(fieldsInfo)) {
+        if (field['x-ref'] === 'Person') {
+            headers.push(`${key}.lastName`)
+            headers.push(`${key}.firstName`)
+        } else if (field['x-ref'] === 'Institution') {
+            headers.push(`${key}.name`)
+        } else {
+            headers.push(key)
+        }
+    }
+    console.log()
+    return headers
 }

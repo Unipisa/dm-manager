@@ -47,8 +47,10 @@ function FormDataView() {
     const form = useObject()
     const Form = engine.Models.Form
 
-    return <LoadTable 
-        path={`${Form.code}/${form._id}/data`}
-        columns={['createdAt', 'email', 'firstName', 'lastName', 'data']}
-    />
+    return <>
+        <LoadTable 
+            path={`${Form.code}/${form._id}/data`}
+            columns={['createdAt', 'email', 'firstName', 'lastName', 'data']}
+        />
+    </>
 }
