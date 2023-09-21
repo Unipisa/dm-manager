@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Route, useParams, useSearchParams, Navigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { Button, ButtonGroup, Card, Form } from 'react-bootstrap'
+import { Button, ButtonGroup, Card, Container, Form, Table } from 'react-bootstrap'
 
 import ModelsPage from '../pages/ModelsPage'
 import ModelViewPage from '../pages/ModelViewPage'
@@ -10,7 +10,7 @@ import ModelViewPage from '../pages/ModelViewPage'
 import Loading from '../components/Loading'
 import { useEngine } from '../Engine'
 import { ModelHeading } from '../components/ModelHeading'
-import { StringInput, TextInput } from '../components/Input'
+import { PersonInput, StringInput, TextInput } from '../components/Input'
 
 const compareValue = (v1, v2) => {
     // capita di confrontare una stringa con una data
@@ -22,6 +22,22 @@ const compareValue = (v1, v2) => {
     }
     if (typeof(v1) === 'object') return (v1?._id && v1?._id === v2?._id)
     return v1 === v2
+}
+
+const withProps = (modifiedObj, setModifiedObj, Component, field) => {
+    const value = modifiedObj[field]
+    const setValue = value => {
+        setModifiedObj(obj => {
+            console.log(obj)
+
+            return {
+                ...obj,
+                [field]: value,
+            }
+        })
+    }
+
+    return ({}) => <Component id={field} value={value} setValue={setValue} />
 }
 
 const EditPage = ({ Model }) => {
@@ -59,6 +75,9 @@ const EditPage = ({ Model }) => {
         .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
     const changed = modifiedFields.length > 0
 
+    const TitleField = withProps(modifiedObj, setModifiedObj, StringInput, 'title')
+    const LecturerField = withProps(modifiedObj, setModifiedObj, PersonInput, 'lecturer')
+
     return (
         <>
             <ModelHeading model={Model}/>
@@ -73,15 +92,54 @@ const EditPage = ({ Model }) => {
                 <Card.Body>
                     <Form onSubmit={e => e.preventDefault()}>
                         <Form.Group className="row my-2">
-                        <Form.Label className="col-sm-2 " htmlFor={"title"} style={{textAlign: "right"}}>
-                            Titolo
-                        </Form.Label>
-                        <div className="col-sm-10">
-                            <StringInput id="title" />                     
-                        </div>
-                        <div className="col-sm-2"></div>
-                        <div className="col-sm-10 form-text">Help text</div>
-                    </Form.Group>
+                            <Form.Label className="col-sm-2" htmlFor={"title"} style={{textAlign: "right"}}>
+                                Titolo
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <StringInput 
+                                    id="title"
+                                    value={modifiedObj.title}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            title: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2" htmlFor={"lecturer"} style={{textAlign: "right"}}>
+                                Docente
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <PersonInput 
+                                    id="lecturer"
+                                    value={modifiedObj.lecturer}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            lecturer: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2" htmlFor={"lecturer"} style={{textAlign: "right"}}>
+                                Lezioni
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <Button className="offset-sm-10 col-sm-2 btn-primary">
+                                    Nuova Lezione
+                                </Button>
+                                <Container>
+                                    Tabella degli orari...
+                                </Container>
+                            </div>
+                        </Form.Group>
                         <ButtonGroup className="mt-3">
                             <Button 
                                 className="btn-primary"
