@@ -4,6 +4,7 @@ import { Button, Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
 import { useObject, ObjectProvider } from '../components/ObjectProvider'
+import LoginPage from './LoginPage'
 
 export default function FormFillPage({enabled = true, showData = false}) {
     const id = useParams().id
@@ -17,15 +18,20 @@ export function FormFillPageInner({enabled, showData}) {
     const engine = useEngine()
     const user = engine.user
     const vars = {
-        email: user.email,
-        username: user.username,
-        lastName: user.lastName,
-        firstName: user.firstName,
+        email: user?.email,
+        username: user?.username,
+        lastName: user?.lastName,
+        firstName: user?.firstName,
     }
     const [data, setData] = useState({})
     const form = useObject()
     const [thanks, setThanks] = useState(false)
-    const put = engine.usePut(`fill/${form._id}`)
+    const putUrl = `/fill/${form._id}`
+    const put = engine.usePut(putUrl)
+
+    if (!user && form.requireAutentication) {
+        return <LoginPage engine={engine}/>
+    }
 
     async function submit() {
         if (!enabled) {

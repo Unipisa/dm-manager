@@ -38,7 +38,10 @@ export default class Form extends Model {
     routers() {
         return [
             ...super.routers(),
-            <Route path={`/fill/:id`} element={<FormFillPage />} />
+            <Route path={`/fill/:id`} element={<FormFillPage />} />,
+            // la seguente route è pubblica, affinché ci si entri senza login
+            // è duplicata in App.js
+            <Route path={`/pub/fill/:id`} element={<FormFillPage />} />,  
         ]
     }
 }
