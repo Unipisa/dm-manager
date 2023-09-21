@@ -72,18 +72,21 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
 }
 
 export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
-    let lst = []
-    for (let [field, field_schema] of Object.entries(schema)) {
-        if (RESERVED_FIELDS.includes(field)) continue
-
-        const setValue = value => {
-            if (onChange && onChange(field, value)) return
-            setObj(obj => ({...obj, [field]: value}))
-        }
-        const modified = modifiedFields.includes(field)
-        lst.push(<ModelInput modified={modified} key={field} field={field} schema={field_schema} value={obj[field]} setValue={setValue} edit={true} />)
-    }        
-    return lst
+    return Object.entries(schema)
+        .filter(([field]) => !RESERVED_FIELDS.includes(field))
+        .map(([field, field_schema]) => (
+            <ModelInput 
+                modified={modifiedFields.includes(field)}
+                key={field}
+                field={field}
+                schema={field_schema}
+                value={obj[field]}
+                setValue={value => {
+                    if (onChange?.(field, value)) return
+                    setObj(obj => ({...obj, [field]: value}))
+                }}
+                edit={true} />
+        ))
 }
 
 export function emptyObject(Model) {

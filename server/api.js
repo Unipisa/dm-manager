@@ -1,9 +1,9 @@
-var express = require('express')
+const express = require('express')
 
 const config = require('./config')
 const profile = require('./controllers/profile')
 
-var router = express.Router()
+const router = express.Router()
 
 let paths = []
 let ModelSchemas = {}

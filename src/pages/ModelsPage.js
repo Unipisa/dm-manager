@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
 import LoadTable from '../components/LoadTable'
+import { ModelHeading } from '../components/ModelHeading'
 
 export default function ModelsPage({ Model, columns }) {
     const engine = useEngine()
@@ -10,6 +11,7 @@ export default function ModelsPage({ Model, columns }) {
         ? <Link className="mx-2 btn btn-primary text-nowrap" to={Model.editUrl('new')}>aggiungi {Model.name}</Link>
         : null
     return <>
+        <ModelHeading model={Model} />
         <LoadTable 
             path={Model.code}
             defaultFilter={Model.indexDefaultFilter || {}}

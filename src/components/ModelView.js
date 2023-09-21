@@ -5,49 +5,52 @@ import { ModelOutputs } from './ModelOutput'
 import { useObject } from './ObjectProvider'
 import Timestamps from './Timestamps'
 
+export default function ModelView({ Model, buttons, key }) {
+    buttons ??= ['edit', 'clone', 'index']
 
-export default function ModelView({Model, buttons, key}) {
+    const buttonComponents = {
+        edit: () => (
+            <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
+                modifica
+            </Button>
+        ),
+        clone: () => (
+            <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('new')}?clone=${obj._id}`)}>
+                duplica
+            </Button>
+        ),
+        index: () => (
+            <Button key='index' className="btn btn-secondary" onClick={() => navigate(Model.indexUrl())}>
+                torna all'elenco
+            </Button>
+        ),
+    }
+    
     const obj = useObject()
     const navigate = useNavigate()
-    if (!buttons) buttons = ['edit', 'clone', 'index']
 
-    buttons = buttons.map(button => {
-        switch(button) {
-            case 'edit': return <Button 
-                    key='edit'
-                    onClick={ () => navigate('edit') }
-                    className="btn-warning">
-                    modifica
-                </Button>
-            case 'clone': return <Button
-                    key='clone'
-                    onClick={ () => navigate(`${Model.editUrl('new')}?clone=${obj._id}`) }
-                    className="btn-primary">
-                    duplica
-                </Button>
-            case 'index': return <Button 
-                    key='index'
-                    onClick={ () => navigate(Model.indexUrl()) }
-                    className="btn btn-secondary">
-                        torna all'elenco
-                </Button>
-            default: return button
-        }
-    })
-
-    return <Card key={key}>
+    return (
+        <Card key={key}>
             <Card.Header>
                 <h3>{ `${Model.name} ${Model.describe(obj)}` }</h3>
             </Card.Header>
             <Card.Body>
-        <ModelOutputs 
-                Model={Model} 
-                obj={obj} 
-            />
-        <ButtonGroup>{buttons}</ButtonGroup>
+                <ModelOutputs Model={Model} obj={obj} />
+                <ButtonGroup>
+                    {buttons.map(buttonNameOrCustom => {
+                        if (buttonComponents[buttonNameOrCustom]) {
+                            // render button component
+                            return buttonComponents[buttonNameOrCustom]()
+                        } else {
+                            // fallback
+                            return buttonNameOrCustom
+                        }
+                    })}
+                </ButtonGroup>
             </Card.Body>
             <Card.Footer>
                 <Timestamps obj={obj} />
             </Card.Footer>
-    </Card>
+        </Card>
+    )
 }

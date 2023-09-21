@@ -55,16 +55,17 @@ export function ModelFieldOutput({ field, schema, value }) {
     }
 }
 
-export function ModelOutputs({ Model, obj}) {
-    let lst = []
-    const schema = Model.schema.fields
-    for (let [field, field_schema] of Object.entries(schema)) {
-        if (RESERVED_FIELDS.includes(field)) continue
-        const label = field_schema.items?.label || field_schema.label || field
-        lst.push(<p key={field}>
-            <strong className="align-top">{label}: </strong>
-            <ModelFieldOutput key={field} field={field} schema={field_schema} value={obj[field]} />
-        </p>)
-    }        
-    return lst
+export function ModelOutputs({ Model, obj }) {
+    return (
+        <>
+            {Object.entries(Model.schema.fields)
+                .filter(([field]) => !RESERVED_FIELDS.includes(field))
+                .map(([field, field_schema]) => (
+                    <p key={field}>
+                        <strong className="align-top">{field_schema.items?.label || field_schema.label || field}: </strong>
+                        <ModelFieldOutput key={field} field={field} schema={field_schema} value={obj[field]} />
+                    </p>
+                ))}
+        </>
+    )
 }

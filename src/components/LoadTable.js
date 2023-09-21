@@ -56,7 +56,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         }))
     }
 
-    function handleMouseDown(evt, obj) {
+    function handleRowClick(evt, obj) {
         function openInNewTab(obj) {
             // It is currently unclear if this can be handled with React router
             // directly, or we can simply call window.open.
@@ -94,7 +94,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                     </>
                     : `usa ctrl-click per selezionare una riga` && ''}
             </div>
-            <Table hover>
+            <Table className="model-table" hover>
                 <thead className="thead-dark">
                     <tr>
                         {
@@ -105,11 +105,12 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                 </thead>
                 <tbody>
                     { data.map(obj => 
-                        <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onMouseDown={evt => handleMouseDown(evt, obj)} >
-                            {
-                                Object.entries(columns).map(([key, opts]) =>
-                                <td key={key}>{ opts.render ? opts.render(obj) : displayField(obj, key, fieldsInfo) }</td>)
-                            }
+                        <tr className={selectedIds.includes(obj._id)?"bg-warning":""} key={obj._id} onClick={evt => handleRowClick(evt, obj)} >
+                            {Object.entries(columns).map(([key, opts]) => (
+                                <td key={key}>
+                                    { opts.render ? opts.render(obj) : displayField(obj, key, fieldsInfo) }
+                                </td>
+                            ))}
                         </tr>)}
                 </tbody>
             </Table>

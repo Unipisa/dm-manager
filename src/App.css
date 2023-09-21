@@ -9,3 +9,13 @@
 a {
   text-decoration: none;
 }
+
+/* Model Table */
+.model-table {
+  user-select: none;
+}
+
+/* Model Table Links  */
+.model-table>tbody>tr {
+  cursor: pointer;
+}
