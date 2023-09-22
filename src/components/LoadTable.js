@@ -1,17 +1,10 @@
 import { useCallback, useRef, useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { CSVLink, CSVDownload } from "react-csv"
+import { CSVLink } from "react-csv"
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import Loading from './Loading'
-
-const csvData = [
-    ["firstname", "lastname", "email"],
-    ["Ahmed", "Tomi", "ah@smthing.co.com"],
-    ["Raed", "Labes", "rl@smthing.co.com"],
-    ["Yezzi", "Min l3b", "ymin@cocococo.com"]
-  ]
 
 export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders}) {    const engine = useEngine()
     const filter = useQueryFilter(defaultFilter || {})
@@ -167,7 +160,7 @@ export function Th({ filter, children }) {
     </th>
 }
 
-function computeCsvHeaders(fieldsInfo) {
+export function computeCsvHeaders(fieldsInfo) {
     console.log(`computeCsvHeaders: ${JSON.stringify(fieldsInfo)}`)
     let headers = []
     for (const [key, field] of Object.entries(fieldsInfo)) {
