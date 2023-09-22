@@ -6,6 +6,7 @@ import ModelView from '../components/ModelView'
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
 import { FormFillPageInner } from './FormFillPage'
 import LoadTable from '../components/LoadTable'
+import { extractFieldNames } from './FormFillPage'
 
 export default function FormViewPage() {
     const params = useParams()
@@ -41,14 +42,23 @@ function FormViewPageInner() {
     </>
 }
 
-
 function FormDataView() {
     const engine = useEngine()
     const form = useObject()
     const Form = engine.Models.Form
+    const authColumns = form.requireAuthentication ? ['email', 'firstName', 'lastName'] : []
+    const columns = ['createdAt', ...authColumns, 'data']
+    const csvHeaders = [
+        'createdAt', 
+        ...authColumns,
+        ...extractFieldNames(form.text).map(name => `data.${name}`)
+    ]
 
-    return <LoadTable 
-        path={`${Form.code}/${form._id}/data`}
-        columns={['createdAt', 'email', 'firstName', 'lastName', 'data']}
-    />
+    return <>
+        <LoadTable 
+            path={`${Form.code}/${form._id}/data`}
+            columns={columns}
+            csvHeaders={csvHeaders}
+        />
+    </>
 }

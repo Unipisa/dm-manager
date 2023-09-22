@@ -88,6 +88,28 @@ export function FormFillPageInner({enabled, showData}) {
 
 }
 
+export function extractFieldNames(text) {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(text, 'text/html')
+    return extractFieldNamesFromElement(doc.body)
+}
+
+function extractFieldNamesFromElement(el) {
+    const nodeName = el.nodeName.toLowerCase()
+    if (nodeName === '#text') return []
+    let names = []
+
+    if (nodeName === 'input') names.push(el.name)
+    if (nodeName === 'select') names.push(el.name)
+    if (nodeName === 'textarea') names.push(el.name)
+    
+    ;[...el.childNodes].forEach(child => {
+            names = [...names, ...extractFieldNamesFromElement(child)]
+        })
+
+    return names
+}
+
 function RenderHtml({text, vars, data, setData}) {
     const parser = new DOMParser()
     const doc = parser.parseFromString(text, 'text/html')
@@ -176,7 +198,6 @@ function RenderTextarea({el, data, setData}) {
         className="form form-control"
         name={name}
         onChange={ evt => setData(data => ({
-            ...data, [name]: evt.target.value}))}>
-        {value}
-    </textarea>
+            ...data, [name]: evt.target.value}))} value={value} />
 }
+
