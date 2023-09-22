@@ -85,8 +85,8 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
     return <>
         <div>
             <div className="d-flex mb-4">
-                <input onChange={updateFilter} className="form-control" placeholder="Search..."></input>
-                <CSVLink data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
+                <input onChange={updateFilter} className="mx-1 form-control" placeholder="Search..."></input>
+                <CSVLink className="btn btn-primary mx-1" data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
                 { addButton }
             </div>            
             <div className="d-flex mb-4">
