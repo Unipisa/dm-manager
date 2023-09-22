@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
-import { Route, useParams, useSearchParams, Navigate } from 'react-router-dom'
+import { Route, useParams, Navigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { Button, ButtonGroup, Card, Container, Form, Table } from 'react-bootstrap'
+import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 
 import ModelsPage from '../pages/ModelsPage'
 import ModelViewPage from '../pages/ModelViewPage'
@@ -10,7 +10,7 @@ import ModelViewPage from '../pages/ModelViewPage'
 import Loading from '../components/Loading'
 import { useEngine } from '../Engine'
 import { ModelHeading } from '../components/ModelHeading'
-import { PersonInput, StringInput, TextInput } from '../components/Input'
+import { PersonInput, StringInput } from '../components/Input'
 
 const compareValue = (v1, v2) => {
     // capita di confrontare una stringa con una data
@@ -24,30 +24,14 @@ const compareValue = (v1, v2) => {
     return v1 === v2
 }
 
-const withProps = (modifiedObj, setModifiedObj, Component, field) => {
-    const value = modifiedObj[field]
-    const setValue = value => {
-        setModifiedObj(obj => {
-            console.log(obj)
-
-            return {
-                ...obj,
-                [field]: value,
-            }
-        })
-    }
-
-    return ({}) => <Component id={field} value={value} setValue={setValue} />
-}
-
 const EditPage = ({ Model }) => {
     const params = useParams()
     const id = params.id
     
-    const [searchParams] = useSearchParams()
-    const clone_id = searchParams.get('clone')
+    // const [searchParams] = useSearchParams()
+    // const clone_id = searchParams.get('clone')
     
-    const [ redirect, setRedirect ] = useState(null)
+    const [ redirect ] = useState(null)
 
     const create = id === 'new'
     const [modifiedObj, setModifiedObj] = useState(null)
@@ -75,8 +59,8 @@ const EditPage = ({ Model }) => {
         .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
     const changed = modifiedFields.length > 0
 
-    const TitleField = withProps(modifiedObj, setModifiedObj, StringInput, 'title')
-    const LecturerField = withProps(modifiedObj, setModifiedObj, PersonInput, 'lecturer')
+    // const TitleField = withProps(modifiedObj, setModifiedObj, StringInput, 'title')
+    // const LecturerField = withProps(modifiedObj, setModifiedObj, PersonInput, 'lecturer')
 
     return (
         <>
