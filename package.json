@@ -19,7 +19,7 @@
     "express-session": "^1.17.3",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
-    "mongoose": "^6.5.2",
+    "mongoose": "^6.12.0",
     "mongoose-permissions": "^1.0.0",
     "mongoose-schema-jsonschema": "^2.0.2",
     "morgan": "^1.10.0",
