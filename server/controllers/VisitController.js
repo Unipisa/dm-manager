@@ -8,7 +8,7 @@ class VisitController extends Controller {
         this.path = 'visit'
         this.managerRoles.push('visit-manager')
         this.supervisorRoles.push('visit-manager', 'visit-supervisor')
-        this.searchFields = [ 'person.lastName', 'person.firstName', 'affiliations.name' ]
+        this.searchFields = [ 'person.lastName', 'person.firstName', 'affiliations.name', 'grants' ]
 
         // inserisce tutte le assegnazioni
         // stanze
