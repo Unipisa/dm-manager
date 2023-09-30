@@ -1,150 +1,17 @@
-import { useEffect, useState } from 'react'
-import { Route, useParams, Navigate } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import { Link } from 'react-router-dom'
-import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 
 import ModelsPage from '../pages/ModelsPage'
-import ModelViewPage from '../pages/ModelViewPage'
+import PhdCourseEditPage from '../pages/PhdCourseEditPage'
+import PhdCourseViewPage from '../pages/PhdCourseViewPage'
 
-
-import Loading from '../components/Loading'
-import { useEngine } from '../Engine'
-import { ModelHeading } from '../components/ModelHeading'
-import { PersonInput, StringInput } from '../components/Input'
-
-const compareValue = (v1, v2) => {
-    // capita di confrontare una stringa con una data
-    if (JSON.stringify(v1) === JSON.stringify(v2)) return true
-    if (typeof(v1) !== typeof(v2)) return false
-    if (Array.isArray(v1)) {
-        if (v1.length !== v2.length) return false
-        return v1.every((v, i) => compareValue(v, v2[i]))
-    }
-    if (typeof(v1) === 'object') return (v1?._id && v1?._id === v2?._id)
-    return v1 === v2
-}
-
-const EditPage = ({ Model }) => {
-    const params = useParams()
-    const id = params.id
-    
-    // const [searchParams] = useSearchParams()
-    // const clone_id = searchParams.get('clone')
-    
-    const [ redirect ] = useState(null)
-
-    const create = id === 'new'
-    const [modifiedObj, setModifiedObj] = useState(null)
-    const engine = useEngine()
-    // const putObj = engine.usePut(objCode)
-    // const patchObj = engine.usePatch(objCode)
-    // const engineDeleteObj = engine.useDelete(objCode)
-
-    const { status, data } = engine.useGet(Model.code, id)
-    
-    useEffect(() => {
-        if (status === "success") {
-            setModifiedObj(data)
-        }
-    }, [status, data])
-
-    if (redirect !== null) return <Navigate to={redirect} />
-
-    if (status === "error") return <div>errore caricamento</div>
-    if (status === "loading") return <Loading />
-    if (modifiedObj === null) return <Loading />
-
-    const originalObj = data
-    const modifiedFields = Object.keys(modifiedObj)
-        .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
-    const changed = modifiedFields.length > 0
-
-    // const TitleField = withProps(modifiedObj, setModifiedObj, StringInput, 'title')
-    // const LecturerField = withProps(modifiedObj, setModifiedObj, PersonInput, 'lecturer')
-
-    return (
-        <>
-            <ModelHeading model={Model}/>
-            <Card>
-                <Card.Header>
-                    <h3>
-                        {create 
-                            ? "Nuovo Corso di Dottorato" 
-                            : `Modifica Corso di Dottorato ${Model.describe(modifiedObj)}`}
-                    </h3>
-                </Card.Header>
-                <Card.Body>
-                    <Form onSubmit={e => e.preventDefault()}>
-                        <Form.Group className="row my-2">
-                            <Form.Label className="col-sm-2" htmlFor={"title"} style={{textAlign: "right"}}>
-                                Titolo
-                            </Form.Label>
-                            <div className="col-sm-10">
-                                <StringInput 
-                                    id="title"
-                                    value={modifiedObj.title}
-                                    setValue={value => {
-                                        setModifiedObj(obj => ({
-                                            ...obj,
-                                            title: value,
-                                        }))
-                                    }}
-                                />
-                            </div>
-                            <div className="col-sm-2"></div>
-                        </Form.Group>
-                        <Form.Group className="row my-2">
-                            <Form.Label className="col-sm-2" htmlFor={"lecturer"} style={{textAlign: "right"}}>
-                                Docente
-                            </Form.Label>
-                            <div className="col-sm-10">
-                                <PersonInput 
-                                    id="lecturer"
-                                    value={modifiedObj.lecturer}
-                                    setValue={value => {
-                                        setModifiedObj(obj => ({
-                                            ...obj,
-                                            lecturer: value,
-                                        }))
-                                    }}
-                                />
-                            </div>
-                            <div className="col-sm-2"></div>
-                        </Form.Group>
-                        <Form.Group className="row my-2">
-                            <Form.Label className="col-sm-2" htmlFor={"lecturer"} style={{textAlign: "right"}}>
-                                Lezioni
-                            </Form.Label>
-                            <div className="col-sm-10">
-                                <Button className="offset-sm-10 col-sm-2 btn-primary">
-                                    Nuova Lezione
-                                </Button>
-                                <Container>
-                                    Tabella degli orari...
-                                </Container>
-                            </div>
-                        </Form.Group>
-                        <ButtonGroup className="mt-3">
-                            <Button 
-                                className="btn-primary"
-                                disabled= { !changed }>
-                                {create ? "Aggiungi Corso di Dottorato" : "Salva Modifiche"}
-                            </Button>
-                            <Button className="btn btn-secondary">
-                                Annulla Modifiche
-                            </Button>
-                            {!create && (
-                                <Button className="btn btn-danger pull-right">
-                                    Elimina {Model.describe(modifiedObj)}
-                                </Button>
-                            )}
-                        </ButtonGroup>
-                    </Form>
-                </Card.Body>
-            </Card>
-        </>     
-    )
-}
+/**
+ * @typedef {{ 
+ *      date: Date, 
+ *      duration: number, 
+ *      room: Room
+ *  }} Lesson
+ */
 
 export default class EventPhdCourse {
     constructor() {
@@ -169,8 +36,8 @@ export default class EventPhdCourse {
         this.schema = null
 
         this.IndexPage = ModelsPage
-        this.ViewPage = ModelViewPage
-        this.EditPage = EditPage
+        this.ViewPage = PhdCourseViewPage
+        this.EditPage = PhdCourseEditPage
     }
 
     // absolute url of objects index

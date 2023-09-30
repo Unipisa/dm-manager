@@ -73,7 +73,7 @@ const EventColloquium = model('EventColloquium', eventColloquiumSchema)
 // Corso di Dottorato
 // 
 
-const lectureDateSchema = new Schema({
+const lessonSchema = new Schema({
     date: { type: Date, label: 'data e orario', required: true },
     duration: { type: Number, label: 'durata (in minuti)', default: 120, required: true },
     room: { type: ObjectId, label: 'aula', ref: 'Room', required: true },
@@ -82,7 +82,7 @@ const lectureDateSchema = new Schema({
 const eventPhdCourseSchema = new Schema({
     title:  {type: String, label: 'titolo'},
     lecturer: { type: ObjectId, label: 'lecturer', ref: 'Person', required: true },
-    lectureDates: [lectureDateSchema],
+    lessons: [lessonSchema],
     
     createdBy,
     updatedBy,
