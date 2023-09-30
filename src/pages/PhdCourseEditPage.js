@@ -156,7 +156,7 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     )
 }
 
-export default ({ Model }) => {
+export default function PhdCourseEditPage({ Model }) {
     const params = useParams()
     const id = params.id
     
@@ -185,7 +185,7 @@ export default ({ Model }) => {
                 setModifiedObj(data)
             }
         }
-    }, [status, cloneStatus, data])
+    }, [clone_id, status, cloneStatus, data, cloneData])
 
     const [showGenerateLessonForm, setShowGenerateLessonForm] = useState(false)
 
