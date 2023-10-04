@@ -214,9 +214,9 @@ const migrations = {
             const gene_id = url.split('id=')[1]
 
             const person = await people.findOne({ genealogyId: gene_id })
-            console.log(`person: ${person._id} ${person.firstName} ${person.lastName}`)
+            console.log(`person: ${person?._id} ${person?.firstName} ${person?.lastName}`)
             // find all thesis with missing or empty affiliation
-            const thesis = await theses.findOne({ person: person._id })
+            const thesis = await theses.findOne({ person: person?._id })
             if (!thesis) continue
             console.log(`setting affiliation of thesis: ${thesis._id} was ${thesis.institution}`)
             await theses.updateOne({ _id: thesis._id }, { $set: { institution: 'Università di Pisa' } })
