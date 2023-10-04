@@ -1,8 +1,25 @@
 import { useId } from 'react'
 import { Form } from 'react-bootstrap'
 
-import { InstitutionInput, BooleanInput, ListInput, PersonInput, RoomInput, GrantInput, DateInput, SelectInput, StringInput, TextInput, MultipleSelectInput, NumberInput, AttachmentInput, ImageInput } from './Input'
 import { RESERVED_FIELDS } from './ModelOutput'
+
+import { 
+    InstitutionInput,
+    BooleanInput,
+    ListInput,
+    PersonInput,
+    RoomInput,
+    GrantInput,
+    DateInput,
+    SelectInput,
+    StringInput,
+    TextInput,
+    MultipleSelectInput,
+    NumberInput,
+    AttachmentInput,
+    ImageInput,
+    ConferenceRoomInput
+} from './Input'
 
 export function ModelFieldInput({ id, schema, value, setValue }) {
     function element(Element, opts = {}) {
@@ -28,6 +45,7 @@ export function ModelFieldInput({ id, schema, value, setValue }) {
     } else {
         if (schema['x-ref'] === 'Person') return element(PersonInput)
         if (schema['x-ref'] === 'Room') return element(RoomInput)
+        if (schema['x-ref'] === 'ConferenceRoom') return element(ConferenceRoomInput)
         if (schema['x-ref'] === 'Institution') return element(InstitutionInput)
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
         if (schema.format === 'date-time') return element(DateInput)
@@ -55,7 +73,7 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
     const label = schema.items?.label || schema.label || field
 
     return <Form.Group className="row my-2">
-        <Form.Label className={ "col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id } style={{textAlign: "right"}}>
+        <Form.Label className={ "col-form-label text-end col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id }>
             { label }
         </Form.Label>
         <div className="col-sm-10">

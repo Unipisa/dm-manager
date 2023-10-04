@@ -11,6 +11,7 @@ let ModelSchemas = {}
 ;[
     require('./controllers/RoomLabelController'), 
     require('./controllers/RoomController'),
+    require('./controllers/ConferenceRoomController'),
     require('./controllers/RoomAssignmentController'),
     require('./controllers/VisitController'),
     require('./controllers/GrantController'),

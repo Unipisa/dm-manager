@@ -23,8 +23,8 @@ export default class EventSeminar {
         this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
         this.columns = {
             'title': 'Titolo',
+            'speaker': 'Speaker',
             'startDate': 'Data',
-            'duration': 'Durata (minuti)',
         }
 
         this.schema = null

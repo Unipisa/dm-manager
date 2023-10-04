@@ -22,6 +22,7 @@ export default class EventColloquium {
         this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
         this.columns = {
             'title': 'Titolo',
+            'speaker': 'Speaker',
             'startDate': 'Data',
         }
 

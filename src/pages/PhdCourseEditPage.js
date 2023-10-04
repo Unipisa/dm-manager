@@ -5,7 +5,7 @@ import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 import Loading from '../components/Loading'
 import { useEngine } from '../Engine'
 import { ModelHeading } from '../components/ModelHeading'
-import { NumberInput, PersonInput, RoomInput, StringInput } from '../components/Input'
+import { ConferenceRoomInput, NumberInput, PersonInput, RoomInput, StringInput } from '../components/Input'
 import moment from 'moment'
 import { isValidDate, LessonTable, parseDate } from '../components/PhdCourseLessonList'
 
@@ -56,7 +56,7 @@ const CADENCE_TEMPLATE_GENERATORS = {
 const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const [dateTime, setDateTime] = useState('')
     const [duration, setDuration] = useState(120)
-    const [room, setRoom] = useState(null)
+    const [conferenceRoom, setConferenceRoom] = useState(null)
 
     const [cadence, setCadence] = useState('single')
     const [repetitions, setRepetitions] = useState(1)
@@ -64,7 +64,7 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const handleGenerateLessons = () => {
         const date = parseDate(dateTime)
 
-        const baseLesson = { date, duration, room: room._id }
+        const baseLesson = { date, duration, conferenceRoom: conferenceRoom._id }
         CADENCE_TEMPLATE_GENERATORS[cadence]?.(addLesson, baseLesson, repetitions)
         
         close()
@@ -103,10 +103,10 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
                     Aula
                 </Form.Label>
                 <div className="col-sm-10">
-                    <RoomInput 
+                    <ConferenceRoomInput 
                         id="new-lesson-room"
-                        value={room}
-                        setValue={setRoom} />
+                        value={conferenceRoom}
+                        setValue={setConferenceRoom} />
                 </div>
             </Form.Group>
             <Form.Group className="row my-2">

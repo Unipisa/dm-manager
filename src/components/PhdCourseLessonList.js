@@ -62,13 +62,13 @@ export const parseDate = (dateString) => {
 export const LessonTable = ({ lessons, deleteLesson }) => {
     const isEdit = !!deleteLesson
 
-    const Room = ({ id }) => {
+    const ConferenceRoom = ({ id }) => {
         const engine = useEngine()
-        const { isSuccess, data } = engine.useGet('room', id)
+        const { isSuccess, data } = engine.useGet('conference-room', id)
 
         if (!isSuccess) return <Loading />
-        const { Room } = engine.Models
-        return <Link key={data._id} to={Room.viewUrl(data._id)}>{Room.describe(data)}</Link>
+        const { ConferenceRoom } = engine.Models
+        return <Link key={data._id} to={ConferenceRoom.viewUrl(data._id)}>{ConferenceRoom.describe(data)}</Link>
     }
 
     return (
@@ -87,9 +87,7 @@ export const LessonTable = ({ lessons, deleteLesson }) => {
                         <td>{formatDate(lesson.date)}</td>
                         <td>{lesson.duration}</td>
                         <td>
-                            {typeof lesson.room !== 'string' 
-                                ? lesson.room.code 
-                                : <Room id={lesson.room} />}
+                            <ConferenceRoom id={lesson.conferenceRoom} />
                         </td>
                         {isEdit && (
                             <td>

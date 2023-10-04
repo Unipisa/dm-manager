@@ -148,6 +148,8 @@ function displayField(obj, key, fieldsInfo={}) {
         return `${value.lastName} ${value.firstName}`
     } else if (xref === 'Room') {
         return `${value.code}`
+    } if (xref === 'ConferenceRoom') {
+        return `${value.name}`
     } else if (xref) {
         return `${xref} not implemented`
     }

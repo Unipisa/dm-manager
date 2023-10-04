@@ -406,6 +406,50 @@ export function RoomInput({ id, value, setValue }) {
     />
 }
 
+export function ConferenceRoomInput({ id, value, setValue }) {
+    return <ObjectInput
+        id={id}
+        value={value}
+        setValue={setValue}
+        objCode="conference-room"
+        objName="stanza per conferenza"
+        oa="a"
+        render={conferenceRoom => conferenceRoom.name}
+        new_object={q => ({ name: '' })}
+        inputs={{
+                name: 'Nome',
+        }}
+        placeholder="stanza"
+    />
+}
+
+// export function ConferenceRoomInput({ id, value, setValue }) {
+//     const engine = useEngine()
+//     const query = useQuery(['conference-room'], () => api.get('/api/v0/conference-room', {_sort: 'name', _limit: 100}), {
+//         onError: (err) => {
+//             engine.addMessage(err.message, 'error') },
+//         })
+    
+//     if (query.isLoading) return <Loading />
+    
+//     const data = new Map(query.data.data.map(conferenceRoom => ([conferenceRoom._id, conferenceRoom])))
+    
+//     if (value && value._id) value = value._id
+    
+//     return <SelectInput 
+//         id={id}
+//         options = {Array.from(data.keys())}
+//         displayFunction = {id => {
+//             if (id === null) return '---'
+//             const conferenceRoom = data.get(id)
+//             if (conferenceRoom === undefined) return '???' // database inconsistency
+//             return conferenceRoom.name
+//         }}
+//         value={value} 
+//         setValue={value => setValue(value ? data.get(value) : null)}
+//     />
+// }
+
 export function InstitutionInput({ id, value, setValue, multiple }) {
     return <ObjectInput 
         id={id} 

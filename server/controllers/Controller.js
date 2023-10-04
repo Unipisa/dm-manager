@@ -206,8 +206,22 @@ class Controller {
                                 building: 1,
                             }}]
                         }})
-                if (single) unwind(field)
-            }})
+                    if (single) unwind(field)
+                } else if (info.ref === 'ConferenceRoom') {
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "conferencerooms",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                            pipeline: [{ $project: {
+                                name: 1,
+                                room: 1,
+                            }}]
+                        }})
+                    if (single) unwind(field)
+                }
+            })
     }
 
     async getModel(req, res) {

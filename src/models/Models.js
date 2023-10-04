@@ -1,6 +1,7 @@
 import Grant from './Grant'
 import RoomLabel from './RoomLabel'
 import Room from './Room'
+import ConferenceRoom from './ConferenceRoom'
 import RoomAssignment from './RoomAssignment'
 import Visit from './Visit'
 import Person from './Person'
@@ -39,6 +40,7 @@ const Models = {
     RoomAssignment: new RoomAssignment(),
     RoomLabel: new RoomLabel(),
     Room: new Room(),
+    ConferenceRoom: new ConferenceRoom(),
 
     // altro:
     Form: new Form(),
