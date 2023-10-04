@@ -18,6 +18,7 @@ export default function Home() {
   if (redirectAfterLogin) {
       console.log(`Home: redirecting to ${redirectAfterLogin}`)
       sessionStorage.removeItem("redirect_after_login")
+      setRedirectAfterLogin(null)
       return <Navigate to={redirectAfterLogin} />
   }
   

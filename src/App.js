@@ -13,9 +13,11 @@ import Header from './components/Header'
 import Home from './pages/Home'
 import Profile from './pages/Profile'
 import LoginPage from './pages/LoginPage'
+import Map from './pages/Map'
 import Models from './models/Models'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
+import FormFillPage from './pages/FormFillPage'
 
 
 console.log("dm-manager (app starting)")
@@ -30,24 +32,36 @@ function Internal() {
   }
   
   if (! engine.loggedIn) {
-    console.log("user is not logged in");
-    return <LoginPage engine={engine}/>
-  }
-
-  return <EngineProvider value={engine}>
-     <BrowserRouter>
-      <Header/>
+    // console.log("user is not logged in");
+    //return <LoginPage engine={engine}/>
+    return <EngineProvider value={engine}>
+      <BrowserRouter>
       <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
       <Container className="p-5">
         <Routes>  
-          <Route path="/" element={<Home />} />
-          <Route path="/profile" element={<Profile />} />
-          {  Object.values(Models).map(x => x.routers()) }
-          <Route path="*" element={<NotFound />} />
+          <Route path={`/pub/fill/:id`} element={<FormFillPage />} />
+          <Route path="*" element={<LoginPage engine={engine} />} />
         </Routes>
       </Container>
-     </BrowserRouter>    
-    </EngineProvider>
+      </BrowserRouter>    
+   </EngineProvider>
+  }
+
+  return <EngineProvider value={engine}>
+  <BrowserRouter>
+   <Header/>
+   <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
+   <Container className="p-5">
+     <Routes>  
+       <Route path="/" element={<Home />} />
+       <Route path="/profile" element={<Profile />} />
+       {  Object.values(Models).map(x => x.routers()) }
+       <Route path="/map" element={<Map />} />
+       <Route path="*" element={<NotFound />} />
+     </Routes>
+   </Container>
+  </BrowserRouter>    
+ </EngineProvider>
 }  
 
 export default function App() {

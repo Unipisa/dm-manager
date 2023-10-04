@@ -4,7 +4,7 @@ import { myDateFormat, useEngine } from '../Engine'
 
 export const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
-export function ModelFieldOutput({ field, schema, value}) {
+export function ModelFieldOutput({ field, schema, value }) {
     const engine = useEngine()
     const Models = engine.Models
     if (value === null) return '---'
@@ -29,7 +29,7 @@ export function ModelFieldOutput({ field, schema, value}) {
         if (schema.enum) return value
         if (schema.type === 'string') {
             if (value === undefined || value === null) return '???'
-            if (field === 'genealogyId') return <a href={`https://genealogy.math.ndsu.nodak.edu/id.php?id=${value}`}>{value}</a>
+            if (schema.href) return <a href={schema.href.replace('{}', value)}>{value}</a>
             if (schema.widget === 'text') {
                 var lst = []
                 value.split('\n').forEach((line ,i) => {

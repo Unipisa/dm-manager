@@ -13,10 +13,11 @@ async function getFormAndCheckAccess(req, res) {
             res.status(404).send({error: `not found ${id}`})
             return null
         }
-        if ((obj.requireUser || obj.restrictedGroup) && !req.user) {
+        if ((obj.requireAuthentication) && !req.user) {
             res.status(401).send({error: `user required`})
             return null
         }
+        /*
         if (obj.restrictedGroup) {
             const group = await Group.findById(obj.restrictedGroup)
             if (!group) {
@@ -28,6 +29,7 @@ async function getFormAndCheckAccess(req, res) {
                 return null 
             }
         }
+        */
         today = new Date()
         if ((obj.startDate && obj.startDate > today) || 
             (obj.endDate && obj.endDate < today)) {
@@ -84,11 +86,11 @@ class FormController extends Controller {
         const payload = {
             form,
             data: map,
-            email: user.email || null,
-            lastName: user.lastName || null,
-            firstName: user.firstName || null,
-            createdBy: user._id,
-            updatedBy: user._id,
+            email: user?.email || null,
+            lastName: user?.lastName || null,
+            firstName: user?.firstName || null,
+            createdBy: user?._id,
+            updatedBy: user?._id,
         }
         const data = new FormData(payload)
         log(req, {}, payload)
@@ -116,6 +118,7 @@ class FormController extends Controller {
                 }
             },
             Model: FormData,
+            searchFields: ['email', 'firstName', 'lastName'],
         })   
     }
 

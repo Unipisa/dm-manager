@@ -6,6 +6,7 @@ import ModelView from '../components/ModelView'
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
 import { FormFillPageInner } from './FormFillPage'
 import LoadTable from '../components/LoadTable'
+import { extractFieldNames } from './FormFillPage'
 
 export default function FormViewPage() {
     const params = useParams()
@@ -14,10 +15,20 @@ export default function FormViewPage() {
     const Form = engine.Models.Form
 
     return <ObjectProvider path={Form.code} id={id}>
+        <FormViewPageInner/>
+    </ObjectProvider>
+}
+
+function FormViewPageInner() {
+    const engine = useEngine()
+    const Form = engine.Models.Form
+    const form = useObject()
+    const fillUrl = form.requireAuthentication ? `/fill/${form._id}` : `/pub/fill/${form._id}`
+    return <>
         <ModelView Model={Form} buttons={[
             'edit', 
             'clone', 
-            <Link key='fill' className='btn btn-success' to={`/fill/${id}`}>compila</Link>,
+            <Link key='fill' className='btn btn-success' to={fillUrl}>compila</Link>,
             'index'
             ]} />
         <Tabs className='my-2'>
@@ -28,16 +39,26 @@ export default function FormViewPage() {
                 <FormDataView />
             </Tab>
         </Tabs>
-    </ObjectProvider>
+    </>
 }
 
 function FormDataView() {
     const engine = useEngine()
     const form = useObject()
     const Form = engine.Models.Form
+    const authColumns = form.requireAuthentication ? ['email', 'firstName', 'lastName'] : []
+    const columns = ['createdAt', ...authColumns, 'data']
+    const csvHeaders = [
+        'createdAt', 
+        ...authColumns,
+        ...extractFieldNames(form.text).map(name => `data.${name}`)
+    ]
 
-    return <LoadTable 
-        path={`${Form.code}/${form._id}/data`}
-        columns={['createdAt', 'email', 'firstName', 'lastName', 'data']}
-    />
+    return <>
+        <LoadTable 
+            path={`${Form.code}/${form._id}/data`}
+            columns={columns}
+            csvHeaders={csvHeaders}
+        />
+    </>
 }

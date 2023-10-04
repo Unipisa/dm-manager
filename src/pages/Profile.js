@@ -27,8 +27,8 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
 
     function Field() {
         if (edit) return <>
-            {modified && <Button onClick={submit}>salva</Button>}
-            <Button className="btn-warning" onClick={() => {
+            {modified && <Button className="p-1" onClick={submit}>salva</Button>}
+            <Button className="btn-warning p-1" onClick={() => {
                 setEdit(false)
                 setValue(obj[field])
             }}>annulla</Button>
@@ -36,12 +36,12 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
         </>
         else return <>
             <ModelFieldOutput field={field} schema={field_schema} value={obj[field]} />
-            {editable && <Button className="btn-warning" onClick={() => setEdit(!edit)}>modifica</Button>}
+            {} {editable && <Button className="btn-warning p-1" onClick={() => setEdit(!edit)}>modifica</Button>}
         </>
     }
 
     return <p key={field}>
-        <strong className="align-top">{label}: </strong>
+        <strong>{label}: </strong>
         { Field() }
     </p>
 }
@@ -61,6 +61,7 @@ export default function Profile() {
     const getGroups = engine.useGet("profile/group")
     const getVisits = engine.useGet("profile/visit")
     const getGrants = engine.useGet("profile/grant")
+    const getTheses = engine.useGet("profile/thesis")
 
     const User = engine.Models.User
     const Person = engine.Models.Person
@@ -133,17 +134,11 @@ export default function Profile() {
                 <h3>Qualifica: {staff.qualification}</h3>
             </Card.Header>
             <Card.Body>
-                {
-                    Object.entries({
-                        matricola: "Matricola",
-                        startDate: "Data inizio",
-                        endDate: "Data fine",
-                        SSD: "SSD",
-                        photoUrl: "Foto",
-                    }).map(([field, label]) =>
-                        <FieldOutput key={field} label={label} field={field} Model={Staff} obj={staff} editable={getStaffs.data.editable_fields.includes(field)} />
-                    )
-                }
+                <FieldOutput field="matricola" label="Matricola" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="startDate" label="Data inizio" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="endDate" label="Data fine" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="SSD" label="SSD" Model={Staff} obj={staff} editable={false} />
+                <FieldOutput field="photoUrl" label="Foto" Model={Staff} obj={staff} editable={false} />
             </Card.Body>
         </Card>)
         : <Loading />}
@@ -214,6 +209,24 @@ export default function Profile() {
                         {getGrants.data.data.map(grant => <li key={grant._id}>  
                             <b>{grant.name}:</b>
                             {} dal: {myDateFormat(grant.startDate)} al: {myDateFormat(grant.endDate)}
+                        </li>
+                        )}
+                    </ul>
+                </Card.Body>
+            </Card>)
+            : <Loading /> }
+
+        {   getTheses.isSuccess
+            ? (getTheses.data.data.length>0 &&
+            <Card className="mt-2">
+                <Card.Header>
+                    <h3>Tesi</h3>
+                </Card.Header>
+                <Card.Body>
+                    <ul>
+                        {getTheses.data.data.map(thesis => <li key={thesis._id}>
+                            <b>{thesis.person.firstName}, {thesis.person.lastName}:</b>
+                            {} <i>{thesis.title}</i> ({myDateFormat(thesis.date)})
                         </li>
                         )}
                     </ul>

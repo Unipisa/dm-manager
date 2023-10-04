@@ -5,6 +5,7 @@ const RoomAssignment = require('../models/RoomAssignment')
 const Group = require('../models/Group')
 const Visit = require('../models/Visit')
 const Grant = require('../models/Grant')
+const Thesis = require('../models/Thesis')
 
 const { log } = require('./middleware')
 
@@ -24,7 +25,7 @@ module.exports = function profile(router, path) {
         
         const data = (user.email 
             ? await Person.aggregate([
-                { $match: { email: user.email } },
+                { $match: {$or: [{email: user.email }, {alternativeEmails: user.email}] } },
                 { $project: { notes: 0 }},
                 { $lookup: {
                     from: "staffs",
@@ -163,31 +164,61 @@ module.exports = function profile(router, path) {
         })
     })
     
+    router.get(`${path}/thesis`, async (req, res) => {  
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+        
+        const people = await Person.find({ email: user.email })
+        const people_ids = people.map(p => p._id)
+        
+        const data = await Thesis.aggregate([
+            // match people in person, advisors
+            { $match: { $or: [
+                { person: { $in: people_ids } },
+                { advisors: { $in: people_ids } },
+            ]}},
+            { $project: { notes: 0 }},
+            { $lookup: {
+                from: "people",
+                localField: "person",
+                foreignField: "_id",
+                as: "person",
+                pipeline: [
+                    { $project: { firstName: 1,
+                                  lastName: 1, }},
+                ],
+            }},
+            { $unwind: { path: "$person", preserveNullAndEmptyArrays: true } },
+        ])
+
+        res.send({
+            data,
+            editable_fields: Thesis._profile_editable_fields,
+        })
+    })
+
     router.patch(`${path}/person/:id`, async (req, res) => {
         const user = req.user || null
         const id = req.params.id
         const modifiable_fields = Person._profile_editable_fields
         const payload = req.body
-        console.log(`req.body: ${JSON.stringify(req.body)}`)
-        console.log(`payload: ${JSON.stringify(payload)}`)
         try {
             const person = await Person.findById(id)
-            if (person.email != user.email) {
+            if (person.email != user.email && !person.alternativeEmails.includes(user.email)) {
                 // not authorized
                 res.status(401).send({error: "Not authorized"})
                 return
             }
-            log(req, person, payload)
+            req.log_who = user.username
+            await log(req, person, payload)
             for(field of modifiable_fields) {
                 if (payload[field] !== undefined) {
                     person[field] = payload[field]
                 }
             }
             await person.save()
-            console.log(`person: ${JSON.stringify(person)}`)
             res.send({})
         } catch(error) {
-            console.log(`error: ${error.message}}`)
             console.error(error)
             res.status(400).send({error: error.message})
         }

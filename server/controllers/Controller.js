@@ -230,15 +230,19 @@ class Controller {
         path ||= this.path
         Model ||= this.Model
 
+        if (query._direction) {
+            if (query._direction=="1") direction = 1
+            else if (query._direction=="-1") direction = -1
+            else return sendBadRequest(res, `invalid _direction ${query._direction}: 1 or -1 expected`)
+        }
+
         for (let key in query) {
             let value = query[key];
             const key_parts = key.split('__')
             const key0 = key_parts[0]
 
             if (key == '_direction') {
-                if (value=="1") direction = 1
-                else if (value=="-1") direction = -1
-                else return sendBadRequest(res, `invalid _direction ${value}: 1 or -1 expected`)
+                // already processed
             } else if (key == '_limit') {
                 limit = parseInt(value);
                 if (isNaN(limit) || limit < 0) return sendBadRequest(res, `invalid _limit ${value}: positive integer expected`)
@@ -449,7 +453,7 @@ class Controller {
             console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
             let obj = await this.Model
                 .aggregate(pipeline)
-            if (obj === []) {
+            if (obj.length === 0) {
                 return res.status(404).send({error: `not found ${id}`})
             }
             if (obj.length > 1) {
@@ -485,7 +489,7 @@ class Controller {
 
         try {
             const obj = await this.Model.create(payload)
-            log(req, {}, obj)
+            await log(req, {}, obj)
             this.get(req, res, obj._id)
         } catch(err) {
             console.error(err)
@@ -497,7 +501,7 @@ class Controller {
         console.log(`*** PATCH ${id} ${JSON.stringify(payload)}`)
         try {
             const was = await this.Model.findById(id)
-            log(req, was, payload)
+            await log(req, was, payload)
             was.set({...was, ...payload})
             await was.save()
             res.send(was)
@@ -512,7 +516,7 @@ class Controller {
         console.log(`*** DELETE ${req.path}`)
         try {
             const obj = await this.Model.findById(id)
-            log(req, obj.toObject(), {})
+            await log(req, obj.toObject(), {})
             obj.delete()
             res.send({})
         } catch(err) {

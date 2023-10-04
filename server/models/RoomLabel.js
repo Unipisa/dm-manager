@@ -7,7 +7,9 @@ const {
 
 const RoomLabel = model('RoomLabel', new Schema({
     names: [String],
-    number: String,
+    number: { 
+        type: String, 
+    },
     size: Number, // la dimensione effettiva sara cm: 2^(size/2)
     state: {
         type: String,

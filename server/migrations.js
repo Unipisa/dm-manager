@@ -352,7 +352,23 @@ const migrations = {
         db.collection('theses').createIndex({date: 1})
 
         return true
-    }
+    },
+
+    D20230719_fill_person_alternative_emails: async function(db) {
+        const people = db.collection("people")
+        await people.updateMany(
+            { alternativeEmails: { $exists: false }}, 
+            { $set: { alternativeEmails: [] }})
+        return true
+    },
+
+    D20230919_fill_form_require_authorization_1: async function(db) {
+        const forms = db.collection("forms")
+        await forms.updateMany(
+            {},
+            { $set: { requireAuthentication: true }})
+        return true
+    },
 }
 
 async function migrate(db, options) {

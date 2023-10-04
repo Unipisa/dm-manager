@@ -38,7 +38,7 @@ Person.relatedModels.push({
     model: Thesis,
     modelName: 'Thesis',
     url: 'thesis',
-    field: 'supervisors',
+    field: 'advisors',
     multiple: true,
 })
 

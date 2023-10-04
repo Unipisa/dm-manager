@@ -21,6 +21,7 @@ const staffSchema = new Schema({
             'Docente Esterno',
             'Dottorando Esterno',
             'Personale in quiescenza',
+            'ex Docente',
         ]},
     isInternal: {type: Boolean, label: 'interno al dipartimento', default: true},
     startDate,
@@ -51,7 +52,7 @@ module.exports = Staff
 Staff.personStaffPipeline = () => ([
     {$lookup: {
         from: "staffs",
-        let: { start: new Date(), end: new Date() },
+        let: { start: { $toDate: "$$NOW" }, end: { $toDate: "$$NOW" } },
         localField: '_id',
         foreignField: "person",
         as: 'staffs',

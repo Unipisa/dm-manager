@@ -155,13 +155,24 @@ function RoomsTable({onClick, onDone, onDelete, data}) {
     </Table>
 }
 
-function RoomLabels({onClick, onDone, onDelete}) {
+function RoomLabels({onClick, onDone, onDelete, urlId, setUrlId }) {
     const engine = useEngine()
-    const query = engine.useIndex('roomLabel')
-
+    const query = engine.useIndex('roomLabel',{_sort:"updatedAt", _direction: -1})
     let data = []
     if (query.isLoading) return <Loading />
     if (query.isSuccess) data = query.data.data
+
+    if (urlId) {
+        const obj = data.find(obj => obj._id === urlId)
+        if (obj) {
+            // avoid calling upper component change
+            // while rendering
+            setTimeout(() => onClick(obj), 0)       
+        } else {
+            engine.addMessage(`non trovo il cartellino ${urlId}`)
+        }
+        setTimeout(()=> setUrlId(null), 0)
+    }
 
     return <>
         <h3>cartellini richiesti</h3>
@@ -194,6 +205,7 @@ export default function RoomLabelsPage() {
     const patchRoomLabel = engine.usePatch('roomLabel')
     const onDelete = engine.useDelete('roomLabel')
     const isSupervisor = engine.user.hasSomeRole('admin', 'supervisor', 'room-manager', 'room-supervisor', 'label-manager')
+    const [urlId, setUrlId] = useState(window.location.search.substring(1))
 
     const onSave = (roomLabel) => {
         setRoomLabel(roomLabel)
@@ -215,7 +227,7 @@ export default function RoomLabelsPage() {
             onSave={isSupervisor?onSave:null}/>
         <div style={{marginTop: "1cm"}}/>
         { engine.user.hasSomeRole('admin', 'supervisor', 'label-manager', 'label-supervisor') && 
-            <RoomLabels onClick={onClick} onDone={onDone} onDelete={onDelete} />
+            <RoomLabels onClick={onClick} onDone={onDone} onDelete={onDelete} urlId={urlId} setUrlId={setUrlId} />
         }
     </>
 }
