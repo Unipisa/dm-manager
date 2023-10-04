@@ -5,7 +5,7 @@ import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 import Loading from '../components/Loading'
 import { useEngine } from '../Engine'
 import { ModelHeading } from '../components/ModelHeading'
-import { ConferenceRoomInput, NumberInput, PersonInput, RoomInput, StringInput } from '../components/Input'
+import { ConferenceRoomInput, NumberInput, PersonInput, StringInput } from '../components/Input'
 import moment from 'moment'
 import { isValidDate, LessonTable, parseDate } from '../components/PhdCourseLessonList'
 
