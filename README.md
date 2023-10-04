@@ -1,10 +1,26 @@
-## setup
+## Development using Github's codespace
+When using Github's codespaces, you need the following steps to get up and running. Open a terminal and type:
+```bash
+export SERVER_URL="http://localhost:8080"
+export REACT_APP_SERVER_URL="http://localhost:8080"
+export BASE_URL="http://localhost:8080"
+export ADMIN_USERNAME=admin
+export ADMIN_PASSWORD=secret
 
+sudo docker compose up -d 
+npm run server 
+
+# In another terminal tab
+npm start
+```
+The server now runs on port ```8080``` (ignore the tab that automatically opens for port ```3000```), which can be accessed from the **Ports** tab.
+
+## development
+
+Install the packages with 
  ```
  npm ci
  ```
-
-## development
 
 Use two terminals for backend and frontend. 
 
