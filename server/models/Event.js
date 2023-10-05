@@ -10,6 +10,8 @@ const {
     notes,
 } = require('./Model')
 
+const Grant = require('./Grant')
+
 // 
 // Seminario
 // 
@@ -37,6 +39,7 @@ const eventSeminarSchema = new Schema({
             'seminari-map'
         ],
     },
+    grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     abstract: { type: String, label: 'Abstract', widget: 'text' },
     
     createdBy,
@@ -46,6 +49,14 @@ const eventSeminarSchema = new Schema({
 })
 
 const EventSeminar = model('EventSeminar', eventSeminarSchema)
+
+Grant.relatedModels.push({
+    model: EventSeminar,
+    modelName: 'EventSeminar',
+    url: 'event-seminar',
+    field: 'grants',
+    multiple: true,
+})
 
 // 
 // Conferenza
@@ -58,6 +69,7 @@ const eventConferenceSchema = new Schema({
     SSD,
     url: { type: String, label: 'Sito web' },
     conferenceRoom: { type: ObjectId, label: 'Stanza', ref: 'ConferenceRoom', required: true },
+    grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     notes,
 
     createdBy,
@@ -67,6 +79,14 @@ const eventConferenceSchema = new Schema({
 })
 
 const EventConference = model('EventConference', eventConferenceSchema)
+
+Grant.relatedModels.push({
+    model: EventConference,
+    modelName: 'EventConference',
+    url: 'event-conference',
+    field: 'grants',
+    multiple: true,
+})
 
 // 
 // Colloquium
@@ -78,6 +98,7 @@ const eventColloquiumSchema = new Schema({
     conferenceRoom: { type: ObjectId, label: 'Stanza', ref: 'ConferenceRoom', required: true },
     startDate,
     duration: { type: Number, label: 'Durata (in minuti)', default: 120 },
+    grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     notes,
 
     createdBy,
@@ -87,6 +108,14 @@ const eventColloquiumSchema = new Schema({
 })
 
 const EventColloquium = model('EventColloquium', eventColloquiumSchema)
+
+Grant.relatedModels.push({
+    model: EventColloquium,
+    modelName: 'EventColloquium',
+    url: 'event-colloquium',
+    field: 'grants',
+    multiple: true,
+})
 
 // 
 // Corso di Dottorato

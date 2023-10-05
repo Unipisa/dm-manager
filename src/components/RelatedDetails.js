@@ -35,7 +35,7 @@ export default function RelatedDetails({ Model, related, title }) {
                             case 'Person':
                                 return <a href={`/${info.url}/${obj._id}`}>{obj.lastName} {obj.firstName}</a>
                             default:
-                                return <span>not implemented {JSON.stringify(info)}</span>
+                                return <a href={`/${info.url}/${obj._id}`}>{engine.Models[info.modelName].describe(obj)}</a>
                         }
                     }).map((_,i) => <li key={i}>{_} </li>)}
                 </ul>
