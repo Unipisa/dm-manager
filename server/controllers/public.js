@@ -7,7 +7,7 @@ async function staffQuery(req) {
         matches.push({$match: {
             $or: [
                 { 'person.email': req.query.email },
-                { 'person.alternativeEmail': req.query.email }
+                { 'person.alternativeEmails': req.query.email }
             ]
         }})
     }
