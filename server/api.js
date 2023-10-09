@@ -2,6 +2,7 @@ const express = require('express')
 
 const config = require('./config')
 const profile = require('./controllers/profile')
+const { staffQuery } = require('./controllers/public')
 
 const router = express.Router()
 
@@ -56,6 +57,10 @@ router.get('/', (req, res) => {
 })
 
 profile(router, "/profile")
+
+router.get('/public/staff', async (req, res) => {
+    res.send(await staffQuery(req))
+})
 
 module.exports = router
 module.exports.ModelSchemas = ModelSchemas
