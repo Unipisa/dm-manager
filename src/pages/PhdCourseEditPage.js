@@ -7,7 +7,8 @@ import { useEngine } from '../Engine'
 import { ModelHeading } from '../components/ModelHeading'
 import { ConferenceRoomInput, NumberInput, PersonInput, StringInput } from '../components/Input'
 import moment from 'moment'
-import { isValidDate, LessonTable, parseDate } from '../components/PhdCourseLessonList'
+import { LessonTable } from '../components/PhdCourseLessonList'
+import { DatetimeInput, isValidDate, parseDate } from '../components/DatetimeInput'
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
@@ -61,7 +62,14 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const [cadence, setCadence] = useState('single')
     const [repetitions, setRepetitions] = useState(1)
 
+    const engine = useEngine()
+
     const handleGenerateLessons = () => {
+        if (!isValidDate(dateTime)) {
+            engine.addErrorMessage('Non hai inserito una data valida, usa il formato "YYYY-MM-DD HH:mm"')
+            return
+        }
+
         const date = parseDate(dateTime)
 
         const baseLesson = { date, duration, conferenceRoom: conferenceRoom._id }
@@ -77,14 +85,10 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
                     Orario
                 </Form.Label>
                 <div className="col-sm-10">
-                    <input
-                        className={["form-control", !isValidDate(dateTime) && "is-invalid"].filter(Boolean).join(' ')} 
+                    <DatetimeInput
                         id="new-lesson-start"
-                        type="text"
                         value={dateTime}
-                        onChange={e => setDateTime(e.target.value)}
-                        placeholder="YYYY-MM-DD HH:mm" 
-                    />
+                        setValue={setDateTime} />
                 </div>
             </Form.Group>
             <Form.Group className="row my-2">

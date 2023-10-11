@@ -21,6 +21,10 @@ import {
     ConferenceRoomInput
 } from './Input'
 
+import { 
+    DatetimeInput
+} from './DatetimeInput'
+
 export function ModelFieldInput({ id, schema, value, setValue }) {
     function element(Element, opts = {}) {
         const {options, multiple} = opts
@@ -48,7 +52,10 @@ export function ModelFieldInput({ id, schema, value, setValue }) {
         if (schema['x-ref'] === 'ConferenceRoom') return element(ConferenceRoomInput)
         if (schema['x-ref'] === 'Institution') return element(InstitutionInput)
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
-        if (schema.format === 'date-time') return element(DateInput)
+        if (schema.format === 'date-time') {
+            if (schema.widget === 'datetime') return element(DatetimeInput) // use formatted text input "YYYY-MM-DD HH:mm"
+            return element(DateInput) // use date only widget
+        }
         if (schema.enum) return element(SelectInput, {options: schema.enum})
         if (schema.type === 'number') return element(NumberInput)
         if (schema.type === 'boolean') return element(BooleanInput)

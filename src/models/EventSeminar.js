@@ -20,11 +20,11 @@ export default class EventSeminar {
             'gli oggetti': "i seminari", 
             'un oggetto': "un seminario", 
         }
-        this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+        this.indexDefaultFilter = {'_sort': '-startDatetime', '_limit': 10}
         this.columns = {
             'title': 'Titolo',
             'speaker': 'Speaker',
-            'startDate': 'Data',
+            'startDatetime': 'Inizio',
         }
 
         this.schema = null

@@ -20,7 +20,7 @@ const eventSeminarSchema = new Schema({
     speaker: { type: ObjectId, label: 'Speaker', ref: 'Person', required: true },
     title: { type: String, label: 'Titolo' },
     conferenceRoom: { type: ObjectId, label: 'Stanza', ref: 'ConferenceRoom', required: true },
-    startDate,
+    startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },
     duration: { type: Number, label: 'Durata (in minuti)', default: 120 },
     category: {
         type: String,
@@ -96,7 +96,7 @@ const eventColloquiumSchema = new Schema({
     speaker: { type: ObjectId, label: 'Speaker', ref: 'Person', required: true },
     title:  {type: String, label: 'titolo'},
     conferenceRoom: { type: ObjectId, label: 'Stanza', ref: 'ConferenceRoom', required: true },
-    startDate,
+    startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },
     duration: { type: Number, label: 'Durata (in minuti)', default: 120 },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     notes,

@@ -73,7 +73,7 @@ export default class EventPhdCourse {
 
     // brief description of given object
     describe(obj) {
-        return `"${obj.title}"`;
+        return `"${obj.title ?? '???'}"`;
     }
 
     onObjectChange(setObj) {}

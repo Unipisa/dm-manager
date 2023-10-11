@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 
 import { myDateFormat, useEngine } from '../Engine'
+import { formatDate } from './DatetimeInput'
 
 export const RESERVED_FIELDS = ['_id', '__v', 'createdBy', 'updatedBy', 'createdAt', 'updatedAt']
 
@@ -25,7 +26,13 @@ export function ModelFieldOutput({ field, schema, value }) {
         return lst
     } else {
         if (schema['x-ref']) return render(value, schema['x-ref'])
-        if (schema.format === 'date-time') return myDateFormat(value)
+        if (schema.format === 'date-time') {
+            if (schema.widget === 'datetime') {
+                return !value ? '???' : formatDate(value)
+            }
+
+            return myDateFormat(value) // default to date only
+        }
         if (schema.enum) return value
         if (schema.type === 'string') {
             if (value === undefined || value === null) return '???'

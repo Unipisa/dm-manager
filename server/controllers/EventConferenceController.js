@@ -11,7 +11,7 @@ class EventConferenceController extends Controller {
         this.searchFields = [
             'title', 
             'url',
-            'startDate',
+            'startDatetime',
             'endDate',
             'room.code',
             'notes',

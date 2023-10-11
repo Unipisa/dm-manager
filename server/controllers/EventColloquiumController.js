@@ -10,7 +10,7 @@ class EventColloquiumController extends Controller {
 
         this.searchFields = [
             'title', 
-            'startDate',
+            'startDatetime',
             'notes',
         ]
     }
