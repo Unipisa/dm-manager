@@ -72,7 +72,6 @@ async function staffQuery(req) {
                 affiliations: {
                     name: 1,
                 },
-                alternativeEmails: 1,
                 staff: {
                     qualification: 1,
                     photoUrl: 1,
