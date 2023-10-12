@@ -10,6 +10,7 @@ let paths = []
 let ModelSchemas = {}
 
 ;[
+    require('./controllers/SeminarCategoryController'),
     require('./controllers/RoomLabelController'), 
     require('./controllers/RoomController'),
     require('./controllers/ConferenceRoomController'),

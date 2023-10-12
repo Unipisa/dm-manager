@@ -220,6 +220,19 @@ class Controller {
                             }}]
                         }})
                     if (single) unwind(field)
+                } else if (info.ref === 'SeminarCategory') {
+                    this.queryPipeline.push(
+                        {$lookup: {
+                            from: "seminarcategories",
+                            localField: field,
+                            foreignField: "_id",
+                            as: field,
+                            pipeline: [{ $project: {
+                                name: 1,
+                                label: 1,
+                            }}]
+                        }})
+                    if (single) unwind(field)
                 }
             })
     }

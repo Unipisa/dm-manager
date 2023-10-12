@@ -8,7 +8,7 @@ import { ModelHeading } from '../components/ModelHeading'
 import { ConferenceRoomInput, NumberInput, PersonInput, StringInput } from '../components/Input'
 import moment from 'moment'
 import { LessonTable } from '../components/PhdCourseLessonList'
-import { DatetimeInput, isValidDate, parseDate } from '../components/DatetimeInput'
+import { DatetimeInput } from '../components/DatetimeInput'
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
@@ -56,7 +56,7 @@ const CADENCE_TEMPLATE_GENERATORS = {
 
 const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const [dateTime, setDateTime] = useState('')
-    const [duration, setDuration] = useState(120)
+    const [duration, setDuration] = useState(60)
     const [conferenceRoom, setConferenceRoom] = useState(null)
 
     const [cadence, setCadence] = useState('single')
@@ -65,14 +65,12 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const engine = useEngine()
 
     const handleGenerateLessons = () => {
-        if (!isValidDate(dateTime)) {
-            engine.addErrorMessage('Non hai inserito una data valida, usa il formato "YYYY-MM-DD HH:mm"')
+        if (!conferenceRoom) {
+            engine.addErrorMessage("Non ha inserito un'aula conferenze")
             return
         }
 
-        const date = parseDate(dateTime)
-
-        const baseLesson = { date, duration, conferenceRoom: conferenceRoom._id }
+        const baseLesson = { date: dateTime, duration, conferenceRoom: conferenceRoom._id }
         CADENCE_TEMPLATE_GENERATORS[cadence]?.(addLesson, baseLesson, repetitions)
         
         close()

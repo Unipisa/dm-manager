@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useState } from "react";
 
 /**
  * Formats a date to "YYYY-MM-DD HH:mm"
@@ -11,88 +11,86 @@ export const formatDate = (date) => {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
+    
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
 
-    const formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+    const formattedDate = `${day}/${month}/${year} ${hours}:${minutes}`;
 
     return formattedDate;
 }
 
-function convertUTCToLocalDate(date) {
-    if (!date) {
-        return date
-    }
-    date = new Date(date)
-    return new Date(Date.UTC(
-        date.getUTCFullYear(),
-        date.getUTCMonth(),
-        date.getUTCDate(),
-        date.getUTCHours(),
-        date.getUTCMinutes(),
-        date.getUTCSeconds(),
-    ))
-}
-
-export const normalizeStringDate = (dateString) => {
-    return formatDate(convertUTCToLocalDate(dateString))
-}
 
 /**
- * Tries to parse a date string in the format "YYYY-MM-DD HH:mm" or throws an
- * error.
+ * Crea una nuova data partendo da quella fornita e ci imposta la data e
+ * l'orario partendo da delle stringhe in formato "yyyy-mm-dd" e "HH:mm".
  * 
- * @type {(dateString: string) => Date}
+ * @type {(timeStr: string, date: Date | null | undefined) => Date} updateDatetimeFromString
  */
-export const parseDate = (dateString) => {
-    if (!dateString.match(/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{1,2}$/)) {
-        throw new Error('invalid date format, expected "YYYY-MM-DD HH:mm"')
+const updateDatetimeFromString = (dateStr, timeStr, date) => {
+    const newDate = date ? new Date(date) : new Date()
+    
+    if (dateStr && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        const [year, month, date] = dateStr.split('-').map(s => parseInt(s))
+        newDate.setFullYear(year)
+        newDate.setMonth(month - 1)
+        newDate.setDate(date)
     }
 
-    const [datePart, timePart] = dateString.trim().split(/\s+/g)
-    const [year, month, day] = datePart.split('-')
-    const [hours, minutes] = timePart.split(':')
+    if (timeStr && timeStr.match(/^\d{2}:\d{2}$/)) {
+        const [hours, minutes] = timeStr.split(':').map(s => parseInt(s))
+        newDate.setHours(hours)
+        newDate.setMinutes(minutes)
+        newDate.setSeconds(0)
+        newDate.setMilliseconds(0)
+    }
 
-    return new Date(
-        parseInt(year, 10),
-        parseInt(month, 10) - 1, // months are zero-based
-        parseInt(day, 10),
-        parseInt(hours, 10),
-        parseInt(minutes, 10)
+    return newDate
+}
+
+export function DatetimeInput({ value, setValue }) {
+    if (value) value = new Date(value)
+
+    const [date, setDate] = useState(value 
+        ? `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}` 
+        : ''
     )
-}
+    const [time, setTime] = useState(value 
+        ? `${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+        : ''
+    )
 
-/**
- * Tries to run parseDate and returns true if the parse is successful
- */
-export const isValidDate = (dateString) => {
-    try {
-        parseDate(dateString)
-        return true
-    } catch (e) {
-        return false
-    }
-}
-
-// TODO: per ora c'è uno "useEffect" per normalizzare il formato della data al
-// mount. In teoria il modo migliore di risolvere questo problema sarebbe di
-// ricostruire tutti gli oggetti "Date" del json iniziale ricevuto dal server
-// ma è noto che il js non rende la cosa facile.
-export function DatetimeInput({ id, value, setValue }) {
-    // Questo useEffect viene eseguito solo al primo render quindi non
-    // servono dipendenze
-    useEffect(() => {
-        setValue(normalizeStringDate(value))
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
+    console.log(date, time)
 
     return (
-        <input
-            type="text"
-            className={["form-control", !((value || '').trim().length === 0 || isValidDate(value)) && "is-invalid"].filter(Boolean).join(' ')} 
-            id={id}
-            value={value ?? ''}
-            onChange={e => setValue(e.target.value)}
-            placeholder="YYYY-MM-DD HH:mm" />
+        <div className="row d-flex">
+            <div className="col-sm-8 pe-0">
+                <input
+                    type="date"
+                    className="form-control"
+                    required pattern="\d{4}-\d{2}-\d{2}"
+                    value={date}
+                    onChange={e => {
+                        setDate(e.target.value)
+                        setValue(updateDatetimeFromString(e.target.value, null, value))
+                    }} />
+            </div>
+            <div className="col-sm-4">
+                <input
+                    type="time"
+                    className="form-control"
+                    required pattern="\d{2}:\d{2}"
+                    value={time}
+                    onChange={e => {
+                        setTime(e.target.value)
+                        setValue(updateDatetimeFromString(null, e.target.value, value))
+                    }} />
+            </div>
+        </div>
     )
+}
+
+
+export function DateInput({ id, value, setValue }) {
+    return 
 }

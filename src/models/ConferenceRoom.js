@@ -4,14 +4,14 @@ export default class ConferenceRoom extends Model {
     constructor() {
         super()
         this.code = 'conference-room'
-        this.name = "stanza per conferenza"
+        this.name = "aula per conferenza"
         this.oa = "a"
         this.articulation = {
-            'oggetto': "stanza per conferenza", 
-            'oggetti': "stanze per conferenze",
-            'l\'oggetto': "la stanza per conferenza",
-            'gli oggetti': "le stanze per conferenze", 
-            'un oggetto': "una stanza per conferenza", 
+            'oggetto': "aula per conferenza", 
+            'oggetti': "aule per conferenze",
+            'l\'oggetto': "la aula per conferenza",
+            'gli oggetti': "le aule per conferenze", 
+            'un oggetto': "una aula per conferenza", 
         }
         this.ModelName = 'ConferenceRoom'
         this.ModelCategory = 'stanze'

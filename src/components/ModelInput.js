@@ -18,7 +18,8 @@ import {
     NumberInput,
     AttachmentInput,
     ImageInput,
-    ConferenceRoomInput
+    ConferenceRoomInput,
+    SeminarCategoryInput
 } from './Input'
 
 import { 
@@ -50,6 +51,7 @@ export function ModelFieldInput({ id, schema, value, setValue }) {
         if (schema['x-ref'] === 'Person') return element(PersonInput)
         if (schema['x-ref'] === 'Room') return element(RoomInput)
         if (schema['x-ref'] === 'ConferenceRoom') return element(ConferenceRoomInput)
+        if (schema['x-ref'] === 'SeminarCategory') return element(SeminarCategoryInput)
         if (schema['x-ref'] === 'Institution') return element(InstitutionInput)
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
         if (schema.format === 'date-time') {

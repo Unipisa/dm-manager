@@ -412,14 +412,32 @@ export function ConferenceRoomInput({ id, value, setValue }) {
         value={value}
         setValue={setValue}
         objCode="conference-room"
-        objName="stanza per conferenza"
+        objName="aula per conferenza"
         oa="a"
         render={conferenceRoom => conferenceRoom.name}
         new_object={q => ({ name: '' })}
         inputs={{
-                name: 'Nome',
+            name: 'Nome',
         }}
-        placeholder="stanza"
+        placeholder="Aula per conferenza..."
+    />
+}
+
+export function SeminarCategoryInput({ id, value, setValue }) {
+    return <ObjectInput
+        id={id}
+        value={value}
+        setValue={setValue}
+        objCode="seminar-category"
+        objName="ciclo di seminari"
+        oa="o"
+        render={seminarCategory => seminarCategory.name}
+        new_object={q => ({ name: q, label: '' })}
+        inputs={{
+            name: 'Nome',
+            label: 'Label',
+        }}
+        placeholder="Ciclo di seminari..."
     />
 }
 

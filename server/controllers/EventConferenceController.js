@@ -1,4 +1,4 @@
-const { EventConference } = require('../models/Event.js')
+const EventConference = require('../models/EventConference.js')
 const Controller = require('./Controller.js')
 
 class EventConferenceController extends Controller {

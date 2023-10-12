@@ -25,7 +25,7 @@ export default class EventConference {
             'startDate': 'Data Inizio',
             'endDate': 'Data Fine',
             'SSD': 'SSD',
-            'conferenceRoom': 'Stanza',
+            'conferenceRoom': 'Aula',
         }
 
         this.schema = null

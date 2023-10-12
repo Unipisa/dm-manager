@@ -19,6 +19,8 @@ import EventConference from './EventConference'
 import EventColloquium from './EventColloquium'
 import EventPhdCourse from './EventPhdCourse'
 
+import SeminarCategory from './SeminarCategory'
+
 const Models = { 
     // amministrazione:
     Token: new Token(),
@@ -50,6 +52,8 @@ const Models = {
     EventConference: new EventConference(),
     EventColloquium: new EventColloquium(),
     EventPhdCourse: new EventPhdCourse(),
+    
+    SeminarCategory: new SeminarCategory(),
 }
 
 export default Models
