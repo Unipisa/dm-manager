@@ -5,18 +5,14 @@ async function staffQuery(req) {
     const matches = []
 
     if (req.query.email) {
-        matches.push({$match: {
-            $or: [
-                { 'email': req.query.email },
-                { 'alternativeEmails': req.query.email },
-            ]
-        }})
+        matches.push({ 'email': req.query.email },
+            { 'alternativeEmails': req.query.email })
     }
 
     if (req.query.matricola) {
-        matches.push({$match: {
+        matches.push({
             'staff.matricola': req.query.matricola
-        }})
+        })
     }
 
     const pipeline = [
@@ -47,7 +43,9 @@ async function staffQuery(req) {
                 'staff.0': {$exists: true}
             }
         },
-        ...matches,
+        {$match: {
+            $or: matches,
+        }},
         {$lookup: {
             from: 'institutions',
             localField: 'affiliations',
