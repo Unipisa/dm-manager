@@ -54,6 +54,11 @@
     "test-react": "react-scripts test (not implemented yet)",
     "eject": "react-scripts eject"
   },
+  "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    }
+  },
   "_proxy": "http://localhost:8000",
   "eslintConfig": {
     "extends": [
