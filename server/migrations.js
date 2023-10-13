@@ -13,13 +13,19 @@ const he = require('he')
 async function findPerson(people, firstName, lastName, affiliazione) {
     let p = await people.findOne({ firstName, lastName })
     if (p === null) {
-        p = await people.insertOne({ firstName, lastName, affiliation: affiliazione || "Università di Pisa"})
-        p = p.insertedId
+        p = await people.insertOne({ 
+            firstName, 
+            lastName, 
+            affiliation: affiliazione || "Università di Pisa",
+            created_by_migration: true,
+            notes: `creato da migrazione\n***fix affiliation: ${affiliazione}\n`,
+        })
         console.log(`Nuova persona creata: ${firstName} ${lastName}`)
+        return p.insertedId
     } else {
-        console.log(`Persona trovata: ${firstName} ${lastName}`)
+        console.log(`Persona trovata: ${firstName} ${lastName} ${p._id}`)
+        return p._id
     }
-    return p
 }
 
 async function findPerson2(people, fullName, affiliazione) {
@@ -41,13 +47,11 @@ async function findPerson2(people, fullName, affiliazione) {
         ]).toArray()
         if (p.length === 1) {
             console.log(`found ${fullName} as ${p[0].firstName}+${p[0].lastName}`)
-            return p[0]
+            return p[0]._id
         } else {
-            console.log(`*** not found ${fullName}: cannot distinguish firstName by lastName`)
-            p = null
+            return findPerson(people, fullName, '*** fixme ***')
         }
     }
-    return p
 }
 
 const migrations = { 
@@ -373,11 +377,12 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_3: async function(db) {
+    D20231013_copy_events_6: async function(db) {
         var offset = 0;
         const batch_size = 100;
         var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
 
+        const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const colloquia = db.collection('eventcolloquia')
         const phdcourses = db.collection('eventphdcourses')
@@ -522,14 +527,14 @@ const migrations = {
             Teams: 'Teams',
           }
           
+        people.deleteMany({created_by_migration: true})
         conferences.deleteMany({})
+        colloquia.deleteMany({})
         conferencerooms.deleteMany({})
 
         const created_rooms = {}
 
         for (const [room_key, room_name] of Object.entries(room_mapping)) {
-            console.log(room_key)
-            console.log(room_name)
             if (created_rooms[room_name] === undefined) {
                 const newroom = await conferencerooms.insertOne({
                     name: room_name,
@@ -541,29 +546,51 @@ const migrations = {
 
         while (res.data.length > 0) {
             const events = res.data
-            for (const event of events) {                
-                // Conference
-                if (event.unipievents_taxonomy.includes(90)) {
-                    console.log(event.link)
+            for (const event of events) {   
+                const taxonomy = event.unipievents_taxonomy             
+                const title = he.decode(event.title.rendered)
+                const conferenceRoom = created_rooms[room_mapping[event.unipievents_place]]
+                const startDatetime = toUTCDate(event.unipievents_startdate)
+                const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
+                const notes = event.content.rendered
+                const old_url = event.link
 
-                    console.log(event.unipievents_place)
-                    console.log(created_rooms[room_mapping[event.unipievents_place]])
+                if (taxonomy.includes(90)) {
+                    console.log("> Conference", event.link)
 
                     const object = {
-                        title: he.decode(event.title.rendered),
+                        title,
                         startDate: toUTCDate(event.unipievents_startdate),
                         endDate: toUTCDate(event.unipievents_enddate),
                         SSD: event.unipievents_taxonomy.map(categoryToSSD).filter(x => x),
                         url: "",
-                        old_url: event.link,
-                        conferenceRoom: created_rooms[room_mapping[event.unipievents_place]],
+                        old_url,
+                        conferenceRoom,
                         grants: [],
-                        notes: event.content.rendered
+                        notes,
                     }
                     if (! await conferences.insertOne(object)) {
                         console.log("Error")
                         return false
                     }
+                } else if (taxonomy.includes(175)) {
+                    console.log("> Colloquium", event.link)
+                    const speaker = title.split('–')[1].split('(')[0].trim()
+                    const affiliation = title.split('–')[1].split('(')[1].trim().trim(')')   
+                    const person = await findPerson2(people, speaker, affiliation)
+                    const object = {
+                        title: title.split('–')[0].trim(),
+                        conferenceRoom,
+                        startDatetime,
+                        speaker: person,
+                        duration,
+                        notes,     
+                        old_url,               
+                        grants: [],
+                    }
+                    await colloquia.insertOne(object)
+                } else {
+                    console.log(taxonomy, event.link)
                 }
                 
             }
