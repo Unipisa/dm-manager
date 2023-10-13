@@ -17,6 +17,7 @@
     "connect-mongo": "^4.6.0",
     "cors": "^2.8.5",
     "express-session": "^1.17.3",
+    "he": "^1.2.0",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
     "mongoose": "^6.5.2",

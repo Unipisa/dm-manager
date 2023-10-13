@@ -7,6 +7,9 @@
  * più allo stato del database
  */
 
+const { default: axios } = require('axios')
+const he = require('he')
+
 async function findPerson(people, firstName, lastName, affiliazione) {
     let p = await people.findOne({ firstName, lastName })
     if (p === null) {
@@ -367,6 +370,207 @@ const migrations = {
         await forms.updateMany(
             {},
             { $set: { requireAuthentication: true }})
+        return true
+    },
+
+    D20231013_copy_events_3: async function(db) {
+        var offset = 0;
+        const batch_size = 100;
+        var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
+
+        const conferences = db.collection('eventconferences')
+        const colloquia = db.collection('eventcolloquia')
+        const phdcourses = db.collection('eventphdcourses')
+        const seminars = db.collection('eventseminars')
+        const conferencerooms = db.collection('conferencerooms')
+
+        toUTCDate = s => {
+            const sd = new Date(s * 1000)
+            const date = new Date(sd.getFullYear(), sd.getUTCMonth(), sd.getUTCDate(), sd.getUTCHours(), sd.getUTCMinutes())
+            return date
+        }
+
+        categoryToSSD = c => {
+            return {
+                '198': 'MAT/01',
+                '162': 'MAT/02',
+                '152': 'MAT/03',
+                '200': 'MAT/04',
+                '114': 'MAT/05',
+                '190': 'MAT/06',
+                '191': 'MAT/07',
+                '154': 'MAT/08'
+            }[c];
+        }
+
+        const room_mapping = {
+            'Department of Mathematics, Aula Seminari.': 'Aula Seminari (DM)',
+            'Aula Magna': 'Aula Magna (DM)',
+            'Aula Seminari': 'Aula Seminari (DM)',
+            'Scuola Normale Superiore, Aula Volterra.': 'Aula Volterra (SNS)',
+            'Dipartimento di Matematica, Sala Seminari.': 'Aula Seminari (DM)',
+            'Department of Mathematics, Aula Riunioni.': 'Aula Riunioni (DM)',
+            'Aula Dini, Centro De Giorgi': 'Aula Dini (CRM)',
+            'Aula Seminari - Dipartimento di Matematica': 'Aula Seminari (DM)',
+            'Aula Riunioni - Dipartimento di Matematica': 'Aula Riunioni (DM)',
+            'Aula Magna - Dipartimento di Matematica': 'Aula Magna (DM)',
+            'CRM - SNS, Sala Conferenze - Palazzo Puteano.': 'Sala Conferenze (Palazzo Puteano)',
+            'Aula Riunioni, Dipartimento di Matematica': 'Aula Riunioni (DM)',
+            'Department of Mathematics, Aula Magna.': 'Aula Magna (DM)',
+            'Dipartimento di Matematica, Aula Magna.': 'Aula Magna (DM)',
+
+            'Aula 1 Dipartimento di Matematica.': 'Aula 1 (DM)',
+            'Aula 2 Dipartimento di Matematica.': 'Aula 2 (DM)',
+            'Aula Bianchi Lettere - Palazzo della Carovana': 'Aula Bianchi Lettere (SNS)',
+            'Aula Bianchi Lettere (SNS).': 'Aula Bianchi Lettere (SNS)',
+            'Aula Bianchi Scienze (SNS).': 'Aula Bianchi Scienze (SNS)',
+            'Aula Centro De Giorgi.': 'Aula Centro De Giorgi.',
+            'Aula Fermi, Palazzo della Carovana': 'Aula Fermi (SNS)',
+            'Aula Magna - Dipartimento di Matematica.': 'Aula Magna (DM)',
+            'Aula Magna (Dip. Matematica Applicata).': 'Aula Magna (ex-DMA).',
+            'Aula Magna (Dipartimento di Matematica).': 'Aula Magna (DM)',
+            'Aula Magna Polo Fibonacci, Pisa': 'Aula Magna (Polo Fibonacci)',
+            'aula magna storica (palazzo della Sapienza)': 'Aula magna storica (Palazzo della Sapienza)',
+            'Aula Magna, Department of Mathematics': 'Aula Magna (DM)',
+            'Aula Magna, Dipartimento di Matematica': 'Aula Magna (DM)',
+            'Aula Mancini (SNS).': 'Aula Mancini (SNS)',
+            'Aula O1 - Polo Fibonacci': 'Aula O1 (Polo Fibonacci)',
+            'Aula P1 - Polo Fibonacci': 'Aula P1 (Polo Fibonacci)',
+            'Aula Riunioni (Dipartimento di Matematica).': 'Aula Riunioni (DM)',
+            'Aula Riunioni, Department of Mathematics.': 'Aula Riunioni (DM)',
+            'Aula riunioni, Dipartimento di matematica': 'Aula Riunioni (DM)',
+            'Aula Riunioni': 'Aula Riunioni (DM)',
+            'Aula seminari - Dipartimento di Matematica': 'Aula Seminari (DM)',
+            'Aula Seminari e Riunioni': 'Aula Seminari e Riunioni (DM)',
+            'Aula Seminari, Department of Mathematics': 'Aula Seminari (DM)',
+            'Aula Seminari, Dipartimento di Matematica': 'Aula Seminari (DM)',
+            'Aula seminari': 'Aula Seminari (DM)',
+            'Aula Tonelli - Palazzo della Carovana': 'Aula Tonelli (SNS)',
+            'Aula Tonelli (SNS).': 'Aula Tonelli (SNS)',
+            'Aula Volterra - Palazzo della Carovana': 'Aula Volterra (SNS)',
+            'Aula Volterra, Normale': 'Aula Volterra (SNS)',
+            'Aula Volterra, Scuola Normale Superiore': 'Aula Volterra (SNS)',
+            'BellaVista Relax Hotel': 'BellaVista Relax Hotel',
+            'Centro De Giorgi - SNS ': 'Centro De Giorgi (SNS)',
+            'Centro de Giorgi - SNS.': 'Centro De Giorgi (SNS)',
+            'Centro De Giorgi - SNS.': 'Centro De Giorgi (SNS)',
+            'Collegio Puteano, SNS': 'Collegio Puteano (SNS)',
+            'conferenza telematica': 'conferenza telematica',
+            'CRM - SNS.': 'Centro De Giorgi (SNS)',
+            'CRM SNS.': 'Centro De Giorgi (SNS)',
+            'Department of Mathematics and online': 'Department of Mathematics and online',
+            'Department of Mathematics, Aula Magna': 'Aula Magna (DM)',
+            'Department of Mathematics, Aula Riunioni': 'Aula Riunioni (DM)',
+            'Department of Mathematics, Aula Seminari': 'Aula Seminari (DM)',
+            'Department of Mathematics, Aula Seminari`.': 'Aula Seminari (DM)',
+            'Department of Mathematics, N1.': 'Aula N1 (Polo Fibonacci)',
+            'Department of Mathematics, Sala Seminari': 'Aula Seminari (DM)',
+            'Department of Mathematics, University of Pisa, Aula Magna': 'Aula Magna (DM)',
+            'Department of Mathematics, University of Pisa': 'Dipartimento di Matematica',
+            'Dipartimenti di Matematica, Aula Seminari.': 'Aula Seminari (DM)',
+            'Dipartimento di Matematica Università di Pisa, Aula magna': 'Aula Magna (DM)',
+            'Dipartimento di Matematica, Aula Magna': 'Aula Magna (DM)',
+            'Dipartimento di Matematica, Aula Riunioni.': 'Aula Riunioni (DM)',
+            'Dipartimento di Matematica, Aula seminari.': 'Aula Seminari (DM)',
+            'Dipartimento di Matematica, Aula Seminari.': 'Aula Seminari (DM)',
+            'Dipartimento di Matematica, Sala Riunioni.': 'Aula Riunioni (DM)',
+            'Dipartimento di Matematica, Sala Riunioni': 'Aula Riunioni (DM)',
+            'Dipartimento di Matematica, Università di Pisa e SNS, Pisa': 'Dipartimento di Matematica, Università di Pisa e SNS, Pisa',
+            'Dipartimento di Matematica, Università di Pisa, Aula Magna': 'Aula Magna (DM)',
+            'Dipartimento di Matematica': 'Dipartimento di Matematica',
+            'Dipartimetno di Matematica, Aula Seminari.': 'Aula Seminari (DM)',
+            'Dobbiaco (Toblach)': 'Dobbiaco (Toblach)',
+            'Google Meet.': 'Google Meet',
+            'Google Meet': 'Google Meet',
+            'Grand Hotel Tettuccio Montecatini, Sala Conferenze': 'Grand Hotel Tettuccio Montecatini, Sala Conferenze',
+            'IHÉS, France': 'IHÉS, France',
+            'Levico Terme, Italy': 'Levico Terme, Italy',
+            'Museo del Calcolo, Pisa': 'Museo del Calcolo, Pisa',
+            'Online ( https://seminarimap.wixsite.com/seminarimap )': 'Online ( https://seminarimap.wixsite.com/seminarimap )',
+            'Palazzo della Carovana, Aula Bianchi Lettere': 'Aula Bianchi Lettere (SNS)',
+            'Palazzo della Carovana, Aula Russo': 'Aula Russo (SNS)',
+            'Palazzone di Cortona': 'Palazzone di Cortona',
+            'Pisa, “Polo Congressuale Le Benedettine” (June 6-7-8), “Aula Magna Pontecorvo” (June 10-11)': 'Polo Congressuale Le Benedettine',
+            'Polo Carmignani, Aula Magna': 'Aula Magna (Polo Carmignani)',
+            'Sala Conferenze (Puteano, Centro De Giorgi).': 'Sala Conferenze (Collegio Puteano)',
+            'Sala conferenze, Centro De Giorgi': 'Sala conferenze (CRM)',
+            'Sala delle Riunioni (Dip. Matematica Applicata).': 'Aula Riunioni (ex-DMA)',
+            'Sala Riunioni (Dip. Matematica).': 'Aula Riunioni (DM)',
+            'Sala Riunioni (Dipartimento di Matematica).': 'Aula Riunioni (DM)',
+            'Sala Riunioni (Puteano, Centro De Giorgi).': 'Aula Riunioni (DM)',
+            'Sala Seminari .': 'Aula Seminari (DM)',
+            'Sala Seminari (Dip. Matematica).': 'Aula Seminari (DM)',
+            'Sala Seminari (Dipartimento di Matematica).': 'Aula Seminari (DM)',
+            'Sala Seminari del Dipartimento di Matematica': 'Aula Seminari (DM)',
+            'Sala Seminari.': 'Aula Seminari (DM)',
+            'sala seminari': 'Aula Seminari (DM)',
+            'Sala seminari': 'Aula Seminari (DM)',
+            'Sala Seminari': 'Aula Seminari (DM)',
+            'Scuola Normale Superiore, Aula Mancini.': 'Aula Mancini (SNS)',
+            'Scuola Normale Superiore, Pisa, Aula Mancini.': 'Aula Mancini (SNS)',
+            'SISSA - Trieste': 'SISSA - Trieste',
+            'SNS - Centro De Giorgi - Aula Seminari.': 'Aula Seminari (CRM)',
+            'SNS - Centro De Giorgi - Aula Seminari': 'Aula Seminari (CRM)',
+            'SNS - CRM, Sala Seminari.': 'Aula Seminari (CRM)',
+            'SNS - Palazzo della Carovana.': 'Palazzo della Carovana (SNS)',
+            'SNS – Centro De Giorgi – Aula Seminari.': 'Aula Seminari (CRM)',
+            'SNS Aula Dini, Palazzo del Castelletto': 'Aula Dini (CRM)',
+            'SNS, Aula Mancini.': 'Aula Mancini (SNS)',
+            'SNS, Pisa': 'Palazzo della Carovana (SNS)',
+            'Università degli Studi di Milano La Statale, Dipartimento di Matematica': 'Università degli Studi di Milano La Statale, Dipartimento di Matematica',
+            Online: 'Online',
+            Teams: 'Teams',
+          }
+          
+        conferences.deleteMany({})
+        conferencerooms.deleteMany({})
+
+        const created_rooms = {}
+
+        for (const [room_key, room_name] of Object.entries(room_mapping)) {
+            console.log(room_key)
+            console.log(room_name)
+            if (created_rooms[room_name] === undefined) {
+                const newroom = await conferencerooms.insertOne({
+                    name: room_name,
+                })
+
+                created_rooms[room_name] = newroom.insertedId
+            }
+        }
+
+        while (res.data.length > 0) {
+            const events = res.data
+            for (const event of events) {                
+                // Conference
+                if (event.unipievents_taxonomy.includes(90)) {
+                    console.log(event.link)
+
+                    console.log(event.unipievents_place)
+                    console.log(created_rooms[room_mapping[event.unipievents_place]])
+
+                    const object = {
+                        title: he.decode(event.title.rendered),
+                        startDate: toUTCDate(event.unipievents_startdate),
+                        endDate: toUTCDate(event.unipievents_enddate),
+                        SSD: event.unipievents_taxonomy.map(categoryToSSD).filter(x => x),
+                        url: "",
+                        old_url: event.link,
+                        conferenceRoom: created_rooms[room_mapping[event.unipievents_place]],
+                        grants: [],
+                        notes: event.content.rendered
+                    }
+                    if (! await conferences.insertOne(object)) {
+                        console.log("Error")
+                        return false
+                    }
+                }
+                
+            }
+            res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=${offset}`)
+            offset += batch_size
+        }
+
         return true
     },
 }

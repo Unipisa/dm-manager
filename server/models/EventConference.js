@@ -6,7 +6,7 @@ const {
     endDate,
     createdBy, 
     updatedBy,
-    SSD,
+    multipleSSDs,
     notes,
 } = require('./Model')
 
@@ -16,7 +16,7 @@ const eventConferenceSchema = new Schema({
     title:  {type: String, label: 'Titolo'},
     startDate,
     endDate,
-    SSD,
+    SSD: multipleSSDs,
     url: { type: String, label: 'Sito web' },
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
