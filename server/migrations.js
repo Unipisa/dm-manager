@@ -377,7 +377,7 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_6: async function(db) {
+    D20231013_copy_events_7: async function(db) {
         var offset = 0;
         const batch_size = 100;
         var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
@@ -527,10 +527,29 @@ const migrations = {
             Teams: 'Teams',
           }
           
+          const category_mapping = {
+              "algebra-seminar":	3,
+              "algebraic-and-arithmetic-geometry-seminar":	75,
+              "analysis-seminar":	159,
+              "baby-geometri-seminar":	79,
+              "dynamical-systems-seminar":	78,
+              "geometry-seminar":	85,
+              "il-teorema-piu-bello":	5,
+              "logic-seminar":	23,
+              "mathematical-physics-seminar":	6,
+              "number-theory-seminar":	7,
+              "probability-stochastic-analysis-statistics-seminar":	73,
+              "seminar-on-combinatorics-and-lie-theory-and-topology":	33,
+              "seminar-on-numerical-analysis":	63,
+              "seminari-map":	21,
+        }
+
+
         people.deleteMany({created_by_migration: true})
         conferences.deleteMany({})
         colloquia.deleteMany({})
         conferencerooms.deleteMany({})
+        seminars.deleteMany({})
 
         const created_rooms = {}
 
@@ -541,6 +560,21 @@ const migrations = {
                 })
 
                 created_rooms[room_name] = newroom.insertedId
+            }
+        }
+
+        const created_categories = {}
+
+        for (const [category, label] of Object.entries(category_mapping)) {
+            const find = await db.collection('eventcategories').findOne({ label })
+            if (find) {
+                created_categories[category] = find._id
+            } else {
+                const newcategory = await db.collection('eventcategories').insertOne({
+                    name:label,
+                    label,
+                })
+                created_categories[category] = newcategory.insertedId
             }
         }
 
@@ -590,7 +624,34 @@ const migrations = {
                     }
                     await colloquia.insertOne(object)
                 } else {
+                    console.log("> Seminar", event.link)
                     console.log(taxonomy, event.link)
+                    console.log("title", title)
+                    let speaker = null
+                    try {
+                        speaker = title.split('–')[1].split('(')[0].trim()
+                    } catch (e) {
+                    }
+                    let affiliation = ""
+                    try {
+                        affiliation = title.split('–').at(-1).split('(')[1].trim().trim(')')   
+                    } catch (e) {
+                    }
+                    const person = speaker 
+                        ? await findPerson2(people, speaker, affiliation)
+                        : null
+                    const object = {
+                        speaker: person,
+                        title,
+                        conferenceRoom,
+                        startDatetime,
+                        duration,
+                        category: created_categories[taxonomy[0]] || created_categories[taxonomy[1]],
+                        grants: [],
+                        abstract: notes,                    
+                    }
+                    console.log(object)
+                    await seminars.insertOne(object)
                 }
                 
             }
