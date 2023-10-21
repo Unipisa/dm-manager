@@ -111,37 +111,35 @@ async function visitsQuery(req) {
             localField: 'person',
             foreignField: '_id',
             as: 'person',
-            pipeline: [
-                {$lookup: {
-                    from: 'institutions',
-                    localField: 'affiliations',
-                    foreignField: '_id',
-                    as: 'affiliations',
-                    pipeline: [
-                        {$project: {
-                            _id: 0,
-                            name: 1,
-                            code: 1,
-                            city: 1,
-                            country: 1,
-                        }}
-                    ]
-                }},
-            ]
         }},
-        ...personRoomAssignmentPipeline(),
         { $unwind: {
             path: '$person',
             preserveNullAndEmptyArrays: true
+        }},
+        ...personRoomAssignmentPipeline(),
+        {$lookup: {
+            from: 'institutions',
+            localField: 'affiliations',
+            foreignField: '_id',
+            as: 'affiliations',
+            pipeline: [
+                {$project: {
+                    _id: 0,
+                    name: 1,
+                    code: 1,
+                    city: 1,
+                    country: 1,
+                }}
+            ]
         }},
         { $project: {
             _id: 0,
             startDate: 1,
             endDate: 1,
+            affiliations: 1,
             person: {
                 firstName: 1,
                 lastName: 1,
-                affiliations: 1,
             },
             roomAssignment: {
                 room: {
