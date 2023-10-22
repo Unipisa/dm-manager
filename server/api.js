@@ -2,7 +2,9 @@ const express = require('express')
 
 const config = require('./config')
 const profile = require('./controllers/profile')
-const { staffQuery, visitsQuery } = require('./controllers/public')
+const staffQuery = require('./controllers/public/staff')
+const visitsQuery = require('./controllers/public/visits')
+const seminarsQuery = require('./controllers/public/seminars')
 
 const router = express.Router()
 
@@ -64,6 +66,10 @@ router.get('/public/staff', async (req, res) => {
 
 router.get('/public/visits', async (req, res) => {
     res.send(await visitsQuery(req))
+})
+
+router.get('/public/seminars', async (req, res) => {
+    res.send(await seminarsQuery(req))
 })
 
 module.exports = router
