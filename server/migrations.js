@@ -380,7 +380,7 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_10: async function(db) {
+    D20231013_copy_events_11: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
@@ -569,8 +569,8 @@ const migrations = {
                 created_categories[label] = find._id
             } else {
                 const newcategory = await db.collection('eventcategories').insertOne({
-                    name:label,
-                    label,
+                    name: category,
+                    label: `${label}`,
                 })
                 created_categories[label] = newcategory.insertedId
             }
