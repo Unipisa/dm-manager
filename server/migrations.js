@@ -1,7 +1,15 @@
 /**
  * "migrations" contiene le migrazioni da applicare.
+ * 
  * Se la funzione torna true il nome viene salvato
  * nel database e la migrazione non verrà più applicata.
+ * 
+ * Se la migrazione torna undefined o false
+ * il nome non viene salvato e la migrazione verrà
+ * applicata ogni volta che il server viene avviato.
+ * Se la migrazione torna false il server non si avvia
+ * se invece torna undefined il server si avvia comunque
+ * 
  * Le migrazioni devono essere autoconsistenti, non bisogna
  * utilizzare i modelli perché potrebbero non corrispondere 
  * più allo stato del database
@@ -380,11 +388,12 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_11: async function(db) {
+    D20231013_copy_events_13: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
         const conferencerooms = db.collection('conferencerooms')
+        const seminarcategories = db.collection('seminarcategories')
 
         toUTCDate = s => {
             const sd = new Date(s * 1000)
@@ -436,8 +445,10 @@ const migrations = {
             'Aula Magna, Department of Mathematics': 'Aula Magna (DM)',
             'Aula Magna, Dipartimento di Matematica': 'Aula Magna (DM)',
             'Aula Mancini (SNS).': 'Aula Mancini (SNS)',
+            'Aula N, Polo Fibonacci': 'Aula N (Polo Fibonacci)',
             'Aula O1 - Polo Fibonacci': 'Aula O1 (Polo Fibonacci)',
             'Aula P1 - Polo Fibonacci': 'Aula P1 (Polo Fibonacci)',
+            'Aula Riunioni.': 'Aula Riunioni (DM)',
             'Aula Riunioni (Dipartimento di Matematica).': 'Aula Riunioni (DM)',
             'Aula Riunioni, Department of Mathematics.': 'Aula Riunioni (DM)',
             'Aula riunioni, Dipartimento di matematica': 'Aula Riunioni (DM)',
@@ -511,6 +522,7 @@ const migrations = {
             'Scuola Normale Superiore, Aula Mancini.': 'Aula Mancini (SNS)',
             'Scuola Normale Superiore, Pisa, Aula Mancini.': 'Aula Mancini (SNS)',
             'SISSA - Trieste': 'SISSA - Trieste',
+            'SNS - Centro De Giorgi.': 'Aula Seminari (CRM)',
             'SNS - Centro De Giorgi - Aula Seminari.': 'Aula Seminari (CRM)',
             'SNS - Centro De Giorgi - Aula Seminari': 'Aula Seminari (CRM)',
             'SNS - CRM, Sala Seminari.': 'Aula Seminari (CRM)',
@@ -543,11 +555,11 @@ const migrations = {
               "seminari-map":	21,
         }
 
-
-        people.deleteMany({created_by_migration: true})
-        conferences.deleteMany({})
-        conferencerooms.deleteMany({})
-        seminars.deleteMany({})
+        await people.deleteMany({created_by_migration: true})
+        await conferences.deleteMany({})
+        await conferencerooms.deleteMany({})
+        await seminars.deleteMany({})
+        await seminarcategories.deleteMany({})
 
         const created_rooms = {}
 
@@ -564,17 +576,18 @@ const migrations = {
         const created_categories = {}
 
         for (const [category, label] of Object.entries(category_mapping)) {
-            const find = await db.collection('eventcategories').findOne({ label })
-            if (find) {
-                created_categories[label] = find._id
-            } else {
-                const newcategory = await db.collection('eventcategories').insertOne({
+            const newcategory = await seminarcategories.insertOne({
                     name: category,
                     label: `${label}`,
                 })
-                created_categories[label] = newcategory.insertedId
-            }
+            const find = await seminarcategories.findOne({ label : `${label}`})
+            created_categories[label] = find._id
         }
+
+        const lst = (await seminarcategories.find()).toArray()
+        console.log(JSON.stringify({lst}))
+
+        console.log(JSON.stringify({created_categories}))
 
         var offset = 0;
         const batch_size = 97;
@@ -592,6 +605,11 @@ const migrations = {
                 const notes = event.content.rendered
                 const abstract = event.content.rendered
                 const oldUrl = event.link
+
+                if (event.unipievents_place && !conferenceRoom) {
+                    console.log("**************** Cannot find room: ${event.unipievents_place}")
+                    console.log("conferenceRoom", JSON.stringify({conferenceRoom, unipi_place: event.unipievents_place}))
+                }
 
                 if (taxonomy.includes(90)) {
                     console.log("> Conference", event.link)
@@ -658,7 +676,7 @@ const migrations = {
                         oldUrl,
                         abstract: notes,                    
                     }
-                    //console.log(object)
+                    // console.log(object)
                     if (alreadyLoaded[object.title] === undefined) {
                         alreadyLoaded[object.title] = true
                         await seminars.insertOne(object)
@@ -722,13 +740,15 @@ async function migrate(db, options) {
         for (const [name, run] of Object.entries(migrations)) {
             if (config.migrations.includes(name)) continue
             console.log(`===> apply migration: ${name}`)
-            if (await run(db)) {
+            const ret = await run(db)
+            if (ret) {
                 // migrazione applicata!
                 config.migrations.push(name)
                 await update()
                 console.log(`migration ${name} OK!`)
             } else {
-                console.log(`migration ${name} FAILED! ****`)
+                console.log(`migration ${name} FAILED! **** (${JSON.stringify(ret)})`)
+                if (ret === undefined) return true
                 return false
             }
         }
