@@ -9,6 +9,7 @@
 
 const { default: axios } = require('axios')
 const he = require('he')
+const assert = require('assert')
 
 async function findPerson(people, firstName, lastName, affiliazione) {
     let p = await people.findOne({ firstName, lastName })
@@ -379,7 +380,7 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_9: async function(db) {
+    D20231013_copy_events_10: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
@@ -528,6 +529,7 @@ const migrations = {
               "algebra-seminar":	3,
               "algebraic-and-arithmetic-geometry-seminar":	75,
               "analysis-seminar":	159,
+              "analysis-seminar2":  77,
               "baby-geometri-seminar":	79,
               "dynamical-systems-seminar":	78,
               "geometry-seminar":	85,
@@ -564,13 +566,13 @@ const migrations = {
         for (const [category, label] of Object.entries(category_mapping)) {
             const find = await db.collection('eventcategories').findOne({ label })
             if (find) {
-                created_categories[category] = find._id
+                created_categories[label] = find._id
             } else {
                 const newcategory = await db.collection('eventcategories').insertOne({
                     name:label,
                     label,
                 })
-                created_categories[category] = newcategory.insertedId
+                created_categories[label] = newcategory.insertedId
             }
         }
 
@@ -630,6 +632,8 @@ const migrations = {
                     // console.log("> Seminar", event.link)
                     console.log(taxonomy, event.link)
                     // console.log("title", title)
+                    const category = created_categories[taxonomy[0]] || created_categories[taxonomy[1]]
+
                     let speaker = null
                     try {
                         speaker = title.split('–')[1].split('(')[0].trim()
@@ -649,7 +653,7 @@ const migrations = {
                         conferenceRoom,
                         startDatetime,
                         duration,
-                        category: created_categories[taxonomy[0]] || created_categories[taxonomy[1]],
+                        category,
                         grants: [],
                         oldUrl,
                         abstract: notes,                    
