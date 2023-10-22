@@ -16,7 +16,6 @@ import Thesis from './Thesis'
 
 import EventSeminar from './EventSeminar'
 import EventConference from './EventConference'
-import EventColloquium from './EventColloquium'
 import EventPhdCourse from './EventPhdCourse'
 
 import SeminarCategory from './SeminarCategory'
@@ -50,7 +49,6 @@ const Models = {
     // eventi:
     EventSeminar: new EventSeminar(),
     EventConference: new EventConference(),
-    EventColloquium: new EventColloquium(),
     EventPhdCourse: new EventPhdCourse(),
     
     SeminarCategory: new SeminarCategory(),

@@ -30,7 +30,6 @@ let ModelSchemas = {}
     // Event Controllers
     require('./controllers/EventSeminarController'),
     require('./controllers/EventConferenceController'),
-    require('./controllers/EventColloquiumController'),
     require('./controllers/EventPhdCourseController'),
 ].forEach(Controller => {
     const controller = new Controller()

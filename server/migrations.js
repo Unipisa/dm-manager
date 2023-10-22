@@ -377,15 +377,9 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_7: async function(db) {
-        var offset = 0;
-        const batch_size = 100;
-        var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
-
+    D20231013_copy_events_8: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
-        const colloquia = db.collection('eventcolloquia')
-        const phdcourses = db.collection('eventphdcourses')
         const seminars = db.collection('eventseminars')
         const conferencerooms = db.collection('conferencerooms')
 
@@ -528,6 +522,7 @@ const migrations = {
           }
           
           const category_mapping = {
+              "colloquium": 175,
               "algebra-seminar":	3,
               "algebraic-and-arithmetic-geometry-seminar":	75,
               "analysis-seminar":	159,
@@ -547,7 +542,6 @@ const migrations = {
 
         people.deleteMany({created_by_migration: true})
         conferences.deleteMany({})
-        colloquia.deleteMany({})
         conferencerooms.deleteMany({})
         seminars.deleteMany({})
 
@@ -578,6 +572,11 @@ const migrations = {
             }
         }
 
+        var offset = 0;
+        const batch_size = 97;
+
+        const alreadyLoaded = {}
+        var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
         while (res.data.length > 0) {
             const events = res.data
             for (const event of events) {   
@@ -587,6 +586,7 @@ const migrations = {
                 const startDatetime = toUTCDate(event.unipievents_startdate)
                 const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
                 const notes = event.content.rendered
+                const abstract = event.content.rendered
                 const old_url = event.link
 
                 if (taxonomy.includes(90)) {
@@ -614,19 +614,20 @@ const migrations = {
                     const person = await findPerson2(people, speaker, affiliation)
                     const object = {
                         title: title.split('–')[0].trim(),
+                        category: created_categories['colloquium'],
                         conferenceRoom,
                         startDatetime,
                         speaker: person,
                         duration,
-                        notes,     
+                        abstract,     
                         old_url,               
                         grants: [],
                     }
-                    await colloquia.insertOne(object)
+                    await seminars.insertOne(object)
                 } else {
-                    console.log("> Seminar", event.link)
-                    console.log(taxonomy, event.link)
-                    console.log("title", title)
+                    // console.log("> Seminar", event.link)
+                    // console.log(taxonomy, event.link)
+                    // console.log("title", title)
                     let speaker = null
                     try {
                         speaker = title.split('–')[1].split('(')[0].trim()
@@ -642,7 +643,7 @@ const migrations = {
                         : null
                     const object = {
                         speaker: person,
-                        title,
+                        title: title.split('–')[0].trim(),
                         conferenceRoom,
                         startDatetime,
                         duration,
@@ -650,12 +651,16 @@ const migrations = {
                         grants: [],
                         abstract: notes,                    
                     }
-                    console.log(object)
-                    await seminars.insertOne(object)
+                    //console.log(object)
+                    if (alreadyLoaded[object.title] === undefined) {
+                        alreadyLoaded[object.title] = true
+                        await seminars.insertOne(object)
+                    }
                 }
                 
             }
             res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=${offset}`)
+            console.log(`BATCh ${offset}`)
             offset += batch_size
         }
 
