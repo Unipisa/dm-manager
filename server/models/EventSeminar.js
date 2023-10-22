@@ -17,7 +17,8 @@ const eventSeminarSchema = new Schema({
     category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: true },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     abstract: { type: String, label: 'Abstract', widget: 'text' },
-    
+    oldUrl: { type: String, label: 'URL vecchio', widget: 'url' },
+
     createdBy,
     updatedBy,
 }, { 
@@ -25,6 +26,7 @@ const eventSeminarSchema = new Schema({
 })
 
 const EventSeminar = model('EventSeminar', eventSeminarSchema)
+module.exports = EventSeminar
 
 Grant.relatedModels.push({
     model: EventSeminar,
@@ -34,4 +36,11 @@ Grant.relatedModels.push({
     multiple: true,
 })
 
-module.exports = EventSeminar
+const Person = require('./Person')
+Person.relatedModels.push({
+    model: EventSeminar,
+    modelName: 'EventSeminar',
+    url: 'event-seminar',
+    field: 'speaker',
+    multiple: false,
+})

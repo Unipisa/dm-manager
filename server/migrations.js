@@ -33,6 +33,8 @@ async function findPerson2(people, fullName, affiliazione) {
     let p = null
     if (names.length === 2) {
         return await findPerson(people, names[0], names[1], affiliazione)
+    } else if (names.length ===3 && ['de','di','da','dal','del'].includes(names[1].toLowerCase())) {
+        return await findPerson(people, names[0], `${names[1]} ${names[2]}`)
     } else {
         // find people where firstName + lastName equals fullName        
         p = await people.aggregate([
@@ -377,7 +379,7 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_8: async function(db) {
+    D20231013_copy_events_9: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
@@ -587,7 +589,7 @@ const migrations = {
                 const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
                 const notes = event.content.rendered
                 const abstract = event.content.rendered
-                const old_url = event.link
+                const oldUrl = event.link
 
                 if (taxonomy.includes(90)) {
                     console.log("> Conference", event.link)
@@ -598,7 +600,7 @@ const migrations = {
                         endDate: toUTCDate(event.unipievents_enddate),
                         SSD: event.unipievents_taxonomy.map(categoryToSSD).filter(x => x),
                         url: "",
-                        old_url,
+                        oldUrl,
                         conferenceRoom,
                         grants: [],
                         notes,
@@ -620,13 +622,13 @@ const migrations = {
                         speaker: person,
                         duration,
                         abstract,     
-                        old_url,               
+                        oldUrl,               
                         grants: [],
                     }
                     await seminars.insertOne(object)
                 } else {
                     // console.log("> Seminar", event.link)
-                    // console.log(taxonomy, event.link)
+                    console.log(taxonomy, event.link)
                     // console.log("title", title)
                     let speaker = null
                     try {
@@ -649,6 +651,7 @@ const migrations = {
                         duration,
                         category: created_categories[taxonomy[0]] || created_categories[taxonomy[1]],
                         grants: [],
+                        oldUrl,
                         abstract: notes,                    
                     }
                     //console.log(object)
@@ -660,7 +663,7 @@ const migrations = {
                 
             }
             res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=${offset}`)
-            console.log(`BATCh ${offset}`)
+            console.log(`>>>> BATCH ${offset}`)
             offset += batch_size
         }
 
