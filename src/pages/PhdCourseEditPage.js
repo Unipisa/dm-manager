@@ -180,6 +180,7 @@ export default function PhdCourseEditPage({ Model }) {
     useEffect(() => {
         if (clone_id) {
             if (cloneStatus === "success") {
+                delete cloneData._id
                 setModifiedObj(cloneData)
             }
         } else {
