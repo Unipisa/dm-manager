@@ -388,32 +388,40 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_13: async function(db) {
-        const people = db.collection('people')
-        const conferences = db.collection('eventconferences')
-        const seminars = db.collection('eventseminars')
-        const conferencerooms = db.collection('conferencerooms')
+    D20231026_init_seminarcategories_1: async function(db) {
         const seminarcategories = db.collection('seminarcategories')
 
-        toUTCDate = s => {
-            const sd = new Date(s * 1000)
-            const date = new Date(sd.getFullYear(), sd.getUTCMonth(), sd.getUTCDate(), sd.getUTCHours(), sd.getUTCMinutes())
-            return date
-        }
+        const category_mapping = {
+            "colloquium": 175,
+            "algebra-seminar":	3,
+            "algebraic-and-arithmetic-geometry-seminar":	75,
+            "analysis-seminar":	159,
+            "analysis-seminar2":  77,
+            "baby-geometri-seminar":	79,
+            "dynamical-systems-seminar":	78,
+            "geometry-seminar":	85,
+            "il-teorema-piu-bello":	5,
+            "logic-seminar":	23,
+            "mathematical-physics-seminar":	6,
+            "number-theory-seminar":	7,
+            "probability-stochastic-analysis-statistics-seminar":	73,
+            "seminar-on-combinatorics-and-lie-theory-and-topology":	33,
+            "seminar-on-numerical-analysis":	63,
+            "seminari-map":	21,
+      }
+      await seminarcategories.deleteMany({})
 
-        categoryToSSD = c => {
-            return {
-                '198': 'MAT/01',
-                '162': 'MAT/02',
-                '152': 'MAT/03',
-                '200': 'MAT/04',
-                '114': 'MAT/05',
-                '190': 'MAT/06',
-                '191': 'MAT/07',
-                '154': 'MAT/08'
-            }[c];
-        }
+      for (const [category, label] of Object.entries(category_mapping)) {
+          await seminarcategories.insertOne({
+                  name: category,
+                  label: category,
+              })
+      }
+      return true
+    },
 
+    D20231026_init_conferencerooms_2: async function(db) {
+        const conferencerooms = db.collection('conferencerooms')
         const room_mapping = {
             'Department of Mathematics, Aula Seminari.': 'Aula Seminari (DM)',
             'Aula Magna': 'Aula Magna (DM)',
@@ -535,59 +543,71 @@ const migrations = {
             Online: 'Online',
             Teams: 'Teams',
           }
-          
-          const category_mapping = {
-              "colloquium": 175,
-              "algebra-seminar":	3,
-              "algebraic-and-arithmetic-geometry-seminar":	75,
-              "analysis-seminar":	159,
-              "analysis-seminar2":  77,
-              "baby-geometri-seminar":	79,
-              "dynamical-systems-seminar":	78,
-              "geometry-seminar":	85,
-              "il-teorema-piu-bello":	5,
-              "logic-seminar":	23,
-              "mathematical-physics-seminar":	6,
-              "number-theory-seminar":	7,
-              "probability-stochastic-analysis-statistics-seminar":	73,
-              "seminar-on-combinatorics-and-lie-theory-and-topology":	33,
-              "seminar-on-numerical-analysis":	63,
-              "seminari-map":	21,
-        }
 
-        await people.deleteMany({created_by_migration: true})
-        await conferences.deleteMany({})
-        await conferencerooms.deleteMany({})
-        await seminars.deleteMany({})
-        await seminarcategories.deleteMany({})
-
-        const created_rooms = {}
+        const name2names = {}
 
         for (const [room_key, room_name] of Object.entries(room_mapping)) {
-            if (created_rooms[room_name] === undefined) {
-                const newroom = await conferencerooms.insertOne({
-                    name: room_name,
-                })
+            if (!name2names[room_name]) name2names[room_name] = []
+            name2names[room_name].push(room_key)
+        }
 
-                created_rooms[room_name] = newroom.insertedId
+        await conferencerooms.deleteMany({})
+
+        for (const [name, names] of Object.entries(name2names)) {
+            await conferencerooms.insertOne({
+                name,
+                names,
+            })
+        }
+
+        return true
+    },
+
+    D20231013_copy_events_14: async function(db) {
+        const people = db.collection('people')
+        const conferences = db.collection('eventconferences')
+        const seminars = db.collection('eventseminars')
+        const conferencerooms = db.collection('conferencerooms')
+        const seminarcategories = db.collection('seminarcategories')
+
+        const created_categories = {}
+    
+        for (let seminarcategory of await seminarcategories.find({}).toArray()) {
+            created_categories[seminarcategory.label] = seminarcategory._id
+        }
+
+        const room_mapping = {}
+
+        for (const room of await conferencerooms.find({}).toArray()) {
+            for (const name of room.names) {
+                room_mapping[name] = room._id
             }
         }
 
-        const created_categories = {}
-
-        for (const [category, label] of Object.entries(category_mapping)) {
-            const newcategory = await seminarcategories.insertOne({
-                    name: category,
-                    label: `${label}`,
-                })
-            const find = await seminarcategories.findOne({ label : `${label}`})
-            created_categories[label] = find._id
+        toUTCDate = s => {
+            const sd = new Date(s * 1000)
+            const date = new Date(sd.getFullYear(), sd.getUTCMonth(), sd.getUTCDate(), sd.getUTCHours(), sd.getUTCMinutes())
+            return date
         }
 
-        const lst = (await seminarcategories.find()).toArray()
-        console.log(JSON.stringify({lst}))
+        categoryToSSD = c => {
+            return {
+                '198': 'MAT/01',
+                '162': 'MAT/02',
+                '152': 'MAT/03',
+                '200': 'MAT/04',
+                '114': 'MAT/05',
+                '190': 'MAT/06',
+                '191': 'MAT/07',
+                '154': 'MAT/08'
+            }[c];
+        }
 
-        console.log(JSON.stringify({created_categories}))
+          
+        await people.deleteMany({created_by_migration: true})
+        await conferences.deleteMany({})
+        await seminars.deleteMany({})
+
 
         var offset = 0;
         const batch_size = 97;
@@ -599,7 +619,7 @@ const migrations = {
             for (const event of events) {   
                 const taxonomy = event.unipievents_taxonomy             
                 const title = he.decode(event.title.rendered)
-                const conferenceRoom = created_rooms[room_mapping[event.unipievents_place]]
+                const conferenceRoom = room_mapping[event.unipievents_place]
                 const startDatetime = toUTCDate(event.unipievents_startdate)
                 const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
                 const notes = event.content.rendered
