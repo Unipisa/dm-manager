@@ -26,7 +26,6 @@ async function findPerson(people, firstName, lastName, affiliazione) {
             firstName, 
             lastName, 
             affiliation: affiliazione || "Università di Pisa",
-            created_by_migration: true,
             notes: `creato da migrazione\n***fix affiliation: ${affiliazione}\n`,
         })
         console.log(`Nuova persona creata: ${firstName} ${lastName}`)
@@ -388,26 +387,24 @@ const migrations = {
         return true
     },
 
-    D20231026_init_seminarcategories_1: async function(db) {
+    D20231026_init_seminarcategories_3: async function(db) {
         const seminarcategories = db.collection('seminarcategories')
 
         const category_mapping = {
             "colloquium": 175,
-            "algebra-seminar":	3,
-            "algebraic-and-arithmetic-geometry-seminar":	75,
-            "analysis-seminar":	159,
-            "analysis-seminar2":  77,
-            "baby-geometri-seminar":	79,
-            "dynamical-systems-seminar":	78,
-            "geometry-seminar":	85,
-            "il-teorema-piu-bello":	5,
-            "logic-seminar":	23,
-            "mathematical-physics-seminar":	6,
-            "number-theory-seminar":	7,
-            "probability-stochastic-analysis-statistics-seminar":	73,
-            "seminar-on-combinatorics-and-lie-theory-and-topology":	33,
-            "seminar-on-numerical-analysis":	63,
-            "seminari-map":	21,
+            "algebra-seminar":	177,
+            "algebraic-and-arithmetic-geometry-seminar":	76,
+            "analysis-seminar":	77,
+            "baby-geometri-seminar":	78,
+            "dynamical-systems-seminar":	79,
+            "geometry-seminar":	80,
+            "il-teorema-piu-bello":	176,
+            "logic-seminar":	81,
+            "mathematical-physics-seminar":	174,
+            "number-theory-seminar":	173,
+            "probability-stochastic-analysis-statistics-seminar":	83,            "seminar-on-combinatorics-and-lie-theory-and-topology":	33,
+            "seminar-on-numerical-analysis":	88,
+            "seminari-map":	89,
       }
       await seminarcategories.deleteMany({})
 
@@ -415,6 +412,7 @@ const migrations = {
           await seminarcategories.insertOne({
                   name: category,
                   label: category,
+                  old_id: label,
               })
       }
       return true
@@ -563,17 +561,17 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_14: async function(db) {
+    D20231013_copy_events_15: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
         const conferencerooms = db.collection('conferencerooms')
         const seminarcategories = db.collection('seminarcategories')
 
-        const created_categories = {}
+        const created_categories = []
     
         for (let seminarcategory of await seminarcategories.find({}).toArray()) {
-            created_categories[seminarcategory.label] = seminarcategory._id
+            created_categories[seminarcategory.old_id] = seminarcategory._id
         }
 
         const room_mapping = {}
@@ -603,11 +601,9 @@ const migrations = {
             }[c];
         }
 
-          
-        await people.deleteMany({created_by_migration: true})
+        // await people.deleteMany({created_by_migration: true})
         await conferences.deleteMany({})
         await seminars.deleteMany({})
-
 
         var offset = 0;
         const batch_size = 97;
@@ -656,7 +652,7 @@ const migrations = {
                     const person = await findPerson2(people, speaker, affiliation)
                     const object = {
                         title: title.split('–')[0].trim(),
-                        category: created_categories['colloquium'],
+                        category: created_categories[175],
                         conferenceRoom,
                         startDatetime,
                         speaker: person,
@@ -709,7 +705,7 @@ const migrations = {
             offset += batch_size
         }
 
-        return true
+        // return true
     },
 }
 

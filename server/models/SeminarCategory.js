@@ -27,6 +27,7 @@ const {
 const seminarCategorySchema = new Schema({
     name: { type: String, label: 'Nome', required: true },
     label: { type: String, label: 'Label (Wordpress)', required: true },
+    old_id: { type: Number, label: 'ID (vecchio sito)', required: false },
     notes,
 
     createdBy,
