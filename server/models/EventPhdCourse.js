@@ -4,6 +4,8 @@ const {
     ObjectId, 
     createdBy, 
     updatedBy,
+    startDate,
+    endDate,
 } = require('./Model')
 
 const lessonSchema = new Schema({
@@ -13,8 +15,11 @@ const lessonSchema = new Schema({
 });
 
 const eventPhdCourseSchema = new Schema({
-    title:  {type: String, label: 'Titolo'},
-    lecturer: { type: ObjectId, label: 'Docente', ref: 'Person', required: true },
+    title: { type: String, label: 'Titolo'},
+    description: { type: String, label: 'Descrizione', widget: 'text', default: '' },
+    startDate,
+    endDate,
+    lecturers: [{ type: ObjectId, label: 'Docente/i', ref: 'Person', default: [], required: true }],
     lessons: [lessonSchema],
     
     createdBy,
