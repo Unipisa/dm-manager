@@ -95,7 +95,7 @@ export function ListInput({ id, value, setValue, separator }) {
     if (separator === undefined) separator = ','    
     return <input 
         id={ id } 
-        value={ value.join(separator) || "" } 
+        value={ value ? (value.join(separator) || "") : "" } 
         onChange={ (evt) => {
                 const val = evt.target.value
                     .split(separator)
