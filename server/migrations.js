@@ -803,7 +803,8 @@ const migrations = {
         }
     
         for(const seminar of await seminars.find({}).toArray()) {
-            const abstract = seminar.oldAbstract || ''
+            const abstract = seminar.oldAbstract
+            if (!abstract) continue
             const parsed = parseHTML(abstract)
             await seminars.updateOne({ _id: seminar._id },
                 { $set: { abstract: parsed } })
