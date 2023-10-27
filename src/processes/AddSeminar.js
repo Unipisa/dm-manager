@@ -1,7 +1,6 @@
 import { Button, Card, Form } from 'react-bootstrap'
 import { ModelInput } from '../components/ModelInput'
 import { useState } from 'react'
-import EventSeminar from '../models/EventSeminar'
 import { useEngine } from '../Engine'
 
 export default function AddSeminar() {
@@ -59,7 +58,7 @@ export default function AddSeminar() {
 }
 
 function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, duration, setDuration, category, setCategory }) {
-    const confirm_enabled = (title != "") && (date != null) && (duration > 0) && (room != null) && (category != null)
+    const confirm_enabled = (title !== "") && (date !== null) && (duration > 0) && (room !== null) && (category !== null)
 
     if (disabled) {
         return <></>
