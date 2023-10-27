@@ -1,7 +1,6 @@
 import { Button, Card, Form } from 'react-bootstrap'
 import { ModelInput } from '../components/ModelInput'
 import { useState } from 'react'
-import { useEngine } from '../Engine'
 
 export default function AddSeminar() {
     const [speaker, setSpeaker] = useState(null)
@@ -30,7 +29,7 @@ export default function AddSeminar() {
 }
 
 function SeminarDetailsBlock({ speaker, onCompleted }) {
-    const [confirm, setConfirm] = useState(false)
+    const [confirm] = useState(false)
 
     return <Card className="shadow">
         <Card.Header>Dettagli del seminario [speaker: <strong>{speaker?.firstName} {speaker?.lastName}</strong>]</Card.Header>
