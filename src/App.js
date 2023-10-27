@@ -18,6 +18,7 @@ import Models from './models/Models'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
 import FormFillPage from './pages/FormFillPage'
+import AddSeminar from './processes/AddSeminar';
 
 
 console.log("dm-manager (app starting)")
@@ -55,6 +56,7 @@ function Internal() {
      <Routes>  
        <Route path="/" element={<Home />} />
        <Route path="/profile" element={<Profile />} />
+       <Route path="/process/seminar/add" element={<AddSeminar/>}></Route>
        {  Object.values(Models).map(x => x.routers()) }
        <Route path="/map" element={<Map />} />
        <Route path="*" element={<NotFound />} />
