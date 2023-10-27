@@ -7,6 +7,7 @@ const visitsQuery = require('./controllers/public/visits')
 const seminarsQuery = require('./controllers/public/seminars')
 const seminarQuery = require('./controllers/public/seminar')
 const coursesQuery = require('./controllers/public/courses')
+const lessonsQuery = require('./controllers/public/lessons')
 const processes = require('./processes.js')
 
 const router = express.Router()
@@ -81,6 +82,10 @@ router.get('/public/seminar/:id', async (req, res) => {
 
 router.get('/public/courses', async (req, res) => {
     res.send(await coursesQuery(req))
+})
+
+router.get('/public/lessons', async (req, res) => {
+    res.send(await lessonsQuery(req))
 })
 
 router.use('/process', processes)
