@@ -60,8 +60,6 @@ export function DatetimeInput({ value, setValue }) {
         : ''
     )
 
-    console.log(date, time)
-
     return (
         <div className="row d-flex">
             <div className="col-sm-8 pe-0">
