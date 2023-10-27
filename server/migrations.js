@@ -705,7 +705,7 @@ const migrations = {
             offset += batch_size
         }
 
-        // return true
+        return true
     },
 }
 
