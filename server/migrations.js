@@ -561,7 +561,7 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_15: async function(db) {
+    D20231027_update_events_1: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
@@ -602,8 +602,8 @@ const migrations = {
         }
 
         // await people.deleteMany({created_by_migration: true})
-        await conferences.deleteMany({})
-        await seminars.deleteMany({})
+        // await conferences.deleteMany({})
+        // await seminars.deleteMany({})
 
         var offset = 0;
         const batch_size = 97;
@@ -615,20 +615,39 @@ const migrations = {
             for (const event of events) {   
                 const taxonomy = event.unipievents_taxonomy             
                 const title = he.decode(event.title.rendered)
-                const conferenceRoom = room_mapping[event.unipievents_place]
+                let conferenceRoom = room_mapping[event.unipievents_place]
                 const startDatetime = toUTCDate(event.unipievents_startdate)
                 const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
                 const notes = event.content.rendered
                 const abstract = event.content.rendered
                 const oldUrl = event.link
 
+                let found = await conferences.findOne({ oldUrl })
+
+                if (found) {
+                    console.log(`Already loaded ${oldUrl} as conference ${found._id}. Skipping!`)
+                    continue
+                }
+
+                found = await seminars.findOne({ oldUrl })
+
+                if (found) {
+                    console.log(`Already loaded ${oldUrl} as seminar ${found._id}. Skipping!`)
+                    continue
+                }
+
+
                 if (event.unipievents_place && !conferenceRoom) {
-                    console.log("**************** Cannot find room: ${event.unipievents_place}")
-                    console.log("conferenceRoom", JSON.stringify({conferenceRoom, unipi_place: event.unipievents_place}))
+                    const res = await conferencerooms.insertOne({
+                        name: event.unipievents_place,
+                    })
+                    conferenceRoom = res.insertedId
+                    console.log(`**** creatd new room: ${event.unipievents_place}`)
                 }
 
                 if (taxonomy.includes(90)) {
                     console.log("> Conference", event.link)
+
 
                     const object = {
                         title,
@@ -693,10 +712,8 @@ const migrations = {
                         abstract: notes,                    
                     }
                     // console.log(object)
-                    if (alreadyLoaded[object.title] === undefined) {
-                        alreadyLoaded[object.title] = true
-                        await seminars.insertOne(object)
-                    }
+                    const res = await seminars.insertOne(object)
+                    console.log(`inserted seminar ${res.insertedId}`)
                 }
                 
             }
