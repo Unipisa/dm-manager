@@ -38,7 +38,7 @@ if (config.OAUTH2_CLIENT_ID) {
 function setup_routes(app) {
   app.use(cors(
     {
-      origin: config.CORS_ORIGIN.split(","),
+      origin: config.CORS_ORIGIN,
       optionsSuccessStatus: 200,
       credentials: true // Needed for the client to handle session
     }))

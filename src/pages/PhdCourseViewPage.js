@@ -24,12 +24,24 @@ const PhdCourseView = ({ Model }) => {
             </Card.Header>
             <Card.Body>
                 <p>
-                    <strong className="align-top">titolo: </strong>
+                    <strong className="align-top">Titolo: </strong>
                     <ModelFieldOutput key="title" field="title" schema={schema.title} value={obj.title} />
                 </p>
                 <p>
-                    <strong className="align-top">docente: </strong>
-                    <ModelFieldOutput key="lecturer" field="lecturer" schema={schema.lecturer} value={obj.lecturer} />
+                    <strong className="align-top">Data Inizio: </strong>
+                    <ModelFieldOutput key="startDate" field="startDate" schema={schema.startDate} value={obj.startDate} />
+                </p>
+                <p>
+                    <strong className="align-top">Data Fine: </strong>
+                    <ModelFieldOutput key="endDate" field="endDate" schema={schema.endDate} value={obj.endDate} />
+                </p>
+                <p>
+                    <strong className="align-top">Docente/i: </strong>
+                    <ModelFieldOutput key="lecturers" field="lecturers" schema={schema.lecturers} value={obj.lecturers} />
+                </p>
+                <p>
+                    <strong className="align-top">Descrizione: </strong>
+                    <ModelFieldOutput key="description" field="description" schema={schema.description} value={obj.description} />
                 </p>
                 <h4>Lezioni</h4>
                 <Container>

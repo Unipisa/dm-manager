@@ -20,6 +20,7 @@ const eventConferenceSchema = new Schema({
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     notes,
+    oldNotes: { type: String, label: 'note vecchie', widget: 'text'},
 
     createdBy,
     updatedBy,

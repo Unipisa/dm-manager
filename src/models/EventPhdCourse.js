@@ -27,10 +27,12 @@ export default class EventPhdCourse {
             'gli oggetti': "i corsi di dottorato", 
             'un oggetto': "un corso di dottorato", 
         }
-        this.indexDefaultFilter = {'_sort': 'title', '_limit': 10}
+        this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
         this.columns = {
             'title': 'Titolo',
-            'lecturer': 'Docente',
+            'startDate': 'Data Inizio',
+            'endDate': 'Data Fine',
+            'lecturers': 'Docente/i',
         }
 
         this.schema = null

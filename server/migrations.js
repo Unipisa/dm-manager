@@ -18,6 +18,7 @@
 const { default: axios } = require('axios')
 const he = require('he')
 const assert = require('assert')
+const jsdom = require('jsdom')
 
 async function findPerson(people, firstName, lastName, affiliazione) {
     let p = await people.findOne({ firstName, lastName })
@@ -561,7 +562,7 @@ const migrations = {
         return true
     },
 
-    D20231013_copy_events_15: async function(db) {
+    D20231027_update_events_1: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
         const seminars = db.collection('eventseminars')
@@ -602,33 +603,51 @@ const migrations = {
         }
 
         // await people.deleteMany({created_by_migration: true})
-        await conferences.deleteMany({})
-        await seminars.deleteMany({})
+        // await conferences.deleteMany({})
+        // await seminars.deleteMany({})
 
         var offset = 0;
         const batch_size = 97;
 
-        const alreadyLoaded = {}
         var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
         while (res.data.length > 0) {
             const events = res.data
             for (const event of events) {   
                 const taxonomy = event.unipievents_taxonomy             
                 const title = he.decode(event.title.rendered)
-                const conferenceRoom = room_mapping[event.unipievents_place]
+                let conferenceRoom = room_mapping[event.unipievents_place]
                 const startDatetime = toUTCDate(event.unipievents_startdate)
                 const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
                 const notes = event.content.rendered
                 const abstract = event.content.rendered
                 const oldUrl = event.link
 
+                let found = await conferences.findOne({ oldUrl })
+
+                if (found) {
+                    console.log(`Already loaded ${oldUrl} as conference ${found._id}. Skipping!`)
+                    continue
+                }
+
+                found = await seminars.findOne({ oldUrl })
+
+                if (found) {
+                    console.log(`Already loaded ${oldUrl} as seminar ${found._id}. Skipping!`)
+                    continue
+                }
+
+
                 if (event.unipievents_place && !conferenceRoom) {
-                    console.log("**************** Cannot find room: ${event.unipievents_place}")
-                    console.log("conferenceRoom", JSON.stringify({conferenceRoom, unipi_place: event.unipievents_place}))
+                    const res = await conferencerooms.insertOne({
+                        name: event.unipievents_place,
+                    })
+                    conferenceRoom = res.insertedId
+                    console.log(`**** creatd new room: ${event.unipievents_place}`)
                 }
 
                 if (taxonomy.includes(90)) {
                     console.log("> Conference", event.link)
+
 
                     const object = {
                         title,
@@ -693,10 +712,8 @@ const migrations = {
                         abstract: notes,                    
                     }
                     // console.log(object)
-                    if (alreadyLoaded[object.title] === undefined) {
-                        alreadyLoaded[object.title] = true
-                        await seminars.insertOne(object)
-                    }
+                    const res = await seminars.insertOne(object)
+                    console.log(`inserted seminar ${res.insertedId}`)
                 }
                 
             }
@@ -705,6 +722,94 @@ const migrations = {
             offset += batch_size
         }
 
+        return true
+    },
+
+    D20231027_save_old_abstract_1: async function(db) {
+        const seminars = db.collection('eventseminars')
+        for(const seminar of await seminars.find({}).toArray()) {
+            await seminars.updateOne({ _id: seminar._id }, 
+                { $set: { oldAbstract: seminar.abstract } })
+            }
+        return true
+    },
+
+    D20231027_save_conference_old_abstract_1: async function(db) {
+        const conferences = db.collection('eventconferences')
+        for(const conference of await conferences.find({}).toArray()) {
+            await conferences.updateOne({ _id: conference._id }, 
+                { $set: { oldNotes: conference.notes } })
+            }
+        return true
+    },
+
+    D20231028_convert_html_to_markdown_1: async function(db) {
+        const seminars = db.collection('eventseminars')
+        const conferences = db.collection('eventconferences')
+        const invalid_tags = []
+
+        function parseHTML(html) {
+            const dom = new jsdom.JSDOM(html, 'text/html')
+            const doc = dom.window.document
+            let out = parseElement(doc.body).trim()
+            out = out.replace('\n\n\n', '\n\n')
+            out = out.replace('\n\n\n', '\n\n')
+            out = out.replace('\n\n\n', '\n\n')
+            return out            
+        }
+
+        function parseElement(el) {
+            const nodeName = el.nodeName.toLowerCase()
+            if (nodeName === '#text') return el.textContent
+            const children = [...el.childNodes].map((child, i) => 
+                parseElement(child)).join('')
+            switch (nodeName) {
+                case 'body':
+                    return children
+                case 'h4':
+                    return `#### ${children}`
+                case 'h3':
+                    return `### ${children}`
+                case 'h2':
+                    return `## ${children}`
+                case 'h1':
+                    return `# ${children}`
+                case 'p':
+                    return `${children}\n`
+                case 'br':
+                    return `\n\n`
+                case 'em':
+                case 'i':
+                    return `*${children}*`
+                case 'a':
+                    return `[${children}](${el.href})`
+                case 'strong':
+                case 'b':
+                    return `**${children}**`
+                case 'ul':
+                case 'ol':
+                    return `${children}\n`
+                case 'li':
+                    return `* ${children}\n`
+                case 'pre':
+                    return `\`\`\`\n${children}\n\`\`\`\n`
+                case 'img':
+                    return `![${el.alt}](${el.src})`
+                default: 
+                    // console.log(`unexpected node ${nodeName}`)
+                    if (!invalid_tags.includes(nodeName)) invalid_tags.push(nodeName)
+                    return children
+            }
+        }
+    
+        for(const seminar of await seminars.find({}).toArray()) {
+            const abstract = seminar.oldAbstract || ''
+            const parsed = parseHTML(abstract)
+            await seminars.updateOne({ _id: seminar._id },
+                { $set: { abstract: parsed } })
+            }
+        
+        console.log(`invalid tags:`, invalid_tags.join(', '))
         return true
     },
 }
