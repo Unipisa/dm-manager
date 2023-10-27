@@ -5,7 +5,7 @@ import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 import Loading from '../components/Loading'
 import { useEngine } from '../Engine'
 import { ModelHeading } from '../components/ModelHeading'
-import { ConferenceRoomInput, NumberInput, PersonInput, StringInput } from '../components/Input'
+import { ConferenceRoomInput, DateInput, NumberInput, PersonInput, StringInput, TextInput } from '../components/Input'
 import moment from 'moment'
 import { LessonTable } from '../components/PhdCourseLessonList'
 import { DatetimeInput } from '../components/DatetimeInput'
@@ -276,17 +276,17 @@ export default function PhdCourseEditPage({ Model }) {
                             <div className="col-sm-2"></div>
                         </Form.Group>
                         <Form.Group className="row my-2">
-                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"lecturer"} style={{textAlign: "right"}}>
-                                Docente
+                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"description"} style={{textAlign: "right"}}>
+                                Descrizione
                             </Form.Label>
                             <div className="col-sm-10">
-                                <PersonInput 
-                                    id="lecturer"
-                                    value={modifiedObj.lecturer}
+                                <TextInput 
+                                    id="description"
+                                    value={modifiedObj.description}
                                     setValue={value => {
                                         setModifiedObj(obj => ({
                                             ...obj,
-                                            lecturer: value,
+                                            description: value,
                                         }))
                                     }}
                                 />
@@ -294,7 +294,62 @@ export default function PhdCourseEditPage({ Model }) {
                             <div className="col-sm-2"></div>
                         </Form.Group>
                         <Form.Group className="row my-2">
-                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"lecturer"} style={{textAlign: "right"}}>
+                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"start-date"} style={{textAlign: "right"}}>
+                                Data inizio
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <DateInput 
+                                    id="start-date"
+                                    value={modifiedObj.startDate}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            startDate: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"end-date"} style={{textAlign: "right"}}>
+                                Data fine
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <DateInput 
+                                    id="end-date"
+                                    value={modifiedObj.endDate}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            endDate: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" style={{textAlign: "right"}}>
+                                Docente/i
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <PersonInput 
+                                    id="lecturers"
+                                    multiple={true}
+                                    value={modifiedObj.lecturers}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            lecturers: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" style={{textAlign: "right"}}>
                                 Lezioni
                             </Form.Label>
                             <div className="col-sm-10">

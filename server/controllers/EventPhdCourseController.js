@@ -9,7 +9,8 @@ class EventPhdCourseController extends Controller {
         this.supervisorRoles.push('event-phd-course-manager', 'event-phd-course-supervisor')
 
         this.searchFields = [
-            'title', 'lecturer.firstName', 'lecturer.lastName'
+            'title',
+            'description',
         ]
     }
 }
