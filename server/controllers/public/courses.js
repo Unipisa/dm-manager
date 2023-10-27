@@ -2,17 +2,25 @@ const EventPhdCourse = require('../../models/EventPhdCourse')
 
 async function coursesQuery(req) {
     const pipeline = [
-        {$unwind: '$lessons'},
-        {$lookup: {
+        { $unwind: '$lessons'},
+        { $lookup: {
             from: 'conferencerooms',
             localField: 'lessons.conferenceRoom',
             as: 'lessons.conferenceRoom',
             foreignField: '_id'
         }},
+        { $lookup: {
+            from: 'people',
+            localField: 'lecturers',
+            foreignField: '_id',
+            as: 'lecturers',
+        }},
         { $project: {
             _id: 1,
-            speaker: 1,
-            lecturers: 1,
+            lecturers: {
+                firstName: 1,
+                lastName: 1,
+            },
             title: 1,
             lessons: {
                 date: 1,
