@@ -59,7 +59,7 @@ async function findPerson2(people, fullName, affiliazione) {
             console.log(`found ${fullName} as ${p[0].firstName}+${p[0].lastName}`)
             return p[0]._id
         } else {
-            return findPerson(people, fullName, '*** fixme ***')
+            return findPerson(people, fullName, '')
         }
     }
 }
@@ -705,7 +705,7 @@ const migrations = {
             offset += batch_size
         }
 
-        // return true
+        return true
     },
 }
 
