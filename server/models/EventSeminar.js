@@ -44,3 +44,11 @@ Person.relatedModels.push({
     field: 'speaker',
     multiple: false,
 })
+
+const ConferenceRoom = require('./ConferenceRoom')
+ConferenceRoom.relatedModels.push({
+    model: EventSeminar,
+    modelName: 'EventSeminar',
+    url: 'event-seminar',
+    field: 'conferenceRoom',
+})
