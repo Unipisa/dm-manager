@@ -11,6 +11,7 @@ async function lessonsQuery(req) {
             course: {
                 _id: '$_id',
                 title: '$title',
+                description: '$description',
                 lecturers: '$lecturers',
             }
         }},
