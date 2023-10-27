@@ -6,6 +6,7 @@ const staffQuery = require('./controllers/public/staff')
 const visitsQuery = require('./controllers/public/visits')
 const seminarsQuery = require('./controllers/public/seminars')
 const seminarQuery = require('./controllers/public/seminar')
+const coursesQuery = require('./controllers/public/courses')
 
 const router = express.Router()
 
@@ -77,6 +78,9 @@ router.get('/public/seminar/:id', async (req, res) => {
     res.send(await seminarQuery(req))
 })
 
-module.exports =
- router
+router.get('/public/courses', async (req, res) => {
+    res.send(await coursesQuery(req))
+})
+
+module.exports = router
 module.exports.ModelSchemas = ModelSchemas
