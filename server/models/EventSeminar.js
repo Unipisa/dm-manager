@@ -16,7 +16,7 @@ const eventSeminarSchema = new Schema({
     duration: { type: Number, label: 'Durata (in minuti)', default: 60 },
     category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: true },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
-    abstract: { type: String, label: 'Abstract (non modificare!)', widget: 'text' },
+    abstract: { type: String, label: "Abstract (non modificare se c'è un abstract vecchio!)", widget: 'text' },
     oldUrl: { type: String, label: 'URL vecchio', widget: 'url' },
     oldAbstract: { type: String, label: 'Abstract vecchio', widget: 'text' },
 
@@ -44,4 +44,12 @@ Person.relatedModels.push({
     url: 'event-seminar',
     field: 'speaker',
     multiple: false,
+})
+
+const ConferenceRoom = require('./ConferenceRoom')
+ConferenceRoom.relatedModels.push({
+    model: EventSeminar,
+    modelName: 'EventSeminar',
+    url: 'event-seminar',
+    field: 'conferenceRoom',
 })
