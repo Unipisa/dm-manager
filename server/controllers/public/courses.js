@@ -12,7 +12,7 @@ async function coursesQuery(req) {
         { $project: {
             _id: 1,
             speaker: 1,
-            lecturer: 1,
+            lecturers: 1,
             title: 1,
             lessons: {
                 date: 1,
