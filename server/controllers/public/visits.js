@@ -20,12 +20,12 @@ async function visitsQuery(req) {
         ...personRoomAssignmentPipeline(),
         {$lookup: {
             from: 'institutions',
-            localField: 'affiliations',
+            localField: 'person.affiliations',
             foreignField: '_id',
-            as: 'affiliations',
+            as: 'person.affiliations',
             pipeline: [
                 {$project: {
-                    _id: 0,
+                    _id: 1,
                     name: 1,
                     code: 1,
                     city: 1,
@@ -41,6 +41,9 @@ async function visitsQuery(req) {
             person: {
                 firstName: 1,
                 lastName: 1,
+                affiliations: {
+                    name: 1
+                }
             },
             roomAssignment: {
                 room: {
