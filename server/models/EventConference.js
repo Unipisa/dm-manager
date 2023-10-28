@@ -10,8 +10,6 @@ const {
     notes,
 } = require('./Model')
 
-const Grant = require('./Grant')
-
 const eventConferenceSchema = new Schema({
     title:  {type: String, label: 'Titolo'},
     startDate,
@@ -31,7 +29,9 @@ const eventConferenceSchema = new Schema({
 })
 
 const EventConference = model('EventConference', eventConferenceSchema)
+module.exports = EventConference
 
+const Grant = require('./Grant')
 Grant.relatedModels.push({
     model: EventConference,
     modelName: 'EventConference',
@@ -40,4 +40,10 @@ Grant.relatedModels.push({
     multiple: true,
 })
 
-module.exports = EventConference
+const ConferenceRoom = require('./ConferenceRoom')
+ConferenceRoom.relatedModels.push({
+    model: EventConference,
+    modelName: 'EventConference',
+    url: 'event-conference',
+    field: 'conferenceRoom',
+})

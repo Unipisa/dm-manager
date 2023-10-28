@@ -15,6 +15,7 @@ const schema = new Schema({
 })
 
 const ConferenceRoom = model('ConferenceRoom', schema)
+ConferenceRoom.relatedModels = []
 
 /**
  * Questa è giusto una collezione intermedia che include alcune delle stanze
