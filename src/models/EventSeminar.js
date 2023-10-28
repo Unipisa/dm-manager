@@ -24,6 +24,7 @@ export default class EventSeminar {
         this.columns = {
             'title': 'Titolo',
             'speaker': 'Speaker',
+            'category': 'Categoria',
             'startDatetime': 'Inizio',
         }
 
