@@ -174,6 +174,10 @@ export function computeCsvHeaders(fieldsInfo) {
             headers.push(`${key}.firstName`)
         } else if (field['x-ref'] === 'Institution') {
             headers.push(`${key}.name`)
+        } else if (field['x-ref'] === 'SeminarCategory') {
+            headers.push(`${key}.name`)
+        } else if (field['x-ref'] === 'ConferenceRoom') {
+            headers.push(`${key}.name`)
         } else {
             headers.push(key)
         }
