@@ -813,6 +813,12 @@ const migrations = {
         console.log(`invalid tags:`, invalid_tags.join(', '))
         return true
     },
+
+    D20231029_rename_conference_description_1: async function(db) {
+        const seminars = db.collection('eventconferences')
+        await seminars.updateMany({}, { $rename: { notes: 'description' } })
+        return true
+    },
 }
 
 async function migrate(db, options) {
