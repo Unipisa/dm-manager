@@ -20,9 +20,6 @@ const {
 // - "seminar-on-combinatorics-lie-theory-and-topology"
 // - "seminar-on-numerical-analysis"
 // - "seminari-map"
-// 
-// TODO: Magari si può aggiungere una regola nelle migrazioni per creare
-// automaticamente tutte le categorie di base.
 
 const seminarCategorySchema = new Schema({
     name: { type: String, label: 'Nome', required: true },
