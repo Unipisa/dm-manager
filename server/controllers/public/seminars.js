@@ -1,9 +1,18 @@
 const EventSeminar = require('../../models/EventSeminar')
 
+const maxDate = new Date(8640000000000000);
+
+/** @param {import('@types/express').Request} req */
 async function seminarsQuery(req) {
+    const from = req.query.from ? new Date(req.query.from) : new Date()
+    const to = req.query.to ? new Date(req.query.to) : maxDate
+
     const pipeline = [
         { $match: {
-            startDatetime: {$gte: new Date()}
+            startDatetime: { 
+                $gte: from,
+                $lt: to,
+            },
         }},
         { $lookup: {
             from: 'people',
