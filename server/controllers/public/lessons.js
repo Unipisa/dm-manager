@@ -1,6 +1,10 @@
 const EventPhdCourse = require('../../models/EventPhdCourse')
 
 async function lessonsQuery(req) {
+    // TODO: Forse serve usare $add ~> <https://www.mongodb.com/docs/manual/reference/operator/aggregation/add>
+    const from = req.query.from ? new Date(req.query.from) : new Date()
+    const to = req.query.to ? new Date(req.query.to) : maxDate
+
     const pipeline = [
         {$unwind: '$lessons'},
         {$project: {

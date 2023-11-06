@@ -1,9 +1,18 @@
 const EventSeminar = require('../../models/EventSeminar')
 
+const maxDate = new Date(8640000000000000);
+
+/** @param {import('@types/express').Request} req */
 async function seminarsQuery(req) {
+    const from = req.query.from ? new Date(req.query.from) : new Date()
+    const to = req.query.to ? new Date(req.query.to) : maxDate
+
     const pipeline = [
         { $match: {
-            startDatetime: {$gte: new Date()}
+            startDatetime: { 
+                $gte: from,
+                $lt: to,
+            },
         }},
         { $lookup: {
             from: 'people',
@@ -20,6 +29,39 @@ async function seminarsQuery(req) {
             localField: 'affiliations',
             foreignField: '_id',
             as: 'affiliations'
+        }},
+        {$lookup: {
+            from: 'seminarcategories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category',
+            pipeline: [
+                {$project: {
+                    _id: 1,
+                    name: 1,
+                    label: 1,
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$category',
+            preserveNullAndEmptyArrays: true
+        }},
+        {$lookup: {
+            from: 'conferencerooms',
+            localField: 'conferenceRoom',
+            foreignField: '_id',
+            as: 'conferenceRoom',
+            pipeline: [
+                {$project: {
+                    _id: 0,
+                    name: 1,
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$conferenceRoom',
+            preserveNullAndEmptyArrays: true
         }},
         { $project: {
             _id: 1,
