@@ -143,7 +143,7 @@ function MatchedSpeakersBlock({speakers, onSpeakerSelected}) {
         onSpeakerSelected(x)
     }
 
-    if (speakers.length == 0) {
+    if (speakers.length === 0) {
         return <div className="my-3">
             <em>Nessuna persona trovata. <br></br>Se la persona cercata non è presente in anagrafica, scrivere a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a> per richiederne l'inserimento, fornendo nome, affiliazione, indirizzo e-mail.
             </em>
@@ -172,29 +172,4 @@ function MatchedSpeakersBlock({speakers, onSpeakerSelected}) {
             </div>
         </div>
     }
-}
-
-function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
-    if (disabled) {
-        return <Card className="shadow mb-3">
-            <Card.Header>Selezione speaker: <strong>{person?.firstName} {person?.lastName}</strong></Card.Header>
-        </Card>
-    }
-
-    return <div>
-        <Card className="shadow mb-3">
-            <Card.Header>Selezione speaker</Card.Header>
-            <Card.Body>
-            <Form>
-                <Form.Group>
-                    <ModelInput field="Speaker" schema={{'x-ref': 'Person'}} value={person} setValue={setPerson}></ModelInput>
-                </Form.Group>
-            </Form>
-            <div className="d-flex flex-row justify-content-end">
-                <Button className="text-end" onClick={() => onCompleted(person)} disabled={person != null}>Conferma</Button>
-            </div>
-            </Card.Body>
-        </Card>
-        
-    </div>
 }
