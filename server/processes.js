@@ -1,10 +1,10 @@
 // Custom processes to insert data from end-users. 
 const express = require('express')
-
 const router = express.Router()
 
-router.get('/', function (req, res) {
-    res.send('ok')
-})
+const addSeminarRouter = require('./controllers/processes/AddSeminar')
+router.use('/seminars/add', addSeminarRouter)
+
+
 
 module.exports = router
