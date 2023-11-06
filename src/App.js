@@ -56,7 +56,7 @@ function Internal() {
      <Routes>  
        <Route path="/" element={<Home />} />
        <Route path="/profile" element={<Profile />} />
-       <Route path="/process/seminar/add" element={<AddSeminar/>}></Route>
+       <Route path="/process/seminars/add" element={<AddSeminar/>}></Route>
        {  Object.values(Models).map(x => x.routers()) }
        <Route path="/map" element={<Map />} />
        <Route path="*" element={<NotFound />} />

@@ -1,7 +1,6 @@
 import { Button, Card, Form } from 'react-bootstrap'
 import { ModelInput } from '../components/ModelInput'
 import { useState } from 'react'
-import { useEngine } from '../Engine'
 import axios from 'axios'
 
 export default function AddSeminar() {
@@ -12,9 +11,7 @@ export default function AddSeminar() {
     const [room, setRoom] = useState(null)
     const [category, setCategory] = useState(null)
     const [seminarAdded, setSeminarAdded] = useState(false)
-
-    const engine = useEngine()
-    const putSeminar = engine.usePut('event-seminar')
+    const [abstract, setAbstract] = useState("")
 
     const onCompleted = async () => {
         // Insert the seminar in the database
@@ -22,16 +19,18 @@ export default function AddSeminar() {
             title: title, 
             startDatetime: date, 
             duration: duration, 
-            conferenceRoom: room, 
-            speaker: person,
-            category: category
+            conferenceRoom: room._id, 
+            speaker: person._id,
+            category: category._id,
+            abstract: abstract
         }
 
-        if (await putSeminar(s)) {
+        try {
+            await axios.put('/api/v0/process/seminars/add/save', s)
             setSeminarAdded(true)
         }
-        else {
-            console.log("error")
+        catch (error) {
+            console.log(error)
         }
     }
 
@@ -44,19 +43,20 @@ export default function AddSeminar() {
 
     return <div>
         <h1 className="text-primary pb-4">Inserimento nuovo seminario</h1>
-        <SelectPersonBlock2 person={person} setPerson={setPerson} disabled={person != null}></SelectPersonBlock2>
+        <SelectPersonBlock person={person} setPerson={setPerson} disabled={person != null}></SelectPersonBlock>
         <SeminarDetailsBlock disabled={person == null} 
             title={title} setTitle={setTitle}
             date={date} setDate={setDate}
             duration={duration} setDuration={setDuration}
             room={room} setRoom={setRoom}
             category={category} setCategory={setCategory}
+            abstract={abstract} setAbstract={setAbstract}
             onCompleted={onCompleted}
         ></SeminarDetailsBlock>
     </div>;
 }
 
-function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, duration, setDuration, category, setCategory }) {
+function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, duration, setDuration, category, setCategory, abstract, setAbstract }) {
     const confirm_enabled = (title !== "") && (date !== null) && (duration > 0) && (room !== null) && (category !== null)
 
     if (disabled) {
@@ -82,6 +82,9 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
             <Form.Group className="my-3">
                 <ModelInput field="Aula" schema={{ "x-ref": "ConferenceRoom" }} value={room} setValue={setRoom}></ModelInput>
             </Form.Group>
+            <Form.Group className="my-3">
+                <ModelInput field="Abstract" schema={{ type: "string", widget: "text" }} value={abstract} setValue={setAbstract}></ModelInput>
+            </Form.Group>
         </Form>
         <div className="d-flex flex-row justify-content-end">
             <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Conferma</Button>
@@ -90,7 +93,7 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
     </Card>;
 }
 
-function SelectPersonBlock2({ onCompleted, disabled, person, setPerson }) {
+function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
     const [surname, setSurname] = useState("")
     const [matchedSpeakers, setMatchedSpeakers] = useState([])
 
@@ -145,7 +148,7 @@ function MatchedSpeakersBlock({speakers, onSpeakerSelected}) {
 
     if (speakers.length === 0) {
         return <div className="my-3">
-            <em>Nessuna persona trovata. <br></br>Se la persona cercata non è presente in anagrafica, scrivere a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a> per richiederne l'inserimento, fornendo nome, affiliazione, indirizzo e-mail.
+            <em>Se la persona cercata non è presente in anagrafica, scrivere a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a> per richiederne l'inserimento, fornendo nome, affiliazione, indirizzo e-mail.
             </em>
         </div>
     }
