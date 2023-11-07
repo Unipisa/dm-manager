@@ -9,7 +9,7 @@ async function seminarsQuery(req) {
 
     const pipeline = [
         { $match: {
-            startDatetime: { 
+            startDatetime: {
                 $gte: from,
                 $lt: to,
             },
