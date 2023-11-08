@@ -3,7 +3,11 @@ const EventSeminar = require('../../models/EventSeminar')
 async function seminarsQuery(req) {
     const pipeline = [
         { $match: {
-            startDatetime: {$gte: new Date()}
+            $expr: {
+                $gte: [
+                    "$startDatetime",
+                    "$$NOW"],
+            }
         }},
         { $lookup: {
             from: 'people',
@@ -70,7 +74,8 @@ async function seminarsQuery(req) {
         }}
     ]
 
-    // console.log(JSON.stringify({pipeline}))
+    
+    console.log(JSON.stringify({pipeline}))
 
     const seminars = await EventSeminar.aggregate(pipeline)
 
