@@ -12,6 +12,16 @@ class EventPhdCourseController extends Controller {
             'title',
             'description',
         ]
+
+        
+        // this.queryPipeline.push({
+        //     $lookup: {
+        //         from: 'conferencerooms',
+        //         localField: 'lessons.[].conferenceRoom',
+        //         foreignField: '_id',
+        //         // ...
+        //     },
+        // });
     }
 }
 

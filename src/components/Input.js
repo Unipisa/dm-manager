@@ -2,7 +2,7 @@ import { Modal, Button } from 'react-bootstrap'
 import UtcDatePicker from "./UtcDatePicker"
 import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useQuery } from 'react-query'
 
 import api from '../api'
@@ -414,7 +414,7 @@ export function ConferenceRoomInput({ id, value, setValue }) {
         objCode="conference-room"
         objName="aula per conferenza"
         oa="a"
-        render={conferenceRoom => conferenceRoom.name}
+        render={conferenceRoom => conferenceRoom.name ?? '???'}
         new_object={q => ({ name: '' })}
         inputs={{
             name: 'Nome',
