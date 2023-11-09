@@ -12,6 +12,27 @@ class EventPhdCourseController extends Controller {
             'title',
             'description',
         ]
+        this.queryPipeline.push(
+            { $unwind: '$lessons' },
+            { $lookup: {
+                from: 'conferencerooms',
+                localField: 'lessons.conferenceRoom',
+                foreignField: '_id',
+                as: 'lessons.conferenceRoom',
+                pipeline: [
+                    {$project: {name:1}},
+                ],
+            }},
+            { $unwind: {
+                path: '$lessons.conferenceRoom',
+                preserveNullAndEmptyArrays: true,
+            } },
+            { $group: {
+                    _id: "$_id",
+                    lessons: { $push: "$lessons" },
+                    // include other fields you want to keep
+            }}
+        )
     }
 }
 
