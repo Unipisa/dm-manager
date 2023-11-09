@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom';
 import { useEngine } from '../Engine';
 import { DatetimeInput, formatDate } from './DatetimeInput';
 import { ConferenceRoomInput, NumberInput } from './Input';
-import Loading from './Loading';
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
