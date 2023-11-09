@@ -176,8 +176,6 @@ export default function PhdCourseEditPage({ Model }) {
     const modifiedFields = Object.keys(modifiedObj)
         .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
     
-    console.log(modifiedFields)
-
     const changed = modifiedFields.length > 0
 
     const updateLesson = (index, newLesson) => {

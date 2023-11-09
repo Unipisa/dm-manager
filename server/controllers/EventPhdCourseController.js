@@ -15,24 +15,38 @@ class EventPhdCourseController extends Controller {
 
         this.queryPipeline.push(
             { $unwind: '$lessons' },
-            { $lookup: {
-                from: 'conferencerooms',
-                localField: 'lessons.conferenceRoom',
-                foreignField: '_id',
-                as: 'lessons.conferenceRoom',
-                pipeline: [
-                    { $project: { name: 1 } },
-                ],
-            }},
-            { $unwind: {
-                path: '$lessons.conferenceRoom',
-                preserveNullAndEmptyArrays: true,
-            } },
-            { $group: {
-                    _id: "$_id",
+            {
+                $lookup: {
+                    from: 'conferencerooms',
+                    localField: 'lessons.conferenceRoom',
+                    foreignField: '_id',
+                    as: 'lessons.conferenceRoom',
+                    pipeline: [
+                        { $project: { name: 1 } },
+                    ],
+                }
+            },
+            {
+                $unwind: {
+                    path: '$lessons.conferenceRoom',
+                    preserveNullAndEmptyArrays: true,
+                }
+            },
+            {
+                $group: {
+                    _id: '$_id',
+                    title: { $first: '$title' },
+                    description: { $first: '$description' },
+                    startDate: { $first: '$startDate' },
+                    endDate: { $first: '$endDate' },
                     lessons: { $push: "$lessons" },
-                    // include other fields you want to keep
-            }}
+                    lecturers: { $first: '$lecturers' },
+                    createdBy: { $first: '$createdBy' },
+                    updatedBy: { $first: '$updatedBy' },
+                    createdAt: { $first: '$createdAt' },
+                    updatedAt: { $first: '$updatedAt' },
+                }
+            },
         )
     }
 }

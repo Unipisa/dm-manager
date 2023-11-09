@@ -10,18 +10,19 @@ import Loading from './Loading';
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
-const ConferenceRoom = ({ id }) => {
+const ConferenceRoomOutput = ({ value }) => {
     const engine = useEngine()
-    const { isSuccess, data } = engine.useGet('conference-room', id)
+    // const { isSuccess, data } = engine.useGet('conference-room', id)
 
-    if (!isSuccess) return <Loading />
+    if (!value)
+        return <>???</>
+
+    // if (!isSuccess) return <Loading />
     const { ConferenceRoom } = engine.Models
-    return <Link key={data._id} to={ConferenceRoom.viewUrl(data._id)}>{ConferenceRoom.describe(data)}</Link>
+    return <Link to={ConferenceRoom.viewUrl(value._id)}>{value.name}</Link>
 }
 
 export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom }) => {
-    console.log(idPrefix)
-
     return (
         <>
             <Form.Group className="row my-2">
@@ -70,8 +71,8 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
         updateLesson({
             ...lesson,
             date: dateTime,
-            duration: duration,
-            conferenceRoom: conferenceRoom,
+            duration,
+            conferenceRoom,
         })
 
         close()
@@ -127,7 +128,7 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
                 <td>{formatDate(lesson.date)}</td>
                 <td>{lesson.duration}</td>
                 <td>
-                    <ConferenceRoom id={lesson.conferenceRoom} />
+                    <ConferenceRoomOutput value={lesson.conferenceRoom} />
                 </td>
                 <td className="d-flex justify-content-end gap-2">
                     <Button 
@@ -152,7 +153,7 @@ const LessonViewRow = ({ lesson }) => {
             <td>{formatDate(lesson.date)}</td>
             <td>{lesson.duration}</td>
             <td>
-                <ConferenceRoom id={lesson.conferenceRoom} />
+                <ConferenceRoomOutput value={lesson.conferenceRoom} />
             </td>
         </>
     )
