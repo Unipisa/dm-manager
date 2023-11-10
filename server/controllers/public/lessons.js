@@ -1,5 +1,7 @@
 const EventPhdCourse = require('../../models/EventPhdCourse')
 
+const maxDate = new Date(8640000000000000);
+
 async function lessonsQuery(req) {
     // TODO: Forse serve usare $add ~> <https://www.mongodb.com/docs/manual/reference/operator/aggregation/add>
     const from = req.query.from ? new Date(req.query.from) : new Date()
