@@ -414,7 +414,7 @@ export function ConferenceRoomInput({ id, value, setValue }) {
         objCode="conference-room"
         objName="aula per conferenza"
         oa="a"
-        render={conferenceRoom => conferenceRoom.name}
+        render={conferenceRoom => conferenceRoom.name ?? '???'}
         new_object={q => ({ name: '' })}
         inputs={{
             name: 'Nome',

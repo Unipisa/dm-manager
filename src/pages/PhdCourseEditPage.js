@@ -2,13 +2,14 @@ import { useEffect, useState } from 'react'
 import { useParams, Navigate, useSearchParams } from 'react-router-dom'
 import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 
-import Loading from '../components/Loading'
 import { useEngine } from '../Engine'
+import { DateInput, NumberInput, PersonInput, StringInput, TextInput } from '../components/Input'
+
+import Loading from '../components/Loading'
 import { ModelHeading } from '../components/ModelHeading'
-import { ConferenceRoomInput, DateInput, NumberInput, PersonInput, StringInput, TextInput } from '../components/Input'
+import LessonsEditor, { LessonFormFields } from '../components/LessonsEditor'
+
 import moment from 'moment'
-import { LessonTable } from '../components/PhdCourseLessonList'
-import { DatetimeInput } from '../components/DatetimeInput'
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
@@ -21,12 +22,12 @@ const sortBy = (list, compareFn) => {
 const compareValue = (v1, v2) => {
     // capita di confrontare una stringa con una data
     if (JSON.stringify(v1) === JSON.stringify(v2)) return true
-    if (typeof(v1) !== typeof(v2)) return false
-    if (Array.isArray(v1)) {
-        if (v1.length !== v2.length) return false
-        return v1.every((v, i) => compareValue(v, v2[i]))
-    }
-    if (typeof(v1) === 'object') return (v1?._id && v1?._id === v2?._id)
+    // if (typeof(v1) !== typeof(v2)) return false
+    // if (Array.isArray(v1)) {
+    //     if (v1.length !== v2.length) return false
+    //     return v1.every((v, i) => compareValue(v, v2[i]))
+    // }
+    // if (typeof(v1) === 'object') return (v1?._id && v1?._id === v2?._id)
     return v1 === v2
 }
 
@@ -78,39 +79,11 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
 
     return (
         <Container {...rest}>
-            <Form.Group className="row my-2">
-                <Form.Label className="text-end col-sm-2 col-form-label" htmlFor="new-lesson-start">
-                    Orario
-                </Form.Label>
-                <div className="col-sm-10">
-                    <DatetimeInput
-                        id="new-lesson-start"
-                        value={dateTime}
-                        setValue={setDateTime} />
-                </div>
-            </Form.Group>
-            <Form.Group className="row my-2">
-                <Form.Label className="text-end col-sm-2 col-form-label" htmlFor="new-lesson-duration">
-                    Durata
-                </Form.Label>
-                <div className="col-sm-10">
-                    <NumberInput 
-                        id="new-lesson-duration"
-                        value={duration}
-                        setValue={setDuration} />
-                </div>
-            </Form.Group>
-            <Form.Group className="row my-2">
-                <Form.Label className="text-end col-sm-2 col-form-label" htmlFor="new-lesson-room">
-                    Aula
-                </Form.Label>
-                <div className="col-sm-10">
-                    <ConferenceRoomInput 
-                        id="new-lesson-room"
-                        value={conferenceRoom}
-                        setValue={setConferenceRoom} />
-                </div>
-            </Form.Group>
+            <LessonFormFields idPrefix="new-lesson" {...{
+                dateTime, setDateTime,
+                duration, setDuration,
+                conferenceRoom, setConferenceRoom,
+            }} />
             <Form.Group className="row my-2">
                 <Form.Label className="text-end col-sm-2 col-form-label" htmlFor="new-lesson-repeat-cadence">
                     Cadenza
@@ -201,7 +174,19 @@ export default function PhdCourseEditPage({ Model }) {
     const originalObj = data
     const modifiedFields = Object.keys(modifiedObj)
         .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
+    
     const changed = modifiedFields.length > 0
+
+    const updateLesson = (index, newLesson) => {
+        setModifiedObj(obj => ({
+            ...obj,
+            lessons: [
+                ...obj.lessons.slice(0, index),
+                newLesson,
+                ...obj.lessons.slice(index + 1),
+            ]
+        }))
+    }
 
     const deleteLesson = (index) => {
         setModifiedObj(obj => ({
@@ -368,8 +353,9 @@ export default function PhdCourseEditPage({ Model }) {
                                             close={() => setShowGenerateLessonForm(false)} />
                                     )}
                                 <Container>
-                                    <LessonTable 
+                                    <LessonsEditor 
                                         lessons={modifiedObj.lessons}
+                                        updateLesson={updateLesson}
                                         deleteLesson={deleteLesson} />
                                 </Container>
                             </div>
