@@ -15,8 +15,8 @@ class RoomController extends Controller {
         this.queryPipeline.push(
             // inserisce startDate e endDate con la data odierna
             {$addFields: {
-                startDate: new Date(),
-                endDate: new Date(),
+                startDate: "$$NOW",
+                endDate: "$$NOW",
             }},
             ...RoomAssignment.roomRoomAssignmentPipeline()
         ) 
