@@ -1,3 +1,4 @@
+const ConferenceRoom = require('../models/ConferenceRoom.js')
 const EventPhdCourse = require('../models/EventPhdCourse.js')
 const Controller = require('./Controller.js')
 
@@ -14,40 +15,35 @@ class EventPhdCourseController extends Controller {
         ]
 
         this.queryPipeline.push(
-            { $unwind: '$lessons' },
-            {
+            {   
                 $lookup: {
                     from: 'conferencerooms',
                     localField: 'lessons.conferenceRoom',
                     foreignField: '_id',
-                    as: 'lessons.conferenceRoom',
+                    as: 'conferenceRooms',
                     pipeline: [
                         { $project: { name: 1 } },
                     ],
                 }
             },
-            {
-                $unwind: {
-                    path: '$lessons.conferenceRoom',
-                    preserveNullAndEmptyArrays: true,
-                }
-            },
-            {
-                $group: {
-                    _id: '$_id',
-                    title: { $first: '$title' },
-                    description: { $first: '$description' },
-                    startDate: { $first: '$startDate' },
-                    endDate: { $first: '$endDate' },
-                    lessons: { $push: "$lessons" },
-                    lecturers: { $first: '$lecturers' },
-                    createdBy: { $first: '$createdBy' },
-                    updatedBy: { $first: '$updatedBy' },
-                    createdAt: { $first: '$createdAt' },
-                    updatedAt: { $first: '$updatedAt' },
-                }
-            },
         )
+    }
+
+    async aggregatePostProcess(phdCourses) {
+        for (const phdCourse of phdCourses) {
+            // dictionary of conference rooms by id 
+            const conferenceRooms = Object.fromEntries(
+                phdCourse.conferenceRooms?.map(c => [c._id, c]) ?? []
+            )
+
+            for (const lesson of phdCourse.lessons) {
+                lesson.conferenceRoom = conferenceRooms[lesson.conferenceRoom]
+            }
+
+            delete phdCourse.conferenceRooms
+        }
+
+        return phdCourses
     }
 }
 
