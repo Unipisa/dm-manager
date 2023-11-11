@@ -452,12 +452,14 @@ class Controller {
         console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
 
         let result = await this.Model.aggregate(pipeline)
-        result[0].data = await this.aggregatePostProcess(result[0].data)
-
+        
         if (result.length === 0) {
             total = 0;
             data = result;
         } else {
+            // do postprocessing
+            result[0].data = await this.aggregatePostProcess(result[0].data);
+            
             [{ total, data }] = result;
         }
             
