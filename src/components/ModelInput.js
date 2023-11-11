@@ -26,7 +26,7 @@ import {
     DatetimeInput
 } from './DatetimeInput'
 
-export function ModelFieldInput({ id, schema, value, setValue }) {
+export function ModelFieldInput({ id, schema, value, setValue, api_prefix }) {
     function element(Element, opts = {}) {
         const {options, multiple} = opts
         return <Element 
@@ -35,24 +35,29 @@ export function ModelFieldInput({ id, schema, value, setValue }) {
                     setValue={setValue} 
                     options={options}
                     multiple={multiple}
+                    api_prefix={api_prefix}
                 />
     }
 
     if (!schema) return <p>no schema provided</p>
 
+    if (api_prefix === undefined) {
+        api_prefix = "/api/v0"
+    }
+
     if (schema.type === 'array') {
         if (schema.enum) return element(MultipleSelectInput, {options: schema.enum})
         if (!schema.items['x-ref']) return element(ListInput)
-        if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true})
-        if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true})        
-        if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true})
+        if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true, api_prefix: api_prefix})
+        if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true, api_prefix: api_prefix})        
+        if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true, api_prefix: api_prefix})
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
-        if (schema['x-ref'] === 'Person') return element(PersonInput)
-        if (schema['x-ref'] === 'Room') return element(RoomInput)
-        if (schema['x-ref'] === 'ConferenceRoom') return element(ConferenceRoomInput)
-        if (schema['x-ref'] === 'SeminarCategory') return element(SeminarCategoryInput)
-        if (schema['x-ref'] === 'Institution') return element(InstitutionInput)
+        if (schema['x-ref'] === 'Person') return element(PersonInput, {api_prefix: api_prefix})
+        if (schema['x-ref'] === 'Room') return element(RoomInput, {api_prefix: api_prefix})
+        if (schema['x-ref'] === 'ConferenceRoom') return element(ConferenceRoomInput, {api_prefix: api_prefix})
+        if (schema['x-ref'] === 'SeminarCategory') return element(SeminarCategoryInput, {api_prefix: api_prefix})
+        if (schema['x-ref'] === 'Institution') return element(InstitutionInput, {api_prefix: api_prefix})
         if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
         if (schema.format === 'date-time') {
             if (schema.widget === 'datetime') return element(DatetimeInput) // use formatted text input "YYYY-MM-DD HH:mm"
@@ -77,7 +82,7 @@ export function ModelFieldInput({ id, schema, value, setValue }) {
     }
 }
 
-export function ModelInput({ field, modified, schema, value, setValue}) {
+export function ModelInput({ field, modified, schema, value, setValue, api_prefix}) {
     const id = useId()
     const label = schema.items?.label || schema.label || field
 
@@ -91,6 +96,7 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
                 schema={schema}
                 value={value} 
                 setValue={setValue} 
+                api_prefix={api_prefix}
             />                         
         </div>
         <div className="col-sm-2"></div>
