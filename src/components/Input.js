@@ -124,6 +124,10 @@ export function TextInput({ id, value, setValue }) {
 //
 // TODO: valutare widget alternativo: https://react-select.com/home
 export function ObjectInput({ id, placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple, api_prefix }) {
+    if (api_prefix === undefined) {
+        api_prefix = "/api/v0"
+    }
+
     const engine = useEngine()
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
