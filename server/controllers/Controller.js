@@ -1,4 +1,6 @@
 const { ObjectId } = require('mongoose').Types
+
+const User = require('../models/User')
 const {log, requireSomeRole, requireUser, allowAnonymous} = require('./middleware') 
 
 function sendBadRequest(res, message) {
@@ -541,6 +543,12 @@ class Controller {
         try {
             const was = await this.Model.findById(id)
             await log(req, was, payload)
+            if (was.createdBy !== undefined) delete payload.createdBy
+            if (payload.createdBy) {
+                const user = await User.findOne({username: payload.createdBy})
+                if (!user) throw new Error(`user ${payload.createdBy} not found`)
+                payload.createdBy = user._id
+            }
             was.set({...was, ...payload})
             await was.save()
             res.send(was)
@@ -612,7 +620,8 @@ class Controller {
                     const payload = {...req.body,
                         updatedBy: req.user._id
                     }
-                    delete payload.createdBy
+                    // è possibile modificare l'owner se undefined
+                    //delete payload.createdBy
                     delete payload.createdAt
                     delete payload.updatedAt
                     this.patch(req, res, req.params.id, payload)

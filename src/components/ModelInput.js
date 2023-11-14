@@ -53,12 +53,14 @@ export function ModelFieldInput({ id, schema, value, setValue, api_prefix }) {
         if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true, api_prefix: api_prefix})
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
-        if (schema['x-ref'] === 'Person') return element(PersonInput, {api_prefix: api_prefix})
-        if (schema['x-ref'] === 'Room') return element(RoomInput, {api_prefix: api_prefix})
-        if (schema['x-ref'] === 'ConferenceRoom') return element(ConferenceRoomInput, {api_prefix: api_prefix})
-        if (schema['x-ref'] === 'SeminarCategory') return element(SeminarCategoryInput, {api_prefix: api_prefix})
-        if (schema['x-ref'] === 'Institution') return element(InstitutionInput, {api_prefix: api_prefix})
-        if (schema['x-ref']) return <p>x-ref to {schema['x-ref']} not yet implemented</p> 
+        const xref = schema['x-ref']
+        if (xref === 'Person') return element(PersonInput, {api_prefix: api_prefix})
+        if (xref === 'Room') return element(RoomInput, {api_prefix: api_prefix})
+        if (xref === 'ConferenceRoom') return element(ConferenceRoomInput, {api_prefix: api_prefix})
+        if (xref === 'SeminarCategory') return element(SeminarCategoryInput, {api_prefix: api_prefix})
+        if (xref === 'Institution') return element(InstitutionInput, {api_prefix: api_prefix})
+        if (xref === 'User') return element(StringInput, {api_prefix: api_prefix})
+        if (xref) return <p>x-ref to {xref} not yet implemented</p> 
         if (schema.format === 'date-time') {
             if (schema.widget === 'datetime') return element(DatetimeInput) // use formatted text input "YYYY-MM-DD HH:mm"
             return element(DateInput) // use date only widget
@@ -84,7 +86,7 @@ export function ModelFieldInput({ id, schema, value, setValue, api_prefix }) {
 
 export function ModelInput({ field, modified, schema, value, setValue, api_prefix}) {
     const id = useId()
-    const label = schema.items?.label || schema.label || field
+    const label = schema?.items?.label || schema?.label || field
 
     return <Form.Group className="row my-2">
         <Form.Label className={ "col-form-label text-end col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id }>
@@ -100,7 +102,7 @@ export function ModelInput({ field, modified, schema, value, setValue, api_prefi
             />                         
         </div>
         <div className="col-sm-2"></div>
-        <div className="col-sm-10 form-text">{schema.help}</div>
+        <div className="col-sm-10 form-text">{schema?.help}</div>
     </Form.Group>
 }
 

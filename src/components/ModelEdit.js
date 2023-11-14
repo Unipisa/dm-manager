@@ -3,7 +3,7 @@ import { Form, Button, ButtonGroup } from 'react-bootstrap'
 import { Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
-import { ModelInputs } from '../components/ModelInput'
+import { ModelInput, ModelInputs } from '../components/ModelInput'
 import Timestamps from '../components/Timestamps'
 import Loading from '../components/Loading'
 
@@ -56,8 +56,9 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
         return v1 === v2
     }
 
-    const modifiedFields = Object.keys(modifiedObj)
+    const modifiedFields = [...Object.keys(modifiedObj)]
         .filter(key => !compareValue(modifiedObj[key], originalObj[key]))
+    console.log(`Modified fields: ${JSON.stringify(modifiedFields)}`)
 
     const changed = modifiedFields.length > 0
 
@@ -105,6 +106,22 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
                 modifiedFields={modifiedFields}
                 onChange={onChange && onChange(setModifiedObj)} 
                 />
+            { /* input speciale per modificare il campo createdBy */
+                originalObj.createdBy === undefined && !create && 
+                <ModelInput 
+                    schema={{
+                        label: 'Creato da',
+                        ...Model.schema.fields.createdBy}} 
+                    setValue={(value) => {
+                            setModifiedObj(obj => ({...obj, createdBy: value}))
+                        }}
+                    edit={true}
+                    value={modifiedObj.createdBy}
+                    obj={modifiedObj} 
+                    setObj={setModifiedObj} 
+                    modified={modifiedFields.includes("createdBy")}
+                    onChange={onChange && onChange(setModifiedObj)} 
+            />}
             <ButtonGroup className="mt-3">
                 <Button 
                     onClick={ submit } 
@@ -121,12 +138,12 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
                     onClick={ () => deleteObj(modifiedObj) }
                     className="btn btn-danger pull-right">
                         elimina {objName}
-                </Button>}
+                </Button>}  
             </ButtonGroup>
           </Form>
         </Card.Body>
         <Card.Footer>
-            <Timestamps obj={originalObj} />
+            <Timestamps obj={originalObj}/>
         </Card.Footer>
     </Card>
 }
