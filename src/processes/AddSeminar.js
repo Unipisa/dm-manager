@@ -1,7 +1,7 @@
 import { Button, Card, Form } from 'react-bootstrap'
 import { ModelInput } from '../components/ModelInput'
 import { useState } from 'react'
-import { useEngine } from '../Engine'
+import axios from 'axios'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -11,9 +11,7 @@ export default function AddSeminar() {
     const [room, setRoom] = useState(null)
     const [category, setCategory] = useState(null)
     const [seminarAdded, setSeminarAdded] = useState(false)
-
-    const engine = useEngine()
-    const putSeminar = engine.usePut('event-seminar')
+    const [abstract, setAbstract] = useState("")
 
     const onCompleted = async () => {
         // Insert the seminar in the database
@@ -21,18 +19,18 @@ export default function AddSeminar() {
             title: title, 
             startDatetime: date, 
             duration: duration, 
-            conferenceRoom: room, 
-            speaker: person,
-            category: category
+            conferenceRoom: room._id, 
+            speaker: person._id,
+            category: category._id,
+            abstract: abstract
         }
 
-        console.log(s)
-
-        if (await putSeminar(s)) {
+        try {
+            await axios.put('/api/v0/process/seminars/add/save', s)
             setSeminarAdded(true)
         }
-        else {
-            console.log("error")
+        catch (error) {
+            console.log(error)
         }
     }
 
@@ -52,12 +50,13 @@ export default function AddSeminar() {
             duration={duration} setDuration={setDuration}
             room={room} setRoom={setRoom}
             category={category} setCategory={setCategory}
+            abstract={abstract} setAbstract={setAbstract}
             onCompleted={onCompleted}
         ></SeminarDetailsBlock>
     </div>;
 }
 
-function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, duration, setDuration, category, setCategory }) {
+function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, duration, setDuration, category, setCategory, abstract, setAbstract }) {
     const confirm_enabled = (title !== "") && (date !== null) && (duration > 0) && (room !== null) && (category !== null)
 
     if (disabled) {
@@ -72,7 +71,7 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
                 <ModelInput field="Titolo" schema={{ type: "string" }} value={title} setValue={setTitle}></ModelInput>
             </Form.Group>
             <Form.Group className="my-3">
-                <ModelInput field="Categoria" schema={{ "x-ref": "SeminarCategory" }} value={category} setValue={setCategory}></ModelInput>
+                <ModelInput field="Categoria" schema={{ "x-ref": "SeminarCategory" }} value={category} setValue={setCategory} api_prefix="/api/v0/process/seminars/add"></ModelInput>
             </Form.Group>
             <Form.Group className="my-3">
                 <ModelInput field="Data e ora" schema={{ format: "date-time", widget: "datetime" }} value={date} setValue={setDate}></ModelInput>
@@ -81,7 +80,10 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
                 <ModelInput field="Durata (in minuti)" schema={{ type: "number" }} value={duration} setValue={setDuration}></ModelInput>
             </Form.Group>
             <Form.Group className="my-3">
-                <ModelInput field="Aula" schema={{ "x-ref": "ConferenceRoom" }} value={room} setValue={setRoom}></ModelInput>
+                <ModelInput field="Aula" schema={{ "x-ref": "ConferenceRoom" }} value={room} setValue={setRoom} api_prefix="/api/v0/process/seminars/add"></ModelInput>
+            </Form.Group>
+            <Form.Group className="my-3">
+                <ModelInput field="Abstract" schema={{ type: "string", widget: "text" }} value={abstract} setValue={setAbstract}></ModelInput>
             </Form.Group>
         </Form>
         <div className="d-flex flex-row justify-content-end">
@@ -94,24 +96,27 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
 function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
     if (disabled) {
         return <Card className="shadow mb-3">
-            <Card.Header>Selezione speaker: <strong>{person?.firstName} {person?.lastName}</strong></Card.Header>
+            <Card.Header>
+                <div className="d-flex d-row justify-content-between">
+                    <div>Selezione speaker: <strong>{person?.firstName} {person?.lastName}</strong></div>                    
+                    <div className="btn btn-warning btn-sm" onClick={() => setPerson(null)}>Annulla</div>
+                </div>
+            </Card.Header>
         </Card>
     }
 
     return <div>
         <Card className="shadow mb-3">
-            <Card.Header>Selezione speaker</Card.Header>
+            <Card.Header className="">Selezione speaker</Card.Header>
             <Card.Body>
-            <Form>
-                <Form.Group>
-                    <ModelInput field="Speaker" schema={{'x-ref': 'Person'}} value={person} setValue={setPerson}></ModelInput>
-                </Form.Group>
+            <p>
+            Digitare le prime lettere del cognome per attivare il completamento.
+            Solo se lo speaker non esiste in anagrafica, crearne uno nuovo selezionando la voce che appare nel menù a tendina.
+            </p>
+            <Form className="mb-3">
+                <ModelInput field="Speaker" schema={{"x-ref": "Person"}} value={person} setValue={setPerson} api_prefix="/api/v0/process/seminars/add"></ModelInput>
             </Form>
-            <div className="d-flex flex-row justify-content-end">
-                <Button className="text-end" onClick={() => onCompleted(person)} disabled={person != null}>Conferma</Button>
-            </div>
             </Card.Body>
-        </Card>
-        
+        </Card>        
     </div>
 }

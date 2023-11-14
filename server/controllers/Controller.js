@@ -241,6 +241,10 @@ class Controller {
         res.send(this.getSchema())
     }
 
+    async aggregatePostProcess(results) {
+        return results
+    }
+
     async performQuery(query, res, { fields, searchFields, queryPipeline, path, Model } = {}) {
         let $matches = []
         let $match_lookups = {}
@@ -446,12 +450,16 @@ class Controller {
         ]
         
         console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
+
+        let result = await this.Model.aggregate(pipeline)
         
-        let result = await Model.aggregate(pipeline)
         if (result.length === 0) {
             total = 0;
             data = result;
         } else {
+            // do postprocessing
+            result[0].data = await this.aggregatePostProcess(result[0].data);
+            
             [{ total, data }] = result;
         }
             
@@ -478,8 +486,10 @@ class Controller {
                 ...this.queryPipeline
             ]
             console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
-            let obj = await this.Model
-                .aggregate(pipeline)
+            
+            let obj = await this.Model.aggregate(pipeline)
+            obj = await this.aggregatePostProcess(obj)
+
             if (obj.length === 0) {
                 return res.status(404).send({error: `not found ${id}`})
             }
@@ -489,6 +499,8 @@ class Controller {
             }
             res.send(obj[0])
         } catch(error) {
+            console.warn(error)
+
             console.log(`invalid _id: ${id}`)
             res.status(404).send({error: `invalid id ${id}`})
         }

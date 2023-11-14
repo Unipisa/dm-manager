@@ -51,12 +51,14 @@ const updateDatetimeFromString = (dateStr, timeStr, date) => {
 export function DatetimeInput({ value, setValue }) {
     if (value) value = new Date(value)
 
-    const [date, setDate] = useState(value 
-        ? `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}` 
+    const pad = (v, n) => v.toString().padStart(n, '0');
+
+    const [date, setDate] = useState(value
+        ? `${pad(value.getFullYear(), 4)}-${pad(value.getMonth() + 1, 2)}-${pad(value.getDate(), 2)}`
         : ''
     )
-    const [time, setTime] = useState(value 
-        ? `${value.getHours().toString().padStart(2, '0')}:${value.getMinutes().toString().padStart(2, '0')}`
+    const [time, setTime] = useState(value
+        ? `${pad(value.getHours(), 2)}:${pad(value.getMinutes(), 2)}`
         : ''
     )
 

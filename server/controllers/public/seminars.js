@@ -1,13 +1,18 @@
 const EventSeminar = require('../../models/EventSeminar')
 
+const maxDate = new Date(8640000000000000);
+
+/** @param {import('@types/express').Request} req */
 async function seminarsQuery(req) {
+    const from = req.query.from ? new Date(req.query.from) : new Date()
+    const to = req.query.to ? new Date(req.query.to) : maxDate
+
     const pipeline = [
         { $match: {
-            $expr: {
-                $gte: [
-                    "$startDatetime",
-                    "$$NOW"],
-            }
+            startDatetime: {
+                $gte: from,
+                $lt: to,
+            },
         }},
         { $lookup: {
             from: 'people',
@@ -75,8 +80,6 @@ async function seminarsQuery(req) {
     ]
 
     
-    console.log(JSON.stringify({pipeline}))
-
     const seminars = await EventSeminar.aggregate(pipeline)
 
     return seminars

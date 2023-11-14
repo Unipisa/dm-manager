@@ -1,15 +1,12 @@
-import { useParams } from 'react-router-dom'
-import { ModelHeading } from '../components/ModelHeading'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Button, ButtonGroup, Card, Container } from 'react-bootstrap'
 
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
-// import RelatedDetails from '../components/RelatedDetails'
-
-import { Button, ButtonGroup, Card, Container } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
 
 import Timestamps from '../components/Timestamps'
+import { ModelHeading } from '../components/ModelHeading'
 import { ModelFieldOutput } from '../components/ModelOutput'
-import { LessonTable } from '../components/PhdCourseLessonList'
+import LessonsEditor from '../components/LessonsEditor'
 
 const PhdCourseView = ({ Model }) => {
     const obj = useObject()
@@ -45,7 +42,7 @@ const PhdCourseView = ({ Model }) => {
                 </p>
                 <h4>Lezioni</h4>
                 <Container>
-                    <LessonTable lessons={obj.lessons} />
+                    <LessonsEditor lessons={obj.lessons} />
                 </Container>
                 <ButtonGroup>
                     <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>

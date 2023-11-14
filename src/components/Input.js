@@ -123,7 +123,11 @@ export function TextInput({ id, value, setValue }) {
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
 // TODO: valutare widget alternativo: https://react-select.com/home
-export function ObjectInput({ id, placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple }) {
+export function ObjectInput({ id, placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple, api_prefix }) {
+    if (api_prefix === undefined) {
+        api_prefix = "/api/v0"
+    }
+
     const engine = useEngine()
     const [options, setOptions] = useState([])
     const [isLoading, setIsLoading] = useState(false)
@@ -153,7 +157,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     function handleClose() {
         // Add a new person with the given data
         console.log(`Creating new object (${objCode})`, newObject)
-        api.put(`/api/v0/${objCode}`, newObject).then(data => {      
+        api.put(`${api_prefix}/${objCode}`, newObject).then(data => {      
             console.log("New object created", data)
             console.log("value", value)
             if (multiple) {
@@ -191,7 +195,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        api.get(`/api/v0/${objCode}/search`, {q: query}).then((data) => {
+        api.get(`${api_prefix}/${objCode}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
             })
@@ -250,6 +254,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
                     console.log(`Setting ${key} to`, x)
                     setNewObject(o => ({...o, [key]: x}))
                 }}
+                api_prefix={api_prefix}
                 >
             </InstitutionInput>
         } else {
@@ -300,7 +305,7 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     </>
 }
 
-export function PersonInput({ id, value, setValue, multiple }) {
+export function PersonInput({ id, value, setValue, multiple, api_prefix }) {
     return <ObjectInput 
         id={id} 
         value={value} 
@@ -318,11 +323,12 @@ export function PersonInput({ id, value, setValue, multiple }) {
                 lastName: 'Cognome',
                 affiliations: 'Affiliazioni',
         }}
+        api_prefix={api_prefix}
         placeholder="cognome"
     />
 }
 
-export function GrantInput({ id, value, setValue, multiple }) {
+export function GrantInput({ id, value, setValue, multiple, api_prefix }) {
     return <ObjectInput 
         id={id} 
         value={value} 
@@ -336,6 +342,7 @@ export function GrantInput({ id, value, setValue, multiple }) {
         inputs={{
                 identifier: 'Identificativo',
         }}
+        api_prefix={api_prefix}
         placeholder="grant"
     />
 }
@@ -382,7 +389,7 @@ export function MultipleSelectInput({ id, options, value, setValue}) {
     </select>
 }
 
-export function RoomInput({ id, value, setValue }) {
+export function RoomInput({ id, value, setValue, api_prefix }) {
     const engine = useEngine()
     const path = 'room'
     const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_sort: 'code', _limit: 1000}), {
@@ -402,11 +409,12 @@ export function RoomInput({ id, value, setValue }) {
             return room.code
         }}
         value={value} 
+        api_prefix={api_prefix}
         setValue={value => setValue(value?data.get(value):null)}
     />
 }
 
-export function ConferenceRoomInput({ id, value, setValue }) {
+export function ConferenceRoomInput({ id, value, setValue, api_prefix }) {
     return <ObjectInput
         id={id}
         value={value}
@@ -414,16 +422,17 @@ export function ConferenceRoomInput({ id, value, setValue }) {
         objCode="conference-room"
         objName="aula per conferenza"
         oa="a"
-        render={conferenceRoom => conferenceRoom.name}
+        render={conferenceRoom => conferenceRoom.name ?? '???'}
         new_object={q => ({ name: '' })}
         inputs={{
             name: 'Nome',
         }}
+        api_prefix={api_prefix}
         placeholder="Aula per conferenza..."
     />
 }
 
-export function SeminarCategoryInput({ id, value, setValue }) {
+export function SeminarCategoryInput({ id, value, setValue, api_prefix }) {
     return <ObjectInput
         id={id}
         value={value}
@@ -437,6 +446,7 @@ export function SeminarCategoryInput({ id, value, setValue }) {
             name: 'Nome',
             label: 'Label',
         }}
+        api_prefix={api_prefix}
         placeholder="Ciclo di seminari..."
     />
 }
@@ -468,7 +478,7 @@ export function SeminarCategoryInput({ id, value, setValue }) {
 //     />
 // }
 
-export function InstitutionInput({ id, value, setValue, multiple }) {
+export function InstitutionInput({ id, value, setValue, multiple, api_prefix }) {
     return <ObjectInput 
         id={id} 
         value={value} 
@@ -482,6 +492,7 @@ export function InstitutionInput({ id, value, setValue, multiple }) {
         inputs={{
                 name: 'nome',
         }}
+        api_prefix={api_prefix}
         placeholder="affiliazione"
     />
 }
