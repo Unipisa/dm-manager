@@ -36,8 +36,8 @@ const multipleSSDs = {
 }
 
 const notes = {type: String, label: 'note', widget: 'text', default: ''}
-const createdBy = { type: ObjectId, ref: 'User' }
-const updatedBy = { type: ObjectId, ref: 'User' }
+const createdBy = { type: ObjectId, ref: 'User', can_filter: true }
+const updatedBy = { type: ObjectId, ref: 'User', can_filter: true }
 const date = {type: Date, label: 'data', default: null}
 const startDate = {...date, label: 'data inizio'}
 const endDate = {...date, label: 'data fine',
