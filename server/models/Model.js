@@ -1,5 +1,7 @@
 const mongoose = require('mongoose-schema-jsonschema')()
 const config = require('mongoose-schema-jsonschema/config')
+const assert = require('assert')
+
 
 const fieldOptionsMapping = {
     label: 'label',
@@ -138,6 +140,20 @@ function field_from_model_info(info) {
             can_filter: true,
             related_field: true,
         }
+    } else if (info.ref === 'SeminarCategory') {
+        return {
+            can_sort: ['name'],
+            can_filter: true,
+            related_field: true,
+        }
+    } else if (info.ref === 'Form') {
+        return {
+            can_sort: ['name'],
+            can_filter: true,
+            related_field: true,
+        }
+    } else if (info.ref) {
+        assert(false, `field_from_model_info: unknown ref type ${info.ref}`)
     } else {
         switch(info.type) {
             case Number: // fall through

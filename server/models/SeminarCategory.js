@@ -34,5 +34,6 @@ const seminarCategorySchema = new Schema({
 })
 
 const SeminarCategory = model('SeminarCategory', seminarCategorySchema)
+SeminarCategory.relatedModels = []
 
 module.exports = SeminarCategory
