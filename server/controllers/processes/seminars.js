@@ -8,6 +8,7 @@ const ConferenceRoomController = require('../ConferenceRoomController')
 const PersonController = require('../PersonController')
 const InstitutionController = require('../InstitutionController')
 const EventSeminarController = require('../EventSeminarController')
+const GrantController = require('../GrantController')
 
 const controller = new EventSeminarController()
 
@@ -98,6 +99,11 @@ router.get('/add/conference-room/search', async (req, res) => {
 
 router.get('/add/institution/search', async (req, res) => {
     const controller = new InstitutionController()
+    await controller.search(req, res)
+})
+
+router.get('/add/grant/search', async (req, res) => {
+    const controller = new GrantController()
     await controller.search(req, res)
 })
 

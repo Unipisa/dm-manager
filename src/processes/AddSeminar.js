@@ -13,6 +13,7 @@ export default function AddSeminar() {
     const [room, setRoom] = useState(null)
     const [category, setCategory] = useState(null)
     const [abstract, setAbstract] = useState("")
+    const [grants, setGrants] = useState(null)
     const [dataLoaded, setDataLoaded] = useState(false)
 
     const { id } = useParams()
@@ -32,6 +33,7 @@ export default function AddSeminar() {
                 setDuration(seminar.duration)
                 setRoom(seminar.conferenceRoom)
                 setCategory(seminar.category)
+                setGrants(seminar.grants)
                 setAbstract(seminar.abstract)
             }
             fetchData()
@@ -47,6 +49,7 @@ export default function AddSeminar() {
             conferenceRoom: room._id, 
             speaker: person._id,
             category: category._id,
+            grants: grants,
             abstract: abstract
         }
 
@@ -73,12 +76,14 @@ export default function AddSeminar() {
             room={room} setRoom={setRoom}
             category={category} setCategory={setCategory}
             abstract={abstract} setAbstract={setAbstract}
+            grants={grants} setGrants={setGrants}
             onCompleted={onCompleted}
         ></SeminarDetailsBlock>
     </div>;
 }
 
-function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, duration, setDuration, category, setCategory, abstract, setAbstract }) {
+function SeminarDetailsBlock({ onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, 
+        duration, setDuration, category, setCategory, abstract, setAbstract, grants, setGrants }) {
     const confirm_enabled = (title !== "") && (date !== null) && (duration > 0) && (room !== null) && (category !== null)
 
     if (disabled) {
@@ -93,7 +98,7 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
                 <ModelInput field="Titolo" schema={{ type: "string" }} value={title} setValue={setTitle}></ModelInput>
             </Form.Group>
             <Form.Group className="my-3">
-                <ModelInput field="Categoria" schema={{ "x-ref": "SeminarCategory" }} value={category} setValue={setCategory} api_prefix="/api/v0/process/seminars/add"></ModelInput>
+                <ModelInput field="Ciclo di seminari" schema={{ "x-ref": "SeminarCategory" }} value={category} setValue={setCategory} api_prefix="/api/v0/process/seminars/add"></ModelInput>
             </Form.Group>
             <Form.Group className="my-3">
                 <ModelInput field="Data e ora" schema={{ format: "date-time", widget: "datetime" }} value={date} setValue={setDate}></ModelInput>
@@ -103,6 +108,9 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
             </Form.Group>
             <Form.Group className="my-3">
                 <ModelInput field="Aula" schema={{ "x-ref": "ConferenceRoom" }} value={room} setValue={setRoom} api_prefix="/api/v0/process/seminars/add"></ModelInput>
+            </Form.Group>
+            <Form.Group className="my-3">
+                <ModelInput field="Grant" schema={{ type: "array", "items" : {"x-ref": "Grant"} }} value={grants} setValue={setGrants} api_prefix="/api/v0/process/seminars/add"></ModelInput>
             </Form.Group>
             <Form.Group className="my-3">
                 <ModelInput field="Abstract" schema={{ type: "string", widget: "text" }} value={abstract} setValue={setAbstract}></ModelInput>
@@ -132,8 +140,9 @@ function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
             <Card.Header className="">Selezione speaker</Card.Header>
             <Card.Body>
             <p>
-            Digitare le prime lettere del cognome per attivare il completamento.
-            Solo se lo speaker non esiste in anagrafica, crearne uno nuovo selezionando la voce che appare nel menù a tendina.
+            Digitare le prime lettere del cognome per attivare il completamento. Solo se lo speaker non esiste, crearne uno nuovo selezionando 
+            la voce che appare nel menù a tendina. All'atto della creazione, inserire nome, cognome e istituzione nella loro lingua di appartenenza
+            (ad esempio, "Universität Zürich" piuttosto che "University of Zurich").
             </p>
             <Form className="mb-3">
                 <ModelInput field="Speaker" schema={{"x-ref": "Person"}} value={person} setValue={setPerson} api_prefix="/api/v0/process/seminars/add"></ModelInput>
