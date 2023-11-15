@@ -21,7 +21,7 @@ export default function AddSeminar() {
     useEffect(() => {
         if (id && ! dataLoaded) {
             async function fetchData() {
-                const res = await axios.get(`/api/v0/process/seminars/add/get/${id}`)
+                const res = await axios.get(`/api/v0/process/seminars/get/${id}`)
                 const seminar = res.data.data[0]
                 
                 // Load the data into the state
@@ -55,7 +55,7 @@ export default function AddSeminar() {
         }
 
         try {
-            await axios.put('/api/v0/process/seminars/add/save', s)
+            await axios.put('/api/v0/process/seminars/save', s)
             navigate('/process/seminars')
         }
         catch (error) {

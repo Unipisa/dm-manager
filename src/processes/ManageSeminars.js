@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import { Card } from 'react-bootstrap'
 import axios from 'axios'
+import { Link } from 'react-router-dom'
 
 const queryClient = new QueryClient()
 
@@ -54,11 +55,11 @@ function SeminarList() {
                         <button className="ms-2 btn btn-danger" onClick={() => deleteSeminar(seminar._id)}>
                             Delete
                         </button>
-                        <a className="ms-2" href={"/process/seminars/add/" + seminar._id}>
+                        <Link className="ms-2" to={"/process/seminars/add/" + seminar._id}>
                             <button className="btn btn-primary">
                                 Edit
                             </button>
-                        </a>
+                        </Link>
                     </div>
                 </Card.Body>                
             </Card>
