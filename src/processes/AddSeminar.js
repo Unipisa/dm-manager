@@ -1,7 +1,9 @@
 import { Button, Card, Form } from 'react-bootstrap'
 import { ModelInput } from '../components/ModelInput'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
 import axios from 'axios'
+
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -10,8 +12,31 @@ export default function AddSeminar() {
     const [duration, setDuration] = useState(60)
     const [room, setRoom] = useState(null)
     const [category, setCategory] = useState(null)
-    const [seminarAdded, setSeminarAdded] = useState(false)
     const [abstract, setAbstract] = useState("")
+    const [dataLoaded, setDataLoaded] = useState(false)
+
+    const { id } = useParams()
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        if (id && ! dataLoaded) {
+            async function fetchData() {
+                const res = await axios.get(`/api/v0/process/seminars/add/get/${id}`)
+                const seminar = res.data.data[0]
+                
+                // Load the data into the state
+                setDataLoaded(true)
+                setPerson(seminar.speaker)
+                setTitle(seminar.title)
+                setDate(seminar.startDatetime)
+                setDuration(seminar.duration)
+                setRoom(seminar.conferenceRoom)
+                setCategory(seminar.category)
+                setAbstract(seminar.abstract)
+            }
+            fetchData()
+        } 
+    })
 
     const onCompleted = async () => {
         // Insert the seminar in the database
@@ -25,20 +50,17 @@ export default function AddSeminar() {
             abstract: abstract
         }
 
+        if (id) {
+            s._id = id
+        }
+
         try {
             await axios.put('/api/v0/process/seminars/add/save', s)
-            setSeminarAdded(true)
+            navigate('/process/seminars')
         }
         catch (error) {
             console.log(error)
         }
-    }
-
-    if (seminarAdded) {
-        return <div>
-            <p>Seminario inserito correttamente.</p>
-            <a href="/"><button className="btn btn-primary">Torna alla home</button></a>
-        </div>
     }
 
     return <div>
@@ -87,7 +109,7 @@ function SeminarDetailsBlock({ speaker, onCompleted, disabled, room, setRoom, da
             </Form.Group>
         </Form>
         <div className="d-flex flex-row justify-content-end">
-            <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Conferma</Button>
+            <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
         </div>
         </Card.Body>
     </Card>;

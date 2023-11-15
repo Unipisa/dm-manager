@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Card } from 'react-bootstrap'
 import { Navigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
@@ -38,7 +39,32 @@ export default function Home() {
           {/* spacer */} se questo ti sembra un errore.
     </li>)
 
+    const processes = <>
+        <h4>Processi disponibili</h4>
+        <div className="row">
+            <div className="col-lg-6 p-3">
+            <Card className="shadow">
+                <Card.Header>                    
+                    <div className="d-flex flex-row justify-content-between">
+                        <strong>Seminari</strong>
+                        <a href="/process/seminars"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    <ul>
+                        <li>Inserimento di nuovi seminari</li>
+                        <li>Gestione dei propri seminari</li>
+                    </ul>
+                    
+                </Card.Body>
+            </Card>
+            </div>
+        </div>
+    </>
+
   return <>
+    {processes}
+    <h4>Altre azioni</h4>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, 
         puoi:
       </p>

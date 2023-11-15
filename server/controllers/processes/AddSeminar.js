@@ -8,6 +8,15 @@ const SeminarCategoryController = require('../SeminarCategoryController')
 const ConferenceRoomController = require('../ConferenceRoomController')
 const PersonController = require('../PersonController')
 const InstitutionController = require('../InstitutionController')
+const EventSeminarController = require('../EventSeminarController')
+
+router.get('/get/:id', async (req, res) => {
+    const controller = new EventSeminarController()
+    controller.performQuery({
+        _id: req.params.id, 
+        createdBy: req.user._id
+    }, res)
+})
 
 router.put('/save', async (req, res) => {
     let payload = {
@@ -15,11 +24,23 @@ router.put('/save', async (req, res) => {
         createdBy: req.user._id,
         updatedBy: req.user._id,
     }
-    const seminar = EventSeminar(payload)
 
-    console.log(seminar)
     try {
-        await seminar.save()
+        if (! payload._id) {
+            const seminar = EventSeminar(payload)
+            await seminar.save()
+        }
+        else {
+            const seminar = await EventSeminar.findById(payload._id)
+            if (seminar.createdBy.equals(req.user)) {
+                res.status(401).json({ error: "Forbidden" })
+                return
+            }
+            delete payload.createdBy
+            
+            seminar.set({ ...seminar, ...payload })
+            await seminar.save()
+        }
         res.send({ result: "OK" })
     }
     catch (error) {
