@@ -16,6 +16,9 @@ COPY build ./build
 COPY server ./server
 COPY entrypoint.sh ./
 
+# Copy the dmwidgets script inside the assets folder
+COPY widgets/dist/dmwidgets.js ./build/
+
 EXPOSE 8000
 
 CMD [ "./entrypoint.sh" ]

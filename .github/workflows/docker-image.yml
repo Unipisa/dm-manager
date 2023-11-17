@@ -19,6 +19,8 @@ jobs:
       run: npm ci
     - name: Build Js bundle
       run: REACT_APP_SERVER_URL="" npm run build
+    - name: Build DM Widgets
+      run: cd widgets && npm ci && npm run build && cd ..
     - name: Start MongoDB
       uses: supercharge/mongodb-github-action@1.8.0
       with:
