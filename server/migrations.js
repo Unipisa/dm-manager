@@ -695,7 +695,6 @@ const migrations = {
                 let conferenceRoom = room_mapping[event.unipievents_place]
                 const startDatetime = toUTCDate(event.unipievents_startdate)
                 const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
-                const notes = event.content.rendered
                 let abstract = event.content.rendered
                 const oldUrl = event.link
 
@@ -716,6 +715,8 @@ const migrations = {
                 if (abstract) {
                     abstract = parseHTML(abstract)
                 }
+
+                const notes = abstract
 
                 if (event.unipievents_place && !conferenceRoom) {
                     const res = await conferencerooms.insertOne({
@@ -804,6 +805,44 @@ const migrations = {
         return true
     },
 
+    D20231117_convert_abstract: async function (db) {
+        const seminar_ids = [
+            "655770ed442cf09480d9c243",
+            "655770ed442cf09480d9c244",
+            "655770ed442cf09480d9c248",
+            "655770ed442cf09480d9c249",
+            "655770ee442cf09480d9c24d",
+            "655770ee442cf09480d9c24f",
+            "655770ee442cf09480d9c251",
+            "655770ee442cf09480d9c254",
+            "655770ee442cf09480d9c256",
+            "655770ee442cf09480d9c257",
+            "655770ee442cf09480d9c259",
+            "655770ee442cf09480d9c25b",
+            "655770ee442cf09480d9c25d",
+            "655770ee442cf09480d9c25e",
+            "655770ee442cf09480d9c25f",
+            "655770ee442cf09480d9c260",
+            "655770ee442cf09480d9c262",
+            "655770ee442cf09480d9c264",
+            "655770f1442cf09480d9c265",
+            "655770f3442cf09480d9c267",
+            "655770f4442cf09480d9c268",
+            "655770f6442cf09480d9c26a",
+        ]
+        for (const seminar_id of seminar_ids) {
+            console.log(`processing seminar ${seminar_id}`)
+            const seminar = await db.collection('eventseminars').findOne({ _id: seminar_id })
+            if (!seminar) {
+                console.log(`seminar ${seminar_id} not found!`)
+                continue
+            }
+            const abstract = seminar.abstract
+            const parsed = parseHTML(abstract)
+            await db.collection('eventseminars').updateOne({ _id: seminar_id }, { $set: { abstract: parsed } })
+        }
+        return true
+    },
 }
 
 async function migrate(db, options) {
