@@ -17,7 +17,7 @@ COPY server ./server
 COPY entrypoint.sh ./
 
 # Copy the dmwidgets script inside the assets folder
-COPY widgets/dist/dmwidgets.js ./build/
+COPY widgets/dist/dmwidgets.js ./build/static/
 
 EXPOSE 8000
 

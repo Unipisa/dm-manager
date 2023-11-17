@@ -70,7 +70,7 @@ router.put('/save', async (req, res) => {
             seminar.set({ ...seminar, ...payload })
             await seminar.save()
         }
-        res.send({ result: "OK" })
+        res.send({})
     }
     catch (error) {
         res.status(400).send({ error: error.message })
