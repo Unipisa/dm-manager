@@ -45,7 +45,9 @@ async function seminarQuery(req) {
 
     const seminars = await EventSeminar.aggregate(pipeline)
 
-    return seminars
+    return {
+        data: seminars
+    }
 }
 
 module.exports = seminarQuery

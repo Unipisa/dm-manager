@@ -93,7 +93,9 @@ async function staffQuery(req) {
             error: 'multiple matches'
         }
     }
-    return staffs[0]
+    return {
+        data: staffs[0]
+    }
 }
 
 module.exports = staffQuery

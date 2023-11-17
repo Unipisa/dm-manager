@@ -2,9 +2,7 @@
 const express = require('express')
 const router = express.Router()
 
-const addSeminarRouter = require('./controllers/processes/AddSeminar')
-router.use('/seminars/add', addSeminarRouter)
-
-
+const seminarRouter = require('./controllers/processes/seminars')
+router.use('/seminars', seminarRouter)
 
 module.exports = router

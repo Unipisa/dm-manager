@@ -12,6 +12,7 @@ const schema = new Schema({
     country: {type: String, label: 'paese', default: ''},
     city: {type: String, label: 'città', default: ''},
     code: {type: String, label: 'codice', default: ''},
+    alternativeNames: {type: [String], label:'alternative names', widget: 'list'},
     notes,
     createdBy,
     updatedBy,

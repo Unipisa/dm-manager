@@ -1,0 +1,25 @@
+{
+  "name": "widgets",
+  "version": "1.0.0",
+  "description": "Widgets for DM-Manager",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack serve --config ./webpack.config.js --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config ./webpack.config.js --mode production"
+  },
+  "author": "Leonardo Robol <leonardo.robol@unipi.it>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/preset-react": "^7.23.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^4.15.1"
+  },
+  "dependencies": {
+    "axios": "^1.6.2",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.1",
+    "react-dom": "^18.2.0"
+  }
+}
