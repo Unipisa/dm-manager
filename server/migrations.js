@@ -19,6 +19,7 @@ const { default: axios } = require('axios')
 const he = require('he')
 const assert = require('assert')
 const jsdom = require('jsdom')
+const { ObjectId } = require('mongodb')
 
 async function findPerson(people, firstName, lastName, affiliazione) {
     let p = await people.findOne({ firstName, lastName })
@@ -805,7 +806,7 @@ const migrations = {
         return true
     },
 
-    D20231117_convert_abstract: async function (db) {
+    D20231117_convert_abstract_1: async function (db) {
         const seminar_ids = [
             "655770ed442cf09480d9c243",
             "655770ed442cf09480d9c244",
@@ -832,7 +833,7 @@ const migrations = {
         ]
         for (const seminar_id of seminar_ids) {
             console.log(`processing seminar ${seminar_id}`)
-            const seminar = await db.collection('eventseminars').findOne({ _id: seminar_id })
+            const seminar = await db.collection('eventseminars').findOne({ _id: new ObjectId(seminar_id) })
             if (!seminar) {
                 console.log(`seminar ${seminar_id} not found!`)
                 continue
