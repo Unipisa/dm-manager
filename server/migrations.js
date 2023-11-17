@@ -65,6 +65,59 @@ async function findPerson2(people, fullName, affiliazione) {
     }
 }
 
+function parseHTML(html) {
+    const dom = new jsdom.JSDOM(html, 'text/html')
+    const doc = dom.window.document
+    let out = parseElement(doc.body).trim()
+    out = out.replace('\n\n\n', '\n\n')
+    out = out.replace('\n\n\n', '\n\n')
+    out = out.replace('\n\n\n', '\n\n')
+    return out            
+}
+
+function parseElement(el) {
+    const nodeName = el.nodeName.toLowerCase()
+    if (nodeName === '#text') return el.textContent
+    const children = [...el.childNodes].map((child, i) => 
+        parseElement(child)).join('')
+    switch (nodeName) {
+        case 'body':
+            return children
+        case 'h4':
+            return `#### ${children}`
+        case 'h3':
+            return `### ${children}`
+        case 'h2':
+            return `## ${children}`
+        case 'h1':
+            return `# ${children}`
+        case 'p':
+            return `${children}\n`
+        case 'br':
+            return `\n\n`
+        case 'em':
+        case 'i':
+            return `*${children}*`
+        case 'a':
+            return `[${children}](${el.href})`
+        case 'strong':
+        case 'b':
+            return `**${children}**`
+        case 'ul':
+        case 'ol':
+            return `${children}\n`
+        case 'li':
+            return `* ${children}\n`
+        case 'pre':
+            return `\`\`\`\n${children}\n\`\`\`\n`
+        case 'img':
+            return `![${el.alt}](${el.src})`
+        default: 
+            console.log(`unexpected node ${nodeName}`)
+            return children
+    }
+}
+
 const migrations = { 
     D20221112_migration_test: async (db) => {
         return true
@@ -388,180 +441,6 @@ const migrations = {
         return true
     },
 
-    D20231026_init_seminarcategories_3: async function(db) {
-        const seminarcategories = db.collection('seminarcategories')
-
-        const category_mapping = {
-            "colloquium": 175,
-            "algebra-seminar":	177,
-            "algebraic-and-arithmetic-geometry-seminar":	76,
-            "analysis-seminar":	77,
-            "baby-geometri-seminar":	78,
-            "dynamical-systems-seminar":	79,
-            "geometry-seminar":	80,
-            "il-teorema-piu-bello":	176,
-            "logic-seminar":	81,
-            "mathematical-physics-seminar":	174,
-            "number-theory-seminar":	173,
-            "probability-stochastic-analysis-statistics-seminar":	83,            "seminar-on-combinatorics-and-lie-theory-and-topology":	33,
-            "seminar-on-numerical-analysis":	88,
-            "seminari-map":	89,
-      }
-      await seminarcategories.deleteMany({})
-
-      for (const [category, label] of Object.entries(category_mapping)) {
-          await seminarcategories.insertOne({
-                  name: category,
-                  label: category,
-                  old_id: label,
-              })
-      }
-      return true
-    },
-
-    D20231026_init_conferencerooms_2: async function(db) {
-        const conferencerooms = db.collection('conferencerooms')
-        const room_mapping = {
-            'Department of Mathematics, Aula Seminari.': 'Aula Seminari (DM)',
-            'Aula Magna': 'Aula Magna (DM)',
-            'Aula Seminari': 'Aula Seminari (DM)',
-            'Scuola Normale Superiore, Aula Volterra.': 'Aula Volterra (SNS)',
-            'Dipartimento di Matematica, Sala Seminari.': 'Aula Seminari (DM)',
-            'Department of Mathematics, Aula Riunioni.': 'Aula Riunioni (DM)',
-            'Aula Dini, Centro De Giorgi': 'Aula Dini (CRM)',
-            'Aula Seminari - Dipartimento di Matematica': 'Aula Seminari (DM)',
-            'Aula Riunioni - Dipartimento di Matematica': 'Aula Riunioni (DM)',
-            'Aula Magna - Dipartimento di Matematica': 'Aula Magna (DM)',
-            'CRM - SNS, Sala Conferenze - Palazzo Puteano.': 'Sala Conferenze (Palazzo Puteano)',
-            'Aula Riunioni, Dipartimento di Matematica': 'Aula Riunioni (DM)',
-            'Department of Mathematics, Aula Magna.': 'Aula Magna (DM)',
-            'Dipartimento di Matematica, Aula Magna.': 'Aula Magna (DM)',
-
-            'Aula 1 Dipartimento di Matematica.': 'Aula 1 (DM)',
-            'Aula 2 Dipartimento di Matematica.': 'Aula 2 (DM)',
-            'Aula Bianchi Lettere - Palazzo della Carovana': 'Aula Bianchi Lettere (SNS)',
-            'Aula Bianchi Lettere (SNS).': 'Aula Bianchi Lettere (SNS)',
-            'Aula Bianchi Scienze (SNS).': 'Aula Bianchi Scienze (SNS)',
-            'Aula Centro De Giorgi.': 'Aula Centro De Giorgi.',
-            'Aula Fermi, Palazzo della Carovana': 'Aula Fermi (SNS)',
-            'Aula Magna - Dipartimento di Matematica.': 'Aula Magna (DM)',
-            'Aula Magna (Dip. Matematica Applicata).': 'Aula Magna (ex-DMA).',
-            'Aula Magna (Dipartimento di Matematica).': 'Aula Magna (DM)',
-            'Aula Magna Polo Fibonacci, Pisa': 'Aula Magna (Polo Fibonacci)',
-            'aula magna storica (palazzo della Sapienza)': 'Aula magna storica (Palazzo della Sapienza)',
-            'Aula Magna, Department of Mathematics': 'Aula Magna (DM)',
-            'Aula Magna, Dipartimento di Matematica': 'Aula Magna (DM)',
-            'Aula Mancini (SNS).': 'Aula Mancini (SNS)',
-            'Aula N, Polo Fibonacci': 'Aula N (Polo Fibonacci)',
-            'Aula O1 - Polo Fibonacci': 'Aula O1 (Polo Fibonacci)',
-            'Aula P1 - Polo Fibonacci': 'Aula P1 (Polo Fibonacci)',
-            'Aula Riunioni.': 'Aula Riunioni (DM)',
-            'Aula Riunioni (Dipartimento di Matematica).': 'Aula Riunioni (DM)',
-            'Aula Riunioni, Department of Mathematics.': 'Aula Riunioni (DM)',
-            'Aula riunioni, Dipartimento di matematica': 'Aula Riunioni (DM)',
-            'Aula Riunioni': 'Aula Riunioni (DM)',
-            'Aula seminari - Dipartimento di Matematica': 'Aula Seminari (DM)',
-            'Aula Seminari e Riunioni': 'Aula Seminari e Riunioni (DM)',
-            'Aula Seminari, Department of Mathematics': 'Aula Seminari (DM)',
-            'Aula Seminari, Dipartimento di Matematica': 'Aula Seminari (DM)',
-            'Aula seminari': 'Aula Seminari (DM)',
-            'Aula Tonelli - Palazzo della Carovana': 'Aula Tonelli (SNS)',
-            'Aula Tonelli (SNS).': 'Aula Tonelli (SNS)',
-            'Aula Volterra - Palazzo della Carovana': 'Aula Volterra (SNS)',
-            'Aula Volterra, Normale': 'Aula Volterra (SNS)',
-            'Aula Volterra, Scuola Normale Superiore': 'Aula Volterra (SNS)',
-            'BellaVista Relax Hotel': 'BellaVista Relax Hotel',
-            'Centro De Giorgi - SNS ': 'Centro De Giorgi (SNS)',
-            'Centro de Giorgi - SNS.': 'Centro De Giorgi (SNS)',
-            'Centro De Giorgi - SNS.': 'Centro De Giorgi (SNS)',
-            'Collegio Puteano, SNS': 'Collegio Puteano (SNS)',
-            'conferenza telematica': 'conferenza telematica',
-            'CRM - SNS.': 'Centro De Giorgi (SNS)',
-            'CRM SNS.': 'Centro De Giorgi (SNS)',
-            'Department of Mathematics and online': 'Department of Mathematics and online',
-            'Department of Mathematics, Aula Magna': 'Aula Magna (DM)',
-            'Department of Mathematics, Aula Riunioni': 'Aula Riunioni (DM)',
-            'Department of Mathematics, Aula Seminari': 'Aula Seminari (DM)',
-            'Department of Mathematics, Aula Seminari`.': 'Aula Seminari (DM)',
-            'Department of Mathematics, N1.': 'Aula N1 (Polo Fibonacci)',
-            'Department of Mathematics, Sala Seminari': 'Aula Seminari (DM)',
-            'Department of Mathematics, University of Pisa, Aula Magna': 'Aula Magna (DM)',
-            'Department of Mathematics, University of Pisa': 'Dipartimento di Matematica',
-            'Dipartimenti di Matematica, Aula Seminari.': 'Aula Seminari (DM)',
-            'Dipartimento di Matematica Università di Pisa, Aula magna': 'Aula Magna (DM)',
-            'Dipartimento di Matematica, Aula Magna': 'Aula Magna (DM)',
-            'Dipartimento di Matematica, Aula Riunioni.': 'Aula Riunioni (DM)',
-            'Dipartimento di Matematica, Aula seminari.': 'Aula Seminari (DM)',
-            'Dipartimento di Matematica, Aula Seminari.': 'Aula Seminari (DM)',
-            'Dipartimento di Matematica, Sala Riunioni.': 'Aula Riunioni (DM)',
-            'Dipartimento di Matematica, Sala Riunioni': 'Aula Riunioni (DM)',
-            'Dipartimento di Matematica, Università di Pisa e SNS, Pisa': 'Dipartimento di Matematica, Università di Pisa e SNS, Pisa',
-            'Dipartimento di Matematica, Università di Pisa, Aula Magna': 'Aula Magna (DM)',
-            'Dipartimento di Matematica': 'Dipartimento di Matematica',
-            'Dipartimetno di Matematica, Aula Seminari.': 'Aula Seminari (DM)',
-            'Dobbiaco (Toblach)': 'Dobbiaco (Toblach)',
-            'Google Meet.': 'Google Meet',
-            'Google Meet': 'Google Meet',
-            'Grand Hotel Tettuccio Montecatini, Sala Conferenze': 'Grand Hotel Tettuccio Montecatini, Sala Conferenze',
-            'IHÉS, France': 'IHÉS, France',
-            'Levico Terme, Italy': 'Levico Terme, Italy',
-            'Museo del Calcolo, Pisa': 'Museo del Calcolo, Pisa',
-            'Online ( https://seminarimap.wixsite.com/seminarimap )': 'Online ( https://seminarimap.wixsite.com/seminarimap )',
-            'Palazzo della Carovana, Aula Bianchi Lettere': 'Aula Bianchi Lettere (SNS)',
-            'Palazzo della Carovana, Aula Russo': 'Aula Russo (SNS)',
-            'Palazzone di Cortona': 'Palazzone di Cortona',
-            'Pisa, “Polo Congressuale Le Benedettine” (June 6-7-8), “Aula Magna Pontecorvo” (June 10-11)': 'Polo Congressuale Le Benedettine',
-            'Polo Carmignani, Aula Magna': 'Aula Magna (Polo Carmignani)',
-            'Sala Conferenze (Puteano, Centro De Giorgi).': 'Sala Conferenze (Collegio Puteano)',
-            'Sala conferenze, Centro De Giorgi': 'Sala conferenze (CRM)',
-            'Sala delle Riunioni (Dip. Matematica Applicata).': 'Aula Riunioni (ex-DMA)',
-            'Sala Riunioni (Dip. Matematica).': 'Aula Riunioni (DM)',
-            'Sala Riunioni (Dipartimento di Matematica).': 'Aula Riunioni (DM)',
-            'Sala Riunioni (Puteano, Centro De Giorgi).': 'Aula Riunioni (DM)',
-            'Sala Seminari .': 'Aula Seminari (DM)',
-            'Sala Seminari (Dip. Matematica).': 'Aula Seminari (DM)',
-            'Sala Seminari (Dipartimento di Matematica).': 'Aula Seminari (DM)',
-            'Sala Seminari del Dipartimento di Matematica': 'Aula Seminari (DM)',
-            'Sala Seminari.': 'Aula Seminari (DM)',
-            'sala seminari': 'Aula Seminari (DM)',
-            'Sala seminari': 'Aula Seminari (DM)',
-            'Sala Seminari': 'Aula Seminari (DM)',
-            'Scuola Normale Superiore, Aula Mancini.': 'Aula Mancini (SNS)',
-            'Scuola Normale Superiore, Pisa, Aula Mancini.': 'Aula Mancini (SNS)',
-            'SISSA - Trieste': 'SISSA - Trieste',
-            'SNS - Centro De Giorgi.': 'Aula Seminari (CRM)',
-            'SNS - Centro De Giorgi - Aula Seminari.': 'Aula Seminari (CRM)',
-            'SNS - Centro De Giorgi - Aula Seminari': 'Aula Seminari (CRM)',
-            'SNS - CRM, Sala Seminari.': 'Aula Seminari (CRM)',
-            'SNS - Palazzo della Carovana.': 'Palazzo della Carovana (SNS)',
-            'SNS – Centro De Giorgi – Aula Seminari.': 'Aula Seminari (CRM)',
-            'SNS Aula Dini, Palazzo del Castelletto': 'Aula Dini (CRM)',
-            'SNS, Aula Mancini.': 'Aula Mancini (SNS)',
-            'SNS, Pisa': 'Palazzo della Carovana (SNS)',
-            'Università degli Studi di Milano La Statale, Dipartimento di Matematica': 'Università degli Studi di Milano La Statale, Dipartimento di Matematica',
-            Online: 'Online',
-            Teams: 'Teams',
-          }
-
-        const name2names = {}
-
-        for (const [room_key, room_name] of Object.entries(room_mapping)) {
-            if (!name2names[room_name]) name2names[room_name] = []
-            name2names[room_name].push(room_key)
-        }
-
-        await conferencerooms.deleteMany({})
-
-        for (const [name, names] of Object.entries(name2names)) {
-            await conferencerooms.insertOne({
-                name,
-                names,
-            })
-        }
-
-        return true
-    },
-
     D20231027_update_events_1: async function(db) {
         const people = db.collection('people')
         const conferences = db.collection('eventconferences')
@@ -746,61 +625,6 @@ const migrations = {
     D20231028_convert_html_to_markdown_1: async function(db) {
         const seminars = db.collection('eventseminars')
         const conferences = db.collection('eventconferences')
-        const invalid_tags = []
-
-        function parseHTML(html) {
-            const dom = new jsdom.JSDOM(html, 'text/html')
-            const doc = dom.window.document
-            let out = parseElement(doc.body).trim()
-            out = out.replace('\n\n\n', '\n\n')
-            out = out.replace('\n\n\n', '\n\n')
-            out = out.replace('\n\n\n', '\n\n')
-            return out            
-        }
-
-        function parseElement(el) {
-            const nodeName = el.nodeName.toLowerCase()
-            if (nodeName === '#text') return el.textContent
-            const children = [...el.childNodes].map((child, i) => 
-                parseElement(child)).join('')
-            switch (nodeName) {
-                case 'body':
-                    return children
-                case 'h4':
-                    return `#### ${children}`
-                case 'h3':
-                    return `### ${children}`
-                case 'h2':
-                    return `## ${children}`
-                case 'h1':
-                    return `# ${children}`
-                case 'p':
-                    return `${children}\n`
-                case 'br':
-                    return `\n\n`
-                case 'em':
-                case 'i':
-                    return `*${children}*`
-                case 'a':
-                    return `[${children}](${el.href})`
-                case 'strong':
-                case 'b':
-                    return `**${children}**`
-                case 'ul':
-                case 'ol':
-                    return `${children}\n`
-                case 'li':
-                    return `* ${children}\n`
-                case 'pre':
-                    return `\`\`\`\n${children}\n\`\`\`\n`
-                case 'img':
-                    return `![${el.alt}](${el.src})`
-                default: 
-                    // console.log(`unexpected node ${nodeName}`)
-                    if (!invalid_tags.includes(nodeName)) invalid_tags.push(nodeName)
-                    return children
-            }
-        }
     
         for(const seminar of await seminars.find({}).toArray()) {
             const abstract = seminar.oldAbstract
@@ -810,7 +634,6 @@ const migrations = {
                 { $set: { abstract: parsed } })
             }
         
-        console.log(`invalid tags:`, invalid_tags.join(', '))
         return true
     },
 
@@ -819,6 +642,168 @@ const migrations = {
         await seminars.updateMany({}, { $rename: { notes: 'description' } })
         return true
     },
+
+    D20231117_update_events_1: async function(db) {
+        const people = db.collection('people')
+        const conferences = db.collection('eventconferences')
+        const seminars = db.collection('eventseminars')
+        const conferencerooms = db.collection('conferencerooms')
+        const seminarcategories = db.collection('seminarcategories')
+
+        const created_categories = []
+
+        for (let seminarcategory of await seminarcategories.find({}).toArray()) {
+            created_categories[seminarcategory.old_id] = seminarcategory._id
+        }
+
+        const room_mapping = {}
+
+        for (const room of await conferencerooms.find({}).toArray()) {
+            for (const name of room.names) {
+                room_mapping[name] = room._id
+            }
+        }
+
+        toUTCDate = s => {
+            const sd = new Date(s * 1000)
+            const date = new Date(sd.getFullYear(), sd.getUTCMonth(), sd.getUTCDate(), sd.getUTCHours(), sd.getUTCMinutes())
+            return date
+        }
+
+        categoryToSSD = c => {
+            return {
+                '198': 'MAT/01',
+                '162': 'MAT/02',
+                '152': 'MAT/03',
+                '200': 'MAT/04',
+                '114': 'MAT/05',
+                '190': 'MAT/06',
+                '191': 'MAT/07',
+                '154': 'MAT/08'
+            }[c];
+        }
+
+        var offset = 0;
+        const batch_size = 97;
+
+        var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
+        while (res.data.length > 0) {
+            const events = res.data
+            for (const event of events) {   
+                const taxonomy = event.unipievents_taxonomy             
+                const title = he.decode(event.title.rendered)
+                let conferenceRoom = room_mapping[event.unipievents_place]
+                const startDatetime = toUTCDate(event.unipievents_startdate)
+                const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
+                const notes = event.content.rendered
+                let abstract = event.content.rendered
+                const oldUrl = event.link
+
+                let found = await conferences.findOne({ oldUrl })
+
+                if (found) {
+                    console.log(`Already loaded ${oldUrl} as conference ${found._id}. Skipping!`)
+                    continue
+                }
+
+                found = await seminars.findOne({ oldUrl })
+
+                if (found) {
+                    console.log(`Already loaded ${oldUrl} as seminar ${found._id}. Skipping!`)
+                    continue
+                }
+
+                if (abstract) {
+                    abstract = parseHTML(abstract)
+                }
+
+                if (event.unipievents_place && !conferenceRoom) {
+                    const res = await conferencerooms.insertOne({
+                        name: event.unipievents_place,
+                    })
+                    conferenceRoom = res.insertedId
+                    console.log(`**** creatd new room: ${event.unipievents_place}`)
+                }
+
+                if (taxonomy.includes(90)) {
+                    console.log("> Conference", event.link)
+
+                    const object = {
+                        title,
+                        startDate: toUTCDate(event.unipievents_startdate),
+                        endDate: toUTCDate(event.unipievents_enddate),
+                        SSD: event.unipievents_taxonomy.map(categoryToSSD).filter(x => x),
+                        url: "",
+                        oldUrl,
+                        conferenceRoom,
+                        grants: [],
+                        notes,
+                    }
+                    if (! await conferences.insertOne(object)) {
+                        console.log("Error")
+                        return false
+                    }
+                } else if (taxonomy.includes(175)) {
+                    console.log("> Colloquium", event.link)
+                    const speaker = title.split('–')[1].split('(')[0].trim()
+                    const affiliation = title.split('–')[1].split('(')[1].trim().trim(')')   
+                    const person = await findPerson2(people, speaker, affiliation)
+                    const object = {
+                        title: title.split('–')[0].trim(),
+                        category: created_categories[175],
+                        conferenceRoom,
+                        startDatetime,
+                        speaker: person,
+                        duration,
+                        abstract,     
+                        oldUrl,               
+                        grants: [],
+                    }
+                    await seminars.insertOne(object)
+                } else {
+                    // console.log("> Seminar", event.link)
+                    console.log(taxonomy, event.link)
+                    // console.log("title", title)
+                    const category = created_categories[taxonomy[0]] || created_categories[taxonomy[1]]
+
+                    let speaker = null
+                    try {
+                        speaker = title.split('–')[1].split('(')[0].trim()
+                    } catch (e) {
+                    }
+                    let affiliation = ""
+                    try {
+                        affiliation = title.split('–').at(-1).split('(')[1].trim().trim(')')   
+                    } catch (e) {
+                    }
+                    const person = speaker 
+                        ? await findPerson2(people, speaker, affiliation)
+                        : null
+                    const object = {
+                        speaker: person,
+                        title: title.split('–')[0].trim(),
+                        conferenceRoom,
+                        startDatetime,
+                        duration,
+                        category,
+                        grants: [],
+                        oldUrl,
+                        abstract: notes,                    
+                    }
+                    // console.log(object)
+                    const res = await seminars.insertOne(object)
+                    console.log(`inserted seminar ${res.insertedId}`)
+                }
+                
+            }
+            res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=${offset}`)
+            console.log(`>>>> BATCH ${offset}`)
+            offset += batch_size
+        }
+
+        return true
+    },
+
 }
 
 async function migrate(db, options) {
