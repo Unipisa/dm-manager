@@ -58,7 +58,9 @@ async function lessonsQuery(req) {
 
     const courses = await EventPhdCourse.aggregate(pipeline)
 
-    return courses
+    return {
+        data: courses
+    }
 }
 
 module.exports = lessonsQuery

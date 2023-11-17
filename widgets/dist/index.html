@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>The Minimal React Webpack Babel Setup</title>
+    <title>DM Widgets gallery</title>
+
+    <!-- Here are all the stylesheets from www.dm.unipi.it, for simplicity -->
+    <link rel='stylesheet' id='unipi-styles-css' href='https://www.dm.unipi.it/wp-content/themes/unipi/css/theme.css?ver=6.3.2' type='text/css' media='all' />
+    <link rel='stylesheet' id='child-style-css' href='https://www.dm.unipi.it/wp-content/themes/unipi-child/css/custom.css?v=1.30&#038;ver=0.1' type='text/css' media='all' />
+    <link rel='stylesheet' id='pb-accordion-blocks-style-css' href='https://www.dm.unipi.it/wp-content/plugins/accordion-blocks/build/index.css?ver=1.5.0' type='text/css' media='all' />
+
   </head>
   <body>
-    <script src="dist/bundle.js"></script>
+    <script src="./dmwidgets.js"></script>
 
-    <div class="container m-5">
-        <div id="eventlist">
-
+    <main class="container m-5">
+      <article>
+        <div class="entry-content box clearfix">
+          <div id="eventlist"></div>
         </div>
-    </div>
-
-    
-
+      </article>
+    </main>
 
     <script>
-        dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList")
+        dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {
+          "filter": "from=2022-11-25&to=2023-11-25"
+        })
     </script>
   </body>
 </html>

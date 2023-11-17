@@ -59,7 +59,9 @@ async function visitsQuery(req) {
 
     const visits = await Visit.aggregate(pipeline)
 
-    return visits
+    return {
+        data: visits
+    }
 }
 
 module.exports = visitsQuery

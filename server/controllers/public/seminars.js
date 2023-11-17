@@ -26,9 +26,9 @@ async function seminarsQuery(req) {
         }},
         {$lookup: {
             from: 'institutions',
-            localField: 'affiliations',
+            localField: 'speaker.affiliations',
             foreignField: '_id',
-            as: 'affiliations'
+            as: 'speaker.affiliations',
         }},
         {$lookup: {
             from: 'seminarcategories',
@@ -76,13 +76,16 @@ async function seminarsQuery(req) {
                 lastName: 1,
                 affiliations: 1,
             },
+            abstract: 1
         }}
     ]
 
     
     const seminars = await EventSeminar.aggregate(pipeline)
 
-    return seminars
+    return {
+        data: seminars
+    }
 }
 
 module.exports = seminarsQuery
