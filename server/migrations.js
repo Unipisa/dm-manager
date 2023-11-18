@@ -660,8 +660,10 @@ const migrations = {
         const room_mapping = {}
 
         for (const room of await conferencerooms.find({}).toArray()) {
-            for (const name of room.names) {
-                room_mapping[name] = room._id
+            if (room.names !== undefined) {
+                for (const name of room.names) {
+                    room_mapping[name] = room._id
+                }
             }
         }
 
