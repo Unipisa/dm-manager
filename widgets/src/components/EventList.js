@@ -30,7 +30,6 @@ export function EventList({ filter }) {
     var events_block = []
     for (var i = 0; i < events.length; i++) {
         const e = events[i]
-        console.log(e)
         events_block.push(
             <div key={e._id}>
                 <h4>{e.title}, {formatPersonName(e.speaker)}</h4>
