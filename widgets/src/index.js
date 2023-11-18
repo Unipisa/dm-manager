@@ -3,7 +3,7 @@ import React from 'react'
 import { EventList } from './components/EventList'
 import { SeminarList } from './components/SeminarList';
 
-import 'bootstrap/dist/css/bootstrap.min.css';
+// import 'bootstrap/dist/css/bootstrap.min.css';
 
 const dmwidgets = {
     loadComponent: function (target, name, props = {}) {
