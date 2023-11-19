@@ -63,6 +63,7 @@ export default function Header() {
                 {user.hasSomeRole('admin', 'disguised-admin') && 
                   [
                   '', // nessun ruolo
+                  '/process/roomLabel',
                   'supervisor', 
                   'assignment-manager',
                   'assignment-supervisor',

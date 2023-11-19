@@ -53,11 +53,26 @@ export default function Home() {
                 <Card.Body>
                     <ul>
                         <li>Inserimento di nuovi seminari</li>
-                        <li>Gestione dei propri seminari</li>
+                        <li>Gestione dei seminari inseriti</li>
                     </ul>
                     
                 </Card.Body>
             </Card>
+            { (user.roles.includes('admin') || user.roles.includes('/process/roomLabel')) &&
+            <Card className="shadow">
+                <Card.Header>                    
+                    <div className="d-flex flex-row justify-content-between">
+                        <strong>Cartellini stanze</strong>
+                        <a href="/process/roomLabels"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    <ul>
+                        <li>Stampa cartellini richiesti</li>
+                    </ul>                    
+                </Card.Body>
+            </Card>
+            }
             </div>
         </div>
     </>

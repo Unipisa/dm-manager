@@ -3,6 +3,7 @@ import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import axios from 'axios'
 
 import {useCreateEngine, EngineProvider} from './Engine'
 import Connecting from './components/Connecting'
@@ -22,10 +23,31 @@ import FormFillPage from './pages/FormFillPage'
 // Processes
 import AddSeminar from './processes/AddSeminar'
 import ManageSeminars from './processes/ManageSeminars'
+import ManageRoomLabels from './processes/ManageRoomLabels'
+
+const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
 
 console.log("dm-manager (app starting)")
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+      queries: {
+          queryFn: async ({queryKey}) => {
+              let url = BASE_URL + '/api/v0'
+              let params = {}
+              for (const key of queryKey) {
+                  if (typeof key === 'object') {
+                      params = key
+                      break
+                  }
+                  url += '/' + key
+              }
+              const out = await axios.get(url, {params})
+              return out.data
+          }
+      }
+  }
+})
 
 function Internal() {
   const engine = useCreateEngine()
@@ -62,6 +84,7 @@ function Internal() {
        <Route path="/process/seminars" element={<ManageSeminars/>}></Route>
        <Route path="/process/seminars/add" element={<AddSeminar/>}></Route>
        <Route path="/process/seminars/add/:id" element={<AddSeminar/>}></Route>
+       <Route path="/process/roomLabels" element={<ManageRoomLabels/>}></Route>
        {  Object.values(Models).map(x => x.routers()) }
        <Route path="/map" element={<Map />} />
        <Route path="*" element={<NotFound />} />

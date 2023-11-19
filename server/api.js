@@ -90,5 +90,9 @@ router.get('/public/lessons', async (req, res) => {
 
 router.use('/process', processes)
 
+router.use('*', async (req, res) => {
+    res.status(404).json({error: 'invalid path'})
+})
+
 module.exports = router
 module.exports.ModelSchemas = ModelSchemas

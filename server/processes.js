@@ -5,4 +5,7 @@ const router = express.Router()
 const seminarRouter = require('./controllers/processes/seminars')
 router.use('/seminars', seminarRouter)
 
+const roomLabelRouter = require('./controllers/processes/roomLabels')
+router.use('/roomLabels', roomLabelRouter)
+
 module.exports = router
