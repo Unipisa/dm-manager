@@ -33,8 +33,11 @@ export function SeminarList({ filter }) {
         var endDatetime = new Date(e.startDatetime)
         endDatetime.setMinutes(endDatetime.getMinutes() + e.duration)
 
-        console.log(e)
-        // const tags = e.
+        var category_tags = [ <a href="#">Seminars</a> ]
+        if (e.category) {
+            category_tags.push(", ")
+            category_tags.push(<a href="#">{e.category.name}</a>)
+        }
 
         events_block.push(
             <div key={e._id}>
@@ -49,7 +52,7 @@ export function SeminarList({ filter }) {
                         <span className="mx-1"></span>
                         <span className="fas fa-map-marker-alt"></span> {e.conferenceRoom?.name}
                         <span className="mx-1"></span>
-                        <i className='fa fa-tags'></i> <a href="#">Seminars</a>, 
+                        <i className='fa fa-tags'></i> {category_tags}
                     </small>
                 </p>
                 <p>

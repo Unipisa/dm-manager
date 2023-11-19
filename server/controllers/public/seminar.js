@@ -31,6 +31,7 @@ async function seminarQuery(req) {
             conferenceRoom: 1,
             category: 1,
             duration: 1,
+            category: 1,
             speaker: {
                 _id: 1,
                 firstName: 1,
