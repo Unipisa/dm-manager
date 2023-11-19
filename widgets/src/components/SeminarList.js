@@ -3,6 +3,11 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { formatPersonName, formatDate, formatTime, truncateText, getManageURL } from '../utils'
 
+
+import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
+
 export function SeminarList({ filter }) {
     const [events, setEvents] = useState(null)
 
@@ -56,7 +61,7 @@ export function SeminarList({ filter }) {
                     </small>
                 </p>
                 <p>
-                    {truncateText(e.abstract, 200)}
+                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
                 </p>
             </div>
         )

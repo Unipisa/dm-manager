@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getManageURL } from '../utils';
 import axios from 'axios'
-import { MathJaxContext, MathJax } from 'better-react-mathjax'
+
+import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 
 export function Seminar({}) {
     const [seminar, setSeminar] = useState(null)
@@ -33,13 +36,11 @@ export function Seminar({}) {
         return <div>Loading seminar...</div>
     }
 
-    return <MathJaxContext>
-        <div>
-            <h2><MathJax>{seminar.title}</MathJax></h2>
+    return <div>
+            <h2>{seminar.title}</h2>
             <p>
-                <MathJax>{seminar.abstract}</MathJax>
+                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{seminar.abstract}</Markdown>
             </p>
         </div>
-    </MathJaxContext>
 }
 

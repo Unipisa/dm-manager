@@ -5,6 +5,7 @@ import { SeminarList } from './components/SeminarList'
 import { Seminar } from './components/Seminar'
 
 // import 'bootstrap/dist/css/bootstrap.min.css';
+import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
 
 const dmwidgets = {
     loadComponent: function (target, name, props = {}) {
