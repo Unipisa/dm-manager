@@ -4,26 +4,97 @@
     <title>DM Widgets gallery</title>
 
     <!-- Here are all the stylesheets from www.dm.unipi.it, for simplicity -->
+    <link rel='stylesheet' id='bootstrap-css' href='https://www.dm.unipi.it/wp-content/themes/unipi/css/bootstrap.min.css?ver=6.3.2' type='text/css' media='all' />
     <link rel='stylesheet' id='unipi-styles-css' href='https://www.dm.unipi.it/wp-content/themes/unipi/css/theme.css?ver=6.3.2' type='text/css' media='all' />
     <link rel='stylesheet' id='child-style-css' href='https://www.dm.unipi.it/wp-content/themes/unipi-child/css/custom.css?v=1.30&#038;ver=0.1' type='text/css' media='all' />
     <link rel='stylesheet' id='pb-accordion-blocks-style-css' href='https://www.dm.unipi.it/wp-content/plugins/accordion-blocks/build/index.css?ver=1.5.0' type='text/css' media='all' />
+    <link rel='stylesheet' id='fontawesome5-css' href='https://use.fontawesome.com/releases/v5.13.0/css/all.css?ver=5.13.0' type='text/css' media='all' />
+    
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+
+    <script type='text/javascript' src='//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js?ver=6.3.2' id='mathjax-js'></script>
+    <script>
+        MathJax = {
+          tex: {
+            inlineMath: [['$','$'],['\\(','\\)']], 
+            processEscapes: true
+          },
+          options: {
+            ignoreHtmlClass: 'tex2jax_ignore|editor-rich-text'
+          }
+        };
+        
+        </script>
 
   </head>
   <body>
     <script src="./dmwidgets.js"></script>
 
-    <main class="container m-5">
-      <article>
-        <div class="entry-content box clearfix">
-          <div id="eventlist"></div>
+    <div class="container">
+
+    <nav class="px-4 pt-4">
+        <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" id="general-label" data-toggle="tab" 
+                   data-target="#general-tab" type="button" role="tab" aria-controls="general" 
+                   aria-selected="true">General instructions</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#eventlist" id="eventlist-label" data-toggle="tab" 
+                   data-target="#eventlist-tab" type="button" role="tab" aria-controls="eventlist" 
+                   aria-selected="false">EventList</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#seminarlist" id="seminarlist-label" data-toggle="tab" 
+                   data-target="#seminarlist-tab" type="button" role="tab" aria-controls="seminarlist" 
+                   aria-selected="false">SeminarList</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#seminar" id="seminar-label" data-toggle="tab" 
+                   data-target="#seminar-tab" type="button" role="tab" aria-controls="seminar" 
+                   aria-selected="false">Seminar</a>
+            </li>
+        </ul>
+    </nav>
+
+    <main class="m-4 mt-2 pt-0 border">
+      <article class="m-0 pt-0">
+        <div class="tab-content m-0">
+          <div class="tab-pane fade show active p-3" id="general-tab"><div id="general">
+            <p>Selezionare un Widget in alto per vederne l'anteprima.</p>
+          </div></div>
+          <div class="tab-pane fade p-3" id="eventlist-tab"><div id="eventlist"></div></div>
+          <div class="tab-pane fade p-3" id="seminarlist-tab"><div id="seminarlist"></div></div>
+          <div class="tab-pane fade p-3" id="seminar-tab"><div id="seminar"></div></div>
         </div>
       </article>
     </main>
 
+    </div>
+
     <script>
-        dmwidgets.loadComponent(document.getElementById("eventlist"), "SeminarList", {
+        dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {
           "filter": "from=2022-11-25&to=2023-11-25"
         })
+        dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", {
+          "filter": "from=2022-11-25&to=2023-11-25"
+        })
+        dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {})
+    </script>
+
+    <script>
+        $(function() {
+            $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+                localStorage.setItem('lastTab', $(this).attr('href'));
+            });
+            var lastTab = localStorage.getItem('lastTab');
+            
+            if (lastTab) {
+                $('[href="' + lastTab + '"]').tab('show');
+            }            
+            });
     </script>
   </body>
 </html>

@@ -5,7 +5,7 @@ async function seminarQuery(req) {
     const seminar_id = req.params.id
     const pipeline = [
         { $match: {
-            startDatetime: {$gte: new Date()},
+            // startDatetime: {$gte: new Date()},
             _id: new ObjectId(seminar_id),
         }},
         { $lookup: {
@@ -31,6 +31,7 @@ async function seminarQuery(req) {
             conferenceRoom: 1,
             category: 1,
             duration: 1,
+            category: 1,
             speaker: {
                 _id: 1,
                 firstName: 1,

@@ -1,7 +1,12 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { formatPersonName, formatDatetime, truncateText, getManageURL } from '../utils'
+import { formatPersonName, formatDate, formatTime, truncateText, getManageURL } from '../utils'
+
+
+import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 
 export function SeminarList({ filter }) {
     const [events, setEvents] = useState(null)
@@ -30,15 +35,33 @@ export function SeminarList({ filter }) {
     var events_block = []
     for (var i = 0; i < events.length; i++) {
         const e = events[i]
-        console.log(e)
+        var endDatetime = new Date(e.startDatetime)
+        endDatetime.setMinutes(endDatetime.getMinutes() + e.duration)
+
+        var category_tags = [ <a href="#">Seminars</a> ]
+        if (e.category) {
+            category_tags.push(", ")
+            category_tags.push(<a href="#">{e.category.name}</a>)
+        }
+
         events_block.push(
             <div key={e._id}>
-                <h4>{e.title}, {formatPersonName(e.speaker)}</h4>
+                <h4>
+                    <a href={"https://www.dm.unipi.it/seminario/?id=" + e._id}>{e.title}, {formatPersonName(e.speaker)}</a>
+                </h4>
                 <p>
-                    {formatDatetime(e.startDatetime)} &mdash; {e.conferenceRoom?.name}
+                    <small>
+                        <span className="far fa-calendar"></span> {formatDate(e.startDatetime)}
+                        <span className="mx-1"></span>
+                        <span className="far fa-clock"></span> {formatTime(e.startDatetime)}  &mdash; {formatTime(endDatetime)}
+                        <span className="mx-1"></span>
+                        <span className="fas fa-map-marker-alt"></span> {e.conferenceRoom?.name}
+                        <span className="mx-1"></span>
+                        <i className='fa fa-tags'></i> {category_tags}
+                    </small>
                 </p>
                 <p>
-                    {truncateText(e.abstract, 200)}
+                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
                 </p>
             </div>
         )
