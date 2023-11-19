@@ -10,13 +10,23 @@ export function formatAffiliations(affiliations) {
     return "(" + affiliations.map(x => x.name).join(", ") + ")"
 }
 
-export function formatDatetime(datetime) {
+export function formatDate(datetime) {
     const date = new Date(datetime)
 
     // Consider passing en-us or it-it in place of undefined, if 
     // you want to force the locale.
     return date.toLocaleDateString(undefined, {
         weekday: "long", year: "numeric", month: "short", day: "numeric"
+    })
+}
+
+export function formatTime(datetime) {
+    const date = new Date(datetime)
+
+    // Consider passing en-us or it-it in place of undefined, if 
+    // you want to force the locale.
+    return date.toLocaleTimeString(undefined, {
+        timeStyle: "short"
     })
 }
 

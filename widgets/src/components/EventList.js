@@ -1,7 +1,8 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { formatPersonName, formatDatetime, truncateText, getManageURL } from '../utils'
+import { formatPersonName, formatDate, formatTime, truncateText, getManageURL } from '../utils'
+import { MathJax, MathJaxContext } from 'better-react-mathjax'
 
 export function EventList({ filter }) {
     const [events, setEvents] = useState(null)
@@ -17,7 +18,6 @@ export function EventList({ filter }) {
                 }
             }
         }
-
         loader()
     })
 
@@ -32,18 +32,18 @@ export function EventList({ filter }) {
         const e = events[i]
         events_block.push(
             <div key={e._id}>
-                <h4>{e.title}, {formatPersonName(e.speaker)}</h4>
+                <h4><MathJax>{e.title}</MathJax>, {formatPersonName(e.speaker)}</h4>
                 <p>
-                    {formatDatetime(e.startDatetime)} &mdash; {e.conferenceRoom?.name}
+                    {formatDate(e.startDatetime)} &mdash; {e.conferenceRoom?.name}
                 </p>
                 <p>
-                    {truncateText(e.abstract, 200)}
+                    <MathJax>{truncateText(e.abstract, 200)}</MathJax>
                 </p>
             </div>
         )
     }
 
-    return <>
+    return <MathJaxContext>
         {events_block}
-    </>
+    </MathJaxContext>
 }
