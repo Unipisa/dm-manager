@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const { ObjectId } = require('mongoose').Types
 
 const EventSeminar = require('../../models/EventSeminar')
 
@@ -25,15 +26,21 @@ router.get('/', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) => {
-    const seminar = await EventSeminar.findById(req.params.id)
+    try {
+        const seminar = await EventSeminar.findById(new ObjectId(req.params.id))
 
-    if (req.user.equals(seminar.createdBy)) {
-        await seminar.delete()
-        res.json({})
-    }
-    else {
-        res.status(401).json({
-            error: "Cannot delete seminars created by other users"
+        if (req.user.equals(seminar.createdBy)) {
+            await seminar.delete()
+            res.json({})
+        }
+        else {
+            res.status(401).json({
+                error: "Cannot delete seminars created by other users"
+            })
+        }
+    } catch(error) {
+        res.status(400).json({
+            error: error.message
         })
     }
 })
