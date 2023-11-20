@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { truncateText, getManageURL } from '../utils'
 import { SeminarTitle } from './Seminar'
+import { Loading } from './Loading'
 
 
 import Markdown from 'react-markdown'
@@ -28,9 +29,7 @@ export function SeminarList({ filter }) {
     })
 
     if (events === null) {
-        return <>
-            Loading seminars ...
-        </>
+        return <Loading widget="Lista dei seminari"></Loading>
     }
 
     var events_block = []

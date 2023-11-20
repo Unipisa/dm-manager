@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getManageURL } from '../utils';
 import axios from 'axios'
+import { Loading } from './Loading'
 
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -35,7 +36,7 @@ export function Seminar({}) {
     }
 
     if (seminar === null) {
-        return <div>Loading seminar...</div>
+        return <Loading widget="Descrizione seminario"></Loading>
     }
 
     return <div>
