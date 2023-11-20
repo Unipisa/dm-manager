@@ -1,5 +1,5 @@
 import {useState,useRef} from 'react'
-import {Table, Button, Badge, ButtonGroup} from 'react-bootstrap'
+import {Table, Button, ButtonGroup} from 'react-bootstrap'
 import ReactToPrint from 'react-to-print'
 import { useQuery, useQueryClient } from 'react-query'
 
