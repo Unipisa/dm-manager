@@ -1,24 +1,18 @@
-import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
+import { QueryClient, QueryClientProvider, useQuery, useQueryClient } from 'react-query'
 import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import api from '../api'
 
-const queryClient = new QueryClient()
-
 export default function ManageSeminars() {
 
     return (
-        <QueryClientProvider client={queryClient}>
-            <SeminarList></SeminarList>
-        </QueryClientProvider>
+        <SeminarList></SeminarList>
     )
 }
 
 function SeminarList() {
-    const { isLoading, error, data } = useQuery('process/seminars', async () => {
-        console.log("Loading seminars")
-        return await api.get('/api/v0/process/seminars')
-    })
+    const queryClient = useQueryClient()
+    const { isLoading, error, data } = useQuery([ 'process', 'seminars' ])
 
     if (isLoading) {
         return "Loading"
@@ -36,7 +30,7 @@ function SeminarList() {
             console.log("Error while deleting the seminar")
         }
         
-        queryClient.invalidateQueries('process/seminars')
+        queryClient.invalidateQueries([ 'process', 'seminars' ])
     }
 
     var seminar_block = []

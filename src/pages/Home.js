@@ -43,22 +43,24 @@ export default function Home() {
         <h4>Processi disponibili</h4>
         <div className="row">
             <div className="col-lg-6 p-3">
-            <Card className="shadow">
-                <Card.Header>                    
-                    <div className="d-flex flex-row justify-content-between">
-                        <strong>Seminari</strong>
-                        <a href="/process/seminars"><button className="btn btn-sm btn-primary">Inizia</button></a>
-                    </div>
-                </Card.Header>
-                <Card.Body>
-                    <ul>
-                        <li>Inserimento di nuovi seminari</li>
-                        <li>Gestione dei seminari inseriti</li>
-                    </ul>
-                    
-                </Card.Body>
-            </Card>
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Seminari</strong>
+                            <a href="/process/seminars"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Inserimento di nuovi seminari</li>
+                            <li>Gestione dei seminari inseriti</li>
+                        </ul>
+                        
+                    </Card.Body>
+                </Card>
+            </div>            
             { (user.roles.includes('admin') || user.roles.includes('/process/roomLabel')) &&
+            <div className="col-lg-6 p-3">
             <Card className="shadow">
                 <Card.Header>                    
                     <div className="d-flex flex-row justify-content-between">
@@ -72,8 +74,8 @@ export default function Home() {
                     </ul>                    
                 </Card.Body>
             </Card>
-            }
             </div>
+            }
         </div>
     </>
 
