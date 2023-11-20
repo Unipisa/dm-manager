@@ -24,6 +24,38 @@ async function seminarQuery(req) {
             foreignField: '_id',
             as: 'affiliations'
         }},
+        {$lookup: {
+            from: 'seminarcategories',
+            localField: 'category',
+            foreignField: '_id',
+            as: 'category',
+            pipeline: [
+                {$project: {
+                    _id: 1,
+                    name: 1,
+                    label: 1,
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$category',
+            preserveNullAndEmptyArrays: true
+        }}, {$lookup: {
+            from: 'conferencerooms',
+            localField: 'conferenceRoom',
+            foreignField: '_id',
+            as: 'conferenceRoom',
+            pipeline: [
+                {$project: {
+                    _id: 0,
+                    name: 1,
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$conferenceRoom',
+            preserveNullAndEmptyArrays: true
+        }},
         { $project: {
             _id: 1,
             title: 1,
