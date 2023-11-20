@@ -2,8 +2,7 @@ import { Button, Card, Form } from 'react-bootstrap'
 import { ModelInput } from '../components/ModelInput'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import axios from 'axios'
-
+import api from '../api'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -22,8 +21,8 @@ export default function AddSeminar() {
     useEffect(() => {
         if (id && ! dataLoaded) {
             async function fetchData() {
-                const res = await axios.get(`/api/v0/process/seminars/get/${id}`)
-                const seminar = res.data.data[0]
+                const res = await api.get(`/api/v0/process/seminars/get/${id}`)
+                const seminar = res.data[0]
                 
                 // Load the data into the state
                 setDataLoaded(true)
@@ -58,7 +57,7 @@ export default function AddSeminar() {
         }
 
         try {
-            await axios.put('/api/v0/process/seminars/save', s)
+            await api.put('/api/v0/process/seminars/save', s)
             navigate('/process/seminars')
         }
         catch (error) {

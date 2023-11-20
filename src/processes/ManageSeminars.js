@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider, useQuery } from 'react-query'
 import { Card } from 'react-bootstrap'
-import axios from 'axios'
 import { Link } from 'react-router-dom'
+import api from '../api'
 
 const queryClient = new QueryClient()
 
@@ -16,7 +16,8 @@ export default function ManageSeminars() {
 
 function SeminarList() {
     const { isLoading, error, data } = useQuery('process/seminars', async () => {
-        return await (await fetch('/api/v0/process/seminars')).json()
+        console.log("Loading seminars")
+        return await api.get('/api/v0/process/seminars')
     })
 
     if (isLoading) {
@@ -29,7 +30,7 @@ function SeminarList() {
 
     const deleteSeminar = async (id) => {
         try {
-            await axios.delete("/api/v0/process/seminars/" + id)
+            await api.del("/api/v0/process/seminars/" + id)
         }
         catch {
             console.log("Error while deleting the seminar")
