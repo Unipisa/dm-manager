@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { getManageURL } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
@@ -7,7 +7,7 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDate, formatTime } from '../utils'
+import { formatDate, formatTime, formatPersonName } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Seminar({ id }) {
@@ -42,7 +42,9 @@ export function SeminarTitle({ seminar, href }) {
         </span>)
     }
 
-    var title_block = <h2>{seminar.title}</h2>
+    const speaker = formatPersonName(seminar.speaker)
+
+    var title_block = <h2>{seminar.title} &ndash; {speaker}</h2>
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}

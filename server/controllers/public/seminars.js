@@ -92,7 +92,6 @@ async function seminarsQuery(req) {
         }}
     ]
 
-    
     const seminars = await EventSeminar.aggregate(pipeline)
 
     return {
