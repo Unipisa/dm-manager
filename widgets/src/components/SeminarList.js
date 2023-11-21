@@ -10,9 +10,12 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function SeminarList({ filter }) {
+export function SeminarList({ from, to, category }) {
+    const filter = { from, to, category }
+
     const { isLoading, error, data } = useQuery([ 'seminars' ], async () => {
-        const res = await axios.get(getManageURL("public/seminars", filter))
+        console.log(filter)
+        const res = await axios.get(getManageURL("public/seminars"), { params: filter })
         if (res.data) {
             const ee = res.data.data
             ee.sort((a,b) => new Date(a.startDatetime) - new Date(b.startDatetime))
@@ -20,12 +23,8 @@ export function SeminarList({ filter }) {
         }
     })
 
-    if (isLoading) {
-        return <Loading widget="Lista dei seminari"></Loading>
-    }
-
-    if (error) {
-        return error.message
+    if (isLoading || error) {
+        return <Loading widget="Lista dei seminari" error={error}></Loading>
     }
 
     var events_block = []

@@ -28,12 +28,8 @@ export function Seminar({}) {
         </div>
     }
 
-    if (isLoading) {
-        return <Loading widget="Descrizione seminario"></Loading>
-    }
-
-    if (error) {
-        return error.message
+    if (isLoading || error) {
+        return <Loading widget="Descrizione seminario" error={error}></Loading>
     }
 
     return <div>

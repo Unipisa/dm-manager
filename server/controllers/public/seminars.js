@@ -1,4 +1,5 @@
 const EventSeminar = require('../../models/EventSeminar')
+const ObjectId = require('mongoose').Types.ObjectId
 
 const maxDate = new Date(8640000000000000);
 
@@ -7,13 +8,19 @@ async function seminarsQuery(req) {
     const from = req.query.from ? new Date(req.query.from) : new Date()
     const to = req.query.to ? new Date(req.query.to) : maxDate
 
+    var match = {
+        startDatetime: {
+            $gte: from,
+            $lt: to,
+        }
+    }
+
+    if (req.query.category) {
+        match["category"] = ObjectId(req.query.category)
+    }
+
     const pipeline = [
-        { $match: {
-            startDatetime: {
-                $gte: from,
-                $lt: to,
-            },
-        }},
+        { $match: match },
         { $lookup: {
             from: 'people',
             localField: 'speaker',
@@ -63,6 +70,7 @@ async function seminarsQuery(req) {
             path: '$conferenceRoom',
             preserveNullAndEmptyArrays: true
         }},
+        { $limit: req.params._limit ?? 50 }, 
         { $project: {
             _id: 1,
             title: 1,

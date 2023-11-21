@@ -75,11 +75,10 @@
     </div>
 
     <script>
-        dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {
-          "filter": "from=2022-11-25&to=2023-11-25"
-        })
-        dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", {
-          "filter": "from=2022-11-25&to=2023-11-25"
+        dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {})
+        dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
+          // from: '2023-11-30', 
+          // category: '653b5d8d10c0279ad486c807'
         })
         dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {})
     </script>
