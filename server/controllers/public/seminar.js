@@ -5,7 +5,7 @@ async function seminarQuery(req) {
     const seminar_id = req.params.id
     const pipeline = [
         { $match: {
-            _id: new ObjectId(seminar_id),
+            _id: ObjectId(seminar_id),
         }},
         { $lookup: {
             from: 'people',
@@ -21,8 +21,8 @@ async function seminarQuery(req) {
             from: 'institutions',
             localField: 'speaker.affiliations',
             foreignField: '_id',
-            as: 'affiliations'
-        }},
+            as: 'speaker.affiliations'
+        }}, 
         {$lookup: {
             from: 'seminarcategories',
             localField: 'category',
@@ -67,7 +67,7 @@ async function seminarQuery(req) {
                 _id: 1,
                 firstName: 1,
                 lastName: 1,
-                affiliations: 1,
+                affiliations: 1
             },
             abstract: 1,
         }}
