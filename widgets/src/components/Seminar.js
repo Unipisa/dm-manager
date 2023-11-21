@@ -42,9 +42,10 @@ export function SeminarTitle({ seminar, href }) {
     var endDatetime = new Date(seminar.startDatetime)
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
-    var category_tags = [ <a href="#" key="seminars-category">Seminars</a> ]
+    var category_tags = [ <a href="https://www.dm.unipi.it/seminari" key="seminars-category">Seminars</a> ]
     if (seminar.category !== undefined) {
-        category_tags.push(<span key={seminar.category._id}>, <a href="#">{seminar.category.name}</a></span>)
+        category_tags.push(<span key={seminar.category._id}>, <a href={"https://www.dm.unipi.it/seminari/?category=" + seminar.category._id}>{seminar.category.name}</a>
+        </span>)
     }
 
     var title_block = <h2>{seminar.title}</h2>
