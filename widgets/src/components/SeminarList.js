@@ -34,6 +34,7 @@ export function SeminarList({ from, to, category }) {
             <div key={e._id}>
                 <SeminarTitle seminar={e} href={"https://www.dm.unipi.it/seminario?id=" + e._id}></SeminarTitle>
                 <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
+                <hr className="my-4"></hr>
             </div>
         )
     }
