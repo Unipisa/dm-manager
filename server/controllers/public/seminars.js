@@ -19,6 +19,10 @@ async function seminarsQuery(req) {
         match["category"] = ObjectId(req.query.category)
     }
 
+    if (req.query.grant) {
+        match["grant"] = ObjectId(req.query.grant)
+    }
+
     const pipeline = [
         { $match: match },
         { $lookup: {

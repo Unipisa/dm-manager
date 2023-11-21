@@ -10,23 +10,17 @@ import remarkMath from 'remark-math'
 import { formatDate, formatTime } from '../utils'
 import { useQuery } from 'react-query'
 
-export function Seminar({}) {
-    const params = new URLSearchParams(window.location.search)
-    const id = params.get('id')
-
+export function Seminar({ id }) {
     const { isLoading, error, data } = useQuery([ 'seminar', id ], async () => {
         if (id !== null) {
             const res = await axios.get(getManageURL('public/seminar/' + id))
             const seminar = res.data.data[0]
             return seminar
         }
+        else {
+            throw new Error('Impossibile trocare il seminario richiesto')
+        }
     })
-
-    if (id == null) {
-        return <div>
-            Please make sure that ?id=xxx is correctly set in the page URL.
-        </div>
-    }
 
     if (isLoading || error) {
         return <Loading widget="Descrizione seminario" error={error}></Loading>
