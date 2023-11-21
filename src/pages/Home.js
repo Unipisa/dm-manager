@@ -42,6 +42,7 @@ export default function Home() {
     const processes = <>
         <h4>Processi disponibili</h4>
         <div className="row">
+            { (user.roles.includes('admin') || user.roles.includes('/api/v0/process/seminars')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
@@ -59,7 +60,8 @@ export default function Home() {
                     </Card.Body>
                 </Card>
             </div>            
-            { (user.roles.includes('admin') || user.roles.includes('/process/roomLabel')) &&
+            }
+            { (user.roles.includes('admin') || user.roles.includes('/api/v0/process/roomLabel')) &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">
                 <Card.Header>                    

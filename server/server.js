@@ -71,6 +71,49 @@ function setup_routes(app) {
   }))
   
   app.use(passport.session())
+
+  app.use(async (req, res, next) => {
+    const user = req.user
+    if (user && user.email) {
+      /* attach roles to user */
+      const persons = await Person.aggregate([
+        { $match: {$or: [
+          {email: user.email }, 
+          {alternativeEmails: user.email}] }
+        },
+        {
+          $lookup: {
+            from: 'staffs',
+            let: { person_id: '$_id'},
+            pipeline: [
+              { $match: {
+                  $expr: { 
+                    $and: [
+                      { $eq: [ '$person', '$$person_id' ]},
+                      { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
+                      { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
+                    ]
+                  }
+                }
+              }
+            ],
+            as: 'staff',
+          }
+        }, 
+        {
+          $unwind: {
+            path: '$staff',
+            preserveNullAndEmptyArrays: false,
+          }
+        }
+      ])
+      const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
+      if (isInternal) user.roles.push('/api/v0/process/seminars')
+      console.log(`sending user ${JSON.stringify(user)}`)
+    }
+
+    next()
+  })
   
   app.use(config.API_PATH, api)
   
@@ -85,48 +128,7 @@ function setup_routes(app) {
   })
   
   app.post('/login', async function(req, res) {
-    const req_user = req.user || null
-    let user = null
-    if (req_user) {
-      user = await User.findById(req_user._id)
-      if (user && user.email) {
-        /* attach roles to user */
-        const persons = await Person.aggregate([
-          { $match: {$or: [
-            {email: user.email }, 
-            {alternativeEmails: user.email}] }
-          },
-          {
-            $lookup: {
-              from: 'staffs',
-              let: { person_id: '$_id'},
-              pipeline: [
-                { $match: {
-                    $expr: { 
-                      $and: [
-                        { $eq: [ '$person', '$$person_id' ]},
-                        { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
-                        { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
-                      ]
-                    }
-                  }
-                }
-              ],
-              as: 'staff',
-            }
-          }, 
-          {
-            $unwind: {
-              path: '$staff',
-              preserveNullAndEmptyArrays: false,
-            }
-          }
-        ])
-        const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
-        if (isInternal) user.roles.push('/process/seminars')
-        console.log(`sending user ${JSON.stringify(user)}`)
-      }
-    }
+    const user = req.user || null
     res.send({ user })
   })
   
@@ -254,6 +256,7 @@ async function createOrUpdateUser({
       await user.setPassword(password)
       await user.save()
   }
+
   return user
 }
 

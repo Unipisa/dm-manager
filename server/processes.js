@@ -2,6 +2,10 @@
 const express = require('express')
 const router = express.Router()
 
+const { requirePathPermissions } = require('./controllers/middleware')
+
+router.use(requirePathPermissions)
+
 const seminarRouter = require('./controllers/processes/seminars')
 router.use('/seminars', seminarRouter)
 

@@ -26,10 +26,11 @@ export function Conference({ id }) {
         return <Loading widget="Descrizione conferenza" error={error}></Loading>
     }
 
-    console.log(data)
-
     return <div>
         <ConferenceTitle conference={data}></ConferenceTitle>
+        <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+            {data.notes}
+        </Markdown>
     </div>
 }
 
@@ -41,6 +42,8 @@ function ConferenceTitle({ conference, href }) {
         </a>
     }
 
+    console.log(conference)
+
     return <>
     {title_block}
     <p>
@@ -49,9 +52,7 @@ function ConferenceTitle({ conference, href }) {
             <span className="mx-1"></span>
             <span className="far fa-clock"></span> {formatTime(conference.endDate)}
             <span className="mx-1"></span>
-            <span className="fas fa-map-marker-alt"></span> XXX
-            <span className="mx-1"></span>
-            <i className='fa fa-tags'></i> XXX
+            <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom.name}
         </small>
     </p></>
 }
