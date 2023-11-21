@@ -58,3 +58,39 @@ export function getManageURL(path, query) {
         return "https://manage.dm.unipi.it/api/v0/" + path + query;
     }
 }
+
+
+// See https://wpml.org/forums/topic/how-to-determine-the-active-language-with-js/
+function getCookie(c_name) {
+    var c_value = document.cookie,
+        c_start = c_value.indexOf(" " + c_name + "=");
+    if (c_start == -1) c_start = c_value.indexOf(c_name + "=");
+    if (c_start == -1) {
+        c_value = null;
+    } else {
+        c_start = c_value.indexOf("=", c_start) + 1;
+        var c_end = c_value.indexOf(";", c_start);
+        if (c_end == -1) {
+            c_end = c_value.length;
+        }
+        c_value = unescape(c_value.substring(c_start, c_end));
+    }
+    return c_value;
+}
+
+export function createLink(path) {
+    const wpml = getCookie('wp-wpml_current_language')
+
+    if (!path || path[0] != '/') {
+        path = '/' + path
+    }
+
+    // Note: this only works while the elements are embedded in the 
+    // Wordpress page, as the cookies are not accessible otherwise.
+    if (wpml == 'en') {
+        return "https://www.dm.unipi.it/en" + path
+    }
+    else {
+        return "https://www.dm.unipi.it" + path
+    }
+}

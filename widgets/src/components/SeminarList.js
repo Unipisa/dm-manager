@@ -1,7 +1,7 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { truncateText, getManageURL } from '../utils'
+import { truncateText, getManageURL, createLink } from '../utils'
 import { SeminarTitle } from './Seminar'
 import { Loading } from './Loading'
 
@@ -10,11 +10,10 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function SeminarList({ from, to, category }) {
-    const filter = { from, to, category }
+export function SeminarList({ from, to, category, grant }) {
+    const filter = { from, to, category, grant }
 
     const { isLoading, error, data } = useQuery([ 'seminars' ], async () => {
-        console.log(filter)
         const res = await axios.get(getManageURL("public/seminars"), { params: filter })
         if (res.data) {
             const ee = res.data.data
@@ -30,9 +29,11 @@ export function SeminarList({ from, to, category }) {
     var events_block = []
     for (var i = 0; i < data.length; i++) {
         const e = data[i]
+        const link = createLink("seminario?id=" + e._id)
+
         events_block.push(
             <div key={e._id}>
-                <SeminarTitle seminar={e} href={"https://www.dm.unipi.it/seminario?id=" + e._id}></SeminarTitle>
+                <SeminarTitle seminar={e} href={link}></SeminarTitle>
                 <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
                 <hr className="my-4"></hr>
             </div>

@@ -19,7 +19,7 @@ async function seminarQuery(req) {
         }},
         {$lookup: {
             from: 'institutions',
-            localField: 'affiliations',
+            localField: 'speaker.affiliations',
             foreignField: '_id',
             as: 'affiliations'
         }},

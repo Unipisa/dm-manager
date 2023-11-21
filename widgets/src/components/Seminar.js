@@ -1,5 +1,5 @@
 import React from 'react';
-import { getManageURL } from '../utils';
+import { createLink, getManageURL } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -36,9 +36,10 @@ export function SeminarTitle({ seminar, href }) {
     var endDatetime = new Date(seminar.startDatetime)
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
-    var category_tags = [ <a href="https://www.dm.unipi.it/seminari" key="seminars-category">Seminars</a> ]
+    var category_tags = [ <a href={createLink("seminari")} key="seminars-category">Seminars</a> ]
     if (seminar.category !== undefined) {
-        category_tags.push(<span key={seminar.category._id}>, <a href={"https://www.dm.unipi.it/seminari/?category=" + seminar.category._id}>{seminar.category.name}</a>
+        const link = createLink("seminar/?category=" + seminar.category._id)
+        category_tags.push(<span key={seminar.category._id}>, <a href={link}>{seminar.category.name}</a>
         </span>)
     }
 
