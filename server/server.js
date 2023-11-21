@@ -8,6 +8,7 @@ const LocalStrategy = require('passport-local')
 const fs = require('fs')
 
 const User = require('./models/User')
+const Person = require('./models/Person')
 const Token = require('./models/Token')
 const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
@@ -83,8 +84,49 @@ function setup_routes(app) {
     })
   })
   
-  app.post('/login', function(req, res) {
-    const user = req.user || null
+  app.post('/login', async function(req, res) {
+    const req_user = req.user || null
+    let user = null
+    if (req_user) {
+      user = await User.findById(req_user._id)
+      if (user && user.email) {
+        /* attach roles to user */
+        const persons = await Person.aggregate([
+          { $match: {$or: [
+            {email: user.email }, 
+            {alternativeEmails: user.email}] }
+          },
+          {
+            $lookup: {
+              from: 'staffs',
+              let: { person_id: '$_id'},
+              pipeline: [
+                { $match: {
+                    $expr: { 
+                      $and: [
+                        { $eq: [ '$person', '$$person_id' ]},
+                        { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
+                        { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
+                      ]
+                    }
+                  }
+                }
+              ],
+              as: 'staff',
+            }
+          }, 
+          {
+            $unwind: {
+              path: '$staff',
+              preserveNullAndEmptyArrays: false,
+            }
+          }
+        ])
+        const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
+        if (isInternal) user.roles.push('/process/seminars')
+        console.log(`sending user ${JSON.stringify(user)}`)
+      }
+    }
     res.send({ user })
   })
   
