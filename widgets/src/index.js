@@ -3,25 +3,35 @@ import React from 'react'
 import { EventList } from './components/EventList'
 import { SeminarList } from './components/SeminarList'
 import { Seminar } from './components/Seminar'
+import { QueryClient, QueryClientProvider } from 'react-query'
 
-// import 'bootstrap/dist/css/bootstrap.min.css';
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
+
+const queryClient = new QueryClient()
 
 const dmwidgets = {
     loadComponent: function (target, name, props = {}) {
 
+        var element = null
+
         switch (name) {
             case 'EventList':
-                ReactDOM.createRoot(target).render(<EventList {...props}></EventList>)
+                element = <EventList {...props}></EventList>
                 break;
             case 'SeminarList':
-                ReactDOM.createRoot(target).render(<SeminarList {...props}></SeminarList>)
+                element = <SeminarList {...props}></SeminarList>
                 break;
             case 'Seminar':
-                ReactDOM.createRoot(target).render(<Seminar {...props}></Seminar>)
+                element = <Seminar {...props}></Seminar>
                 break;
             default:
                 console.log("Unsupported element: " + name)
+        }
+
+        if (element !== null) {
+            ReactDOM.createRoot(target).render(<QueryClientProvider client={queryClient}>
+                {element}
+            </QueryClientProvider>)
         }
     }
 }

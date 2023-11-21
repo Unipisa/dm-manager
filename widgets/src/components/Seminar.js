@@ -7,26 +7,19 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDate, formatTime } from '../utils';
+import { formatDate, formatTime } from '../utils'
+import { useQuery } from 'react-query'
 
 export function Seminar({}) {
-    const [seminar, setSeminar] = useState(null)
-
     const params = new URLSearchParams(window.location.search)
     const id = params.get('id')
 
-    useEffect(() => {
-        const loader = async () => {
-            if (id != null && seminar === null) {
-                const res = await axios.get(getManageURL('public/seminar/' + id))
-                if (res.data.data) {
-                    setSeminar(res.data.data[0])
-                }
-                
-            }
+    const { isLoading, error, data } = useQuery([ 'seminar', id ], async () => {
+        if (id !== null) {
+            const res = await axios.get(getManageURL('public/seminar/' + id))
+            const seminar = res.data.data[0]
+            return seminar
         }
-
-        loader()
     })
 
     if (id == null) {
@@ -35,13 +28,17 @@ export function Seminar({}) {
         </div>
     }
 
-    if (seminar === null) {
+    if (isLoading) {
         return <Loading widget="Descrizione seminario"></Loading>
     }
 
+    if (error) {
+        return error.message
+    }
+
     return <div>
-            <SeminarTitle seminar={seminar}></SeminarTitle>
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{seminar.abstract}</Markdown>
+            <SeminarTitle seminar={data}></SeminarTitle>
+            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
         </div>
 }
 

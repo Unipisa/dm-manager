@@ -23,6 +23,7 @@
     "react-bootstrap": "^1.6.7",
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
+    "react-query": "^3.39.3",
     "rehype-katex": "^7.0.0",
     "remark-math": "^6.0.0"
   }
