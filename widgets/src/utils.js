@@ -78,7 +78,7 @@ function getCookie(c_name) {
     return c_value;
 }
 
-export function createLink(path) {
+export function getDMURL(path) {
     const wpml = getCookie('wp-wpml_current_language')
 
     if (!path || path[0] != '/') {

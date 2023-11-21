@@ -1,5 +1,4 @@
 import React from 'react';
-import { createLink, getManageURL } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -7,7 +6,7 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDate, formatTime, formatPersonName } from '../utils'
+import { formatDate, formatTime, formatPersonName, getDMURL, getManageURL } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Seminar({ id }) {
@@ -36,9 +35,9 @@ export function SeminarTitle({ seminar, href }) {
     var endDatetime = new Date(seminar.startDatetime)
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
-    var category_tags = [ <a href={createLink("seminari")} key="seminars-category">Seminars</a> ]
+    var category_tags = [ <a href={getDMURL("seminari")} key="seminars-category">Seminars</a> ]
     if (seminar.category !== undefined) {
-        const link = createLink("seminar/?category=" + seminar.category._id)
+        const link = getDMURL("seminar/?category=" + seminar.category._id)
         category_tags.push(<span key={seminar.category._id}>, <a href={link}>{seminar.category.name}</a>
         </span>)
     }

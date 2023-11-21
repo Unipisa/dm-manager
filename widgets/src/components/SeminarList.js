@@ -1,7 +1,6 @@
 import React from 'react'
-import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { truncateText, getManageURL, createLink } from '../utils'
+import { truncateText, getManageURL, getDMURL } from '../utils'
 import { SeminarTitle } from './Seminar'
 import { Loading } from './Loading'
 
@@ -29,7 +28,7 @@ export function SeminarList({ from, to, category, grant }) {
     var events_block = []
     for (var i = 0; i < data.length; i++) {
         const e = data[i]
-        const link = createLink("seminario?id=" + e._id)
+        const link = getDMURL("seminario?id=" + e._id)
 
         events_block.push(
             <div key={e._id}>
