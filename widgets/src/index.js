@@ -4,6 +4,7 @@ import { EventList } from './components/EventList'
 import { SeminarList } from './components/SeminarList'
 import { Seminar } from './components/Seminar'
 import { Conference } from './components/Conference'
+import { ConferenceList } from './components/ConferenceList';
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
@@ -27,6 +28,9 @@ const dmwidgets = {
                 break;
             case 'Conference':
                 element = <Conference {...props}></Conference>
+                break;
+            case 'ConferenceList':
+                element = <ConferenceList {...props}></ConferenceList>
                 break;
             default:
                 console.log("Unsupported element: " + name)

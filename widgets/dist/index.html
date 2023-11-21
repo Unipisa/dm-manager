@@ -57,6 +57,11 @@
                    aria-selected="false">Seminar</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="#conferencelist" id="conferencelist-label" data-toggle="tab" 
+                   data-target="#conferencelist-tab" type="button" role="tab" aria-controls="conferencelist" 
+                   aria-selected="false">ConferenceList</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="#conference" id="conference-label" data-toggle="tab" 
                  data-target="#conference-tab" type="button" role="tab" aria-controls="conference" 
                  aria-selected="false">Conference</a>
@@ -73,6 +78,7 @@
           <div class="tab-pane fade p-3" id="eventlist-tab"><div id="eventlist"></div></div>
           <div class="tab-pane fade p-3" id="seminarlist-tab"><div id="seminarlist"></div></div>
           <div class="tab-pane fade p-3" id="seminar-tab"><div id="seminar"></div></div>
+          <div class="tab-pane fade p-3" id="conferencelist-tab"><div id="conferencelist"></div></div>
           <div class="tab-pane fade p-3" id="conference-tab"><div id="conference"></div></div>
         </div>
       </article>
@@ -81,17 +87,27 @@
     </div>
 
     <script>
-        dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {})
-        dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
-          // from: '2023-11-30', 
-          // category: '653b5d8d10c0279ad486c807'
-        })
-        dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {
-          id: '6557a87f74e142fb7c2dd7c3'
-        })
-        dmwidgets.loadComponent(document.getElementById("conference"), "Conference", {
-          id: '6557a87f74e142fb7c2dd7bd'
-        })
+        async function loader() {
+            const seminar_id = (await (await fetch('http://localhost:8000/api/v0/public/seminars')).json()).data[0]._id
+            const conference_id = (await (await fetch('http://localhost:8000/api/v0/public/conferences')).json()).data[0]._id
+
+            dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {
+                id: seminar_id
+            })
+            dmwidgets.loadComponent(document.getElementById("conference"), "Conference", {
+                id: conference_id
+            })
+            dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {})
+            dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
+                // from: '2023-11-30', 
+                // category: '653b5d8d10c0279ad486c807'
+            })
+            dmwidgets.loadComponent(document.getElementById("conferencelist"), "ConferenceList", { 
+                // from: '2023-11-30', 
+                // category: '653b5d8d10c0279ad486c807'
+            })
+        }
+        loader();
     </script>
 
     <script>

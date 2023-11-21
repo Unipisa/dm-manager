@@ -7,7 +7,7 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDate, formatTime, formatPersonName } from '../utils'
+import { formatDate, formatTime, truncateText } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Conference({ id }) {
@@ -29,20 +29,18 @@ export function Conference({ id }) {
     return <div>
         <ConferenceTitle conference={data}></ConferenceTitle>
         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {data.notes}
+            {truncateText(data.notes, 300)}
         </Markdown>
     </div>
 }
 
-function ConferenceTitle({ conference, href }) {
+export function ConferenceTitle({ conference, href }) {
     var title_block = <h2>{conference.title}</h2>
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}
         </a>
     }
-
-    console.log(conference)
 
     return <>
     {title_block}
