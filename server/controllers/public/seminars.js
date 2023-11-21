@@ -12,7 +12,7 @@ async function seminarsQuery(req) {
         startDatetime: {
             $gte: from,
             $lt: to,
-        }
+        },
     }
 
     if (req.query.category) {
