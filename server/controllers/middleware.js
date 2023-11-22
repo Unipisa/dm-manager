@@ -52,6 +52,28 @@ const requireRoles = (req, res, next) => {
     }
 }
 
+const requirePathPermissions = (req, res, next) => {
+    const fullUrl = req.baseUrl + req.path
+    if (! req.user) {
+        res.status(401).send({ error: 'not logged in' })
+        return
+    }
+
+    console.log(fullUrl)
+    console.log(req.user.roles)
+
+    const hasPermission = req.user.roles?.includes('admin') || req.user.roles.reduce(
+        (x,y) => x || fullUrl.startsWith(y), false
+    )
+
+    if (! hasPermission) {
+        res.status(401).send({ error: 'not authorized' })
+        return
+    }
+
+    next()
+}
+
 const hasSomeRole = (req, ...roles) => {
     if (!req.roles) return false
     if (roles.includes('@any-logged-user')) return true
@@ -71,4 +93,4 @@ const requireSomeRole = (...roles) => ((req, res, next) => {
     }
 )})
 
-module.exports = {log, requireUser, hasSomeRole, allowAnonymous, requireRoles, requireSomeRole}
+module.exports = {log, requireUser, hasSomeRole, allowAnonymous, requireRoles, requireSomeRole, requirePathPermissions}

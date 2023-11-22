@@ -15,31 +15,34 @@ const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
 const migrations = require('./migrations')
 const MongoStore = require('connect-mongo')
+const crypto = require('crypto')
 
 // local password authentication
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
-// unipi oauth2 authentication
-if (config.OAUTH2_CLIENT_ID) {
-  passport.use(new UnipiAuthStrategy({
+const oauthStrategy = new UnipiAuthStrategy({
     authorizationURL: config.OAUTH2_AUTHORIZE_URL,
     tokenURL: config.OAUTH2_TOKEN_URL,
     clientID: config.OAUTH2_CLIENT_ID,
     clientSecret: config.OAUTH2_CLIENT_SECRET,
-    callbackURL: `${config.SERVER_URL}/login/oauth2/callback`,
+    callbackURL: `${config.BASE_URL}/login/oauth2/callback`,
     usernameField: config.OAUTH2_USERNAME_FIELD,
-  }))
+  })
+
+// unipi oauth2 authentication
+if (config.OAUTH2_CLIENT_ID) {
+  passport.use(oauthStrategy)
 } else {
   console.log("OAUTH2 authentication disabled")
-  console.log("set OAUTH2_CLIEND_ID to enable")
+  console.log("set OAUTH2_CLIENT_ID to enable")
 }
 
 function setup_routes(app) {
   app.use(cors(
     {
-      origin: config.CORS_ORIGIN,
+      origin: "*",
       optionsSuccessStatus: 200,
       credentials: true // Needed for the client to handle session
     }))
@@ -58,7 +61,7 @@ function setup_routes(app) {
   app.use(session({
     secret: config.SESSION_SECRET,
     cookie: { maxAge: 2628000000 },
-    resave: true,
+    resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
       client: mongoose.connection.getClient(),
@@ -71,6 +74,49 @@ function setup_routes(app) {
   }))
   
   app.use(passport.session())
+
+  app.use(async (req, res, next) => {
+    const user = req.user
+    if (user && user.email) {
+      /* attach roles to user */
+      const persons = await Person.aggregate([
+        { $match: {$or: [
+          {email: user.email }, 
+          {alternativeEmails: user.email}] }
+        },
+        {
+          $lookup: {
+            from: 'staffs',
+            let: { person_id: '$_id'},
+            pipeline: [
+              { $match: {
+                  $expr: { 
+                    $and: [
+                      { $eq: [ '$person', '$$person_id' ]},
+                      { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
+                      { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
+                    ]
+                  }
+                }
+              }
+            ],
+            as: 'staff',
+          }
+        }, 
+        {
+          $unwind: {
+            path: '$staff',
+            preserveNullAndEmptyArrays: false,
+          }
+        }
+      ])
+      const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
+      if (isInternal) user.roles.push('/api/v0/process/seminars')
+      console.log(`sending user ${JSON.stringify(user)}`)
+    }
+
+    next()
+  })
   
   app.use(config.API_PATH, api)
   
@@ -85,53 +131,14 @@ function setup_routes(app) {
   })
   
   app.post('/login', async function(req, res) {
-    const req_user = req.user || null
-    let user = null
-    if (req_user) {
-      user = await User.findById(req_user._id)
-      if (user && user.email) {
-        /* attach roles to user */
-        const persons = await Person.aggregate([
-          { $match: {$or: [
-            {email: user.email }, 
-            {alternativeEmails: user.email}] }
-          },
-          {
-            $lookup: {
-              from: 'staffs',
-              let: { person_id: '$_id'},
-              pipeline: [
-                { $match: {
-                    $expr: { 
-                      $and: [
-                        { $eq: [ '$person', '$$person_id' ]},
-                        { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
-                        { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
-                      ]
-                    }
-                  }
-                }
-              ],
-              as: 'staff',
-            }
-          }, 
-          {
-            $unwind: {
-              path: '$staff',
-              preserveNullAndEmptyArrays: false,
-            }
-          }
-        ])
-        const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
-        if (isInternal) user.roles.push('/process/seminars')
-        console.log(`sending user ${JSON.stringify(user)}`)
-      }
-    }
+    const user = req.user || null
     res.send({ user })
   })
   
   app.post('/login/password',
-    passport.authenticate('local'),
+    passport.authenticate('local', {
+        keepSessionInfo: true
+    }),
     function(req, res) {
       const user = req.user.toObject()
       console.log(`login ${user.username} roles: ${user.roles}`)
@@ -139,16 +146,38 @@ function setup_routes(app) {
     })
   
   if (config.OAUTH2_CLIENT_ID) {
-    app.get('/login/oauth2',
-      passport.authenticate('oauth2'))
+    app.get('/login/oauth2', (req, res, next) => {
+        const db = mongoose.connection.db
+        const redirects = db.collection('redirects')
+        const state = crypto.randomUUID()
+        const now = Date.now()
+
+        redirects.deleteMany({ timestamp: { $lt: now - 3600 * 1000 }}).then(() => {
+            redirects.insertOne({
+                state, next: req.query.next, timestamp: now
+            }).then(() => {
+                const pcb = passport.authenticate('oauth2', { state })
+                pcb(req, res, next)
+            })
+        })
+    })
+    
   }
   
   app.get('/login/oauth2/callback',
     passport.authenticate('oauth2'),
     function(req, res) {
-      const user = req.user.toObject()
-      console.log(`login ${JSON.stringify(user)}`)
-      res.redirect(config.BASE_URL)
+      const db = mongoose.connection.db
+      const redirects = db.collection('redirects')
+
+      redirects.findOne({
+        state: req.query.state
+      }).then((document) => {
+        const next = document.next
+        res.redirect(next ?? '/')
+      }).catch(() => {
+        res.redirect(next ?? '/')
+      })
     }
   )
   
@@ -254,6 +283,7 @@ async function createOrUpdateUser({
       await user.setPassword(password)
       await user.save()
   }
+
   return user
 }
 

@@ -3,6 +3,8 @@ import { ModelInput } from '../components/ModelInput'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
+import axios from 'axios'
+import { DateTime, Interval } from 'luxon'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -13,43 +15,57 @@ export default function AddSeminar() {
     const [category, setCategory] = useState(null)
     const [abstract, setAbstract] = useState("")
     const [grants, setGrants] = useState(null)
+    const [externalid, setExternalId] = useState("")
     const [dataLoaded, setDataLoaded] = useState(false)
 
     const { id } = useParams()
     const navigate = useNavigate()
 
+    const search = new URLSearchParams(window.location.search)
+    const preFill = search.get("prefill")
+
     useEffect(() => {
-        if (id && ! dataLoaded) {
-            async function fetchData() {
+        async function fetchData() {
+            var seminar = {}
+            if (id) {
                 const res = await api.get(`/api/v0/process/seminars/get/${id}`)
-                const seminar = res.data[0]
-                
-                // Load the data into the state
-                setDataLoaded(true)
-                setPerson(seminar.speaker)
-                setTitle(seminar.title)
-                setDate(seminar.startDatetime)
-                setDuration(seminar.duration)
-                setRoom(seminar.conferenceRoom)
-                setCategory(seminar.category)
-                setGrants(seminar.grants)
-                setAbstract(seminar.abstract)
+                seminar = res.data[0]
             }
+
+            if (preFill !== null) {
+                seminar = await loadExternalData(preFill, seminar)
+            }
+            
+            // Load the data into the state
+            seminar.speaker && setPerson(seminar.speaker)
+            seminar.title && setTitle(seminar.title)
+            seminar.startDatetime && setDate(seminar.startDatetime)
+            seminar.duration && setDuration(seminar.duration)
+            seminar.room && setRoom(seminar.conferenceRoom)
+            seminar.category && setCategory(seminar.category)
+            seminar.grants && setGrants(seminar.grants)
+            seminar.abstract && setAbstract(seminar.abstract)
+            seminar.externalid && setExternalId(seminar.externalid)
+        }
+
+        if (! dataLoaded) {
+            setDataLoaded(true)
             fetchData()
-        } 
-    })
+        }
+    }, [id, preFill, dataLoaded])
 
     const onCompleted = async () => {
         // Insert the seminar in the database
         const s = {
             title: title, 
             startDatetime: date, 
-            duration: duration, 
+            duration: duration,
             conferenceRoom: room._id, 
             speaker: person._id,
             category: category._id,
             grants: grants,
-            abstract: abstract
+            abstract: abstract,
+            externalid: externalid
         }
 
         if (id) {
@@ -149,4 +165,68 @@ function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
             </Card.Body>
         </Card>        
     </div>
+}
+
+async function loadExternalData(source, seminar) {
+    if (! source || ! source.includes(':')) {
+        return
+    }
+
+    console.log("Loading external data from source: " + source)
+
+    const externalSource = source.split(":")
+
+    switch (externalSource[0]) {
+        case 'indico':
+            if (externalSource.length !== 2) {
+                console.log("Unsupported formato for Indico import: " + source)
+            }
+            else {
+                return await loadIndicoData(externalSource[1], seminar)
+            }
+            break;
+        default:
+            console.log("Unsupported source specified, aborting")
+    }
+
+    return seminar
+}
+
+async function loadIndicoData(indico_id, seminar) {
+    const res = await axios.get(`https://events.dm.unipi.it/export/event/${indico_id}.json`)
+    const indico_seminar = res.data.results[0]
+    
+    seminar.title = indico_seminar.title
+
+    if (! seminar.abstract) {
+        seminar.abstract = indico_seminar.description
+    }
+
+    const startDatetime = DateTime.fromFormat(
+        indico_seminar.startDate.date + " " + indico_seminar.startDate.time,
+        'yyyy-MM-dd HH:mm:ss', 
+        { zone: indico_seminar.startDate.tz })
+    const endDatetime = DateTime.fromFormat(
+        indico_seminar.endDate.date + " " + indico_seminar.endDate.time,
+        'yyyy-MM-dd HH:mm:ss', 
+        { zone: indico_seminar.endDate.tz })
+
+    seminar.startDatetime = startDatetime.toJSDate()
+    seminar.duration = (Interval.fromDateTimes(startDatetime, endDatetime)).length('minutes')
+
+    // Try to match the category, if possible
+    const res_cat = (await axios.get('/api/v0/public/seminar-categories', {
+        params: { name: indico_seminar.category }
+    })).data
+    if (res_cat && res_cat.data && res_cat.data.length > 0) {
+        seminar.category = res_cat.data[0]
+        console.log(seminar.category)
+    }
+
+    // Try to match the speaker by email? Right now Indico does not export this information, 
+    // so we cannot really do it. 
+
+    seminar.externalid = `indico:${indico_id}`
+
+    return seminar
 }

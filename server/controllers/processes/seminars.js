@@ -11,6 +11,8 @@ const InstitutionController = require('../InstitutionController')
 const EventSeminarController = require('../EventSeminarController')
 const GrantController = require('../GrantController')
 
+const Person = require('../../models/Person')
+
 const controller = new EventSeminarController()
 
 router.get('/', async (req, res) => {    
@@ -87,6 +89,24 @@ router.put('/save', async (req, res) => {
 router.get('/add/person/search', async (req, res) => {
     const controller = new PersonController()
     await controller.search(req, res)
+})
+
+router.get('/add/person/by-email', async (req, res) => {
+    const email = req.query.email
+    if (email) {
+        const p = await Person.aggregate([
+            { $match: { email } }, 
+            { $project: {
+                _id: 1, 
+                firstName: 1, 
+                lastName: 1,
+                email: 1
+        }}])
+        res.json({ data: p })
+    }
+    else {
+        res.status(404).json({ error: "Missing email field"})
+    }
 })
 
 router.put('/add/person', async (req, res) => {

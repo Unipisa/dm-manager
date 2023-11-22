@@ -2,12 +2,16 @@ const express = require('express')
 
 const config = require('./config')
 const profile = require('./controllers/profile')
+const conferenceQuery = require('./controllers/public/conference')
 const staffQuery = require('./controllers/public/staff')
 const visitsQuery = require('./controllers/public/visits')
 const seminarsQuery = require('./controllers/public/seminars')
 const seminarQuery = require('./controllers/public/seminar')
 const coursesQuery = require('./controllers/public/courses')
 const lessonsQuery = require('./controllers/public/lessons')
+const seminarCategoriesQuery = require('./controllers/public/seminar-categories')
+const conferencesQuery = require('./controllers/public/conferences')
+
 const processes = require('./processes.js')
 
 const router = express.Router()
@@ -86,6 +90,18 @@ router.get('/public/courses', async (req, res) => {
 
 router.get('/public/lessons', async (req, res) => {
     res.send(await lessonsQuery(req))
+})
+
+router.get('/public/conference/:id', async (req, res) => {
+    res.send(await conferenceQuery(req))
+})
+
+router.get('/public/conferences', async (req, res) => {
+    res.send(await conferencesQuery(req))
+})
+
+router.get('/public/seminar-categories', async (req, res) => {
+    res.send(await seminarCategoriesQuery(req))
 })
 
 router.use('/process', processes)

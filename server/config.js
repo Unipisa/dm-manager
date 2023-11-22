@@ -19,7 +19,7 @@ class Options {
             STATIC_FILES_PATH: (process.env.NODE_ENV === 'production' ? 'build' : 'public'),
             SESSION_SECRET: randomUUID(),
             JWT_SECRET: randomUUID(),
-            CORS_ORIGIN: "http://localhost:3000", // comma separated URLS
+            // CORS_ORIGIN: "http://localhost:3000", // comma separated URLS
             PORT: "8000",
             OAUTH2_AUTHORIZE_URL: "https://iam.unipi.it/oauth2/authorize",
             OAUTH2_TOKEN_URL: "https://iam.unipi.it/oauth2/token",

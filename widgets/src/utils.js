@@ -1,3 +1,5 @@
+import React from 'react'
+
 export function formatPersonName(person) {
     return person.firstName + " " + person.lastName +  
         " " + formatAffiliations(person.affiliations)
@@ -15,7 +17,7 @@ export function formatDate(datetime) {
 
     // Consider passing en-us or it-it in place of undefined, if 
     // you want to force the locale.
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(isEnglish() ? 'en' : 'it', {
         weekday: "long", year: "numeric", month: "short", day: "numeric"
     })
 }
@@ -57,4 +59,85 @@ export function getManageURL(path, query) {
     else {
         return "https://manage.dm.unipi.it/api/v0/" + path + query;
     }
+}
+
+
+// See https://wpml.org/forums/topic/how-to-determine-the-active-language-with-js/
+function getCookie(c_name) {
+    var c_value = document.cookie,
+        c_start = c_value.indexOf(" " + c_name + "=");
+    if (c_start == -1) c_start = c_value.indexOf(c_name + "=");
+    if (c_start == -1) {
+        c_value = null;
+    } else {
+        c_start = c_value.indexOf("=", c_start) + 1;
+        var c_end = c_value.indexOf(";", c_start);
+        if (c_end == -1) {
+            c_end = c_value.length;
+        }
+        c_value = unescape(c_value.substring(c_start, c_end));
+    }
+    return c_value;
+}
+
+export function isEnglish() {
+    const wpml = getCookie('wp-wpml_current_language')
+    return wpml == 'en'
+}
+
+export function getDMURL(path) {
+    const wpml = getCookie('wp-wpml_current_language')
+
+    if (!path || path[0] != '/') {
+        path = '/' + path
+    }
+
+    // Note: this only works while the elements are embedded in the 
+    // Wordpress page, as the cookies are not accessible otherwise.
+    if (wpml == 'en') {
+        return "https://www.dm.unipi.it/en" + path
+    }
+    else {
+        return "https://www.dm.unipi.it" + path
+    }
+}
+
+export function getSSDLink(SSD) {
+    var label = ""
+
+    switch (SSD) {
+        case "MAT/01":
+            label = "Mathematical Logic"
+            break;
+        case "MAT/02":
+            label = "Algebra"
+            break;
+        case "MAT/03":
+            label = "Geometry"
+            break;
+        case "MAT/04":
+            label = "Mathematics Education and History of Mathematics"
+            break;
+        case "MAT/05":
+            label = "Mathematical Analysis"
+            break;
+        case "MAT/06":
+            label = "Probability and Mathematical Statistics"
+            break;
+        case "MAT/07":
+            label = "Mathematical Physics"
+            break;
+        case "MAT/08":
+            label = "Numerical Analysis"
+            break;
+        case "MAT/09":
+            label = "Operation Research"
+            break;
+    }
+    
+    if (label != "") {
+        return <a key={"SSD-link-" + SSD} href={"https://www.dm.unipi.it/conferenze?SSD=" + SSD.replace("/", "%2F")}>{SSD}</a>
+    }
+
+    return ""
 }

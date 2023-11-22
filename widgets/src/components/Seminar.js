@@ -1,5 +1,4 @@
 import React from 'react';
-import { getManageURL } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -7,7 +6,7 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDate, formatTime, formatPersonName } from '../utils'
+import { formatDate, formatTime, formatPersonName, getDMURL, getManageURL } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Seminar({ id }) {
@@ -36,15 +35,16 @@ export function SeminarTitle({ seminar, href }) {
     var endDatetime = new Date(seminar.startDatetime)
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
-    var category_tags = [ <a href="https://www.dm.unipi.it/seminari" key="seminars-category">Seminars</a> ]
+    var category_tags = [ <a href={getDMURL("seminari")} key="seminars-category">Seminars</a> ]
     if (seminar.category !== undefined) {
-        category_tags.push(<span key={seminar.category._id}>, <a href={"https://www.dm.unipi.it/seminari/?category=" + seminar.category._id}>{seminar.category.name}</a>
+        const link = getDMURL("seminar/?category=" + seminar.category._id)
+        category_tags.push(<span key={seminar.category._id}>, <a href={link}>{seminar.category.name}</a>
         </span>)
     }
 
     const speaker = formatPersonName(seminar.speaker)
 
-    var title_block = <h2>{seminar.title} &ndash; {speaker}</h2>
+    var title_block = <h4 className="title title-entry">{seminar.title} &ndash; {speaker}</h4>
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}

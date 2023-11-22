@@ -5,14 +5,42 @@ const maxDate = new Date(8640000000000000);
 
 /** @param {import('@types/express').Request} req */
 async function seminarsQuery(req) {
-    const from = req.query.from ? new Date(req.query.from) : new Date()
-    const to = req.query.to ? new Date(req.query.to) : maxDate
+    var from = undefined;
+    switch (req.query.from) {
+        case 'now':
+            from = new Date()
+            break;
+        case undefined:
+            from = undefined
+            break;
+        default:
+            from = new Date(req.query.from)
+    }
 
-    var match = {
-        startDatetime: {
-            $gte: from,
-            $lt: to,
-        },
+    var to = undefined;
+    switch (req.query.to) {
+        case 'now':
+            to = new Date()
+            break;
+        case undefined:
+            to = undefined
+            break;
+        default:
+            to = new Date(req.query.to)
+    }
+
+    var startDatetime = {}
+    if (from !== undefined) {
+        startDatetime["$gte"] = from
+    }
+    if (to !== undefined) {
+        startDatetime["$lte"] = to
+    }
+
+    var match = {}
+
+    if (Object.keys(startDatetime).length > 0) {
+        match.startDatetime = startDatetime
     }
 
     if (req.query.category) {
@@ -21,6 +49,10 @@ async function seminarsQuery(req) {
 
     if (req.query.grant) {
         match["grant"] = ObjectId(req.query.grant)
+    }
+
+    if (req.query.externalid) {
+        match["externalid"] = req.query.externalid
     }
 
     const pipeline = [
@@ -88,9 +120,12 @@ async function seminarsQuery(req) {
                 lastName: 1,
                 affiliations: 1,
             },
-            abstract: 1
+            abstract: 1,
+            externalid: 1
         }}
     ]
+
+    console.log(pipeline)
 
     const seminars = await EventSeminar.aggregate(pipeline)
 

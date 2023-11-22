@@ -18,6 +18,7 @@ const eventSeminarSchema = new Schema({
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     abstract: { type: String, label: "Abstract", widget: 'text' },
     oldUrl: { type: String, label: 'URL vecchio', widget: 'url' },
+    externalid: { type: String, label: "External ID" },
 
     createdBy,
     updatedBy,
