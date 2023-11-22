@@ -26,6 +26,12 @@ export function Conference({ id }) {
         return <Loading widget="Descrizione conferenza" error={error}></Loading>
     }
 
+    if (! data) {
+        return <div>
+            404 Not Found.
+        </div>
+    }
+
     return <div>
         <ConferenceTitle conference={data}></ConferenceTitle>
         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
@@ -50,7 +56,7 @@ export function ConferenceTitle({ conference, href }) {
             <span className="mx-1"></span>
             <span className="far fa-clock"></span> {formatTime(conference.endDate)}
             <span className="mx-1"></span>
-            <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom.name}
+            <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom?.name}
         </small>
     </p></>
 }
