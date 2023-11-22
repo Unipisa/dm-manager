@@ -1,9 +1,7 @@
-const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
-
 async function api_fetch(url, options) {
     // console.log(`fetching ${url} starting`)
     options = {credentials: 'include', ...options}
-    const response = await fetch(BASE_URL + url, options)
+    const response = await fetch(url, options)
     if (response.status === 401) throw new Error("invalid credentials")
     if (response.status === 400) {
         const data = await response.json()
@@ -64,7 +62,6 @@ async function del(url) {
 }
 
 const api = {
-    BASE_URL,
     api_fetch,
     get,
     post,

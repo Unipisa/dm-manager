@@ -87,7 +87,7 @@ checkBrowsers(paths.appPath, isInteractive)
       port,
       paths.publicUrlOrPath.slice(0, -1)
     );
-    
+
     // Create a webpack compiler that is configured with custom messages.
     const compiler = createCompiler({
       appName,
@@ -108,7 +108,19 @@ checkBrowsers(paths.appPath, isInteractive)
             target: process.env.SERVER_URL,
             changeOrigin: true
         },
+        '/logout': {
+            target: process.env.SERVER_URL,
+            changeOrigin: true
+        },
         '/login': {
+            target: process.env.SERVER_URL,
+            changeOrigin: true
+        },
+        '/impersonate': {
+            target: process.env.SERVER_URL,
+            changeOrigin: true
+        },
+        '/hello': {
             target: process.env.SERVER_URL,
             changeOrigin: true
         }
