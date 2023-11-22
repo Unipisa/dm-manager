@@ -23,6 +23,10 @@ async function seminarsQuery(req) {
         match["grant"] = ObjectId(req.query.grant)
     }
 
+    if (req.query.externalid) {
+        match["externalid"] = req.query.externalid
+    }
+
     const pipeline = [
         { $match: match },
         { $lookup: {
@@ -88,7 +92,8 @@ async function seminarsQuery(req) {
                 lastName: 1,
                 affiliations: 1,
             },
-            abstract: 1
+            abstract: 1,
+            externalid: 1
         }}
     ]
 

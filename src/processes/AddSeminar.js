@@ -15,6 +15,7 @@ export default function AddSeminar() {
     const [category, setCategory] = useState(null)
     const [abstract, setAbstract] = useState("")
     const [grants, setGrants] = useState(null)
+    const [externalid, setExternalId] = useState("")
     const [dataLoaded, setDataLoaded] = useState(false)
 
     const { id } = useParams()
@@ -44,6 +45,7 @@ export default function AddSeminar() {
             seminar.category && setCategory(seminar.category)
             seminar.grants && setGrants(seminar.grants)
             seminar.abstract && setAbstract(seminar.abstract)
+            seminar.externalid && setExternalId(seminar.externalid)
         }
 
         if (! dataLoaded) {
@@ -62,7 +64,8 @@ export default function AddSeminar() {
             speaker: person._id,
             category: category._id,
             grants: grants,
-            abstract: abstract
+            abstract: abstract,
+            externalid: externalid
         }
 
         if (id) {
@@ -194,7 +197,6 @@ async function loadIndicoData(indico_id, seminar) {
     const indico_seminar = res.data.results[0]
     
     seminar.title = indico_seminar.title
-    // seminar.abstract = indico_seminar.description
 
     if (! seminar.abstract) {
         seminar.abstract = indico_seminar.description
@@ -221,6 +223,10 @@ async function loadIndicoData(indico_id, seminar) {
         console.log(seminar.category)
     }
 
+    // Try to match the speaker by email? Right now Indico does not export this information, 
+    // so we cannot really do it. 
+
+    seminar.externalid = `indico:${indico_id}`
 
     return seminar
 }

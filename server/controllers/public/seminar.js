@@ -70,6 +70,7 @@ async function seminarQuery(req) {
                 affiliations: 1
             },
             abstract: 1,
+            externalid: 1
         }}
     ]
 
