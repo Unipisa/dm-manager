@@ -26,7 +26,10 @@ async function conferencesQuery(req) {
             localField: 'conferenceRoom',
             as: 'conferenceRoom'
         }},
-        { $unwind: '$conferenceRoom' },
+        { $unwind: {
+            path: '$conferenceRoom',
+            preserveNullAndEmptyArrays: true
+        }},
         { $lookup: {
             from: 'grants',
             foreignField: '_id',
