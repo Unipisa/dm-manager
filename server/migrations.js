@@ -614,15 +614,6 @@ const migrations = {
         return true
     },
 
-    D20231027_save_conference_old_abstract_1: async function(db) {
-        const conferences = db.collection('eventconferences')
-        for(const conference of await conferences.find({}).toArray()) {
-            await conferences.updateOne({ _id: conference._id }, 
-                { $set: { oldNotes: conference.notes } })
-            }
-        return true
-    },
-
     D20231028_convert_html_to_markdown_1: async function(db) {
         const seminars = db.collection('eventseminars')
         const conferences = db.collection('eventconferences')
