@@ -1,3 +1,5 @@
+import React from 'react'
+
 export function formatPersonName(person) {
     return person.firstName + " " + person.lastName +  
         " " + formatAffiliations(person.affiliations)
@@ -93,4 +95,44 @@ export function getDMURL(path) {
     else {
         return "https://www.dm.unipi.it" + path
     }
+}
+
+export function getSSDLink(SSD) {
+    var label = ""
+
+    switch (SSD) {
+        case "MAT/01":
+            label = "Mathematical Logic"
+            break;
+        case "MAT/02":
+            label = "Algebra"
+            break;
+        case "MAT/03":
+            label = "Geometry"
+            break;
+        case "MAT/04":
+            label = "Mathematics Education and History of Mathematics"
+            break;
+        case "MAT/05":
+            label = "Mathematical Analysis"
+            break;
+        case "MAT/06":
+            label = "Probability and Mathematical Statistics"
+            break;
+        case "MAT/07":
+            label = "Mathematical Physics"
+            break;
+        case "MAT/08":
+            label = "Numerical Analysis"
+            break;
+        case "MAT/09":
+            label = "Operation Research"
+            break;
+    }
+    
+    if (label != "") {
+        return <a key={"SSD-link-" + SSD} href={"https://www.dm.unipi.it/conferenze?SSD=" + SSD.replace("/", "%2F")}>{SSD}</a>
+    }
+
+    return ""
 }

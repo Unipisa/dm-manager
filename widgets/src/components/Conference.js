@@ -1,5 +1,5 @@
 import React from 'react';
-import { getManageURL } from '../utils';
+import { getManageURL, getSSDLink } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -32,10 +32,12 @@ export function Conference({ id }) {
         </div>
     }
 
+    console.log(data)
+
     return <div>
         <ConferenceTitle conference={data}></ConferenceTitle>
         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-            {truncateText(data.notes, 300)}
+            {data.description}
         </Markdown>
     </div>
 }
@@ -48,6 +50,8 @@ export function ConferenceTitle({ conference, href }) {
         </a>
     }
 
+    // FIXME: tradurre gli SSD nei nomi dei settori.
+
     return <>
     {title_block}
     <p>
@@ -57,6 +61,10 @@ export function ConferenceTitle({ conference, href }) {
             <span className="far fa-clock"></span> {formatTime(conference.endDate)}
             <span className="mx-1"></span>
             <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom?.name}
+            <span className="mx-1"></span>
+            <span className="fas fa-university"></span> {conference.SSD.map(x => <span className="mr-1">{getSSDLink(x)}</span>)}
+            { conference.url && <><span className="mx-1"></span>
+            <span className="fas fa-link"></span> <a href={conference.url}>Web</a></> }
         </small>
     </p></>
 }

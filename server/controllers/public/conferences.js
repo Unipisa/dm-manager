@@ -18,6 +18,10 @@ async function conferencesQuery(req) {
         match["grant"] = ObjectId(req.query.grant)
     }
 
+    if (req.query.SSD) {
+        match["SSD"] = req.query.SSD
+    }
+
     const pipeline = [
         { $match: match },
         { $lookup: {
@@ -44,7 +48,8 @@ async function conferencesQuery(req) {
             SSD: 1,
             url: 1,
             conferenceRoom: 1,
-            notes: 1
+            description: 1,
+            url: 1
         }}
     ]
 

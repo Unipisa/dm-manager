@@ -34,11 +34,12 @@ async function conferenceQuery(req) {
                 _id: 1,
                 name: 1
             }, 
-            notes: 1, 
+            description: 1, 
             conferenceRoom: {
                 _id: 1, 
                 name: 1
-            }
+            },
+            url: 1
         }}
     ]
 

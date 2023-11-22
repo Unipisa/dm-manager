@@ -9,8 +9,8 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function ConferenceList({ from, to, grant }) {
-    const filter = { from, to, grant }
+export function ConferenceList({ from, to, grant, SSD }) {
+    const filter = { from, to, grant, SSD }
 
     const { isLoading, error, data } = useQuery([ 'conferences' ], async () => {
         const res = await axios.get(getManageURL("public/conferences"), { params: filter })
@@ -33,7 +33,7 @@ export function ConferenceList({ from, to, grant }) {
         events_block.push(
             <div key={e._id}>
                 <ConferenceTitle conference={e} href={link}></ConferenceTitle>
-                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.notes, 200)}</Markdown>
+                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.description, 200)}</Markdown>
                 <hr className="my-4"></hr>
             </div>
         )
