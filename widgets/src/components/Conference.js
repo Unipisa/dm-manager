@@ -43,7 +43,7 @@ export function Conference({ id }) {
 }
 
 export function ConferenceTitle({ conference, href }) {
-    var title_block = <h2>{conference.title}</h2>
+    var title_block = <h3 className="title title-entry">{conference.title}</h3>
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}

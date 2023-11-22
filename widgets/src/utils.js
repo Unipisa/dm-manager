@@ -17,7 +17,7 @@ export function formatDate(datetime) {
 
     // Consider passing en-us or it-it in place of undefined, if 
     // you want to force the locale.
-    return date.toLocaleDateString(undefined, {
+    return date.toLocaleDateString(isEnglish() ? 'en' : 'it', {
         weekday: "long", year: "numeric", month: "short", day: "numeric"
     })
 }
@@ -78,6 +78,11 @@ function getCookie(c_name) {
         c_value = unescape(c_value.substring(c_start, c_end));
     }
     return c_value;
+}
+
+export function isEnglish() {
+    const wpml = getCookie('wp-wpml_current_language')
+    return wpml == 'en'
 }
 
 export function getDMURL(path) {
