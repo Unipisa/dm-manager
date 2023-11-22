@@ -30,3 +30,6 @@ server/.dotenv
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# widgets modules
+widgets/node_modules
