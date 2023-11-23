@@ -18,6 +18,7 @@ export default function AddSeminar() {
     const [grants, setGrants] = useState(null)
     const [externalid, setExternalId] = useState("")
     const [dataLoaded, setDataLoaded] = useState(false)
+    const [forbiddenSeminar, setForbiddenSeminar] = useState(false)
 
     const { id } = useParams()
     const navigate = useNavigate()
@@ -31,6 +32,14 @@ export default function AddSeminar() {
             if (id) {
                 const res = await api.get(`/api/v0/process/seminars/get/${id}`)
                 seminar = res.data[0]
+
+                // If the seminar could not be loaded, then either it does not exist, or it 
+                // was created by another use. Either way, we need to give an understandable
+                // error to the end user. 
+                if (! seminar) {
+                    setForbiddenSeminar(true)
+                    return;
+                }
             }
 
             if (preFill !== null) {
@@ -54,6 +63,21 @@ export default function AddSeminar() {
             fetchData()
         }
     }, [id, preFill, dataLoaded])
+
+    if (forbiddenSeminar) {
+        return <div>
+            <h4>Accesso negato</h4>
+            <p>
+                Il seminario selezionato non esiste, oppure è stato creato da un altro utente.
+                Nel secondo caso, solo l'utente che l'ha originariamente creato (o un amministratore) 
+                può modificarne il contenuto. 
+            </p>
+            <p>
+                Nel caso sia necessario l'intervento di un amministratore, scrivere 
+                all'indirizzo <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>.
+            </p>
+        </div>
+    }
 
     const onCompleted = async () => {
         // Insert the seminar in the database
