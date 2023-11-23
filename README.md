@@ -2,7 +2,6 @@
 When using Github's codespaces, you need the following steps to get up and running. Open a terminal and type:
 ```bash
 export SERVER_URL="http://localhost:8080"
-export REACT_APP_SERVER_URL="http://localhost:8080"
 export BASE_URL="http://localhost:8080"
 export ADMIN_USERNAME=admin
 export ADMIN_PASSWORD=secret
@@ -61,7 +60,6 @@ For security reasons if you don't set the variable `SESSION_SECRET` the session 
 Alternative configuration:
 ```
 SERVER_URL="http://localhost:8000"
-REACT_APP_SERVER_URL="http://localhost:8000"
 BASE_URL="http://localhost:3000"
 ```
 
@@ -111,7 +109,7 @@ export TOKEN_SECRET="my-secret-token"
 
 ```
 
-Assume the API server is available at `$REACT_APP_SERVER_URL`
+Assume the API server is available at `$SERVER_URL`
 and that a token `$TOKEN_SECRET` has been inserted in the database.
 If you start a developmnet server as described above these condition 
 are met. 
