@@ -5,6 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
+import { Converter } from 'showdown'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -199,7 +200,8 @@ async function loadIndicoData(indico_id, seminar) {
     seminar.title = indico_seminar.title
 
     if (! seminar.abstract) {
-        seminar.abstract = indico_seminar.description
+        const converter = new Converter()
+        seminar.abstract = converter.makeMarkdown(indico_seminar.description)
     }
 
     const startDatetime = DateTime.fromFormat(
