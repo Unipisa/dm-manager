@@ -4,14 +4,37 @@ const EventConference = require('../../models/EventConference')
 const maxDate = new Date(8640000000000000);
 
 async function conferencesQuery(req) {
-    const from = req.query.from ? new Date(req.query.from) : new Date()
-    const to = req.query.to ? new Date(req.query.to) : maxDate
+    var from = undefined;
+    switch (req.query.from) {
+        case 'now':
+            from = new Date()
+            break;
+        case undefined:
+            from = undefined
+            break;
+        default:
+            from = new Date(req.query.from)
+    }
 
-    var match = {
-        startDate: {
-            $gte: from,
-            $lt: to,
-        },
+    var to = undefined;
+    switch (req.query.to) {
+        case 'now':
+            to = new Date()
+            break;
+        case undefined:
+            to = undefined
+            break;
+        default:
+            to = new Date(req.query.to)
+    }
+
+    var match = {}
+
+    if (from !== undefined) {
+        match["endDate"] = { "$gte": from }
+    }
+    if (to !== undefined) {
+        match["startDate"] = { "$lte": to }
     }
 
     if (req.query.grant) {
