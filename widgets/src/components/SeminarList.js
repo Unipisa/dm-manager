@@ -12,7 +12,7 @@ import { useQuery } from 'react-query'
 export function SeminarList({ from, to, category, grant }) {
     const filter = { from, to, category, grant }
 
-    const { isLoading, error, data } = useQuery([ 'seminars' ], async () => {
+    const { isLoading, error, data } = useQuery([ 'seminars', filter ], async () => {
         const res = await axios.get(getManageURL("public/seminars"), { params: filter })
         if (res.data) {
             const ee = res.data.data
