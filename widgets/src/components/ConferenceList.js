@@ -12,7 +12,7 @@ import { useQuery } from 'react-query'
 export function ConferenceList({ from, to, grant, SSD }) {
     const filter = { from, to, grant, SSD }
 
-    const { isLoading, error, data } = useQuery([ 'conferences' ], async () => {
+    const { isLoading, error, data } = useQuery([ 'conferences', filter ], async () => {
         const res = await axios.get(getManageURL("public/conferences"), { params: filter })
         if (res.data) {
             const ee = res.data.data
