@@ -55,8 +55,6 @@ async function visitsQuery(req) {
         }},
     ]
 
-    // console.log(JSON.stringify({pipeline}))
-
     const visits = await Visit.aggregate(pipeline)
 
     return {

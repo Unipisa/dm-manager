@@ -125,8 +125,6 @@ async function seminarsQuery(req) {
         }}
     ]
 
-    console.log(pipeline)
-
     const seminars = await EventSeminar.aggregate(pipeline)
 
     return {
