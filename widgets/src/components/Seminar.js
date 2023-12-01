@@ -44,12 +44,13 @@ export function SeminarTitle({ seminar, href }) {
 
     const speaker = formatPersonName(seminar.speaker)
 
-    var title_block = <h4 className="title title-entry">{seminar.title} &ndash; {speaker}</h4>
+    var title_block = <span>{seminar.title} &ndash; {speaker}</span>
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}
         </a>
     }
+    title_block = <h3 className="title entry-title">{title_block}</h3>
 
     return <>
     {title_block}

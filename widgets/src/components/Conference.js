@@ -43,12 +43,13 @@ export function Conference({ id }) {
 }
 
 export function ConferenceTitle({ conference, href }) {
-    var title_block = <h4 className="title title-entry">{conference.title}</h4>
+    var title_block = <span>{conference.title}</span>
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}
         </a>
     }
+    title_block = <h3 className="title entry-title">{title_block}</h3>
 
     // FIXME: tradurre gli SSD nei nomi dei settori.
 
