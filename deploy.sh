@@ -2,7 +2,8 @@ VERSION=$( node -e "console.log(require('./package.json').version)" )
 echo version: ${VERSION}
 
 echo build...
-REACT_APP_SERVER_URL="" npm run build
+#REACT_APP_SERVER_URL="" 
+npm run build
 
 echo Build docker image...
 docker build . -t paolini/dm-manager:$VERSION

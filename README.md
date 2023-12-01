@@ -1,9 +1,6 @@
 ## Development using Github's codespace
 When using Github's codespaces, you need the following steps to get up and running. Open a terminal and type:
 ```bash
-export SERVER_URL="http://localhost:8080"
-export REACT_APP_SERVER_URL="http://localhost:8080"
-export BASE_URL="http://localhost:8080"
 export ADMIN_USERNAME=admin
 export ADMIN_PASSWORD=secret
 
@@ -46,30 +43,14 @@ Finally, in another terminal, start the frontend:
 npm start
 ```
 
-The react-script will serve static files while proxying unknown requests to the server frontend. If it does not work see <https://stackoverflow.com/questions/70374005/invalid-options-object-dev-server-has-been-initialized-using-an-options-object>
-
-insert this line in `.env`:
-```
-DANGEROUSLY_DISABLE_HOST_CHECK=true  
-```
-or give a correct value to the configuration 
-variable `SERVER_URL`.
-
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
 For security reasons if you don't set the variable `SESSION_SECRET` the session secret is randomly generated.
-
-Alternative configuration:
-```
-SERVER_URL="http://localhost:8000"
-REACT_APP_SERVER_URL="http://localhost:8000"
-BASE_URL="http://localhost:3000"
-```
 
 ## deployment
 
 Build
 ```
-REACT_APP_SERVER_URL="" npm run build
+npm run build
 STATIC_FILES_PATH=build node server/server.js
 ```
 
@@ -111,7 +92,7 @@ export TOKEN_SECRET="my-secret-token"
 
 ```
 
-Assume the API server is available at `$REACT_APP_SERVER_URL`
+Assume the API server is available
 and that a token `$TOKEN_SECRET` has been inserted in the database.
 If you start a developmnet server as described above these condition 
 are met. 

@@ -32,10 +32,9 @@ class Options {
             MONGO_TEST_URI: "mongodb://localhost:27017/dm-manager-test",
             ADMIN_USER: null,
             ADMIN_PASSWORD: null,
-            SERVER_URL: null,
+            SERVER_URL: "http://localhost:8000",
             EXCHANGE_CODE_FOR_TOKEN_SERVER_URL: null,
             TOKEN_SECRET: null,
-            REACT_APP_SERVER_URL: null,
             BASE_URL: "http://localhost:3000",
             SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
             UPLOAD_DIRECTORY: __dirname + '/../uploads'
@@ -44,11 +43,6 @@ class Options {
             this[key] = process.env[key] || val
         })
         this.VERSION = require('../package.json').version
-        if (this.SERVER_URL === null) this.SERVER_URL = `http://localhost:${this.PORT}`
-        if (this.REACT_APP_SERVER_URL === null) {
-            this.REACT_APP_SERVER_URL = this.SERVER_URL
-            process.env.REACT_APP_SERVER_URL = this.SERVER_URL
-        }
         const parsedUrl = url.parse(this.MONGO_URI)
 
         this.MONGO_HOST = parsedUrl.hostname
