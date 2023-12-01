@@ -1,7 +1,7 @@
 ## Development using Github's codespace
 When using Github's codespaces, you need the following steps to get up and running. Open a terminal and type:
 ```bash
-export ADMIN_USERNAME=admin
+export ADMIN_USER=admin
 export ADMIN_PASSWORD=secret
 
 sudo docker compose up -d 
