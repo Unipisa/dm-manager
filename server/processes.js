@@ -12,4 +12,7 @@ router.use('/seminars', seminarRouter)
 const roomLabelRouter = require('./controllers/processes/roomLabels')
 router.use('/roomLabels', roomLabelRouter)
 
+const planimetrieRouter = require('./controllers/processes/planimetrie')
+router.use('/planimetrie', planimetrieRouter)
+
 module.exports = router

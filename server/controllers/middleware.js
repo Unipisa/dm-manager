@@ -52,17 +52,35 @@ const requireRoles = (req, res, next) => {
     }
 }
 
-const requirePathPermissions = (req, res, next) => {
+const requirePathPermissions = async (req, res, next) => {
     const fullUrl = req.baseUrl + req.path
+    const PREFIX = 'Bearer '
     if (! req.user) {
-        res.status(401).send({ error: 'not logged in' })
-        return
+        // Check for token permission first
+        if (req.headers.authorization?.startsWith(PREFIX)) {
+            const token = req.headers.authorization.slice(PREFIX.length)
+            tok = await Token.findOne({ token }).exec()
+            if (! tok) {
+                res.status(401)
+                res.send({error: "invalid token"})
+                return
+            }
+            else {
+                req.roles = tok.roles || []
+                req.log_who = tok.name || tok.token
+            }
+        }
+        else {
+            res.status(401)
+            res.send({error: "not logged in"})
+            return
+        }
+    }
+    else {
+        req.roles = req.user.roles
     }
 
-    console.log(fullUrl)
-    console.log(req.user.roles)
-
-    const hasPermission = req.user.roles?.includes('admin') || req.user.roles.reduce(
+    const hasPermission = req.roles?.includes('admin') || req.roles.reduce(
         (x,y) => x || fullUrl.startsWith(y), false
     )
 
