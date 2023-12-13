@@ -50,7 +50,7 @@ router.post('/:id', async (req, res) => {
     if (notes) { newdata.notes = notes }
     if (polygon) { newdata.polygon = polygon }
 
-    ok = await Room.updateOne({ _id: id }, newdata)
+    const ok = await Room.updateOne({ _id: id }, newdata)
 
     if (ok.modifiedCount == 1) {
         res.json({})
