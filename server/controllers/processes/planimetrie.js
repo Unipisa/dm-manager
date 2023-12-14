@@ -23,7 +23,14 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-    const id = new ObjectId(req.params.id)
+    var id = null
+    try {
+        id = new ObjectId(req.params.id)
+    }
+    catch {
+        res.status(404).json({ error: "Invalid ID specified "})
+        return
+    }
 
     const room = await Room.aggregate([
         {$match: { _id: id }},
@@ -44,7 +51,14 @@ router.get('/:id', async (req, res) => {
 router.post('/:id', async (req, res) => {
     const notes = req.body.notes
     const polygon = req.body.polygon
-    const id = new ObjectId(req.params.id)
+    var id = null
+    try {
+        id = new ObjectId(req.params.id)
+    }
+    catch {
+        res.status(404).json({ error: "Invalid ID specified "})
+        return
+    }
 
     const newdata = {}
     if (notes) { newdata.notes = notes }
