@@ -28,7 +28,7 @@ router.get('/:id', async (req, res) => {
         id = new ObjectId(req.params.id)
     }
     catch {
-        res.status(404).json({ error: "Invalid ID specified "})
+        res.status(404).json({ error: "Invalid ID specified"})
         return
     }
 
@@ -56,7 +56,7 @@ router.post('/:id', async (req, res) => {
         id = new ObjectId(req.params.id)
     }
     catch {
-        res.status(404).json({ error: "Invalid ID specified "})
+        res.status(404).json({ error: "Invalid ID specified"})
         return
     }
 
