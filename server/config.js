@@ -21,6 +21,7 @@ class Options {
             JWT_SECRET: randomUUID(),
             // CORS_ORIGIN: "http://localhost:3000", // comma separated URLS
             PORT: "8000",
+            SERVER_URL: "http://localhost:8000",
             OAUTH2_AUTHORIZE_URL: "https://iam.unipi.it/oauth2/authorize",
             OAUTH2_TOKEN_URL: "https://iam.unipi.it/oauth2/token",
             OAUTH2_USERINFO_URL: "https://iam.unipi.it/oauth2/userinfo",
@@ -32,7 +33,6 @@ class Options {
             MONGO_TEST_URI: "mongodb://localhost:27017/dm-manager-test",
             ADMIN_USER: null,
             ADMIN_PASSWORD: null,
-            SERVER_URL: null,
             EXCHANGE_CODE_FOR_TOKEN_SERVER_URL: null,
             TOKEN_SECRET: null,
             REACT_APP_SERVER_URL: null,

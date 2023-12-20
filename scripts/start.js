@@ -133,11 +133,15 @@ checkBrowsers(paths.appPath, isInteractive)
       port,
     };
 
+    console.log(`serverConfig: ${JSON.stringify(serverConfig, null, 2)}`);
+
     const devServer = new WebpackDevServer(serverConfig, compiler);
     // Launch WebpackDevServer.
     devServer.startCallback(() => {
       console.log(chalk.cyan('Starting the development server...\n'));
     });
+
+    console.log(`env: ${JSON.stringify(env, null, 2)}`);
 
     ['SIGINT', 'SIGTERM'].forEach(function (sig) {
       process.on(sig, function () {

@@ -22,7 +22,11 @@ passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
 passport.deserializeUser(User.deserializeUser())
 
-const oauthStrategy = new UnipiAuthStrategy({
+// unipi oauth2 authentication
+if (config.OAUTH2_CLIENT_ID) {
+  console.log(`OAUTH2 authentication enabled: ${config.OAUTH2_CLIENT_ID}`)
+
+  const oauthStrategy = new UnipiAuthStrategy({
     authorizationURL: config.OAUTH2_AUTHORIZE_URL,
     tokenURL: config.OAUTH2_TOKEN_URL,
     clientID: config.OAUTH2_CLIENT_ID,
@@ -31,8 +35,6 @@ const oauthStrategy = new UnipiAuthStrategy({
     usernameField: config.OAUTH2_USERNAME_FIELD,
   })
 
-// unipi oauth2 authentication
-if (config.OAUTH2_CLIENT_ID) {
   passport.use(oauthStrategy)
 } else {
   console.log("OAUTH2 authentication disabled")
