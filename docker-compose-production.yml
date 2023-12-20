@@ -22,7 +22,7 @@ services:
       # OAUTH2_CLIENT_ID: 1234567890
       # OAUTH2_CLIENT_SECRET: "1234567890"
       # OAUTH2_USERNAME_FIELD: "email"
-      REACT_APP_SERVER_URL: ""
+      # REACT_APP_SERVER_URL: ""
     ports:
       - 8000:8000
     networks:

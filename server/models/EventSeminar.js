@@ -53,3 +53,12 @@ ConferenceRoom.relatedModels.push({
     url: 'event-seminar',
     field: 'conferenceRoom',
 })
+
+const SeminarCategory = require('./SeminarCategory')
+SeminarCategory.relatedModels.push({
+    model: EventSeminar,
+    modelName: 'EventSeminar',
+    url: 'event-seminar',
+    field: 'category',
+    multiple: false,
+})

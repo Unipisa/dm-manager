@@ -14,6 +14,7 @@ const schema = new Schema({
     nSeats: {type: Number, label: 'numero posti', default: 0, required: true},
     notes,
     code: {type: String, label: 'codice', hidden: true},
+    polygon: {type: String, label: "Map coordinates"},
     createdBy,
     updatedBy,
 }, {

@@ -837,6 +837,11 @@ const migrations = {
         }
         return true
     },
+
+    D20231123_create_group_indexes: async function(db) {
+        db.collection('groups').createIndex({startDate: 1, endDate: 1})
+        return true
+    },
 }
 
 async function migrate(db, options) {
