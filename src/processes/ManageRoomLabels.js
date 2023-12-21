@@ -123,6 +123,7 @@ function RoomsTable({onClick, onDone, onDelete, data}) {
             <tr>
                 <th>stanza</th>
                 <th>nomi</th>
+                <th>richiesto da</th>
                 <th style={{visibility}}>azioni</th>
             </tr>
         </thead>
@@ -132,6 +133,7 @@ function RoomsTable({onClick, onDone, onDelete, data}) {
                 <tr key={obj._id} onClick={() => onClick(obj)}>
                     <td>{obj.number}</td>
                     <td>{obj.names.join(", ")}</td>
+                    <td>{obj.createdBy.email || obj.createdBy.username}</td>
                     <td style={{visibility}}>
                         <ButtonGroup>
                             {   obj.state === 'submitted' && onDone && 

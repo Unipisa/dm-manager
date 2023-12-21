@@ -219,7 +219,7 @@ export default function RoomLabelsPage() {
     const onClick = (roomLabel) => {
         setRoomLabel(roomLabel)
     }
-
+    
     return <>
         <p>Puoi modificare il nome e il numero di stanza.</p>
         <Display 

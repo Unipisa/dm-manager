@@ -6,7 +6,7 @@ import Models from '../models/Models'
 export default function Home() {
   const engine = useEngine()
   const user = engine.user
-  
+  /*
   let modelElements = []
   Object.values(Models).forEach(Model => {
       Model.homeElements(user).forEach(
@@ -20,11 +20,11 @@ export default function Home() {
   if (items.length === 0) items.push(<li>
           Nulla. 
           Scrivi a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>
-          {/* spacer */} se questo ti sembra un errore.
+          {} se questo ti sembra un errore.
     </li>)
-
+    */
     const processes = <>
-        <h4>Processi disponibili</h4>
+        {/*<h4>Processi disponibili</h4>*/}
         <div className="row">
             { (user.roles.includes('admin') || user.roles.includes('/api/v0/process/seminars')) &&
             <div className="col-lg-6 p-3">
@@ -56,7 +56,7 @@ export default function Home() {
                 </Card.Header>
                 <Card.Body>
                     <ul>
-                        <li>Stampa cartellini richiesti</li>
+                        <li>gestisci richieste cartellini</li>
                     </ul>                    
                 </Card.Body>
             </Card>
@@ -67,6 +67,7 @@ export default function Home() {
 
   return <>
     {processes}
+    {/*
     <h4>Altre azioni</h4>
       <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, 
         puoi:
@@ -74,6 +75,13 @@ export default function Home() {
       <ul>
       { items }
       </ul>
+        */}
+    <p>
+        Puoi accedere al <a href="/profile">tuo profilo</a>.
+        Per problemi o informazioni scrivi a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>.
+        {user.roles.length>0 && `I tuoi permessi: ${user.roles.join(', ')}. `}
+        {user.roles.length==0 && `Non risultano permessi assegnati al tuo utente.`}
+    </p>
   </>
   }
   

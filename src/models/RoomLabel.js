@@ -20,6 +20,7 @@ export default class RoomLabel extends Model {
         this.IndexPage = RoomLabelsPage
     }
 
+    /*
     menuElements(user) {
         if (user) {
             return [{
@@ -39,5 +40,5 @@ export default class RoomLabel extends Model {
         } else {
             return [<Link key={this.code} to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>]
         } 
-    }
+    }*/
 }

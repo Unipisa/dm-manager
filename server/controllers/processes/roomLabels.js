@@ -9,7 +9,42 @@ module.exports = router
 router.get('/', async (req, res) => {    
     const labels = await RoomLabel.aggregate([
         {
-            '$sort': {
+            $lookup: {
+                from: 'users',
+                localField: 'createdBy',
+                foreignField: '_id',
+                as: 'createdBy',
+                pipeline: [{$project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    email: 1,
+                }}]
+            }
+        }, {
+            $unwind: {
+                path: '$createdBy',
+                preserveNullAndEmptyArrays: true,
+            }
+        }, {
+            $lookup: {
+                from: 'users',
+                localField: 'updatedBy',
+                foreignField: '_id',
+                as: 'updatedBy',
+                pipeline: [{$project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    email: 1,
+                }}]
+            }}, {
+                $unwind: {
+                    path: '$updatedBy',
+                    preserveNullAndEmptyArrays: true,
+                }
+        },  {
+            $sort: {
                 'updatedAt': -1,
             }
         }
