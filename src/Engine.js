@@ -275,7 +275,7 @@ export function useQueryFilter(initial) {
     function extendLimit() {
         setFilter(filter => ({
             ...filter,
-            _limit: 2* filter._limit
+            _limit: 10* filter._limit
         }))
     }
 
