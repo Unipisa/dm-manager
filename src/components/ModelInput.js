@@ -1,9 +1,7 @@
-import { useId } from 'react'
-import { Form } from 'react-bootstrap'
-
 import { RESERVED_FIELDS } from './ModelOutput'
 
 import { 
+    InputRow,
     InstitutionInput,
     BooleanInput,
     ListInput,
@@ -26,11 +24,10 @@ import {
     DatetimeInput
 } from './DatetimeInput'
 
-export function ModelFieldInput({ id, schema, value, setValue, api_prefix }) {
+export function ModelFieldInput({ schema, value, setValue, api_prefix }) {
     function element(Element, opts = {}) {
         const {options, multiple} = opts
         return <Element 
-                    id={id}
                     value={value} 
                     setValue={setValue} 
                     options={options}
@@ -85,25 +82,17 @@ export function ModelFieldInput({ id, schema, value, setValue, api_prefix }) {
 }
 
 export function ModelInput({ field, modified, schema, value, setValue, api_prefix}) {
-    const id = useId()
     const label = schema?.items?.label || schema?.label || field
+    const help = schema?.help
 
-    return <Form.Group className="row my-2">
-        <Form.Label className={ "col-form-label text-end col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id }>
-            { label }
-        </Form.Label>
-        <div className="col-sm-10">
-            <ModelFieldInput
-                id={id}
-                schema={schema}
-                value={value} 
-                setValue={setValue} 
-                api_prefix={api_prefix}
-            />                         
-        </div>
-        <div className="col-sm-2"></div>
-        <div className="col-sm-10 form-text">{schema?.help}</div>
-    </Form.Group>
+    return <InputRow label={label} modified={modified} help={help}>
+        <ModelFieldInput
+            schema={schema}
+            value={value} 
+            setValue={setValue} 
+            api_prefix={api_prefix}
+        />                         
+    </InputRow>
 }
 
 export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {

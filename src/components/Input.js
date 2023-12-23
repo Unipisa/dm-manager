@@ -4,12 +4,38 @@ import "react-datepicker/dist/react-datepicker.css"
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState, useRef } from 'react';
 import { useQuery } from 'react-query'
+import { useId, createContext, useContext } from 'react'
+import { Form } from 'react-bootstrap'
 
 import api from '../api'
 import { useEngine } from '../Engine'
 import Loading from './Loading'
 
-export function StringInput({ id, value, setValue }) {
+const InputIdContext = createContext('')
+
+export function useInputId() {
+    return useContext(InputIdContext)
+}
+
+export function InputRow({ label, modified, help, children}) {
+    const id = useId()
+
+    return <Form.Group className="row my-2">
+        <Form.Label className={ "col-form-label text-end col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id }>
+            { label }
+        </Form.Label>
+        <div className="col-sm-10">
+            <InputIdContext.Provider value={id}>
+                { children }
+            </InputIdContext.Provider>
+        </div>
+        <div className="col-sm-2"></div>
+        <div className="col-sm-10 form-text">{help}</div>
+    </Form.Group>
+}
+
+export function StringInput({ value, setValue }) {
+    const id = useInputId()
     return <input 
         className="form-control col-sm-10"
         id={ id } 
@@ -18,9 +44,10 @@ export function StringInput({ id, value, setValue }) {
     />
 }
 
-export function AttachmentInput({ id, value, setValue, image }) {
+export function AttachmentInput({ value, setValue, image }) {
     // const [uploading, setUploading] = useState(false)
     const engine = useEngine()
+    const id = useInputId()
 
     function getNewAttachment() {
         const input = document.createElement('input')
@@ -67,11 +94,15 @@ export function AttachmentInput({ id, value, setValue, image }) {
     </div>
 }
 
-export function ImageInput({ id, value, setValue }) {
+export function ImageInput({ value, setValue }) {
+    const id = useInputId()
+
     return <AttachmentInput id={id} value={value} setValue={setValue} image={true} />
 }
 
-export function NumberInput({ id, value, setValue }) {
+export function NumberInput({ value, setValue }) {
+    const id = useInputId()
+
     return <input 
         className="form-control col-sm-10"
         id={ id } 
@@ -81,7 +112,9 @@ export function NumberInput({ id, value, setValue }) {
     />
 }
 
-export function DateInput({ id, value, setValue }) {
+export function DateInput({ value, setValue }) {
+    const id = useInputId()
+
     return <UtcDatePicker 
         id={ id }
         className="form-control"
@@ -91,7 +124,9 @@ export function DateInput({ id, value, setValue }) {
     />
 }
 
-export function ListInput({ id, value, setValue, separator }) {
+export function ListInput({ value, setValue, separator }) {
+    const id = useInputId()
+
     if (separator === undefined) separator = ','    
     return <input 
         id={ id } 
@@ -107,7 +142,9 @@ export function ListInput({ id, value, setValue, separator }) {
     />
 }
 
-export function TextInput({ id, value, setValue }) {
+export function TextInput({ value, setValue }) {
+    const id = useInputId()
+
     return <textarea 
         id={ id } 
         value={ value || "" }
@@ -123,7 +160,9 @@ export function TextInput({ id, value, setValue }) {
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
 // TODO: valutare widget alternativo: https://react-select.com/home
-export function ObjectInput({ id, placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple, api_prefix }) {
+export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple, api_prefix }) {
+    const id = useInputId()
+
     if (api_prefix === undefined) {
         api_prefix = "/api/v0"
     }
@@ -305,9 +344,8 @@ export function ObjectInput({ id, placeholder, render, new_object, objCode, objN
     </>
 }
 
-export function PersonInput({ id, value, setValue, multiple, api_prefix }) {
+export function PersonInput({ value, setValue, multiple, api_prefix }) {
     return <ObjectInput 
-        id={id} 
         value={value} 
         setValue={setValue} 
         multiple={multiple} 
@@ -328,9 +366,8 @@ export function PersonInput({ id, value, setValue, multiple, api_prefix }) {
     />
 }
 
-export function GrantInput({ id, value, setValue, multiple, api_prefix }) {
+export function GrantInput({ value, setValue, multiple, api_prefix }) {
     return <ObjectInput 
-        id={id} 
         value={value} 
         setValue={setValue} 
         multiple={multiple} 
@@ -347,7 +384,9 @@ export function GrantInput({ id, value, setValue, multiple, api_prefix }) {
     />
 }
 
-export function SelectInput({ id, options, value, setValue, displayFunction }) {
+export function SelectInput({ options, value, setValue, displayFunction }) {
+    const id = useInputId()
+
     //console.assert(value===null || options.includes(value),`Value ${value} not in options`) 
     value = value || ""
     if (! options.includes(value)) {
@@ -365,7 +404,9 @@ export function SelectInput({ id, options, value, setValue, displayFunction }) {
     </select>
 }
 
-export function BooleanInput({ id, value, setValue }) {
+export function BooleanInput({ value, setValue }) {
+    const id = useInputId()
+
     return <input 
         className="form-check-input col-sm-10"
         type='checkbox' 
@@ -375,7 +416,9 @@ export function BooleanInput({ id, value, setValue }) {
     />                 
 }
 
-export function MultipleSelectInput({ id, options, value, setValue}) {
+export function MultipleSelectInput({ options, value, setValue}) {
+    const id = useInputId()
+
     return <select 
         multiple className="form-control col-sm-10"
         id={ id }
@@ -389,7 +432,7 @@ export function MultipleSelectInput({ id, options, value, setValue}) {
     </select>
 }
 
-export function RoomInput({ id, value, setValue, api_prefix }) {
+export function RoomInput({ value, setValue, api_prefix }) {
     const engine = useEngine()
     const path = 'room'
     const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_sort: 'code', _limit: 1000}), {
@@ -400,7 +443,6 @@ export function RoomInput({ id, value, setValue, api_prefix }) {
     const data = new Map(query.data.data.map(room => ([room._id, room])))
     if (value && value._id) value = value._id
     return <SelectInput 
-        id={id}
         options = {Array.from(data.keys())}
         displayFunction = {id => {
             if (id === null) return '---'
@@ -414,9 +456,8 @@ export function RoomInput({ id, value, setValue, api_prefix }) {
     />
 }
 
-export function ConferenceRoomInput({ id, value, setValue, api_prefix }) {
+export function ConferenceRoomInput({ value, setValue, api_prefix }) {
     return <ObjectInput
-        id={id}
         value={value}
         setValue={setValue}
         objCode="conference-room"
@@ -432,9 +473,8 @@ export function ConferenceRoomInput({ id, value, setValue, api_prefix }) {
     />
 }
 
-export function SeminarCategoryInput({ id, value, setValue, api_prefix }) {
+export function SeminarCategoryInput({ value, setValue, api_prefix }) {
     return <ObjectInput
-        id={id}
         value={value}
         setValue={setValue}
         objCode="seminar-category"
@@ -451,7 +491,7 @@ export function SeminarCategoryInput({ id, value, setValue, api_prefix }) {
     />
 }
 
-// export function ConferenceRoomInput({ id, value, setValue }) {
+// export function ConferenceRoomInput({ value, setValue }) {
 //     const engine = useEngine()
 //     const query = useQuery(['conference-room'], () => api.get('/api/v0/conference-room', {_sort: 'name', _limit: 100}), {
 //         onError: (err) => {
@@ -465,7 +505,6 @@ export function SeminarCategoryInput({ id, value, setValue, api_prefix }) {
 //     if (value && value._id) value = value._id
     
 //     return <SelectInput 
-//         id={id}
 //         options = {Array.from(data.keys())}
 //         displayFunction = {id => {
 //             if (id === null) return '---'
@@ -478,9 +517,8 @@ export function SeminarCategoryInput({ id, value, setValue, api_prefix }) {
 //     />
 // }
 
-export function InstitutionInput({ id, value, setValue, multiple, api_prefix }) {
+export function InstitutionInput({ value, setValue, multiple, api_prefix }) {
     return <ObjectInput 
-        id={id} 
         value={value} 
         setValue={setValue} 
         multiple={multiple} 

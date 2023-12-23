@@ -166,7 +166,7 @@ export function Th({ filter, children }) {
 }
 
 export function computeCsvHeaders(fieldsInfo) {
-    console.log(`computeCsvHeaders: ${JSON.stringify(fieldsInfo)}`)
+    // console.log(`computeCsvHeaders: ${JSON.stringify(fieldsInfo)}`)
     let headers = []
     for (const [key, field] of Object.entries(fieldsInfo)) {
         if (field['x-ref'] === 'Person') {
