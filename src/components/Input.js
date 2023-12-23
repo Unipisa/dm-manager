@@ -17,10 +17,10 @@ export function useInputId() {
     return useContext(InputIdContext)
 }
 
-export function InputRow({ label, modified, help, children}) {
+export function InputRow({ label, modified, help, children, className}) {
     const id = useId()
 
-    return <Form.Group className="row my-2">
+    return <Form.Group className={`row ${className || 'my-2'}`}>
         <Form.Label className={ "col-form-label text-end col-sm-2 " + (modified ? "bg-warning" : "") } htmlFor={ id }>
             { label }
         </Form.Label>

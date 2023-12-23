@@ -1,11 +1,13 @@
 import { Button, Card, Form } from 'react-bootstrap'
-import { ModelInput } from '../components/ModelInput'
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
+
+import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, PersonInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
+import { DatetimeInput } from '../components/DatetimeInput'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -134,27 +136,27 @@ function SeminarDetailsBlock({ onCompleted, disabled, room, setRoom, date, setDa
         <Card.Header>Dettagli del seminario</Card.Header>
         <Card.Body>
         <Form>
-            <Form.Group className="my-3">
-                <ModelInput field="Titolo" schema={{ type: "string" }} value={title} setValue={setTitle}></ModelInput>
-            </Form.Group>
-            <Form.Group className="my-3">
-                <ModelInput field="Ciclo di seminari" schema={{ "x-ref": "SeminarCategory" }} value={category} setValue={setCategory} api_prefix="/api/v0/process/seminars/add"></ModelInput>
-            </Form.Group>
-            <Form.Group className="my-3">
-                <ModelInput field="Data e ora" schema={{ format: "date-time", widget: "datetime" }} value={date} setValue={setDate}></ModelInput>
-            </Form.Group>
-            <Form.Group className="my-3">
-                <ModelInput field="Durata (in minuti)" schema={{ type: "number" }} value={duration} setValue={setDuration}></ModelInput>
-            </Form.Group>
-            <Form.Group className="my-3">
-                <ModelInput field="Aula" schema={{ "x-ref": "ConferenceRoom" }} value={room} setValue={setRoom} api_prefix="/api/v0/process/seminars/add"></ModelInput>
-            </Form.Group>
-            <Form.Group className="my-3">
-                <ModelInput field="Grant" schema={{ type: "array", "items" : {"x-ref": "Grant"} }} value={grants} setValue={setGrants} api_prefix="/api/v0/process/seminars/add"></ModelInput>
-            </Form.Group>
-            <Form.Group className="my-3">
-                <ModelInput field="Abstract" schema={{ type: "string", widget: "text" }} value={abstract} setValue={setAbstract}></ModelInput>
-            </Form.Group>
+            <InputRow label="Titolo" className="my-3">
+                <StringInput value={title} setValue={setTitle} />
+            </InputRow>
+            <InputRow label="Ciclo di seminari" className="my-3">
+                <SeminarCategoryInput value={category} setValue={setCategory} api_prefix="/api/v0/process/seminars/add" />
+            </InputRow>
+            <InputRow label="Data e ora" className="my-3">
+                <DatetimeInput value={date} setValue={setDate}/>
+            </InputRow>
+            <InputRow className="my-3" label="Durata (in minuti)">
+                <NumberInput value={duration} setValue={setDuration}/>
+            </InputRow>
+            <InputRow className="my-3" label="Aula">
+                <ConferenceRoomInput value={room} setValue={setRoom} api_prefix="/api/v0/process/seminars/add"/>
+            </InputRow>
+            <InputRow className="my-3" label="Grant">
+                <GrantInput multiple={true} value={grants} setValue={setGrants} api_prefix="/api/v0/process/seminars/add"/>
+            </InputRow>
+            <InputRow className="my-3" label="Abstract">
+                <TextInput value={abstract} setValue={setAbstract}/>
+            </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
             <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
@@ -185,7 +187,9 @@ function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
             (ad esempio, "Universität Zürich" piuttosto che "University of Zurich").
             </p>
             <Form className="mb-3">
-                <ModelInput field="Speaker" schema={{"x-ref": "Person"}} value={person} setValue={setPerson} api_prefix="/api/v0/process/seminars/add"></ModelInput>
+                <InputRow label="Speaker">
+                    <PersonInput value={person} setValue={setPerson} api_prefix="/api/v0/process/seminars/add"/>
+                </InputRow>
             </Form>
             </Card.Body>
         </Card>        
