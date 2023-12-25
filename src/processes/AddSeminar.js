@@ -6,6 +6,7 @@ import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
 
+import SelectPersonBlock from './SelectPersonBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, PersonInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 
@@ -105,7 +106,17 @@ export default function AddSeminar() {
 
     return <div>
         <h1 className="text-primary pb-4">Inserimento nuovo seminario</h1>
-        <SelectPersonBlock person={person} setPerson={setPerson} disabled={person != null}></SelectPersonBlock>
+        { person 
+            ? <Card className="shadow mb-3">
+                <Card.Header>
+                    <div className="d-flex d-row justify-content-between">
+                        <div>Selezione speaker: <strong>{person?.firstName} {person?.lastName}</strong></div>                    
+                        <div className="btn btn-warning btn-sm" onClick={() => setPerson(null)}>Annulla</div>
+                    </div>
+                </Card.Header>
+            </Card>
+            : <SelectPersonBlock label="Speaker" person={person} setPerson={setPerson} disabled={person != null} /> 
+        }
         <SeminarDetailsBlock disabled={person == null} 
             title={title} setTitle={setTitle}
             date={date} setDate={setDate}
@@ -160,36 +171,6 @@ function SeminarDetailsBlock({ onCompleted, disabled, room, setRoom, date, setDa
     </Card>;
 }
 
-function SelectPersonBlock({ onCompleted, disabled, person, setPerson }) {
-    if (disabled) {
-        return <Card className="shadow mb-3">
-            <Card.Header>
-                <div className="d-flex d-row justify-content-between">
-                    <div>Selezione speaker: <strong>{person?.firstName} {person?.lastName}</strong></div>                    
-                    <div className="btn btn-warning btn-sm" onClick={() => setPerson(null)}>Annulla</div>
-                </div>
-            </Card.Header>
-        </Card>
-    }
-
-    return <div>
-        <Card className="shadow mb-3">
-            <Card.Header className="">Selezione speaker</Card.Header>
-            <Card.Body>
-            <p>
-            Digitare le prime lettere del cognome per attivare il completamento. Solo se lo speaker non esiste, crearne uno nuovo selezionando 
-            la voce che appare nel menù a tendina. All'atto della creazione, inserire nome, cognome e istituzione nella loro lingua di appartenenza
-            (ad esempio, "Universität Zürich" piuttosto che "University of Zurich").
-            </p>
-            <Form className="mb-3">
-                <InputRow label="Speaker">
-                    <PersonInput value={person} setValue={setPerson} api_prefix="/api/v0/process/seminars/add"/>
-                </InputRow>
-            </Form>
-            </Card.Body>
-        </Card>        
-    </div>
-}
 
 async function loadExternalData(source, seminar) {
     if (! source || ! source.includes(':')) {
