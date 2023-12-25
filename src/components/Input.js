@@ -10,6 +10,7 @@ import { Form } from 'react-bootstrap'
 import api from '../api'
 import { useEngine } from '../Engine'
 import Loading from './Loading'
+import { usePrefix } from '../processes/PrefixProvider'
 
 const InputIdContext = createContext('')
 
@@ -160,12 +161,9 @@ export function TextInput({ value, setValue }) {
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
 // TODO: valutare widget alternativo: https://react-select.com/home
-export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple, api_prefix }) {
+export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple }) {
     const id = useInputId()
-
-    if (api_prefix === undefined) {
-        api_prefix = "/api/v0"
-    }
+    const api_prefix = usePrefix()
 
     const engine = useEngine()
     const [options, setOptions] = useState([])
@@ -292,10 +290,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
                 setValue={x => {
                     console.log(`Setting ${key} to`, x)
                     setNewObject(o => ({...o, [key]: x}))
-                }}
-                api_prefix={api_prefix}
-                >
-            </InstitutionInput>
+                }} />
         } else {
             return <input 
                 key={key} 
@@ -344,7 +339,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     </>
 }
 
-export function PersonInput({ value, setValue, multiple, api_prefix }) {
+export function PersonInput({ value, setValue, multiple }) {
     return <ObjectInput 
         value={value} 
         setValue={setValue} 
@@ -361,7 +356,6 @@ export function PersonInput({ value, setValue, multiple, api_prefix }) {
                 lastName: 'Cognome',
                 affiliations: 'Affiliazioni',
         }}
-        api_prefix={api_prefix}
         placeholder="cognome"
     />
 }
@@ -379,7 +373,6 @@ export function GrantInput({ value, setValue, multiple, api_prefix }) {
         inputs={{
                 identifier: 'Identificativo',
         }}
-        api_prefix={api_prefix}
         placeholder="grant"
     />
 }
@@ -451,7 +444,6 @@ export function RoomInput({ value, setValue, api_prefix }) {
             return room.code
         }}
         value={value} 
-        api_prefix={api_prefix}
         setValue={value => setValue(value?data.get(value):null)}
     />
 }
@@ -468,7 +460,6 @@ export function ConferenceRoomInput({ value, setValue, api_prefix }) {
         inputs={{
             name: 'Nome',
         }}
-        api_prefix={api_prefix}
         placeholder="Aula per conferenza..."
     />
 }
@@ -486,7 +477,6 @@ export function SeminarCategoryInput({ value, setValue, api_prefix }) {
             name: 'Nome',
             label: 'Label',
         }}
-        api_prefix={api_prefix}
         placeholder="Ciclo di seminari..."
     />
 }
@@ -530,7 +520,6 @@ export function InstitutionInput({ value, setValue, multiple, api_prefix }) {
         inputs={{
                 name: 'nome',
         }}
-        api_prefix={api_prefix}
         placeholder="affiliazione"
     />
 }

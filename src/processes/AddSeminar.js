@@ -9,6 +9,7 @@ import { Converter } from 'showdown'
 import SelectPersonBlock from './SelectPersonBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, PersonInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
+import { PrefixProvider } from './PrefixProvider'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
@@ -104,7 +105,7 @@ export default function AddSeminar() {
         navigate('/process/seminars')
     }
 
-    return <div>
+    return <PrefixProvider value="/api/v0/process/seminars/add">
         <h1 className="text-primary pb-4">Inserimento nuovo seminario</h1>
         { person 
             ? <Card className="shadow mb-3">
@@ -115,7 +116,7 @@ export default function AddSeminar() {
                     </div>
                 </Card.Header>
             </Card>
-            : <SelectPersonBlock label="Speaker" person={person} setPerson={setPerson} disabled={person != null} /> 
+            : <SelectPersonBlock label="Speaker" person={person} setPerson={setPerson} /> 
         }
         <SeminarDetailsBlock disabled={person == null} 
             title={title} setTitle={setTitle}
@@ -127,7 +128,7 @@ export default function AddSeminar() {
             grants={grants} setGrants={setGrants}
             onCompleted={onCompleted}
         ></SeminarDetailsBlock>
-    </div>;
+    </PrefixProvider>
 }
 
 function SeminarDetailsBlock({ onCompleted, disabled, room, setRoom, date, setDate, title, setTitle, 
@@ -146,7 +147,7 @@ function SeminarDetailsBlock({ onCompleted, disabled, room, setRoom, date, setDa
                 <StringInput value={title} setValue={setTitle} />
             </InputRow>
             <InputRow label="Ciclo di seminari" className="my-3">
-                <SeminarCategoryInput value={category} setValue={setCategory} api_prefix="/api/v0/process/seminars/add" />
+                <SeminarCategoryInput value={category} setValue={setCategory}/>
             </InputRow>
             <InputRow label="Data e ora" className="my-3">
                 <DatetimeInput value={date} setValue={setDate}/>
@@ -155,10 +156,10 @@ function SeminarDetailsBlock({ onCompleted, disabled, room, setRoom, date, setDa
                 <NumberInput value={duration} setValue={setDuration}/>
             </InputRow>
             <InputRow className="my-3" label="Aula">
-                <ConferenceRoomInput value={room} setValue={setRoom} api_prefix="/api/v0/process/seminars/add"/>
+                <ConferenceRoomInput value={room} setValue={setRoom}/>
             </InputRow>
             <InputRow className="my-3" label="Grant">
-                <GrantInput multiple={true} value={grants} setValue={setGrants} api_prefix="/api/v0/process/seminars/add"/>
+                <GrantInput multiple={true} value={grants} setValue={setGrants}/>
             </InputRow>
             <InputRow className="my-3" label="Abstract">
                 <TextInput value={abstract} setValue={setAbstract}/>

@@ -1,11 +1,11 @@
-import { Button, Card, Form } from 'react-bootstrap'
+import { Card, Form } from 'react-bootstrap'
 
-import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, PersonInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
+import { InputRow, PersonInput } from '../components/Input'
 
-export default function SelectPersonBlock({ label, person, setPerson }) {
+export default function SelectPersonBlock({ title, label, person, setPerson }) {
     return <div>
         <Card className="shadow mb-3">
-            <Card.Header className="">Selezione speaker</Card.Header>
+            <Card.Header className="">{title || "Selezione persona"}</Card.Header>
             <Card.Body>
             <p>
             Digitare le prime lettere del cognome per attivare il completamento. 
@@ -16,7 +16,7 @@ export default function SelectPersonBlock({ label, person, setPerson }) {
             </p>
             <Form className="mb-3">
                 <InputRow label={label || 'persona'}>
-                    <PersonInput value={person} setValue={setPerson} api_prefix="/api/v0/process/seminars/add"/>
+                    <PersonInput value={person} setValue={setPerson} />
                 </InputRow>
             </Form>
             </Card.Body>
