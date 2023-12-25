@@ -70,8 +70,8 @@ router.put('/save', async (req, res) => {
         }
         else {
             const seminar = await EventSeminar.findById(payload._id)
-            if (seminar.createdBy.equals(req.user)) {
-                res.status(401).json({ error: "Forbidden" })
+            if (!seminar.createdBy.equals(req.user._id)) {
+                res.status(403).json({ error: "Forbidden" })
                 return
             }
             delete payload.createdBy

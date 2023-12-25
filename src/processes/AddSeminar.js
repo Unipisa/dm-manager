@@ -99,13 +99,8 @@ export default function AddSeminar() {
             s._id = id
         }
 
-        try {
-            await api.put('/api/v0/process/seminars/save', s)
-            navigate('/process/seminars')
-        }
-        catch (error) {
-            console.log(error)
-        }
+        await api.put('/api/v0/process/seminars/save', s)
+        navigate('/process/seminars')
     }
 
     return <div>
