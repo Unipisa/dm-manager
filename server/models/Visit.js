@@ -14,6 +14,7 @@ const visitSchema = new Schema({
     affiliations: [{ type: ObjectId, label: 'affiliazioni al tempo della visita', ref: 'Institution' }],
     startDate,
     endDate,
+    publish: { type: Boolean, label: 'pubblica', default: false },
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,

@@ -19,12 +19,11 @@ import {
     ConferenceRoomInput,
     SeminarCategoryInput
 } from './Input'
+import { DatetimeInput } from './DatetimeInput'
+import { usePrefix } from '../processes/PrefixProvider'
 
-import { 
-    DatetimeInput
-} from './DatetimeInput'
-
-export function ModelFieldInput({ schema, value, setValue, api_prefix }) {
+export function ModelFieldInput({ schema, value, setValue }) {
+    const api_prefix = usePrefix()
     function element(Element, opts = {}) {
         const {options, multiple} = opts
         return <Element 
@@ -32,31 +31,26 @@ export function ModelFieldInput({ schema, value, setValue, api_prefix }) {
                     setValue={setValue} 
                     options={options}
                     multiple={multiple}
-                    api_prefix={api_prefix}
                 />
     }
 
     if (!schema) return <p>no schema provided</p>
 
-    if (api_prefix === undefined) {
-        api_prefix = "/api/v0"
-    }
-
     if (schema.type === 'array') {
         if (schema.enum) return element(MultipleSelectInput, {options: schema.enum})
         if (!schema.items['x-ref']) return element(ListInput)
-        if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true, api_prefix: api_prefix})
-        if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true, api_prefix: api_prefix})        
-        if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true, api_prefix: api_prefix})
+        if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true})
+        if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true})        
+        if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true})
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
         const xref = schema['x-ref']
-        if (xref === 'Person') return element(PersonInput, {api_prefix: api_prefix})
-        if (xref === 'Room') return element(RoomInput, {api_prefix: api_prefix})
-        if (xref === 'ConferenceRoom') return element(ConferenceRoomInput, {api_prefix: api_prefix})
-        if (xref === 'SeminarCategory') return element(SeminarCategoryInput, {api_prefix: api_prefix})
-        if (xref === 'Institution') return element(InstitutionInput, {api_prefix: api_prefix})
-        if (xref === 'User') return element(StringInput, {api_prefix: api_prefix})
+        if (xref === 'Person') return element(PersonInput)
+        if (xref === 'Room') return element(RoomInput)
+        if (xref === 'ConferenceRoom') return element(ConferenceRoomInput)
+        if (xref === 'SeminarCategory') return element(SeminarCategoryInput)
+        if (xref === 'Institution') return element(InstitutionInput)
+        if (xref === 'User') return element(StringInput)
         if (xref) return <p>x-ref to {xref} not yet implemented</p> 
         if (schema.format === 'date-time') {
             if (schema.widget === 'datetime') return element(DatetimeInput) // use formatted text input "YYYY-MM-DD HH:mm"
@@ -81,7 +75,7 @@ export function ModelFieldInput({ schema, value, setValue, api_prefix }) {
     }
 }
 
-export function ModelInput({ field, modified, schema, value, setValue, api_prefix}) {
+export function ModelInput({ field, modified, schema, value, setValue}) {
     const label = schema?.items?.label || schema?.label || field
     const help = schema?.help
 
@@ -90,7 +84,6 @@ export function ModelInput({ field, modified, schema, value, setValue, api_prefi
             schema={schema}
             value={value} 
             setValue={setValue} 
-            api_prefix={api_prefix}
         />                         
     </InputRow>
 }

@@ -1,5 +1,5 @@
 import { Button, Card, Form } from 'react-bootstrap'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import axios from 'axios'
@@ -9,6 +9,7 @@ import { Converter } from 'showdown'
 import SelectPersonBlock from './SelectPersonBlock'
 import { GrantInput, InputRow, DateInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
+import { myDateFormat } from '../Engine'
 
 export default function AddVisit() {
     const [data, setData] = useState({
@@ -29,7 +30,19 @@ export default function AddVisit() {
             </Card>
             : <SelectPersonBlock title="Selezione speaker" label="Seaker" person={data.person} setPerson={setter(setData, 'person')}/>
         }
-        { data.person && <VisitDetailsBlock data={data} setData={setData} onCompleted={() => setDetailsDone(true)}></VisitDetailsBlock> }
+        { data.person && !detailsDone && <VisitDetailsBlock data={data} setData={setData} onCompleted={() => setDetailsDone(true)}></VisitDetailsBlock> }
+        { data.person && detailsDone && <Card className="shadow mb-3">
+            <Card.Header>
+                <div className="d-flex d-row justify-content-between">
+                    <div>Dettagli della visita</div>
+                    <div className="btn btn-warning btn-sm" onClick={() => setDetailsDone(false)}>Modifica</div>
+                </div>
+            </Card.Header>
+            <Card.Body>
+                <strong>Date:</strong> {myDateFormat(data.startDate)} - {myDateFormat(data.endDate)}<br />
+                <strong>Grants:</strong> {data.grants.map(grant => grant.identifier).join(", ")}<br />
+            </Card.Body>
+        </Card> }
     </PrefixProvider>
 }
 
@@ -55,7 +68,7 @@ function VisitDetailsBlock({data, setData, onCompleted}) {
     </Card>
 
     function check() {
-        return data.startDate && data.endDate
+        return data.startDate && data.endDate && data.startDate <= data.endDate
     }
 }
 
