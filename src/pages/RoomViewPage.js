@@ -21,8 +21,8 @@ export default function RoomViewPage() {
 
 function RoomAssignments() {
     const room = useObject()
-    const engine = useEngine()
-    const assignmentsQuery = engine.useIndex('roomAssignment', {'room': room._id, '_sort': '-startDate'})
+    const {useIndex} = useEngine()
+    const assignmentsQuery = useIndex('roomAssignment', {'room': room._id, '_sort': '-startDate'})
     const [filter, setFilter] = useState('current')
 
     if (!assignmentsQuery.isSuccess) return <Loading />

@@ -63,11 +63,11 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const [cadence, setCadence] = useState('single')
     const [repetitions, setRepetitions] = useState(1)
 
-    const engine = useEngine()
+    const {addErrorMessage} = useEngine()
 
     const handleGenerateLessons = () => {
         if (!conferenceRoom) {
-            engine.addErrorMessage("Non ha inserito un'aula conferenze")
+            addErrorMessage("Non ha inserito un'aula conferenze")
             return
         }
 

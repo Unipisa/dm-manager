@@ -15,19 +15,19 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
     const oa = Model.oa 
     const describe = Model.describe.bind(Model)
     const onChange = Model.onObjectChange.bind(Model)
-    const engine = useEngine()
-    const putObj = engine.usePut(objCode)
-    const patchObj = engine.usePatch(objCode)
-    const engineDeleteObj = engine.useDelete(objCode)
+    const {useGet, usePut, usePatch, useDelete, addWarningMessage, addInfoMessage} = useEngine()
+    const putObj = usePut(objCode)
+    const patchObj = usePatch(objCode)
+    const engineDeleteObj = useDelete(objCode)
 
     async function deleteObj(obj) {
         await engineDeleteObj(obj)
-        engine.addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
+        addWarningMessage(`${objName} ${describe(obj)} eliminat${oa}`)
         onDelete ? onDelete() : onCancel()
     }
 
-    const query = engine.useGet(Model.code, id)
-    const queryClone = engine.useGet(Model.code, clone_id ? clone_id : null)
+    const query = useGet(Model.code, id)
+    const queryClone = useGet(Model.code, clone_id ? clone_id : null)
 
     if (query.isError || queryClone.isError) return <div>errore caricamento</div>
     if (query.isLoading || queryClone.isLoading) return <Loading />
@@ -75,7 +75,7 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
              * we should return after that
              */
             await patchObj(payload)
-            engine.addInfoMessage(`${objName} ${describe(obj)} modificat${oa}`)
+            addInfoMessage(`${objName} ${describe(obj)} modificat${oa}`)
             onSave(obj)
         } else {
             /**
@@ -83,7 +83,7 @@ export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDele
              * we should return after that
              */
             const resultObj = await putObj(obj)
-            engine.addInfoMessage(`nuov${oa} ${objName} ${describe(resultObj)} inserit${oa}`)
+            addInfoMessage(`nuov${oa} ${objName} ${describe(resultObj)} inserit${oa}`)
             onSave(resultObj)
         }
     }

@@ -10,8 +10,8 @@ import { ModelFieldOutput } from "../components/ModelOutput"
 export function FieldOutput({ Model, obj, field, label, editable }) {
     const [edit, setEdit] = useState(false)
     const [value, setValue] = useState(obj[field])
-    const engine = useEngine()
-    const patch = engine.usePatch(`profile/${Model.code}`)
+    const {usePatch} = useEngine()
+    const patch = usePatch(`profile/${Model.code}`)
     const modified = (value !== obj[field])
     const schema = Model.schema.fields
     const field_schema = schema[field]

@@ -20,10 +20,8 @@ import {
     SeminarCategoryInput
 } from './Input'
 import { DatetimeInput } from './DatetimeInput'
-import { usePrefix } from '../processes/PrefixProvider'
 
 export function ModelFieldInput({ schema, value, setValue }) {
-    const api_prefix = usePrefix()
     function element(Element, opts = {}) {
         const {options, multiple} = opts
         return <Element 

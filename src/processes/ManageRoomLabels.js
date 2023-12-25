@@ -153,7 +153,7 @@ function RoomsTable({onClick, onDone, onDelete, data}) {
 }
 
 function RoomLabels({data, onClick, onDone, onDelete, urlId, setUrlId }) {
-    const engine = useEngine()
+    const {addMessage} = useEngine()
 
     if (urlId) {
         const obj = data.find(obj => obj._id === urlId)
@@ -162,7 +162,7 @@ function RoomLabels({data, onClick, onDone, onDelete, urlId, setUrlId }) {
             // while rendering
             setTimeout(() => onClick(obj), 0)       
         } else {
-            engine.addMessage(`non trovo il cartellino ${urlId}`)
+            addMessage(`non trovo il cartellino ${urlId}`)
         }
         setTimeout(()=> setUrlId(null), 0)
     }

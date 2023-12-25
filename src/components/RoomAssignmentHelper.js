@@ -48,18 +48,18 @@ function RoomListing({rooms, createAssignment}) {
 }
 
 export default function RoomAssignmentHelper({ person, startDate, endDate }) {
-    const engine = useEngine()
+    const {useIndex,usePut,usePatch,useDelete,addMessage} = useEngine()
     startDate = startDate ? new Date(startDate) : minDate
     endDate = endDate ? new Date(endDate) : maxDate
     let filter = {
         endDate__gte_or_null: startDate.toISOString(),
         startDate__lte_or_null: endDate.toISOString()
     }
-    const assignmentsQuery = engine.useIndex('roomAssignment', filter)
-    const roomsQuery = engine.useIndex('room', {})
-    const putRoomAssignment = engine.usePut('roomAssignment')
-    const patchRoomAssignment = engine.usePatch('roomAssignment')
-    const deleteRoomAssignment = engine.useDelete('roomAssignment')
+    const assignmentsQuery = useIndex('roomAssignment', filter)
+    const roomsQuery = useIndex('room', {})
+    const putRoomAssignment = usePut('roomAssignment')
+    const patchRoomAssignment = usePatch('roomAssignment')
+    const deleteRoomAssignment = useDelete('roomAssignment')
     if (!(assignmentsQuery.isSuccess && roomsQuery.isSuccess)) return <Loading />
     const rooms = roomsQuery.data.data
     const assignments = assignmentsQuery.data.data
@@ -140,7 +140,7 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
         }
         putRoomAssignment(assignment, () => {
             console.log(`assignment created`)
-            engine.addMessage(`Assegnata stanza ${room.building}${room.floor} ${room.number} a ${person.lastName} ${person.firstName}`, 'success')
+            addMessage(`Assegnata stanza ${room.building}${room.floor} ${room.number} a ${person.lastName} ${person.firstName}`, 'success')
         })
     }
 

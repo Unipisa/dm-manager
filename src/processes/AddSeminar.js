@@ -7,7 +7,7 @@ import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, PersonInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
+import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 
