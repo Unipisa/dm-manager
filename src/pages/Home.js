@@ -45,6 +45,23 @@ export default function Home() {
                 </Card>
             </div>            
             }
+            { (user.roles.includes('admin') || user.roles.includes('/api/v0/process/visit')) &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Visitatori</strong>
+                            <a href="/process/visits"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Work in progress</li>
+                        </ul>                        
+                    </Card.Body>
+                </Card>
+            </div>            
+            }
             { (user.roles.includes('admin') || user.roles.includes('/api/v0/process/roomLabel')) &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">

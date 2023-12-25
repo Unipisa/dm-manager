@@ -635,4 +635,6 @@ class Controller {
     }
 }
 
+Controller.escapeRegExp = escapeRegExp
+
 module.exports = Controller

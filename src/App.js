@@ -23,6 +23,8 @@ import FormFillPage from './pages/FormFillPage'
 // Processes
 import AddSeminar from './processes/AddSeminar'
 import ManageSeminars from './processes/ManageSeminars'
+import ManageVisits from './processes/ManageVisits'
+import AddVisit from './processes/AddVisit'
 import ManageRoomLabels from './processes/ManageRoomLabels'
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
@@ -81,12 +83,20 @@ function Internal() {
        <Route path="/" element={<Home />} />
        <Route path="/profile" element={<Profile />} />
 
-       <Route path="/process/seminars" element={<ManageSeminars/>}></Route>
-       <Route path="/process/seminars/add" element={<AddSeminar/>}></Route>
-       <Route path="/process/seminars/add/:id" element={<AddSeminar/>}></Route>
-       <Route path="/process/roomLabels" element={<ManageRoomLabels/>}></Route>
+       <Route path="/process/seminars" element={<ManageSeminars/>}/>
+       <Route path="/process/seminars/add" element={<AddSeminar/>}/>
+       <Route path="/process/seminars/add/:id" element={<AddSeminar/>}/>
+
+       <Route path="/process/visits" element={<ManageVisits/>}/>
+       <Route path="/process/visits/add" element={<AddVisit/>}/>
+       <Route path="/process/visits/add/:id" element={<AddVisit/>}/>
+       
+       <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
+       
        {  Object.values(Models).map(x => x.routers()) }
+       
        <Route path="/map" element={<Map />} />
+       
        <Route path="*" element={<NotFound />} />
      </Routes>
    </Container>

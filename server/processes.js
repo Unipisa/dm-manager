@@ -9,6 +9,9 @@ router.use(requirePathPermissions)
 const seminarRouter = require('./controllers/processes/seminars')
 router.use('/seminars', seminarRouter)
 
+const visitRouter = require('./controllers/processes/visits')
+router.use('/visits', visitRouter)
+
 const roomLabelRouter = require('./controllers/processes/roomLabels')
 router.use('/roomLabels', roomLabelRouter)
 
