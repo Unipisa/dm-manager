@@ -15,8 +15,6 @@ export default function AddVisit() {
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento {query.error}</div>
 
-    console.log(`QUERY: ${JSON.stringify(query.data)}`)
-
     return <AddVisitForm visit={query.data}/>
 }
 
@@ -33,7 +31,7 @@ function AddVisitForm({visit}) {
             ? <Card className="shadow mb-3">
                 <Card.Header>
                     <div className="d-flex d-row justify-content-between">
-                        <div>Selezione visitatore: <strong>{data.person?.firstName} {data.person?.lastName}</strong></div>                    
+                        <div>Selezione visitatore: <strong>{data.person?.firstName} {data.person?.lastName}</strong> ({data.person.affiliations?.map(_ => _.name).join(', ') || '???'})</div>                    
                         <div className="btn btn-warning btn-sm" onClick={() => setData({...data, person: null})}>Annulla</div>
                     </div>
                 </Card.Header>
@@ -44,6 +42,10 @@ function AddVisitForm({visit}) {
     </PrefixProvider>
 
     async function onCompleted() {
+        if (data.person.affiliations && !data.affiliations?.length) {
+            data.affiliations = data.person.affiliations
+        }
+        data.affiliations = data.affiliations.map(_ => _._id)
         api.put('/api/v0/process/visits/save', data)
         queryClient.invalidateQueries(['process', 'visits'])
         navigate('/process/visits')     

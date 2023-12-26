@@ -4,6 +4,6 @@ module.exports = mongoose.model('Config', {
     migrations: [String],
     notifications: {
         visits: [String],
-        seminars:[String],
+        seminars: [String],
     },
  })

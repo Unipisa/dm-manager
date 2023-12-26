@@ -5,6 +5,7 @@ const { ObjectId } = require('mongoose').Types
 const Visit = require('../../models/Visit')
 const Person = require('../../models/Person')
 const Grant = require('../../models/Grant')
+const Institution = require('../../models/Institution')
 const PersonController = require('../PersonController')
 const { escapeRegExp } = require('../Controller')
 const { log } = require('../middleware')
@@ -26,20 +27,13 @@ router.get('/', async (req, res) => {
             localField: 'person',
             foreignField: '_id',
             as: 'person',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                }},
-            ]
         }},
         { $unwind: {
             path: '$person',
             preserveNullAndEmptyArrays: true,
         }},
         {$lookup: {
-            from: 'affiliations',
+            from: 'institutions',
             localField: 'affiliations',
             foreignField: '_id',
             as: 'affiliations',
@@ -132,10 +126,24 @@ router.get('/get/:id', async (req, res) => {
             foreignField: '_id',
             as: 'person',
             pipeline: [
+                { $lookup: {
+                    from: 'institutions',
+                    localField: 'affiliations',
+                    foreignField: '_id',
+                    as: 'affiliations',
+                    pipeline: [
+                        { $project: {
+                            _id: 1,
+                            name: 1,
+                        }},
+                    ]
+                }},
                 { $project: {
                     _id: 1,
                     firstName: 1,
                     lastName: 1,
+                    affiliations: 1,
+                    email: 1,
                 }},
             ]
         }},
@@ -144,7 +152,7 @@ router.get('/get/:id', async (req, res) => {
             preserveNullAndEmptyArrays: true,
         }},
         {$lookup: {
-            from: 'affiliations',
+            from: 'institutions',
             localField: 'affiliations',
             foreignField: '_id',
             as: 'affiliations',
@@ -239,6 +247,37 @@ router.get('/add/grant/search', async (req, res) => {
         }},
     ])
     res.json({ data })
+})
+
+router.get('/add/institution/search', async (req, res) => {
+    const $regex = new RegExp(escapeRegExp(req.query.q), 'i')
+    const data = await Institution.aggregate([
+        { $match: {$or: [
+            {name: { $regex } },
+            {alternativeNames: { $regex }},
+            {code: { $regex }},
+            {city: { $regex }},
+            {country: { $regex }},
+        ]}},
+        { $project: {
+            _id: 1,
+            name: 1,
+        }},
+    ])
+    res.json({ data })
+})
+
+router.put('/add/institution', async (req, res) => {
+    try {
+        const institution = new Institution({
+            ...req.body,
+            createdBy: req.user._id,
+            updatedBy: req.user._id,
+        })
+    } catch(error) {
+        res.status(400).json({ error: error.message })
+    }
+    res.json(institution)
 })
 
 module.exports = router
