@@ -78,7 +78,10 @@ const requirePathPermissions = async (req, res, next) => {
     }
     else {
         req.roles = req.user.roles
+        req.log_who = req.user.username
     }
+
+    console.log(`checking permissions for ${req.log_who} on ${fullUrl}`)
 
     const hasPermission = req.roles?.includes('admin') || req.roles.reduce(
         (x,y) => x || fullUrl.startsWith(y), false

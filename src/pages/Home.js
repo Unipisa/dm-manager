@@ -56,7 +56,8 @@ export default function Home() {
                     </Card.Header>
                     <Card.Body>
                         <ul>
-                            <li>Work in progress</li>
+                            <li>Inserisci visitatore</li>
+                            <li>Informazioni sui visiatori inseriti</li>
                         </ul>                        
                     </Card.Body>
                 </Card>

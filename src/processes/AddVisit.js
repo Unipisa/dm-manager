@@ -1,19 +1,34 @@
 import { Button, Card, Form } from 'react-bootstrap'
 import { useState } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { useQuery, useQueryClient } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { GrantInput, InputRow, DateInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
-import { myDateFormat } from '../Engine'
+import api from '../api'
+import Loading from '../components/Loading'
 
 export default function AddVisit() {
-    const [data, setData] = useState({
-        person: null
-    })
-    const [detailsDone, setDetailsDone] = useState(false)
+    const { id } = useParams()
+    const query = useQuery(['process', 'visits', 'get', id || 'new'])
+    if (query.isLoading) return <Loading />
+    if (query.isError) return <div>Errore caricamento {query.error}</div>
+
+    console.log(`QUERY: ${JSON.stringify(query.data)}`)
+
+    return <AddVisitForm visit={query.data}/>
+}
+
+function AddVisitForm({visit}) {
+    const [data, setData] = useState(visit)
+    const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     return <PrefixProvider value="/api/v0/process/visits/add">
-        <h1 className="text-primary pb-4">Inserimento nuova visita</h1>
+        <h1 className="text-primary pb-4">{visit._id 
+            ? "Modifica visita inserita"
+            : "Inserimento nuova visita"}</h1>
         { data.person 
             ? <Card className="shadow mb-3">
                 <Card.Header>
@@ -25,20 +40,14 @@ export default function AddVisit() {
             </Card>
             : <SelectPersonBlock title="Selezione speaker" label="Seaker" person={data.person} setPerson={setter(setData, 'person')}/>
         }
-        { data.person && !detailsDone && <VisitDetailsBlock data={data} setData={setData} onCompleted={() => setDetailsDone(true)}></VisitDetailsBlock> }
-        { data.person && detailsDone && <Card className="shadow mb-3">
-            <Card.Header>
-                <div className="d-flex d-row justify-content-between">
-                    <div>Dettagli della visita</div>
-                    <div className="btn btn-warning btn-sm" onClick={() => setDetailsDone(false)}>Modifica</div>
-                </div>
-            </Card.Header>
-            <Card.Body>
-                <strong>Date:</strong> {myDateFormat(data.startDate)} - {myDateFormat(data.endDate)}<br />
-                <strong>Grants:</strong> {data.grants.map(grant => grant.identifier).join(", ")}<br />
-            </Card.Body>
-        </Card> }
+        { data.person && <VisitDetailsBlock data={data} setData={setData} onCompleted={onCompleted}></VisitDetailsBlock> }
     </PrefixProvider>
+
+    async function onCompleted() {
+        api.put('/api/v0/process/visits/save', data)
+        queryClient.invalidateQueries(['process', 'visits'])
+        navigate('/process/visits')     
+    }
 }
 
 function VisitDetailsBlock({data, setData, onCompleted}) {
@@ -53,7 +62,18 @@ function VisitDetailsBlock({data, setData, onCompleted}) {
                 <DateInput value={data.endDate} setValue={setter(setData, "endDate")}/>
             </InputRow>
             <InputRow className="my-3" label="Grants">
-                <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} api_prefix="/api/v0/process/visits/add"/>
+                <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} />
+            </InputRow>
+            <InputRow className="my-3" label="Stanza">
+                <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})}/>
+                {} Richiedi una stanza
+            </InputRow>
+            <InputRow className="my-3" label="Seminario">
+                <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})}/>
+                {} E' previsto un seminario
+            </InputRow>
+            <InputRow className="my-3" label="Note">
+                <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">

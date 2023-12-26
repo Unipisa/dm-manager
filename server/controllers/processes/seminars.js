@@ -10,10 +10,9 @@ const PersonController = require('../PersonController')
 const InstitutionController = require('../InstitutionController')
 const EventSeminarController = require('../EventSeminarController')
 const GrantController = require('../GrantController')
-
 const Person = require('../../models/Person')
-
 const controller = new EventSeminarController()
+const {log} = require('../middleware')
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined) {
@@ -33,6 +32,7 @@ router.delete('/:id', async (req, res) => {
 
         if (req.user.equals(seminar.createdBy)) {
             await seminar.delete()
+            await log(req, seminar, {})
             res.json({})
         }
         else {
@@ -67,6 +67,7 @@ router.put('/save', async (req, res) => {
         if (! payload._id) {
             const seminar = EventSeminar(payload)
             await seminar.save()
+            await log(req, {}, payload)
         }
         else {
             const seminar = await EventSeminar.findById(payload._id)
@@ -76,8 +77,10 @@ router.put('/save', async (req, res) => {
             }
             delete payload.createdBy
             
+            const was = {...seminar}
             seminar.set({ ...seminar, ...payload })
             await seminar.save()
+            await log(req, was, payload)
         }
         res.send({})
     }

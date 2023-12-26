@@ -1,13 +1,15 @@
 const express = require('express')
-const router = express.Router()
+const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
 const Person = require('../../models/Person')
 const Grant = require('../../models/Grant')
 const PersonController = require('../PersonController')
-const GrantController = require('../GrantController')
 const { escapeRegExp } = require('../Controller')
+const { log } = require('../middleware')
+
+const router = express.Router()
 
 router.get('/', async (req, res) => {    
     if (!req.user) {
@@ -48,7 +50,7 @@ router.get('/', async (req, res) => {
                 }},
             ]
         }},
-])
+    ])
 
     res.json({ data })
 })
@@ -85,18 +87,23 @@ router.get('/add/person/search', async (req, res) => {
     res.json({ data })
 })
 
-/*
+router.put('/add/person', async (req, res) => {
+    const controller = new PersonController()
+    await controller.put(req, res)
+})
+
 router.delete('/:id', async (req, res) => {
     try {
-        const seminar = await EventSeminar.findById(new ObjectId(req.params.id))
+        const visit = await Visit.findById(new ObjectId(req.params.id))
 
-        if (req.user.equals(seminar.createdBy)) {
+        if (req.user._id.equals(seminar.createdBy)) {
             await seminar.delete()
+            log(req, seminar, {})
             res.json({})
         }
         else {
-            res.status(401).json({
-                error: "Cannot delete seminars created by other users"
+            res.status(403).json({
+                error: "Cannot delete visit created by other users"
             })
         }
     } catch(error) {
@@ -106,14 +113,70 @@ router.delete('/:id', async (req, res) => {
     }
 })
 
-
 router.get('/get/:id', async (req, res) => {
-    const controller = new EventSeminarController()
-    controller.performQuery({
-        _id: req.params.id, 
-        createdBy: req.user._id
-    }, res)
+    assert(req.user._id)
+    if (req.params.id === 'new') {
+        // return empty object
+        const visit = new Visit().toObject()
+        visit._id = undefined
+        return res.json(visit)
+    }
+    const data = await Visit.aggregate([
+        { $match: { 
+            _id: new ObjectId(req.params.id),
+            createdBy: req.user._id,
+        } },
+        { $lookup: {
+            from: 'people',
+            localField: 'person',
+            foreignField: '_id',
+            as: 'person',
+            pipeline: [
+                { $project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                }},
+            ]
+        }},
+        { $unwind: {
+            path: '$person',
+            preserveNullAndEmptyArrays: true,
+        }},
+        {$lookup: {
+            from: 'affiliations',
+            localField: 'affiliations',
+            foreignField: '_id',
+            as: 'affiliations',
+            pipeline: [
+                { $project: {
+                    _id: 1,
+                    name: 1,
+                }},
+            ]
+        }},
+        {$lookup: {
+            from: 'grants',
+            localField: 'grants',
+            foreignField: '_id',
+            as: 'grants',
+            pipeline: [
+                { $project: {
+                    _id: 1,
+                    name: 1,
+                    identifier: 1,
+                }},
+            ]
+        
+        }}
+    ])
+    if (data.length === 0) {
+        res.status(404).json({ error: "Not found" })
+        return
+    }
+    res.json(data[0])
 })
+
 
 router.put('/save', async (req, res) => {
     let payload = {
@@ -122,72 +185,27 @@ router.put('/save', async (req, res) => {
         updatedBy: req.user._id,
     }
 
-    try {
-        if (! payload._id) {
-            const seminar = EventSeminar(payload)
-            await seminar.save()
-        }
-        else {
-            const seminar = await EventSeminar.findById(payload._id)
-            if (!seminar.createdBy.equals(req.user._id)) {
-                res.status(403).json({ error: "Forbidden" })
-                return
-            }
-            delete payload.createdBy
-            
-            seminar.set({ ...seminar, ...payload })
-            await seminar.save()
-        }
-        res.send({})
-    }
-    catch (error) {
-        res.status(400).send({ error: error.message })
-    }
-})
-
-router.get('/add/person/by-email', async (req, res) => {
-    const email = req.query.email
-    if (email) {
-        const p = await Person.aggregate([
-            { $match: { email } }, 
-            { $project: {
-                _id: 1, 
-                firstName: 1, 
-                lastName: 1,
-                email: 1
-        }}])
-        res.json({ data: p })
+    if (! payload._id) {
+        const visit = new Visit(payload)
+        await visit.save()
+        log(req, {}, payload)
     }
     else {
-        res.status(404).json({ error: "Missing email field"})
+        const visit = await Visit.findById(payload._id)
+        if (!visit.createdBy.equals(req.user._id)) {
+            res.status(403).json({ error: "Forbidden" })
+            return
+        }
+        const was = {...visit}
+        delete visit.createdBy
+        
+        visit.set({ ...visit, ...payload })
+        await visit.save()
+        await log(req, was, payload)
     }
+    res.send({})
 })
 
-router.put('/add/person', async (req, res) => {
-    const controller = new PersonController()
-    await controller.put(req, res)
-})
-
-router.get('/add/seminar-category/search', async (req, res) => {
-    const controller = new SeminarCategoryController()
-    await controller.search(req, res)
-})
-
-router.get('/add/conference-room/search', async (req, res) => {
-    const controller = new ConferenceRoomController()
-    await controller.search(req, res)
-})
-
-router.get('/add/institution/search', async (req, res) => {
-    const controller = new InstitutionController()
-    await controller.search(req, res)
-})
-
-router.put('/add/institution', async (req, res) => {
-    const controller = new InstitutionController()
-    await controller.put(req, res)
-})
-*/
 router.get('/add/grant/search', async (req, res) => {
     const $regex = new RegExp(escapeRegExp(req.query.q), 'i')
     const data = await Grant.aggregate([

@@ -24,7 +24,7 @@ passport.deserializeUser(User.deserializeUser())
 
 // unipi oauth2 authentication
 if (config.OAUTH2_CLIENT_ID) {
-  console.log(`OAUTH2 authentication enabled: ${config.OAUTH2_CLIENT_ID}`)
+  console.log(`OAUTH2 authentication enabled for CLIENT_ID ${config.OAUTH2_CLIENT_ID}`)
 
   const oauthStrategy = new UnipiAuthStrategy({
     authorizationURL: config.OAUTH2_AUTHORIZE_URL,

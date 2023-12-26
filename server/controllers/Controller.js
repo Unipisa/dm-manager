@@ -451,7 +451,7 @@ class Controller {
             }}
         ]
         
-        console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
+        //console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
 
         let result = await this.Model.aggregate(pipeline)
         
