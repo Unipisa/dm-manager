@@ -8,6 +8,7 @@ import { GrantInput, InputRow, DateInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
+import {useEngine, myDateFormat} from '../Engine'
 
 export default function AddVisit() {
     const { id } = useParams()
@@ -22,26 +23,43 @@ function AddVisitForm({visit}) {
     const [data, setData] = useState(visit)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
+    const user = useEngine().user
 
     return <PrefixProvider value="/api/v0/process/visits/add">
         <h1 className="text-primary pb-4">{visit._id 
             ? "Modifica visita inserita"
             : "Inserimento nuova visita"}</h1>
-        { data.person 
-            ? <Card className="shadow mb-3">
-                <Card.Header>
-                    <div className="d-flex d-row justify-content-between">
-                        <div>Selezione visitatore: <strong>{data.person?.firstName} {data.person?.lastName}</strong> ({data.person.affiliations?.map(_ => _.name).join(', ') || '???'})</div>                    
-                        <div className="btn btn-warning btn-sm" onClick={() => setData({...data, person: null})}>Annulla</div>
-                    </div>
-                </Card.Header>
-            </Card>
-            : <SelectPersonBlock title="Selezione speaker" label="Seaker" person={data.person} setPerson={setter(setData, 'person')}/>
-        }
-        { data.person && <VisitDetailsBlock data={data} setData={setData} onCompleted={onCompleted}></VisitDetailsBlock> }
+        <SelectPersonBlock 
+            title="Selezione visitatore" 
+            label="Visitatore" 
+            person={data.person} setPerson={setter(setData, 'person')} 
+            done={nextStep}
+            cancel={() => {setData({...data, person: null});setActiveSection('person')}}
+            active={activeSection==='person'}
+        />
+        { data.person && 
+            <VisitDetailsBlock 
+                data={data} 
+                setData={setData} 
+                active={activeSection==='data'} 
+                done={nextStep} 
+                edit={() => setActiveSection('data')}
+            />}
+        <Button className="m-3" onClick={completed}>Salva</Button>
+        <Button classname="m-3 btn-warning" onClick={cancel}>Annulla</Button>
     </PrefixProvider>
 
-    async function onCompleted() {
+    function nextStep() {
+        let section = activeSection
+        section = {
+            'person': 'data',
+            'data': 'room'
+        }[section]
+        setActiveSection(section)
+    }
+
+    async function completed() {
         if (data.person.affiliations && !data.affiliations?.length) {
             data.affiliations = data.person.affiliations
         }
@@ -50,13 +68,18 @@ function AddVisitForm({visit}) {
         queryClient.invalidateQueries(['process', 'visits'])
         navigate('/process/visits')     
     }
+
+    function cancel() {
+        navigate('/process/visits')
+    }
 }
 
-function VisitDetailsBlock({data, setData, onCompleted}) {
-    return <Card className="shadow">
+function VisitDetailsBlock({data, setData, active, done, edit}) {
+    return <Card>
         <Card.Header>Dettagli della visita</Card.Header>
         <Card.Body>
-        <Form>
+        { active 
+        ? <><Form>
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
             </InputRow>
@@ -79,8 +102,23 @@ function VisitDetailsBlock({data, setData, onCompleted}) {
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
-            <Button className="text-end" onClick={onCompleted} disabled={!check()}>Salva</Button>
-        </div>
+            <Button className="text-end" onClick={done} disabled={!check()}>Fatto</Button>
+        </div></>
+        : <>
+            periodo: <b>{myDateFormat(data.startDate)} - {myDateFormat(data.endDate)}</b>
+            <br />
+            grants: {data.grants ? data.grants.map(grant => <><b>{grant.identifier}</b>&nbsp;</>) : 'nessun grant'}
+            <br />
+            {data.requireRoom ? "è richiesta una stanza" : "non è richiesta una stanza"}
+            <br />
+            {data.requireSeminar ? "è previsto un seminario" : "non è previsto un seminario"}
+            <br />
+            note: <b>{ data.notes || 'nessuna nota'}</b>
+            <div className="d-flex flex-row justify-content-end">
+                <Button className="text-end btn-warning btn-sm" onClick={edit}>Modifica</Button>
+            </div>
+        </>
+        }
         </Card.Body>
     </Card>
 

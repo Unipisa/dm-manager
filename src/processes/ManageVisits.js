@@ -3,6 +3,8 @@ import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import api from '../api'
 
+import { myDateFormat } from '../Engine'
+
 export default function ManageVisits() {
     return <>
         <h1 className="text-primary pb-0">Gestione visite</h1>
@@ -40,7 +42,7 @@ function VisitList() {
                     <Card.Body>
                         {/*JSON.stringify(visit)*/}
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />
-                        <strong>Data</strong>: {visit.startDate}<br></br>
+                        <strong>Periodo</strong>: {myDateFormat(visit.startDate)} – {myDateFormat(visit.endDate)}<br />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        
                             <button className="ms-2 btn btn-danger" onClick={() => deleteVisit(visit._id)}>
                                 Elimina
