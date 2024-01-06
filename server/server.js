@@ -113,7 +113,7 @@ function setup_routes(app) {
         }
       ])
       const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
-      if (isInternal) user.roles.push('/api/v0/process/seminars')
+      if (isInternal) user.roles.push('process/seminars')
       console.log(`sending user ${JSON.stringify(user)}`)
     }
 

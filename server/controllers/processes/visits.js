@@ -90,9 +90,9 @@ router.delete('/:id', async (req, res) => {
     try {
         const visit = await Visit.findById(new ObjectId(req.params.id))
 
-        if (req.user._id.equals(seminar.createdBy)) {
-            await seminar.delete()
-            log(req, seminar, {})
+        if (req.user._id.equals(visit.createdBy)) {
+            await visit.delete()
+            log(req, visit, {})
             res.json({})
         }
         else {
