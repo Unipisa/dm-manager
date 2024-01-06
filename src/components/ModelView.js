@@ -15,7 +15,7 @@ export default function ModelView({ Model, buttons, key }) {
             </Button>
         ),
         clone: () => (
-            <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('new')}?clone=${obj._id}`)}>
+            <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('__new__')}?clone=${obj._id}`)}>
                 duplica
             </Button>
         ),

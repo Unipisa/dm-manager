@@ -477,7 +477,7 @@ class Controller {
     }
 
     async get(req, res, id) {
-        if (id === 'new') {
+        if (id === '__new__') {
             const obj = (new this.Model()).toObject()
             obj._id = undefined
             return res.send(obj)

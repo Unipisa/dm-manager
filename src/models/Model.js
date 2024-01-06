@@ -72,18 +72,6 @@ export default class Model {
         }    
     }
 
-    // react elements to be inserted 
-    // in the home page
-    homeElements(user) {
-        if (user.hasSomeRole(...this.schema.managerRoles)) {
-            return [<Link to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>]
-        } else if (user.hasSomeRole(...this.schema.supervisorRoles)) {
-            return [<Link to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>]
-        } else {
-            return []
-        }    
-    }
-
     // brief description of given object
     describe(obj) { return "<object description not implemented>"}
 

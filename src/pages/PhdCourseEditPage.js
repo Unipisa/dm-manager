@@ -140,7 +140,7 @@ export default function PhdCourseEditPage({ Model }) {
     
     const [redirect, setRedirect] = useState(null)
 
-    const create = id === 'new'
+    const create = id === '__new__'
     const [modifiedObj, setModifiedObj] = useState(null)
     const engine = useEngine()
     const putObj = engine.usePut(Model.code)

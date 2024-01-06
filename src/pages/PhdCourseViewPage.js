@@ -48,7 +48,7 @@ const PhdCourseView = ({ Model }) => {
                     <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
                         Modifica
                     </Button>
-                    <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('new')}?clone=${obj._id}`)}>
+                    <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('__new__')}?clone=${obj._id}`)}>
                         Duplica
                     </Button>
                 </ButtonGroup>

@@ -109,7 +109,7 @@ router.delete('/:id', async (req, res) => {
 
 router.get('/get/:id', async (req, res) => {
     assert(req.user._id)
-    if (req.params.id === 'new') {
+    if (req.params.id === '__new__') {
         // return empty object
         const visit = new Visit().toObject()
         visit._id = undefined

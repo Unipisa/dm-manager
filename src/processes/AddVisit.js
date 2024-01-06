@@ -12,7 +12,7 @@ import {useEngine, myDateFormat} from '../Engine'
 
 export default function AddVisit() {
     const { id } = useParams()
-    const query = useQuery(['process', 'visits', 'get', id || 'new'])
+    const query = useQuery(['process', 'visits', 'get', id || '__new__'])
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento {query.error}</div>
 

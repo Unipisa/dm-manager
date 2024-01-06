@@ -8,7 +8,7 @@ import Timestamps from '../components/Timestamps'
 import Loading from '../components/Loading'
 
 export default function ModelEdit({Model, id, clone_id, onSave, onCancel, onDelete}) {
-    const create = (id === 'new')
+    const create = (id === '__new__')
     const [modifiedObj, setModifiedObj] = useState(null)
     const objCode = Model.code
     const objName = Model.name
