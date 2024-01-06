@@ -10,11 +10,29 @@ function new_user(json) {
         roles: [],
         ...json
     }
+
     // inject functionality into user object:
+
     user.hasSomeRole = (...roles) => {
         if (roles.includes('@any-logged-user')) return true
         return roles.some(role => user.roles.includes(role))
     }
+
+    /**
+     * 
+     * @param {*} process 
+     * @returns true if user has the admin role or has a role 
+     * which is process or a subpath of process
+     */
+    user.hasProcessPermission = (process) => {
+        process = process.split('/')
+        return user.roles.some(role => {
+            if (role === 'admin') return true
+            role = role.split('/')
+            return !process.some((part, i) => part !== role[i])
+        })
+    }
+
     return user
 }
 

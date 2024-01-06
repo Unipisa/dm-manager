@@ -21,7 +21,7 @@ export default function Home() {
     const processes = <>
         {/*<h4>Processi disponibili</h4>*/}
         <div className="row">
-            { (user.roles.includes('admin') || user.roles.includes('process/seminars')) &&
+            { (user.hasProcessPermission('process/seminars')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
@@ -40,7 +40,7 @@ export default function Home() {
                 </Card>
             </div>            
             }
-            { (user.roles.includes('admin') || user.roles.includes('process/visit')) &&
+            { (user.hasProcessPermission('process/visit')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
@@ -53,12 +53,14 @@ export default function Home() {
                         <ul>
                             <li>Inserisci visitatore</li>
                             <li>Informazioni sui visiatori inseriti</li>
-                        </ul>                 
+                            {user.hasProcessPermission('process/visit/room') && 
+                                <li>Assegna una stanza</li>}
+                        </ul>         
                     </Card.Body>
                 </Card>
             </div>            
             }
-            { (user.roles.includes('admin') || user.roles.includes('process/roomLabel')) &&
+            { (user.hasProcessPermission('process/roomLabel')) &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">
                 <Card.Header>                    
