@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import ModelViewPage from '../pages/ModelViewPage'
 import ModelEditPage from '../pages/ModelEditPage'
 import ModelsPage from '../pages/ModelsPage'
-import ModelHomeElement from '../components/ModelHomeElement'
 
 function capitalize(x) {
     if (x) {
@@ -54,8 +53,6 @@ export default class Model {
 
         // react element of object edit
         this.EditPage = ModelEditPage
-
-        this.HomeElement = ModelHomeElement
 
         // Category to be used in the navbar 
         this.ModelCategory = null

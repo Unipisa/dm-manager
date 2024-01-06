@@ -8,11 +8,6 @@ export default function Home() {
   const user = engine.user
   /*
   let modelElements = []
-  Object.values(Models).forEach(Model => {
-      Model.homeElements(user).forEach(
-        Element => modelElements.push([Model, Element])
-      )
-  })
 
   let items = modelElements.map(([Model, Element], i) =>
     <li key={i}>{Element}</li>)
@@ -32,7 +27,7 @@ export default function Home() {
                     <Card.Header>                    
                         <div className="d-flex flex-row justify-content-between">
                             <strong>Seminari</strong>
-                            <a href="/process/seminars"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                            <a href="/process/seminars"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                         </div>
                     </Card.Header>
                     <Card.Body>
@@ -51,7 +46,7 @@ export default function Home() {
                     <Card.Header>                    
                         <div className="d-flex flex-row justify-content-between">
                             <strong>Visitatori</strong>
-                            <a href="/process/visits"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                            <a href="/process/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                         </div>
                     </Card.Header>
                     <Card.Body>
@@ -69,7 +64,7 @@ export default function Home() {
                 <Card.Header>                    
                     <div className="d-flex flex-row justify-content-between">
                         <strong>Cartellini stanze</strong>
-                        <a href="/process/roomLabels"><button className="btn btn-sm btn-primary">Inizia</button></a>
+                        <a href="/process/roomLabels"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                     </div>
                 </Card.Header>
                 <Card.Body>
@@ -85,15 +80,6 @@ export default function Home() {
 
   return <>
     {processes}
-    {/*
-    <h4>Altre azioni</h4>
-      <p>{user.firstName}{user.roles && ` [${user.roles.join(', ')}]`}, 
-        puoi:
-      </p>
-      <ul>
-      { items }
-      </ul>
-        */}
     <p>
         Puoi accedere al <a href="/profile">tuo profilo</a>.
         Per problemi o informazioni scrivi a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>.
