@@ -842,6 +842,15 @@ const migrations = {
         db.collection('groups').createIndex({startDate: 1, endDate: 1})
         return true
     },
+
+    D20240106_rename_process_roles: async function(db) {
+        const users = db.collection('users')
+        for (const user of await users.find({}).toArray()) {
+            user.roles = user.roles.map(role => role.replace('/api/v0/', ''))
+            await users.updateOne({ _id: user._id }, { $set: { roles: user.roles } })
+        }
+        return true
+    },
 }
 
 async function migrate(db, options) {
