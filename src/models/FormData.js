@@ -23,7 +23,6 @@ export default class FormData extends Model {
         this.ViewPage = null
         this.EditPage = null
         this.IndexPage = null
-        this.HomeElement = null
         this.MenuElement = null
     }
 

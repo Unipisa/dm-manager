@@ -33,12 +33,5 @@ export default class RoomLabel extends Model {
             return []
         }
     }
-
-    homeElements(user) {
-        if (user.hasSomeRole(...this.schema.managerRoles)) {
-            return [<Link key={this.code} to={this.indexUrl()}>gestire {this.articulation['gli oggetti']}</Link>]
-        } else {
-            return [<Link key={this.code} to={this.indexUrl()}>visualizzare {this.articulation['gli oggetti']}</Link>]
-        } 
     }*/
 }
