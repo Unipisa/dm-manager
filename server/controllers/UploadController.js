@@ -11,6 +11,7 @@ const valid_mimetypes = [
 class UploadController {
 
     register(router) {
+        router.get('/upload', (req, res) => res.send({ config })),
         router.get('/upload/:id', (req, res) => this.getPhoto(req, res, req.params.id))
         router.post('/upload', (req, res) => this.postPhoto(req, res))
         return []
@@ -72,7 +73,7 @@ class UploadController {
                 return
             }
 
-            res.send({ upload, url: `${config.REACT_APP_SERVER_URL}${config.API_PATH}/upload/${upload._id}` })
+            res.send({ upload, url: `${config.BASE_URL}${config.API_PATH}/upload/${upload._id}` })
         }
     }
 

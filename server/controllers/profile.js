@@ -48,7 +48,7 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
         
-        const people = await Person.find({ email: user.email })
+        const people = user.email ? await Person.find({ email: user.email }) : []
 
         const data = await Staff.aggregate([
             // match person in people
@@ -66,7 +66,7 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = await Person.find({ email: user.email })
+        const people = user.email ? await Person.find({ email: user.email }) : []
 
         const data = await RoomAssignment.aggregate([
             // match person in people
@@ -92,7 +92,7 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = await Person.find({ email: user.email })
+        const people = user.email ? await Person.find({ email: user.email }) : []
         const people_ids = people.map(p => p._id)
 
         const data = await Group.aggregate([
@@ -115,7 +115,7 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = await Person.find({ email: user.email })
+        const people = user.email ? await Person.find({ email: user.email }) : []
         const people_ids = people.map(p => p._id)
 
         const data = await Visit.aggregate([
@@ -145,7 +145,7 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = await Person.find({ email: user.email })
+        const people = user.email ? await Person.find({ email: user.email }) : []
         const people_ids = people.map(p => p._id)
 
         const data = await Grant.aggregate([
@@ -168,7 +168,7 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
         
-        const people = await Person.find({ email: user.email })
+        const people = user.email ? await Person.find({ email: user.email }) : []
         const people_ids = people.map(p => p._id)
         
         const data = await Thesis.aggregate([
@@ -204,7 +204,7 @@ module.exports = function profile(router, path) {
         const payload = req.body
         try {
             const person = await Person.findById(id)
-            if (person.email != user.email && !person.alternativeEmails.includes(user.email)) {
+            if (!user.email || (person.email != user.email && !person.alternativeEmails.includes(user.email))) {
                 // not authorized
                 res.status(401).send({error: "Not authorized"})
                 return
