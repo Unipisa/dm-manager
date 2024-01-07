@@ -270,9 +270,9 @@ async function createOrUpdateUser({
   if (!user) {
     user = await User.create({ 
       username, 
-      lastName: lastName || username,
-      firstName: firstName || username,
-      email,
+      lastName: username,
+      firstName: username,
+      email: `${username}@nomail.com`,
     })
     console.log(`Created new user ${user.username}`)
   } else {

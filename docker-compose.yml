@@ -12,9 +12,9 @@ services:
       - 127.0.0.1:27017:27017
     restart: unless-stopped
 
-  nginx:
-    image: nginx
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf
-    ports:
-      - "8080:80"
+#  nginx:
+#    image: nginx
+#    volumes:
+#      - ./nginx.conf:/etc/nginx/nginx.conf
+#    ports:
+#      - "8080:80"

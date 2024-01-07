@@ -1,18 +1,3 @@
-## Development using Github's codespace
-
-When using Github's codespaces, you need the following steps to get up and running. Open a terminal and type:
-```bash
-export ADMIN_USER=admin
-export ADMIN_PASSWORD=secret
-
-sudo docker compose up -d 
-npm run server 
-
-# In another terminal tab
-npm start
-```
-The server now runs on port ```8080``` (ignore the tab that automatically opens for port ```3000```), which can be accessed from the **Ports** tab.
-
 ## development
 
 Install the packages with 
@@ -24,6 +9,7 @@ Use two terminals for backend and frontend.
 
 For the backend you have to start a mongodb instance once. You can use 
 docker:
+
 ```
 docker-compose up -d
 ```

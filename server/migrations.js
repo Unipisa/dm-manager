@@ -458,7 +458,8 @@ const migrations = {
         const room_mapping = {}
 
         for (const room of await conferencerooms.find({}).toArray()) {
-            for (const name of room.names) {
+            console.log(`room ${room._id} names: ${room.names}`)
+            for (const name of (room.names || [])) {
                 room_mapping[name] = room._id
             }
         }
