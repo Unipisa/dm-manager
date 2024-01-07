@@ -105,7 +105,7 @@ export default function AddSeminar() {
         navigate('/process/seminars')
     }
 
-    return <PrefixProvider value="/api/v0/process/seminars/add">
+    return <PrefixProvider value="process/seminars/add">
         <h1 className="text-primary pb-4">Inserimento nuovo seminario</h1>
         { person 
             ? <Card className="shadow mb-3">

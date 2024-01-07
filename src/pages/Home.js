@@ -21,7 +21,7 @@ export default function Home() {
     const processes = <>
         {/*<h4>Processi disponibili</h4>*/}
         <div className="row">
-            { (user.hasProcessPermission('process/seminars')) &&
+            { (user.hasProcessPermission('/process/seminars')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
@@ -40,27 +40,27 @@ export default function Home() {
                 </Card>
             </div>            
             }
-            { (user.hasProcessPermission('process/visit')) &&
+            { (user.hasProcessPermission('/process/my/visits')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
                         <div className="d-flex flex-row justify-content-between">
                             <strong>Visitatori</strong>
-                            <a href="/process/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                            <a href="/process/my/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                         </div>
                     </Card.Header>
                     <Card.Body>
                         <ul>
                             <li>Inserisci visitatore</li>
-                            <li>Informazioni sui visiatori inseriti</li>
-                            {user.hasProcessPermission('process/visit/room') && 
+                            <li>Informazioni sui visitatori inseriti</li>
+                            {user.hasProcessPermission('/process/visits/') && 
                                 <li>Assegna una stanza</li>}
                         </ul>         
                     </Card.Body>
                 </Card>
             </div>            
             }
-            { (user.hasProcessPermission('process/roomLabel')) &&
+            { (user.hasProcessPermission('/process/roomLabel')) &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">
                 <Card.Header>                    

@@ -21,11 +21,11 @@ import {QueryClient, QueryClientProvider } from 'react-query'
 import FormFillPage from './pages/FormFillPage'
 
 // Processes
-import AddSeminar from './processes/AddSeminar'
-import ManageSeminars from './processes/ManageSeminars'
-import ManageVisits from './processes/ManageVisits'
-import AddVisit from './processes/AddVisit'
-import ManageRoomLabels from './processes/ManageRoomLabels'
+import AddSeminar from './processes/Seminar'
+import ManageSeminars from './processes/Seminars'
+import ManageVisits from './processes/Visits'
+import AddVisit from './processes/Visit'
+import ManageRoomLabels from './processes/RoomLabels'
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
 
@@ -87,9 +87,8 @@ function Internal() {
        <Route path="/process/seminars/add" element={<AddSeminar/>}/>
        <Route path="/process/seminars/add/:id" element={<AddSeminar/>}/>
 
-       <Route path="/process/visits" element={<ManageVisits/>}/>
-       <Route path="/process/visits/add" element={<AddVisit/>}/>
-       <Route path="/process/visits/add/:id" element={<AddVisit/>}/>
+       <Route path="/process/my/visits" element={<ManageVisits/>}/>
+       <Route path="/process/my/visits/:id" element={<AddVisit/>}/>
        
        <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
        

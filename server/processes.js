@@ -6,16 +6,12 @@ const { requirePathPermissions } = require('./controllers/middleware')
 
 router.use(requirePathPermissions)
 
-const seminarRouter = require('./controllers/processes/seminars')
-router.use('/seminars', seminarRouter)
+router.use('/seminars', require('./controllers/processes/seminars'))
 
-const visitRouter = require('./controllers/processes/visits')
-router.use('/visits', visitRouter)
+router.use('/my/visits', require('./controllers/processes/visits'))
 
-const roomLabelRouter = require('./controllers/processes/roomLabels')
-router.use('/roomLabels', roomLabelRouter)
+router.use('/roomLabels', require('./controllers/processes/roomLabels'))
 
-const planimetrieRouter = require('./controllers/processes/planimetrie')
-router.use('/planimetrie', planimetrieRouter)
+router.use('/planimetrie', require('./controllers/processes/planimetrie'))
 
 module.exports = router

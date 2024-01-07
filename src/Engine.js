@@ -25,9 +25,10 @@ function new_user(json) {
      * which is process or a subpath of process
      */
     user.hasProcessPermission = (process) => {
+        console.log(`hasProcessPermission(${process}) roles:${user.roles.join(',')})}`)
         process = process.split('/')
         return user.roles.some(role => {
-            if (role === 'admin') return true
+            //if (role === 'admin') return true
             role = role.split('/')
             return !process.some((part, i) => part !== role[i])
         })

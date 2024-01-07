@@ -8,7 +8,7 @@ import { myDateFormat } from '../Engine'
 export default function ManageVisits() {
     return <>
         <h1 className="text-primary pb-0">Gestione visite</h1>
-        <a href="/process/visits/add">
+        <a href="/process/my/visits/__new__">
             <button className="btn btn-primary my-3">Nuova visita</button>
         </a>
         <div className="row">
@@ -19,7 +19,7 @@ export default function ManageVisits() {
 
 function VisitList() {
     const queryClient = useQueryClient()
-    const { isLoading, error, data } = useQuery([ 'process', 'visits' ])
+    const { isLoading, error, data } = useQuery([ 'process', 'my', 'visits' ])
 
     if (isLoading) {
         return "Loading"
@@ -30,7 +30,7 @@ function VisitList() {
     }
 
     const deleteVisit = async (id) => {
-        await api.del("/api/v0/process/visits/" + id)        
+        await api.del("/api/v0/process/my/visits/" + id)        
         queryClient.invalidateQueries([ 'process', 'visits' ])
     }
 
@@ -44,10 +44,11 @@ function VisitList() {
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />
                         <strong>Periodo</strong>: {myDateFormat(visit.startDate)} – {myDateFormat(visit.endDate)}<br />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        
+                            {/*
                             <button className="ms-2 btn btn-danger" onClick={() => deleteVisit(visit._id)}>
                                 Elimina
-                            </button>
-                            <Link className="ms-2" to={"/process/visits/add/" + visit._id}>
+                            </button>*/}
+                            <Link className="ms-2" to={"/process/my/visits/" + visit._id}>
                                 <button className="btn btn-primary">
                                     Modifica
                                 </button>

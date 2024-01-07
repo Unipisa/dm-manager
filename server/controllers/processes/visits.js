@@ -3,14 +3,17 @@ const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
-const Person = require('../../models/Person')
 const Grant = require('../../models/Grant')
-const Institution = require('../../models/Institution')
-const PersonController = require('../PersonController')
 const { escapeRegExp } = require('../Controller')
 const { log } = require('../middleware')
 
 const router = express.Router()
+
+// inject functionality for the person select widget
+require('./personSearch')(router)
+
+// inject room assignment functionality
+// require('./roomAssignment')(router)
 
 router.get('/', async (req, res) => {    
     if (!req.user) {
@@ -49,65 +52,29 @@ router.get('/', async (req, res) => {
     res.json({ data })
 })
 
-router.get('/add/person/search', async (req, res) => {
-    const $regex = new RegExp(escapeRegExp(req.query.q), 'i')
-    const data = await Person.aggregate([
-        {$lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                {$project: {
-                    _id: 1,
-                    name: 1,
-                }}
-            ]
-        }},
-        {$project: {
-            _id: 1,
-            firstName: 1,
-            lastName: 1,
-            email: 1,
-            affiliations: 1,
-        }},
-        {$match: { $or: [
-            { firstName: { $regex }},
-            { lastName: { $regex }},
-            { email: { $regex }},
-        ]}},
-    ])
-
-    res.json({ data })
-})
-
-router.put('/add/person', async (req, res) => {
-    const controller = new PersonController()
-    await controller.put(req, res)
-})
-
 router.delete('/:id', async (req, res) => {
+    let visit 
     try {
-        const visit = await Visit.findById(new ObjectId(req.params.id))
-
-        if (req.user._id.equals(visit.createdBy)) {
-            await visit.delete()
-            log(req, visit, {})
-            res.json({})
-        }
-        else {
-            res.status(403).json({
-                error: "Cannot delete visit created by other users"
-            })
-        }
+        visit = await Visit.findById(new ObjectId(req.params.id))
     } catch(error) {
-        res.status(400).json({
-            error: error.message
+        return res.status(400).json({
+            error: error.message,
+            id: req.params.id
         })
     }
-})
 
-router.get('/get/:id', async (req, res) => {
+    if (!req.user._id.equals(visit.createdBy)) {
+        return res.status(403).json({
+            error: "Cannot delete visit created by other users"
+        })
+    }
+
+    await visit.delete()
+    log(req, visit, {})
+    res.json({})
+    })
+
+router.get('/:id', async (req, res) => {
     assert(req.user._id)
     if (req.params.id === '__new__') {
         // return empty object
@@ -115,9 +82,15 @@ router.get('/get/:id', async (req, res) => {
         visit._id = undefined
         return res.json(visit)
     }
+    let _id
+    try {
+        _id = new ObjectId(req.params.id)
+    } catch(error) {
+        return res.status(400).json({ error: `Invalid id: ${req.params.id}` })
+    }
     const data = await Visit.aggregate([
         { $match: { 
-            _id: new ObjectId(req.params.id),
+            _id,
             createdBy: req.user._id,
         } },
         { $lookup: {
@@ -176,7 +149,54 @@ router.get('/get/:id', async (req, res) => {
                 }},
             ]
         
-        }}
+        }},
+        {$lookup: {
+            from: "roomassignments",
+            let: { start: "$startDate", end: "$endDate" },
+            localField: 'person._id',
+            foreignField: "person",
+            as: 'roomAssignments',
+            pipeline: [
+                // inserisce i dati della stanza
+                {$lookup: {
+                    from: "rooms",
+                    localField: "room",
+                    foreignField: "_id",
+                    as: "room",
+                }},
+                {$project: {
+                    "startDate": 1,
+                    "endDate": 1,
+                    "room._id": 1,
+                    "room.code": 1,
+                    "room.building": 1,
+                    "room.floor": 1,
+                    "room.number": 1,
+                }},
+                // tiene solo le assegnazioni che includono il periodo [start, end] 
+                {$match: {
+                    $expr: {
+                        $and: [
+                            { $or: [
+                                { $eq: ["$$end", null] },
+                                { $eq: ["$startDate", null] },
+                                { $lte: ["$startDate", "$$end"] } ]},
+                            { $or: [
+                                { $eq: ["$$start", null] },
+                                { $eq: ["$endDate", null] },
+                                { $gte: ["$endDate", "$$start"] } ]}
+                        ]},
+                    },
+                },
+                {$unwind: {
+                    path: "$room",
+                    preserveNullAndEmptyArrays: true
+                }},
+                // ordina per data finale...
+                // l'ultima assegnazione dovrebbe essere quella attuale
+                {$sort: {"endDate": 1}},
+            ]
+        }},
     ])
     if (data.length === 0) {
         res.status(404).json({ error: "Not found" })
@@ -185,36 +205,53 @@ router.get('/get/:id', async (req, res) => {
     res.json(data[0])
 })
 
+router.put('/', async (req, res) => {
+    const payload = {...req.body}
 
-router.put('/save', async (req, res) => {
-    let payload = {
-        ...req.body,
-        createdBy: req.user._id,
-        updatedBy: req.user._id,
-    }
+    // override fields that user cannot change
+    payload.createdBy = req.user._id
+    payload.updatedBy = req.user._id
+    delete payload._id
 
-    if (! payload._id) {
-        const visit = new Visit(payload)
-        await visit.save()
-        log(req, {}, payload)
+    const visit = new Visit(payload)
+    await visit.save()
+
+    log(req, {}, payload)
+
+    res.send({_id: visit._id})
+})
+
+router.patch('/:id', async (req, res) => {
+    const payload = {...req.body}
+
+    // remove fields that user cannot change
+    delete payload._id
+    delete payload.createdBy
+    payload.updatedBy = req.user._id
+
+    const visit = await Visit.findById(req.params.id)
+    
+    // check that the visit belongs to the user
+    if (!visit.createdBy.equals(req.user._id)) {
+        res.status(403).json({ error: "Forbidden" })
+        return
     }
-    else {
-        const visit = await Visit.findById(payload._id)
-        if (!visit.createdBy.equals(req.user._id)) {
-            res.status(403).json({ error: "Forbidden" })
-            return
-        }
-        const was = {...visit}
-        delete visit.createdBy
         
-        visit.set({ ...visit, ...payload })
+    // patch the visit
+    const was = {...visit}
+    visit.set({ ...visit, ...payload })
+    try {
+        console.log(`saving visit: ${JSON.stringify({visit, id: req.params.id})}`)
         await visit.save()
-        await log(req, was, payload)
+    } catch(error) {
+        return res.status(400).json({ error: error.message })
     }
+    await log(req, was, payload)
+
     res.send({})
 })
 
-router.get('/add/grant/search', async (req, res) => {
+router.get('/grant/search', async (req, res) => {
     const $regex = new RegExp(escapeRegExp(req.query.q), 'i')
     const data = await Grant.aggregate([
         { $lookup: {
@@ -247,37 +284,6 @@ router.get('/add/grant/search', async (req, res) => {
         }},
     ])
     res.json({ data })
-})
-
-router.get('/add/institution/search', async (req, res) => {
-    const $regex = new RegExp(escapeRegExp(req.query.q), 'i')
-    const data = await Institution.aggregate([
-        { $match: {$or: [
-            {name: { $regex } },
-            {alternativeNames: { $regex }},
-            {code: { $regex }},
-            {city: { $regex }},
-            {country: { $regex }},
-        ]}},
-        { $project: {
-            _id: 1,
-            name: 1,
-        }},
-    ])
-    res.json({ data })
-})
-
-router.put('/add/institution', async (req, res) => {
-    try {
-        const institution = new Institution({
-            ...req.body,
-            createdBy: req.user._id,
-            updatedBy: req.user._id,
-        })
-    } catch(error) {
-        res.status(400).json({ error: error.message })
-    }
-    res.json(institution)
 })
 
 module.exports = router

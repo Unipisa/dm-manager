@@ -17,7 +17,7 @@ async function api_fetch(url, options) {
     }
     if (response.status !== 200) throw new Error("server error")
     const data = await response.json()
-    // console.log(`fetching ${url} done`)
+    // console.log(`fetching ${url} done, data: ${JSON.stringify(data)}`)
     return data
 }
 

@@ -270,7 +270,6 @@ async function createOrUpdateUser({
       lastName,
       firstName,
       email,
-      roles,
     })
   } else {
     await User.findByIdAndUpdate(user._id, {
@@ -278,13 +277,19 @@ async function createOrUpdateUser({
       lastName,
       firstName,
       email,
-      roles,
       })
   }
   if (password) {
       await user.setPassword(password)
       await user.save()
   }
+
+  for (let role of roles) {
+    if (!user.roles.includes(role)) {
+      user.roles.push(role)
+      await user.save()
+    }
+  } 
 
   return user
 }

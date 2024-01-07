@@ -194,7 +194,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     function handleClose() {
         // Add a new person with the given data
         console.log(`Creating new object (${objCode})`, newObject)
-        api.put(`${api_prefix}/${objCode}`, newObject).then(data => {      
+        api.put(`/api/v0/${api_prefix}/${objCode}`, newObject).then(data => {      
             console.log("New object created", data)
             console.log("value", value)
             if (multiple) {
@@ -232,7 +232,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     const handleSearch = (query) => {
         setIsLoading(true)
        
-        api.get(`${api_prefix}/${objCode}/search`, {q: query}).then((data) => {
+        api.get(`/api/v0/${api_prefix}/${objCode}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
             })
@@ -425,7 +425,7 @@ export function MultipleSelectInput({ options, value, setValue}) {
     </select>
 }
 
-export function RoomInput({ value, setValue, api_prefix }) {
+export function RoomInput({ value, setValue }) {
     const engine = useEngine()
     const path = 'room'
     const query = useQuery([path], () => api.get(`/api/v0/${path}`,{_sort: 'code', _limit: 1000}), {
@@ -448,7 +448,7 @@ export function RoomInput({ value, setValue, api_prefix }) {
     />
 }
 
-export function ConferenceRoomInput({ value, setValue, api_prefix }) {
+export function ConferenceRoomInput({ value, setValue }) {
     return <ObjectInput
         value={value}
         setValue={setValue}
@@ -464,7 +464,7 @@ export function ConferenceRoomInput({ value, setValue, api_prefix }) {
     />
 }
 
-export function SeminarCategoryInput({ value, setValue, api_prefix }) {
+export function SeminarCategoryInput({ value, setValue }) {
     return <ObjectInput
         value={value}
         setValue={setValue}
@@ -507,7 +507,7 @@ export function SeminarCategoryInput({ value, setValue, api_prefix }) {
 //     />
 // }
 
-export function InstitutionInput({ value, setValue, multiple, api_prefix }) {
+export function InstitutionInput({ value, setValue, multiple }) {
     return <ObjectInput 
         value={value} 
         setValue={setValue} 

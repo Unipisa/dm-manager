@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 
-const PrefixContext = createContext("/api/v0")
+const PrefixContext = createContext('')
 
 export function usePrefix() {
     return useContext(PrefixContext)
