@@ -164,9 +164,10 @@ function RoomAssignments({data, active, done, edit}) {
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
                 <div>Assegnazione stanza</div>
-                { !active && <div>
+                <div>[gestito dalla segreteria]</div>
+                {/* !active && <div>
                     <Button className="text-end btn-warning btn-sm" onClick={edit}>Modifica</Button>
-                </div>}
+</div>*/}
             </div>  
         </Card.Header>
         <Card.Body>
