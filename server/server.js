@@ -112,9 +112,18 @@ function setup_routes(app) {
           }
         }
       ])
+
       const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
-      if (isInternal) user.roles.push('process/seminars')
-      console.log(`sending user ${JSON.stringify(user)}`)
+
+      if (isInternal) add_role('/process/seminars')
+
+      // TODO: includere solo il personale docente
+      if (isInternal) add_role('/process/my/visits')
+
+      function add_role(role) {
+        if (!user.roles.includes(role)) user.roles.push(role)
+      }
+      // console.log(`sending user ${JSON.stringify(user)}`)
     }
 
     next()
@@ -254,40 +263,34 @@ function setup_routes(app) {
 async function createOrUpdateUser({
     username, 
     password,
-    lastName,
-    firstName, 
-    email, 
     roles, }) {
   if (!username) throw new Error("username is required")
-  if (!lastName) lastName = username
-  if (!firstName) firstName = username
-  if (!roles) roles = []
 
   let user = await User.findOne({ username })
   if (!user) {
     user = await User.create({ 
       username, 
-      lastName,
-      firstName,
+      lastName: lastName || username,
+      firstName: firstName || username,
       email,
     })
+    console.log(`Created new user ${user.username}`)
   } else {
-    await User.findByIdAndUpdate(user._id, {
-      username,
-      lastName,
-      firstName,
-      email,
-      })
+      console.log(`Found user: ${user.username}`)
   }
   if (password) {
       await user.setPassword(password)
       await user.save()
+      console.log(`Password of user ${user.username} reset (password is ${password.length} characters long)`)
   }
 
   for (let role of roles) {
     if (!user.roles.includes(role)) {
       user.roles.push(role)
       await user.save()
+      console.log(`Added role ${role} to user ${user.username}`)
+    } else {
+      console.log(`User ${user.username} already has role ${role}`)
     }
   } 
 

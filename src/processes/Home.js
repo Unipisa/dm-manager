@@ -30,6 +30,25 @@ export default function Home({}) {
                 <Card className="shadow">
                     <Card.Header>                    
                         <div className="d-flex flex-row justify-content-between">
+                            <strong>I Miei Visitatori</strong>
+                            <a href="/process/my/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Inserisci un tuo visitatore</li>
+                            <li>Informazioni sui tuoi visitatori inseriti</li>    
+                        </ul>         
+                        <b>*** il servizio è in fase sperimentale ***</b>
+                    </Card.Body>
+                </Card>
+            </div>            
+            }
+            { (user.hasProcessPermission('/process/visits')) &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
                             <strong>Visitatori</strong>
                             <a href="/process/my/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                         </div>

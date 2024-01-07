@@ -47,7 +47,7 @@ function EditVisitForm({visit}) {
                 done={() => {save();nextStep()}} 
                 edit={() => setActiveSection('data')}
             />}
-        { data.requireRoom &&
+        { (data.requireRoom || data.roomAssignments?.length>0)  &&
             <RoomAssignments 
                 data={data} 
                 active={activeSection==='room'}
