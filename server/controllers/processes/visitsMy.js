@@ -10,7 +10,9 @@ const router = express.Router()
 // inject functionality on the current route
 require('./personSearch')(router)
 require('./grantSearch')(router)
-require('./roomAssignment')(router)
+
+// inject room assignment functionality
+// require('./roomAssignment')(router)
 
 const DAYS_BACK = 30
 
@@ -31,6 +33,7 @@ router.get('/', async (req, res) => {
 
     const data = await Visit.aggregate([
         { $match: { 
+            createdBy: req.user._id,
             endDate: { $gte: pastDate() },
         }},
         { $lookup: {
@@ -64,6 +67,7 @@ router.delete('/:id', async (req, res) => {
     assert(req.user._id) 
     const visit = await Visit.findOneAndDelete({
         _id: new ObjectId(req.params.id),
+        createdBy: req.user._id,
         endDate: { $gte: pastDate() },
     })
     log(req, visit, {})
@@ -87,6 +91,7 @@ router.get('/:id', async (req, res) => {
     const data = await Visit.aggregate([
         { $match: { 
             _id,
+            createdBy: req.user._id,
             endDate: { $gte: pastDate() },
         }},
         { $lookup: {
@@ -231,6 +236,7 @@ router.patch('/:id', async (req, res) => {
 
     const visit = await Visit.findOneAndUpdate(
         {   _id: new ObjectId(req.params.id),
+            createdBy: req.user._id,
             endDate: { $gte: pastDate() }}, 
         payload)
 

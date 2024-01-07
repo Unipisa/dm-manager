@@ -560,7 +560,7 @@ class Controller {
     }
 
     async delete(req, res, id) {
-        console.log(`*** DELETE ${req.path}`)
+        console.log(`*** DELETE ${req.path} id=${id}`)
         try {
             const obj = await this.Model.findById(id)
             await log(req, obj.toObject(), {})

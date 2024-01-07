@@ -49,16 +49,15 @@ export default function Home({}) {
                 <Card className="shadow">
                     <Card.Header>                    
                         <div className="d-flex flex-row justify-content-between">
-                            <strong>Visitatori</strong>
-                            <a href="/process/my/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                            <strong>Gestione Visitatori</strong>
+                            <a href="/process/visits"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                         </div>
                     </Card.Header>
                     <Card.Body>
                         <ul>
                             <li>Inserisci visitatore</li>
                             <li>Informazioni sui visitatori inseriti</li>
-                            {user.hasProcessPermission('/process/visits/') && 
-                                <li>Assegna una stanza</li>}
+                            <li>Assegnazione stanza</li>
                         </ul>         
                     </Card.Body>
                 </Card>

@@ -23,8 +23,8 @@ import FormFillPage from './pages/FormFillPage'
 // Processes
 import AddSeminar from './processes/Seminar'
 import ManageSeminars from './processes/Seminars'
-import ManageVisits from './processes/Visits'
-import AddVisit from './processes/Visit'
+import ProcessVisits from './processes/Visits'
+import ProcessVisit from './processes/Visit'
 import ManageRoomLabels from './processes/RoomLabels'
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
@@ -87,8 +87,10 @@ function Internal() {
        <Route path="/process/seminars/add" element={<AddSeminar/>}/>
        <Route path="/process/seminars/add/:id" element={<AddSeminar/>}/>
 
-       <Route path="/process/my/visits" element={<ManageVisits/>}/>
-       <Route path="/process/my/visits/:id" element={<AddVisit/>}/>
+       <Route path="/process/my/visits" element={<ProcessVisits variant="my/"/>}/>
+       <Route path="/process/my/visits/:id" element={<ProcessVisit variant="my/"/>}/>
+       <Route path="/process/visits" element={<ProcessVisits variant=""/>}/>
+       <Route path="/process/visits/:id" element={<ProcessVisit variant=""/>}/>
        
        <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
        

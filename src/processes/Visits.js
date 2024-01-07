@@ -1,25 +1,28 @@
 import { useQuery, useQueryClient } from 'react-query'
 import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
-import api from '../api'
 
 import { myDateFormat } from '../Engine'
 
-export default function ManageVisits() {
+export default function ProcessVisits({variant}) {
+    // variant è '' per /process/visits
+    // ed è 'my/' per /process/my/visits
+
     return <>
-        <h1 className="text-primary pb-0">Gestione visite</h1>
-        <a href="/process/my/visits/__new__">
+        <h1 className="text-primary pb-0">Gestione {variant==='my/'?"mie":""} visite</h1>
+        <a href={`/process/${variant}visits/__new__`}>
             <button className="btn btn-primary my-3">Nuova visita</button>
         </a>
         <div className="row">
-            <VisitList />
+            <VisitList variant={variant}/>
         </div>
+        Vengono visualizzate le visite terminate da non più di 30 giorni.
     </>
 }
 
-function VisitList() {
+function VisitList({variant}) {
     const queryClient = useQueryClient()
-    const { isLoading, error, data } = useQuery([ 'process', 'my', 'visits' ])
+    const { isLoading, error, data } = useQuery(`process/${variant}visits`.split('/'))
 
     if (isLoading) {
         return "Loading"
@@ -29,12 +32,8 @@ function VisitList() {
         return "Error: " + error.message
     }
 
-    const deleteVisit = async (id) => {
-        await api.del("/api/v0/process/my/visits/" + id)        
-        queryClient.invalidateQueries([ 'process', 'visits' ])
-    }
-
-    return data.data.map(
+    return <>
+        {data.data.map(
             visit => {
             return <div className="p-3 col-lg-6 p-0" key={visit._id}>
                 <Card className="shadow">
@@ -48,7 +47,7 @@ function VisitList() {
                             <button className="ms-2 btn btn-danger" onClick={() => deleteVisit(visit._id)}>
                                 Elimina
                             </button>*/}
-                            <Link className="ms-2" to={"/process/my/visits/" + visit._id}>
+                            <Link className="ms-2" to={`/process/${variant}visits/${visit._id}`}>
                                 <button className="btn btn-primary">
                                     Modifica
                                 </button>
@@ -57,5 +56,6 @@ function VisitList() {
                     </Card.Body>                
                 </Card>
             </div>
-            })
+        })}
+    </>
 }

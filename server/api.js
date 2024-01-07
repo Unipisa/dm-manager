@@ -11,8 +11,7 @@ const coursesQuery = require('./controllers/public/courses')
 const lessonsQuery = require('./controllers/public/lessons')
 const seminarCategoriesQuery = require('./controllers/public/seminar-categories')
 const conferencesQuery = require('./controllers/public/conferences')
-
-const processes = require('./processes.js')
+const processes = require('./controllers/processes/router.js')
 
 const router = express.Router()
 

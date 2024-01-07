@@ -11,23 +11,27 @@ import Loading from '../components/Loading'
 import {useEngine, myDateFormat} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
 
-export default function EditVisit() {
-    const { id } = useParams()
-    const query = useQuery(['process', 'my', 'visits', id || '__new__'])
-    if (query.isLoading) return <Loading />
-    if (query.isError) return <div>Errore caricamento {query.error}</div>
+export default function Visit({variant}) {
+    // variant è '' per /process/visit
+    // ed è 'my/' per /process/my/visit
 
-    return <EditVisitForm visit={query.data}/>
+    const { id } = useParams()
+    const path = `process/${variant||''}visits/${id || '__new__'}`
+    const query = useQuery(path.split('/'))
+    if (query.isLoading) return <Loading />
+    if (query.isError) return <div>Errore caricamento {`${query.error}`}</div>
+
+    return <VisitForm visit={query.data} variant={variant||''}/>
 }
 
-function EditVisitForm({visit}) {
+function VisitForm({visit, variant}) {
     const [data, setData] = useState(visit)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
     const user = useEngine().user
 
-    return <PrefixProvider value="process/my/visits">
+    return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
             ? "Modifica visita inserita"
             : "Inserimento nuova visita"}</h1>
@@ -53,6 +57,7 @@ function EditVisitForm({visit}) {
                 active={activeSection==='room'}
                 done={nextStep}
                 edit={() => setActiveSection('room')}
+                variant={variant}
             />
         }
         <Button className="mx-3 p-3" onClick={completed}>Fine</Button>
@@ -74,24 +79,24 @@ function EditVisitForm({visit}) {
         }
         data.affiliations = data.affiliations.map(_ => _._id)
         if (visit._id) {
-            await api.patch(`/api/v0/process/my/visits/${visit._id}`, data)
+            await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
         } else {
-            const res = await api.put('/api/v0/process/my/visits', data)
+            const res = await api.put('/api/v0/process/${variant}visits', data)
             const _id = res._id
             console.log(`save response: ${JSON.stringify(res)}`)
-            navigate(`/process/my/visits/${_id}`, {replace: true})
+            navigate(`/process/${variant}visits/${_id}`, {replace: true})
         }
-        queryClient.invalidateQueries(['process', 'my', 'visits'])
+        queryClient.invalidateQueries(`/process/${variant}visits`.split('/'))
     }
 
     async function completed() {
-        navigate('/process/my/visits')     
+        navigate(`/process/${variant}visits`)     
     }
 
     async function remove() {
-        await api.del(`/api/v0/process/my/visits/${data._id}`)
-        queryClient.invalidateQueries(['process', 'my', 'visits'])
-        navigate('/process/my/visits')
+        await api.del(`/api/v0/process/${variant}visits/${data._id}`)
+        queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
+        navigate(`/process/${variant}visits`)
     }
 }
 
@@ -159,15 +164,18 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
 }
 
 
-function RoomAssignments({data, active, done, edit}) {
+function RoomAssignments({data, active, done, edit, variant}) {
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
                 <div>Assegnazione stanza</div>
-                <div>[gestito dalla segreteria]</div>
-                {/* !active && <div>
-                    <Button className="text-end btn-warning btn-sm" onClick={edit}>Modifica</Button>
-</div>*/}
+                <div>
+                    {variant === 'my/' && "[gestito dalla segreteria]"}
+                    {variant === '' && !active &&
+                        <Button className="text-end btn-warning btn-sm" onClick={edit}>
+                            Modifica
+                        </Button>}
+                </div>
             </div>  
         </Card.Header>
         <Card.Body>
