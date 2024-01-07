@@ -8,7 +8,7 @@ import { GrantInput, InputRow, DateInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
-import {useEngine, myDateFormat} from '../Engine'
+import {myDateFormat} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
 
 export default function Visit({variant}) {
@@ -29,7 +29,6 @@ function VisitForm({visit, variant}) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
-    const user = useEngine().user
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -81,7 +80,7 @@ function VisitForm({visit, variant}) {
         if (visit._id) {
             await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
         } else {
-            const res = await api.put('/api/v0/process/${variant}visits', data)
+            const res = await api.put(`/api/v0/process/${variant}visits`, data)
             const _id = res._id
             console.log(`save response: ${JSON.stringify(res)}`)
             navigate(`/process/${variant}visits/${_id}`, {replace: true})

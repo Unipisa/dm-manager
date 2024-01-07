@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
@@ -21,7 +21,6 @@ export default function ProcessVisits({variant}) {
 }
 
 function VisitList({variant}) {
-    const queryClient = useQueryClient()
     const { isLoading, error, data } = useQuery(`process/${variant}visits`.split('/'))
 
     if (isLoading) {

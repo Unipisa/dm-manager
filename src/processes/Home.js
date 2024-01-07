@@ -2,7 +2,7 @@ import { Card } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
 
-export default function Home({}) {
+export default function Home() {
     const user = useEngine().user
     return <>
         <div className="row">
