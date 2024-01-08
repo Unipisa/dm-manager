@@ -25,7 +25,7 @@ export default function Home() {
                 </Card>
             </div>            
             }
-            { (user.hasProcessPermission('/process/my/visits')) &&
+            { /*(user.hasProcessPermission('/process/my/visits')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
@@ -61,7 +61,7 @@ export default function Home() {
                         </ul>         
                     </Card.Body>
                 </Card>
-            </div>            
+            </div>*/            
             }
             { (user.hasProcessPermission('/process/roomLabel')) &&
             <div className="col-lg-6 p-3">
