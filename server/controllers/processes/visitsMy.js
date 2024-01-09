@@ -3,6 +3,7 @@ const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
+const Person = require('../../models/Person')
 const { log } = require('../middleware')
 
 const router = express.Router()
@@ -22,8 +23,19 @@ function pastDate() {
     return d
 }
 
-router.get('/', async (req, res) => {    
+async function getPersonByEmail(email) {
+    const persons = await Person.aggregate([
+        { $match: {$or: [{email}, {alternativeEmails: email}]}},
+    ])
+    // console.log(`lookup person with email ${email}: ${JSON.stringify(persons)}`)
+    if (persons.length === 0) return null
+    if (persons.length > 0) {
+        console.log(`WARNING: found ${persons.length} persons with email ${email}`)
+    }
+    return persons[0]
+}
 
+router.get('/', async (req, res) => {    
     if (!req.user) {
         res.status(401).json({
             result: "Unauthorized"
@@ -31,9 +43,13 @@ router.get('/', async (req, res) => {
         return
     }
 
+    if (!req.user.email) return res.json({ data: [], note: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.json({ data: [], note: `no person found matching user ${req.user._id} email`})
+
     const data = await Visit.aggregate([
         { $match: { 
-            createdBy: req.user._id,
+            referencePeople: person._id,
             endDate: { $gte: pastDate() },
         }},
         { $lookup: {
@@ -58,24 +74,38 @@ router.get('/', async (req, res) => {
                 }},
             ]
         }},
+        { $unwind: {
+            path: '$person',
+            preserveNullAndEmptyArrays: true,
+        }},
     ])
 
-    res.json({ data, DAYS_BACK })
+    res.json({ data, person, DAYS_BACK })
 })
 
 router.delete('/:id', async (req, res) => {
     assert(req.user._id) 
+
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     const visit = await Visit.findOneAndDelete({
         _id: new ObjectId(req.params.id),
-        createdBy: req.user._id,
+        referencePeople: person._id,
         endDate: { $gte: pastDate() },
     })
+
     log(req, visit, {})
     res.json({})
 })
 
 router.get('/:id', async (req, res) => {
     assert(req.user._id)
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     if (req.params.id === '__new__') {
         // return empty object
         const visit = new Visit().toObject()
@@ -91,7 +121,7 @@ router.get('/:id', async (req, res) => {
     const data = await Visit.aggregate([
         { $match: { 
             _id,
-            createdBy: req.user._id,
+            referencePeople: person._id,
             endDate: { $gte: pastDate() },
         }},
         { $lookup: {
@@ -203,15 +233,21 @@ router.get('/:id', async (req, res) => {
         res.status(404).json({ error: "Not found" })
         return
     }
-    res.json(data[0])
+    res.json({...data[0], user_person: person})
 })
 
 router.put('/', async (req, res) => {
     const payload = {...req.body}
 
+    assert(req.user._id)
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     // override fields that user cannot change
     payload.createdBy = req.user._id
     payload.updatedBy = req.user._id
+    payload.referencePeople = [person._id]
     delete payload._id
 
     if (!payload.endDate || new Date(payload.endDate) < pastDate()) {
@@ -229,14 +265,21 @@ router.put('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
     const payload = {...req.body}
 
+    assert(req.user._id)
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     // remove fields that user cannot change
     delete payload._id
     delete payload.createdBy
+    delete payload.referencePeople
     payload.updatedBy = req.user._id
 
     const visit = await Visit.findOneAndUpdate(
         {   _id: new ObjectId(req.params.id),
             createdBy: req.user._id,
+            referencePeople: [person._id],
             endDate: { $gte: pastDate() }}, 
         payload)
 

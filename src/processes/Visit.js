@@ -19,7 +19,7 @@ export default function Visit({variant}) {
     const path = `process/${variant||''}visits/${id || '__new__'}`
     const query = useQuery(path.split('/'))
     if (query.isLoading) return <Loading />
-    if (query.isError) return <div>Errore caricamento {`${query.error}`}</div>
+    if (query.isError) return <div>Errore caricamento: {query.error.response.data?.error || `${query.error}`}</div>
 
     return <VisitForm visit={query.data} variant={variant||''}/>
 }
