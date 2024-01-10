@@ -16,7 +16,7 @@ const visitSchema = new Schema({
     endDate,
     requireRoom: { type: Boolean, label: 'richiede stanza', default: false },
     requireSeminar: { type: Boolean, label: 'richiede seminario', default: false },
-    publish: { type: Boolean, label: 'pubblica', default: false },
+    publish: { type: Boolean, label: 'pubblica', default: true },
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,

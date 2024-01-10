@@ -39,7 +39,6 @@ export default function Home() {
                             <li>Inserisci un tuo visitatore</li>
                             <li>Informazioni sui tuoi visitatori inseriti</li>    
                         </ul>         
-                        <b>*** il servizio è in fase sperimentale ***</b>
                     </Card.Body>
                 </Card>
             </div>            
@@ -63,7 +62,7 @@ export default function Home() {
                 </Card>
             </div>*/            
             }
-            { (user.hasProcessPermission('/process/roomLabel')) &&
+            { (user.hasProcessPermission('/process/roomLabels')) &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">
                 <Card.Header>                    
