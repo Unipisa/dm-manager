@@ -55,8 +55,16 @@ async function seminarsQuery(req) {
         match["externalid"] = req.query.externalid
     }
 
+    var limit_stages = []
+    if (req.query.limit) {
+        limit_stages = [ {
+            $limit: parseInt(req.query.limit)
+        } ]
+    }
+
     const pipeline = [
         { $match: match },
+        ...limit_stages,
         { $lookup: {
             from: 'people',
             localField: 'speaker',

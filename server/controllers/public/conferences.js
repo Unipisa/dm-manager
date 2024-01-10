@@ -45,8 +45,16 @@ async function conferencesQuery(req) {
         match["SSD"] = req.query.SSD
     }
 
+    var limit_stages = []
+    if (req.query.limit) {
+        limit_stages = [ {
+            $limit: parseInt(req.query.limit)
+        } ]
+    }
+
     const pipeline = [
         { $match: match },
+        ...limit_stages,
         { $lookup: {
             from: 'conferencerooms',
             foreignField: '_id',
