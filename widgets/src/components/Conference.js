@@ -7,7 +7,7 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDate, formatTime, truncateText } from '../utils'
+import { formatDateInterval } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Conference({ id }) {
@@ -57,9 +57,8 @@ export function ConferenceTitle({ conference, href }) {
     {title_block}
     <p>
         <small>
-            <span className="far fa-calendar"></span> {formatDate(conference.startDate)}
-            <span className="mx-1"></span>
-            <span className="far fa-clock"></span> {formatTime(conference.endDate)}
+            <span className="far fa-calendar"></span> {
+                formatDateInterval(conference.startDate, conference.endDate)}
             <span className="mx-1"></span>
             <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom?.name}
             <span className="mx-1"></span>

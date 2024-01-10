@@ -22,6 +22,15 @@ export function formatDate(datetime) {
     })
 }
 
+export function formatDateInterval(start, end) {
+    if (start != end) {
+        return formatDate(start) + " - " + formatDate(end);
+    }
+    else {
+        return formatDate(start);
+    }
+}
+
 export function formatTime(datetime) {
     const date = new Date(datetime)
 
