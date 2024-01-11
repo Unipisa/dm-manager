@@ -15,6 +15,10 @@ export function Conference({ id }) {
         if (id !== null) {
             const res = await axios.get(getManageURL('public/conference/' + id))
             const conference = res.data.data[0]
+            if (! conference) {
+                throw new Error("Impossibile trovare la conferenza richiesta")
+            }
+
             return conference
         }
         else {

@@ -14,10 +14,13 @@ export function Seminar({ id }) {
         if (id !== null) {
             const res = await axios.get(getManageURL('public/seminar/' + id))
             const seminar = res.data.data[0]
+            if (! seminar) {
+                throw new Error("Impossibile trovare il seminario")
+            }
             return seminar
         }
         else {
-            throw new Error('Impossibile trocare il seminario richiesto')
+            throw new Error('Impossibile trovare il seminario richiesto')
         }
     })
 

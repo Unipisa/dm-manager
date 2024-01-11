@@ -97,6 +97,8 @@
 
     <script>
         async function loader() {
+            dmwidgets.localDevelopment = true
+
             const seminar_id = (await (await fetch('http://localhost:8000/api/v0/public/seminars')).json()).data[0]._id
             const conference_id = (await (await fetch('http://localhost:8000/api/v0/public/conferences')).json()).data[0]._id
 
