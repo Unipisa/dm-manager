@@ -62,11 +62,11 @@ export function getManageURL(path, query) {
     // FIXME: We will need a better logic here: for now we just 
     // detect local development, and default to the "official"
     // server in all other cases.
-    if (window.location.host.match(/^localhost[:\d+]?/)) {
-        return "http://localhost:8000/api/v0/" + path + query
+    if (window.location.host == 'www.dm.unipi.it') {
+        return "https://manage.dm.unipi.it/api/v0/" + path + query;
     }
     else {
-        return "https://manage.dm.unipi.it/api/v0/" + path + query;
+        return "/api/v0/" + path + query
     }
 }
 
