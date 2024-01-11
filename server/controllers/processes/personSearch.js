@@ -43,6 +43,10 @@ module.exports = (router) => {
         res.json({ data })
     })
 
+    router.get('/person', async (req, res) => {        
+        const { lastName, firstName, email, affiliation } = req.query
+    })
+
     router.put('/person', async (req, res) => {
         const controller = new PersonController()
         await controller.put(req, res)
