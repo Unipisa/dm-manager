@@ -36,8 +36,6 @@ export function Conference({ id }) {
         </div>
     }
 
-    console.log(data)
-
     return <div>
         <ConferenceTitle conference={data}></ConferenceTitle>
         <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>

@@ -96,8 +96,6 @@ function EventListBox() {
 }
 
 function EventBox({ event }) {
-    console.log(event)
-
     var date = undefined;
     if (event.endDate) {
         date = formatDateInterval(event.startDate, event.endDate)
