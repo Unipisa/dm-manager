@@ -12,7 +12,9 @@ import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for 
 
 const queryClient = new QueryClient()
 
-const dmwidgets = {
+export const dmwidgets = {
+    localDevelopment: false,
+
     loadComponent: function (target, name, props = {}) {
 
         var element = null

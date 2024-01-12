@@ -28,5 +28,8 @@ module.exports = {
     static: path.resolve(__dirname, './dist'),
     port: 8001,
     hot: true,
+    proxy: {
+      '/api': 'http://localhost:8000'
+    }
   },
 };
