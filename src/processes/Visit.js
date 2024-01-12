@@ -39,8 +39,9 @@ function VisitForm({visit, variant}) {
             label="Visitatore" 
             person={data.person} setPerson={setter(setData, 'person')} 
             done={nextStep}
-            cancel={() => {setData({...data, person: null});setActiveSection('person')}}
+            change={() => {setData({...data, person: null});setActiveSection('person')}}
             active={activeSection==='person'}
+            prefix={`/api/v0/process/${variant}visits`}
         />
         { data.person && 
             <VisitDetailsBlock 
@@ -70,6 +71,7 @@ function VisitForm({visit, variant}) {
             'data': ''
         }[section]
         setActiveSection(section)
+        console.log(`nextStep: ${section}`)
     }
 
     async function save() {
