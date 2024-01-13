@@ -6,13 +6,14 @@ import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
 
-import SelectPersonBlock from './SelectPersonBlockOld'
+import SelectPersonBlock from './SelectPersonBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 
 export default function AddSeminar() {
     const [person, setPerson] = useState(null)
+    const [personDone, setPersonDone] = useState(false)
     const [title, setTitle] = useState("")
     const [date, setDate] = useState(null)
     const [duration, setDuration] = useState(60)
@@ -107,22 +108,15 @@ export default function AddSeminar() {
 
     return <PrefixProvider value="process/seminars/add">
         <h1 className="text-primary pb-4">Inserimento nuovo seminario</h1>
-        { person 
-            ? <Card className="shadow mb-3">
-                <Card.Header>
-                    <div className="d-flex d-row justify-content-between">
-                        <div>Selezione speaker: <strong>{person?.firstName} {person?.lastName}</strong></div>                    
-                        <div className="btn btn-warning btn-sm" onClick={() => setPerson(null)}>Annulla</div>
-                    </div>
-                </Card.Header>
-            </Card>
-            : <SelectPersonBlock 
-                label="Speaker" 
-                person={person} setPerson={setPerson} 
-                prefix="/api/v0/process/seminars/add/"
-                /> 
-        }
-        <SeminarDetailsBlock disabled={person == null} 
+        <SelectPersonBlock 
+            label="Speaker" 
+            person={person} setPerson={setPerson} 
+            active={!personDone}
+            done={() => setPersonDone(true)}
+            change={() => setPersonDone(false)}
+            prefix="/api/v0/process/seminars"
+            /> 
+        <SeminarDetailsBlock disabled={!personDone} 
             title={title} setTitle={setTitle}
             date={date} setDate={setDate}
             duration={duration} setDuration={setDuration}

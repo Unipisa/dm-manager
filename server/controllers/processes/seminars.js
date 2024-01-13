@@ -14,6 +14,9 @@ const Person = require('../../models/Person')
 const controller = new EventSeminarController()
 const {log} = require('../middleware')
 
+/* inject functionality for person select widget */
+require('./personSearch')(router)
+
 router.get('/', async (req, res) => {    
     if (req.user === undefined) {
         res.status(401).json({
@@ -87,34 +90,6 @@ router.put('/save', async (req, res) => {
     catch (error) {
         res.status(400).send({ error: error.message })
     }
-})
-
-router.get('/add/person/search', async (req, res) => {
-    const controller = new PersonController()
-    await controller.search(req, res)
-})
-
-router.get('/add/person/by-email', async (req, res) => {
-    const email = req.query.email
-    if (email) {
-        const p = await Person.aggregate([
-            { $match: { email } }, 
-            { $project: {
-                _id: 1, 
-                firstName: 1, 
-                lastName: 1,
-                email: 1
-        }}])
-        res.json({ data: p })
-    }
-    else {
-        res.status(404).json({ error: "Missing email field"})
-    }
-})
-
-router.put('/add/person', async (req, res) => {
-    const controller = new PersonController()
-    await controller.put(req, res)
 })
 
 router.get('/add/seminar-category/search', async (req, res) => {

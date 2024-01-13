@@ -48,7 +48,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                     </InputRow>
                 </Form>
                 Solo se la persona non esiste, inserisci tutti i dati e poi
-                <Button className="mx-3" onClick={createNew}>
+                <Button className="mx-3" onClick={createNew} disabled={!lastName || !firstName || !email || !affiliations.length}>
                     Crea una nuova persona
                 </Button>
                 <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} />
@@ -101,7 +101,9 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 <Button className="m-3" onClick={save}>
                     Scegli questa persona
                 </Button>
-                <Button className="m-3" onClick={() => {setPerson(null);setEdit(true)}}>
+                <Button className="m-3" onClick={() => {
+                        setAffiliations([]);setLastName('');setFirstName('');setEmail('');
+                        setPerson(null);setPersonId(null);setEdit(true)}}>
                     Cerca un'altra persona
                 </Button>
             </>} 
