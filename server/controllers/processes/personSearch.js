@@ -72,7 +72,7 @@ module.exports = (router) => {
         return res.json({ data: persons })
     })
 
-    router.put('/person', async (req, res) => {
+    router.post('/person', async (req, res) => {
         const controller = new PersonController()
         await controller.put(req, res)
     })
@@ -102,8 +102,9 @@ module.exports = (router) => {
     })
 
     router.put('/institution', async (req, res) => {
+        let institution
         try {
-            const institution = new Institution({
+            institution = new Institution({
                 ...req.body,
                 createdBy: req.user._id,
                 updatedBy: req.user._id,

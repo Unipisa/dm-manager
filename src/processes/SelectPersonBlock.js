@@ -51,7 +51,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 <Button className="mx-3" onClick={createNew}>
                     Crea una nuova persona
                 </Button>
-                <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0] : '')}} onClick={clickPerson} />
+                <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} />
             </>}
 
             {personId && edit && <>
@@ -143,6 +143,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
             email,
             affiliations,
         })
+        setPersonId(res._id)
         done()
     }
 
