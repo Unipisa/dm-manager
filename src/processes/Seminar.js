@@ -6,7 +6,7 @@ import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
 
-import SelectPersonBlock from './SelectPersonBlock'
+import SelectPersonBlock from './SelectPersonBlockOld'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
@@ -116,7 +116,11 @@ export default function AddSeminar() {
                     </div>
                 </Card.Header>
             </Card>
-            : <SelectPersonBlock label="Speaker" person={person} setPerson={setPerson} /> 
+            : <SelectPersonBlock 
+                label="Speaker" 
+                person={person} setPerson={setPerson} 
+                prefix="/api/v0/process/seminars/add/"
+                /> 
         }
         <SeminarDetailsBlock disabled={person == null} 
             title={title} setTitle={setTitle}
