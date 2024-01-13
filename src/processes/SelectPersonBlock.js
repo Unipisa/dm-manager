@@ -12,9 +12,6 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
     const [email, setEmail] = useState('')
     const [affiliations, setAffiliations] = useState([])
 
-    // persona selezionata
-    const [personId, setPersonId] = useState(null)
-    
     // attiva la modalità di aggiornamento dei dati
     const [edit, setEdit] = useState(true)
 
@@ -31,7 +28,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         <Card.Header className="">{title || "Selezione persona"}</Card.Header>
         <Card.Body>
 
-            {!personId && <>
+            {!person && <>
                 <p>Cerca la persona nel database:</p>
                 <Form className="mb-3">
                     <InputRow label="cognome">
@@ -54,7 +51,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} />
             </>}
 
-            {personId && edit && <>
+            {person && edit && <>
                 <p>Aggiorna i dati della persona già presente in database</p>
                 <Form className="mb-3">
                     <InputRow label="cognome">
@@ -79,7 +76,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
             </>}
 
             {/* mostra i dati */}
-            {personId && !edit && <>
+            {person && !edit && <>
                 <p>La persona è già presente nel database.
                     Controlla i dati...
                     {} { email 
@@ -103,11 +100,16 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 </Button>
                 <Button className="m-3" onClick={() => {
                         setAffiliations([]);setLastName('');setFirstName('');setEmail('');
-                        setPerson(null);setPersonId(null);setEdit(true)}}>
+                        setPerson(null);setEdit(true)}}>
                     Cerca un'altra persona
                 </Button>
             </>} 
         </Card.Body>
+        <Card.Footer>
+            <pre>
+                {JSON.stringify({person, lastName, firstName, email, affiliations}, null, 2)}
+            </pre>
+        </Card.Footer>
     </Card>
 
     function clickPerson(person) {
@@ -115,7 +117,6 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         setFirstName(person.firstName)
         setEmail(person.email)
         setAffiliations([...person.affiliations])
-        setPersonId(person._id)
         setPerson(person)
         setEdit(false)
     }
@@ -145,7 +146,6 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
             email,
             affiliations,
         })
-        setPersonId(res._id)
         done()
     }
 
@@ -153,7 +153,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         const patch = diff();
         console.log(`patch: ${JSON.stringify(patch)}`)
         if (patch) {
-            await api.patch(`${prefix}/person/${personId}`, patch)
+            await api.patch(`${prefix}/person/${person._id}`, patch)
             setPerson({...person, ...patch})
         }
         done()
