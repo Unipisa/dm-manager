@@ -1,75 +1,80 @@
 import { Button, Card, Form } from 'react-bootstrap'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
+import { useQuery } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
+import Loading from '../components/Loading'
 
 export default function AddSeminar() {
-    const [person, setPerson] = useState(null)
-    const [personDone, setPersonDone] = useState(false)
-    const [title, setTitle] = useState("")
-    const [date, setDate] = useState(null)
-    const [duration, setDuration] = useState(60)
-    const [room, setRoom] = useState(null)
-    const [category, setCategory] = useState(null)
-    const [abstract, setAbstract] = useState("")
-    const [grants, setGrants] = useState(null)
-    const [externalid, setExternalId] = useState("")
-    const [dataLoaded, setDataLoaded] = useState(false)
-    const [forbiddenSeminar, setForbiddenSeminar] = useState(false)
-
     const { id } = useParams()
-    const navigate = useNavigate()
 
     const search = new URLSearchParams(window.location.search)
     const preFill = search.get("prefill")
 
-    useEffect(() => {
-        async function fetchData() {
-            var seminar = {}
-            if (id) {
-                const res = await api.get(`/api/v0/process/seminars/get/${id}`)
-                seminar = res.data[0]
-
-                // If the seminar could not be loaded, then either it does not exist, or it 
-                // was created by another use. Either way, we need to give an understandable
-                // error to the end user. 
-                if (! seminar) {
-                    setForbiddenSeminar(true)
-                    return;
-                }
-            }
-
-            if (preFill !== null) {
-                seminar = await loadExternalData(preFill, seminar)
-            }
-            
-            // Load the data into the state
-            seminar.speaker && setPerson(seminar.speaker)
-            seminar.title && setTitle(seminar.title)
-            seminar.startDatetime && setDate(seminar.startDatetime)
-            seminar.duration && setDuration(seminar.duration)
-            seminar.room && setRoom(seminar.conferenceRoom)
-            seminar.category && setCategory(seminar.category)
-            seminar.grants && setGrants(seminar.grants)
-            seminar.abstract && setAbstract(seminar.abstract)
-            seminar.externalid && setExternalId(seminar.externalid)
+    const { isLoading, error, data } = useQuery([ 'process', 'seminar', id, preFill ], async function () {
+        var seminar = {
+            speaker: null, 
+            title: "", 
+            stateDatetime: null,
+            duration: 60,
+            conferenceRoom: null,
+            category: null,
+            abstract: "",
+            grants: null, 
+            externalid: "",
         }
 
-        if (! dataLoaded) {
-            setDataLoaded(true)
-            fetchData()
-        }
-    }, [id, preFill, dataLoaded])
+        if (id) {
+            const res = await api.get(`/api/v0/process/seminars/get/${id}`)
+            seminar = res.data[0]
 
-    if (forbiddenSeminar) {
+            // If the seminar could not be loaded, then either it does not exist, or it 
+            // was created by another use. Either way, we need to give an understandable
+            // error to the end user. 
+            if (! seminar) {
+                return;
+            }
+
+            seminar._id = id
+        }
+
+        if (preFill !== null) {
+            seminar = await loadExternalData(preFill, seminar)
+        }
+
+        return {
+            seminar, 
+            forbidden: !seminar
+        }            
+    })
+
+    if (isLoading || error) return <Loading error={error}></Loading>
+
+    return <AddSeminarBody seminar={data.seminar} forbidden={data.forbidden}></AddSeminarBody>
+}
+
+export function AddSeminarBody({ seminar, forbidden }) {
+    const [person, setPerson] = useState(seminar.speaker)
+    const [personDone, setPersonDone] = useState(seminar.speaker !== null)
+    const [title, setTitle] = useState(seminar.title)
+    const [date, setDate] = useState(seminar.startDatetime)
+    const [duration, setDuration] = useState(seminar.duration)
+    const [room, setRoom] = useState(seminar.conferenceRoom)
+    const [category, setCategory] = useState(seminar.category)
+    const [abstract, setAbstract] = useState(seminar.abstract)
+    const [grants, setGrants] = useState(seminar.grants)
+
+    const navigate = useNavigate()
+
+    if (forbidden) {
         return <div>
             <h4>Accesso negato</h4>
             <p>
@@ -95,11 +100,11 @@ export default function AddSeminar() {
             category: category._id,
             grants: grants,
             abstract: abstract,
-            externalid: externalid
+            externalid: seminar.externalid
         }
 
-        if (id) {
-            s._id = id
+        if (seminar._id) {
+            s._id = seminar._id
         }
 
         await api.put('/api/v0/process/seminars/save', s)

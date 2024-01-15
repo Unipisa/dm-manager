@@ -60,7 +60,7 @@ function VisitForm({visit, variant}) {
                 variant={variant}
             />
         }
-        <Button className="mx-3 p-3" onClick={completed}>Fine</Button>
+        <Button className="mr-3" onClick={completed}>Indietro</Button>
         <Button className="mx-3 btn-danger" onClick={remove}>Elimina visita</Button>
     </PrefixProvider>
 
@@ -155,7 +155,7 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
-            <Button className="text-end mx-3 p-3" onClick={done} disabled={!check()}>Salva</Button>
+            <Button className="text-end" onClick={done} disabled={!check()}>Salva</Button>
         </div>
     </>
 

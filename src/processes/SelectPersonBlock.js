@@ -52,7 +52,6 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
             </>}
 
             {person && edit && <>
-                <p>Aggiorna i dati della persona già presente in database</p>
                 <Form className="mb-3">
                     <InputRow label="cognome">
                         <strong>{lastName}</strong>
@@ -91,7 +90,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                     <div>nome: <strong>{firstName}</strong></div>
                     <div>email: <strong>{email}</strong></div>
                     <div>affiliazione: <strong>{affiliations.map(affiliation => affiliation.name).join(', ')}</strong></div>
-                </div> 
+                </div>
                 <Button className="m-3" onClick={() => setEdit(true)}>
                     Aggiorna i dati di questa persona
                 </Button>
@@ -105,11 +104,11 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 </Button>
             </>} 
         </Card.Body>
-        <Card.Footer>
+        {/* <Card.Footer>
             <pre>
                 {JSON.stringify({person, lastName, firstName, email, affiliations}, null, 2)}
             </pre>
-        </Card.Footer>
+        </Card.Footer> */}
     </Card>
 
     function clickPerson(person) {
@@ -171,17 +170,16 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
 function PersonSuggestions({query, onClick}) {
     const {isLoading, error, data} = useQuery([...'process/my/visits/person/'.split('/'), query])
 
-    if (isLoading) return "Loading"
     if (error) return "Error: " + error.message
-
-    if (data.data.length === 0) return null
+    if (!isLoading && data.data.length === 0) return null
 
     return <Table hover>
         <thead>
             <tr><th>cognome</th><th>nome</th><th>email</th><th>affiliazione</th></tr>
         </thead>
         <tbody>
-        {data.data.map(person => 
+        {isLoading && <tr><td colSpan="4">Loading</td></tr>}
+        {!isLoading && data.data.map(person => 
             <tr key={person._id} onClick={() => onClick(person)}>
                 <td>{person.lastName}</td>
                 <td>{person.firstName}</td>
