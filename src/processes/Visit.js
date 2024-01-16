@@ -81,7 +81,6 @@ function VisitForm({visit, variant}) {
             </Card>
         }
         <Button className="mr-3" onClick={completed}>Indietro</Button>
-        <Button className="mx-3 btn-danger" onClick={remove}>Elimina visita</Button>
     </PrefixProvider>
 
     function nextStep() {
@@ -112,12 +111,6 @@ function VisitForm({visit, variant}) {
 
     async function completed() {
         navigate(`/process/${variant}visits`)     
-    }
-
-    async function remove() {
-        await api.del(`/api/v0/process/${variant}visits/${data._id}`)
-        queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
-        navigate(`/process/${variant}visits`)
     }
 }
 

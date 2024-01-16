@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
@@ -7,7 +9,7 @@ export function ModalDeleteDialog({ show, objectName, handleClose }) {
             title={`Eliminare ${objectName}`}
             body={`Eliminare definitivamente ${objectName}?`}
             handleClose={handleClose}
-            primaryText={"Cancella"}
+            primaryText={"Elimina"}
             secondaryText={"Annulla"}
             primaryColor="danger"
         >
@@ -32,4 +34,17 @@ export function ModalConfirmationDialog({ show, title, body, handleClose, primar
           </Modal.Footer>
         </Modal>
     );
+}
+
+export function ConfirmDeleteButton({className, objectName, onConfirm, children}) {
+  const [show, setShow] = useState(false)
+  return <>
+    <ModalDeleteDialog show={show} objectName={objectName} handleClose={handleClose}/>
+    <Button className={className} onClick={() => setShow(true)}>{children}</Button>
+  </>
+
+  function handleClose(confirm) {
+    if (confirm) onConfirm()
+    setShow(false)
+  }
 }
