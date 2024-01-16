@@ -5,8 +5,10 @@ const { ObjectId } = require('mongoose').Types
 const Visit = require('../../models/Visit')
 const Person = require('../../models/Person')
 const { log } = require('../middleware')
+const { INDEX_PIPELINE, GET_PIPELINE, DAYS_BACK, pastDate } = require('./visits')
 
 const router = express.Router()
+module.exports = router
 
 // inject functionality on the current route
 require('./personSearch')(router)
@@ -14,14 +16,6 @@ require('./grantSearch')(router)
 
 // inject room assignment functionality
 // require('./roomAssignment')(router)
-
-const DAYS_BACK = 30
-
-function pastDate() {
-    const d = new Date()
-    d.setDate(d.getDate() - DAYS_BACK)
-    return d
-}
 
 async function getPersonByEmail(email) {
     const persons = await Person.aggregate([
@@ -52,32 +46,7 @@ router.get('/', async (req, res) => {
             referencePeople: person._id,
             endDate: { $gte: pastDate() },
         }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
-        { $lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                }},
-            ]
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
+        ...INDEX_PIPELINE,
     ])
 
     res.json({ data, person, DAYS_BACK })
@@ -124,110 +93,7 @@ router.get('/:id', async (req, res) => {
             referencePeople: person._id,
             endDate: { $gte: pastDate() },
         }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-            pipeline: [
-                { $lookup: {
-                    from: 'institutions',
-                    localField: 'affiliations',
-                    foreignField: '_id',
-                    as: 'affiliations',
-                    pipeline: [
-                        { $project: {
-                            _id: 1,
-                            name: 1,
-                        }},
-                    ]
-                }},
-                { $project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    affiliations: 1,
-                    email: 1,
-                }},
-            ]
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
-        {$lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                }},
-            ]
-        }},
-        {$lookup: {
-            from: 'grants',
-            localField: 'grants',
-            foreignField: '_id',
-            as: 'grants',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                    identifier: 1,
-                }},
-            ]
-        
-        }},
-        {$lookup: {
-            from: "roomassignments",
-            let: { start: "$startDate", end: "$endDate" },
-            localField: 'person._id',
-            foreignField: "person",
-            as: 'roomAssignments',
-            pipeline: [
-                // inserisce i dati della stanza
-                {$lookup: {
-                    from: "rooms",
-                    localField: "room",
-                    foreignField: "_id",
-                    as: "room",
-                }},
-                {$project: {
-                    "startDate": 1,
-                    "endDate": 1,
-                    "room._id": 1,
-                    "room.code": 1,
-                    "room.building": 1,
-                    "room.floor": 1,
-                    "room.number": 1,
-                }},
-                // tiene solo le assegnazioni che includono il periodo [start, end] 
-                {$match: {
-                    $expr: {
-                        $and: [
-                            { $or: [
-                                { $eq: ["$$end", null] },
-                                { $eq: ["$startDate", null] },
-                                { $lte: ["$startDate", "$$end"] } ]},
-                            { $or: [
-                                { $eq: ["$$start", null] },
-                                { $eq: ["$endDate", null] },
-                                { $gte: ["$endDate", "$$start"] } ]}
-                        ]},
-                    },
-                },
-                {$unwind: {
-                    path: "$room",
-                    preserveNullAndEmptyArrays: true
-                }},
-                // ordina per data finale...
-                // l'ultima assegnazione dovrebbe essere quella attuale
-                {$sort: {"endDate": 1}},
-            ]
-        }},
+        ...GET_PIPELINE,
     ])
     if (data.length === 0) {
         res.status(404).json({ error: "Not found" })
@@ -287,5 +153,3 @@ router.patch('/:id', async (req, res) => {
 
     res.send({})
 })
-
-module.exports = router

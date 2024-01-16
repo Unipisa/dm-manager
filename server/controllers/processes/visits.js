@@ -6,6 +6,7 @@ const Visit = require('../../models/Visit')
 const { log } = require('../middleware')
 
 const router = express.Router()
+module.exports = router
 
 // inject functionality on the current route
 require('./personSearch')(router)
@@ -13,15 +14,182 @@ require('./grantSearch')(router)
 require('./roomAssignment')(router)
 
 const DAYS_BACK = 30
+module.exports.DAYS_BACK = DAYS_BACK
 
 function pastDate() {
     const d = new Date()
     d.setDate(d.getDate() - DAYS_BACK)
     return d
 }
+module.exports.pastDate = pastDate
+
+const INDEX_PIPELINE = [
+    { $lookup: {
+        from: 'people',
+        localField: 'person',
+        foreignField: '_id',
+        as: 'person',
+    }},
+    { $unwind: {
+        path: '$person',
+        preserveNullAndEmptyArrays: true,
+    }},
+    { $lookup: {
+        from: 'institutions',
+        localField: 'affiliations',
+        foreignField: '_id',
+        as: 'affiliations',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                name: 1,
+            }},
+        ]
+    }}]
+module.exports.INDEX_PIPELINE = INDEX_PIPELINE
+
+const GET_PIPELINE = [
+    { $lookup: {
+        from: 'people',
+        localField: 'person',
+        foreignField: '_id',
+        as: 'person',
+        pipeline: [
+            { $lookup: {
+                from: 'institutions',
+                localField: 'affiliations',
+                foreignField: '_id',
+                as: 'affiliations',
+                pipeline: [
+                    { $project: {
+                        _id: 1,
+                        name: 1,
+                    }},
+                ]
+            }},
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                affiliations: 1,
+                email: 1,
+            }},
+        ]
+    }},
+    { $unwind: {
+        path: '$person',
+        preserveNullAndEmptyArrays: true,
+    }},
+    {$lookup: {
+        from: 'institutions',
+        localField: 'affiliations',
+        foreignField: '_id',
+        as: 'affiliations',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                name: 1,
+            }},
+        ]
+    }},
+    {$lookup: {
+        from: 'grants',
+        localField: 'grants',
+        foreignField: '_id',
+        as: 'grants',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                name: 1,
+                identifier: 1,
+            }},
+        ]
+    
+    }},
+    {$lookup: {
+        from: "roomassignments",
+        let: { start: "$startDate", end: "$endDate" },
+        localField: 'person._id',
+        foreignField: "person",
+        as: 'roomAssignments',
+        pipeline: [
+            // inserisce i dati della stanza
+            {$lookup: {
+                from: "rooms",
+                localField: "room",
+                foreignField: "_id",
+                as: "room",
+            }},
+            {$project: {
+                "startDate": 1,
+                "endDate": 1,
+                "room._id": 1,
+                "room.code": 1,
+                "room.building": 1,
+                "room.floor": 1,
+                "room.number": 1,
+            }},
+            // tiene solo le assegnazioni che intersecano il periodo [start, end] 
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$$end", null] },
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$end"] } ]},
+                        { $or: [
+                            { $eq: ["$$start", null] },
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$start"] } ]}
+                    ]},
+                },
+            },
+            {$unwind: {
+                path: "$room",
+                preserveNullAndEmptyArrays: true
+            }},
+            // ordina per data finale...
+            // l'ultima assegnazione dovrebbe essere quella attuale
+            {$sort: {"endDate": 1}},
+        ]
+    }},
+    {$lookup: {
+        from: "eventseminars",
+        let: { start: "$startDate", end: "$endDate" },
+        localField: 'person._id',
+        foreignField: "speaker",
+        as: 'seminars',
+        pipeline: [
+            // tiene solo i seminari che intersecano il periodo [start, end] 
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$$end", null] },
+                            { $eq: ["$startDatetime", null] },
+                            { $lte: ["$startDatetime", "$$end"] } ]},
+                        { $or: [
+                            { $eq: ["$$start", null] },
+                            { $eq: ["$startDatetime", null] },
+                            { $gte: ["$startDatetime", "$$start"] } ]}
+                    ]},
+                },
+            },
+            {$project: {
+                "startDatetime": 1,
+                "title": 1,
+                "category": 1,
+                "abstract": 1,
+                "grants": 1,
+                "conferenceRoom": 1,
+            }},
+            {$sort: {"startDatetime": 1}},
+        ]
+    }},
+]
+module.exports.GET_PIPELINE = GET_PIPELINE
 
 router.get('/', async (req, res) => {    
-
     if (!req.user) {
         res.status(401).json({
             result: "Unauthorized"
@@ -33,28 +201,7 @@ router.get('/', async (req, res) => {
         { $match: { 
             endDate: { $gte: pastDate() },
         }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
-        { $lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                }},
-            ]
-        }},
+        ...INDEX_PIPELINE,
     ])
 
     res.json({ data, DAYS_BACK })
@@ -89,110 +236,7 @@ router.get('/:id', async (req, res) => {
             _id,
             endDate: { $gte: pastDate() },
         }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-            pipeline: [
-                { $lookup: {
-                    from: 'institutions',
-                    localField: 'affiliations',
-                    foreignField: '_id',
-                    as: 'affiliations',
-                    pipeline: [
-                        { $project: {
-                            _id: 1,
-                            name: 1,
-                        }},
-                    ]
-                }},
-                { $project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    affiliations: 1,
-                    email: 1,
-                }},
-            ]
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
-        {$lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                }},
-            ]
-        }},
-        {$lookup: {
-            from: 'grants',
-            localField: 'grants',
-            foreignField: '_id',
-            as: 'grants',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                    identifier: 1,
-                }},
-            ]
-        
-        }},
-        {$lookup: {
-            from: "roomassignments",
-            let: { start: "$startDate", end: "$endDate" },
-            localField: 'person._id',
-            foreignField: "person",
-            as: 'roomAssignments',
-            pipeline: [
-                // inserisce i dati della stanza
-                {$lookup: {
-                    from: "rooms",
-                    localField: "room",
-                    foreignField: "_id",
-                    as: "room",
-                }},
-                {$project: {
-                    "startDate": 1,
-                    "endDate": 1,
-                    "room._id": 1,
-                    "room.code": 1,
-                    "room.building": 1,
-                    "room.floor": 1,
-                    "room.number": 1,
-                }},
-                // tiene solo le assegnazioni che includono il periodo [start, end] 
-                {$match: {
-                    $expr: {
-                        $and: [
-                            { $or: [
-                                { $eq: ["$$end", null] },
-                                { $eq: ["$startDate", null] },
-                                { $lte: ["$startDate", "$$end"] } ]},
-                            { $or: [
-                                { $eq: ["$$start", null] },
-                                { $eq: ["$endDate", null] },
-                                { $gte: ["$endDate", "$$start"] } ]}
-                        ]},
-                    },
-                },
-                {$unwind: {
-                    path: "$room",
-                    preserveNullAndEmptyArrays: true
-                }},
-                // ordina per data finale...
-                // l'ultima assegnazione dovrebbe essere quella attuale
-                {$sort: {"endDate": 1}},
-            ]
-        }},
+        ...GET_PIPELINE,
     ])
     if (data.length === 0) {
         res.status(404).json({ error: "Not found" })
@@ -238,5 +282,3 @@ router.patch('/:id', async (req, res) => {
 
     res.send({})
 })
-
-module.exports = router

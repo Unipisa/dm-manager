@@ -10,6 +10,7 @@ import api from '../api'
 import Loading from '../components/Loading'
 import {myDateFormat} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
+import AddSeminar from './Seminar'
 
 export default function Visit({variant}) {
     // variant è '' per /process/visit
@@ -59,6 +60,25 @@ function VisitForm({visit, variant}) {
                 edit={() => setActiveSection('room')}
                 variant={variant}
             />
+        }
+        { (data.seminars.length>0 || data.requireSeminar) &&
+            <Card className="shadow mb-3">
+                <Card.Header>
+                    <div className="d-flex d-row justify-content-between">
+                        <div>Seminario</div>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    {
+                        data.seminars.length>0 
+                        ? <ul>
+                            {data.seminars.map(s => 
+                            <li key={s._id}>{myDateFormat(s.startDatetime)}: {s.title}</li>)}
+                        </ul>
+                        : <i>nessun seminario inserito nel periodo</i>
+                    }
+                </Card.Body>
+            </Card>
         }
         <Button className="mr-3" onClick={completed}>Indietro</Button>
         <Button className="mx-3 btn-danger" onClick={remove}>Elimina visita</Button>
