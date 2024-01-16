@@ -122,7 +122,7 @@ export function AddSeminarBody({ seminar, forbidden }) {
             person={person} setPerson={setPerson} 
             active={!personDone}
             done={() => setPersonDone(true)}
-            change={() => setPersonDone(false)}
+            change={() => {setPersonDone(false);setPerson(null)}}
             prefix="/api/v0/process/seminars"
             /> 
         <SeminarDetailsBlock disabled={!personDone} 

@@ -106,7 +106,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         </Card.Body>
         {/* <Card.Footer>
             <pre>
-                {JSON.stringify({person, lastName, firstName, email, affiliations}, null, 2)}
+                {JSON.stringify({person, edit, active, lastName, firstName, email, affiliations}, null, 2)}
             </pre>
         </Card.Footer> */}
     </Card>
