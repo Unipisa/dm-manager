@@ -112,7 +112,11 @@ export function AddSeminarBody({ seminar, forbidden }) {
     }
 
     return <PrefixProvider value="process/seminars/add">
-        <h1 className="text-primary pb-4">Inserimento nuovo seminario</h1>
+        <h1 className="text-primary pb-4">
+            { seminar._id 
+                ? "Modifica seminario" 
+                : "Inserimento nuovo seminario" }
+        </h1>
         <SelectPersonBlock 
             label="Speaker" 
             person={person} setPerson={setPerson} 
