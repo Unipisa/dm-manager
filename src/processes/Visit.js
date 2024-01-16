@@ -8,9 +8,9 @@ import { GrantInput, InputRow, DateInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
-import {myDateFormat} from '../Engine'
+import {myDateFormat,setter} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
-import AddSeminar from './Seminar'
+import {SeminarDetailsBlock} from './Seminar'
 
 export default function Visit({variant}) {
     // variant è '' per /process/visit
@@ -30,6 +30,7 @@ function VisitForm({visit, variant}) {
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
+    const [seminar, setSeminar] = useState(null)
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -61,25 +62,10 @@ function VisitForm({visit, variant}) {
                 variant={variant}
             />
         }
-        { (data.seminars.length>0 || data.requireSeminar) &&
-            <Card className="shadow mb-3">
-                <Card.Header>
-                    <div className="d-flex d-row justify-content-between">
-                        <div>Seminario</div>
-                    </div>
-                </Card.Header>
-                <Card.Body>
-                    {
-                        data.seminars.length>0 
-                        ? <ul>
-                            {data.seminars.map(s => 
-                            <li key={s._id}>{myDateFormat(s.startDatetime)}: {s.title}</li>)}
-                        </ul>
-                        : <i>nessun seminario inserito nel periodo</i>
-                    }
-                </Card.Body>
-            </Card>
-        }
+        { data.seminars.map(seminar => <div key={seminar._id}>
+            <SeminarDetailsBlock data={seminar}/>
+            {JSON.stringify(seminar)}
+        </div>)}
         <Button className="mr-3" onClick={completed}>Indietro</Button>
     </PrefixProvider>
 
@@ -212,8 +198,3 @@ function RoomAssignments({data, active, done, edit, variant}) {
     }
 }
 
-function setter(setData, key) {
-    return (value) => {
-        setData(data => ({ ...data, [key]: value }))
-    }
-}
