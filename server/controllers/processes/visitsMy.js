@@ -65,7 +65,7 @@ router.delete('/:id', async (req, res) => {
         endDate: { $gte: pastDate() },
     })
 
-    log(req, visit, {})
+    await log(req, visit, {})
     res.json({})
 })
 
@@ -123,7 +123,7 @@ router.put('/', async (req, res) => {
     const visit = new Visit(payload)
     await visit.save()
 
-    log(req, {}, payload)
+    await log(req, {}, payload)
 
     res.send({_id: visit._id})
 })
