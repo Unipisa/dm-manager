@@ -10,7 +10,6 @@ import api from '../api'
 import Loading from '../components/Loading'
 import {myDateFormat} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
-import AddSeminar from './Seminar'
 
 export default function Visit({variant}) {
     // variant è '' per /process/visit
