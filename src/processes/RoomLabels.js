@@ -114,7 +114,7 @@ function Display({roomLabel, onSave}) {
 function RoomsTable({onClick, onDone, onDelete, data}) {
     const engine = useEngine()
     // visibility of manager elements
-    const visibility = (onDone || onDelete) &&  engine.user.hasSomeRole('admin', 'label-manager', 'room-manager') ? "visible" : "hidden"
+    const visibility = (onDone || onDelete) &&  engine.user.hasSomeRole('admin', '/process/roomLabels', 'room-manager') ? "visible" : "hidden"
 
     if (data.length === 0) return <p>nessuno</p>
 
@@ -194,9 +194,12 @@ export default function ManageRoomLabels() {
     })
 //    const patchRoomLabel = engine.usePatch('roomLabel')
     const [urlId, setUrlId] = useState(window.location.search.substring(1))
-    const query = useQuery(['process','roomLabels',{_sort:"updatedAt", _direction: -1}])
+    const query = useQuery(['process','roomLabels'])
     const queryClient = useQueryClient()
     
+    if (query.isLoading) return <p>caricamento...</p>
+    if (query.isError) return <p>errore: {query.error.message}</p>
+
     function invalidate() {
         queryClient.invalidateQueries(['process','roomLabels'])
     }
@@ -227,7 +230,7 @@ export default function ManageRoomLabels() {
             roomLabel={roomLabel}
             onSave={onSave}/>
         <div style={{marginTop: "1cm"}}/>
-        { engine.user.hasSomeRole('admin', 'supervisor', '/process/roomLabel') && query.isSuccess && 
+        { engine.user.hasSomeRole('admin', 'supervisor', '/process/roomLabels') && query.isSuccess && 
             <RoomLabels data={query.data.data} onClick={onClick} onDone={onDone} onDelete={onDelete} urlId={urlId} setUrlId={setUrlId} />
         }
     </>

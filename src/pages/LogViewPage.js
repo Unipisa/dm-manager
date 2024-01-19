@@ -12,7 +12,7 @@ export default function LogViewPage({ Model }) {
 
     return <>
         <ObjectProvider path={Model.code} id={id}>
-        <LogModelView Model={Model}/>
+            <LogModelView Model={Model}/>
         </ObjectProvider>
     </>
 }
