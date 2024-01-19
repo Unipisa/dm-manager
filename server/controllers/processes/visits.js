@@ -167,7 +167,7 @@ const GET_PIPELINE = [
                         { $or: [
                             { $eq: ["$$end", null] },
                             { $eq: ["$startDatetime", null] },
-                            { $lte: ["$startDatetime", "$$end"] } ]},
+                            { $lte: ["$startDatetime", {$dateAdd: {startDate: "$$end", unit: "day", amount: 1}}] } ]},
                         { $or: [
                             { $eq: ["$$start", null] },
                             { $eq: ["$startDatetime", null] },
@@ -175,13 +175,49 @@ const GET_PIPELINE = [
                     ]},
                 },
             },
+            {$lookup: {
+                from: 'seminarcategories',
+                localField: 'category',
+                foreignField: '_id',
+                as: 'category',
+            }},
+            {$unwind: {
+                path: "$category",
+                preserveNullAndEmptyArrays: true
+            }},
+            {$lookup: {
+                from: 'conferencerooms',
+                localField: 'conferenceRoom',
+                foreignField: '_id',
+                as: 'conferenceRoom',
+            }},
+            {$unwind: {
+                path: "$conferenceRoom",
+                preserveNullAndEmptyArrays: true
+            }},
+            {$lookup: {
+                from: 'users',
+                localField: 'createdBy',
+                foreignField: '_id',
+                as: 'createdBy',
+            }},
+            {$unwind: {
+                path: "$createdBy",
+                preserveNullAndEmptyArrays: true
+            }},
             {$project: {
                 "startDatetime": 1,
                 "title": 1,
-                "category": 1,
+                "category._id": 1,
+                "category.name": 1,
+                "category.label": 1,
                 "abstract": 1,
                 "grants": 1,
-                "conferenceRoom": 1,
+                "conferenceRoom._id": 1,
+                "conferenceRoom.name": 1,
+                "duration": 1,
+                "createdBy._id": 1,
+                "createdBy.username": 1,
             }},
             {$sort: {"startDatetime": 1}},
         ]
@@ -245,6 +281,7 @@ router.get('/:id', async (req, res) => {
     res.json(data[0])
 })
 
+// TODO: should be "post" instead of "put"
 router.put('/', async (req, res) => {
     const payload = {...req.body}
 
@@ -277,6 +314,8 @@ router.patch('/:id', async (req, res) => {
         {   _id: new ObjectId(req.params.id),
             endDate: { $gte: pastDate() }}, 
         payload)
+
+    if (!visit) return res.status(404)
 
     await log(req, visit, payload)
 

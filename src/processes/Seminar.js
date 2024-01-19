@@ -89,7 +89,7 @@ export function SeminarBody({ seminar, forbidden }) {
         navigate('/process/seminars')
     }
 
-    return <PrefixProvider value="process/seminars/add">
+    return <PrefixProvider value="process/seminars">
         <h1 className="text-primary pb-4">
             { seminar._id 
                 ? "Modifica seminario" 
@@ -103,49 +103,70 @@ export function SeminarBody({ seminar, forbidden }) {
             change={() => {setPersonDone(false);setter(setData,'speaker')(null)}}
             prefix="/api/v0/process/seminars"
             /> 
-        <SeminarDetailsBlock disabled={!personDone} 
+        {personDone && <SeminarDetailsBlock 
             data={data} setData={setData}
             onCompleted={onCompleted}
-        ></SeminarDetailsBlock>
+            active={true}
+        />}
     </PrefixProvider>
 }
 
-export function SeminarDetailsBlock({ onCompleted, disabled, data, setData }) {
+export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
     const confirm_enabled = (data.title !== "") && (data.startDatetime !== null) && (data.duration > 0) && (data.conferenceRoom !== null) && (data.category !== null)
 
-    if (disabled) {
-        return <></>
-    }
-
     return <Card className="shadow">
-        <Card.Header>Dettagli del seminario</Card.Header>
+        <Card.Header>
+        <div className="d-flex d-row justify-content-between">
+                <div>
+                    Dettagli del seminario
+                </div>
+                <div>{ change && 
+                    <Button className="text-end btn-warning btn-sm" onClick={change}>
+                        Modifica
+                    </Button>
+                }</div>
+            </div>  
+
+        </Card.Header>
         <Card.Body>
-        <Form>
-            <InputRow label="Titolo" className="my-3">
-                <StringInput value={data.title} setValue={setter(setData,'title')} />
-            </InputRow>
-            <InputRow label="Ciclo di seminari" className="my-3">
-                <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')}/>
-            </InputRow>
-            <InputRow label="Data e ora" className="my-3">
-                <DatetimeInput value={data.startDatetime} setValue={setter(setData,'startDatetime')}/>
-            </InputRow>
-            <InputRow className="my-3" label="Durata (in minuti)">
-                <NumberInput value={data.duration} setValue={setter(setData,'duration')}/>
-            </InputRow>
-            <InputRow className="my-3" label="Aula">
-                <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')}/>
-            </InputRow>
-            <InputRow className="my-3" label="Grant">
-                <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')}/>
-            </InputRow>
-            <InputRow className="my-3" label="Abstract">
-                <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
-            </InputRow>
-        </Form>
-        <div className="d-flex flex-row justify-content-end">
-            <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
-        </div>
+        { active ? <>
+            <Form>
+                <InputRow label="Titolo" className="my-3">
+                    <StringInput value={data.title} setValue={setter(setData,'title')} />
+                </InputRow>
+                <InputRow label="Ciclo di seminari" className="my-3">
+                    <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')}/>
+                </InputRow>
+                <InputRow label="Data e ora" className="my-3">
+                    <DatetimeInput value={data.startDatetime} setValue={setter(setData,'startDatetime')}/>
+                </InputRow>
+                <InputRow className="my-3" label="Durata (in minuti)">
+                    <NumberInput value={data.duration} setValue={setter(setData,'duration')}/>
+                </InputRow>
+                <InputRow className="my-3" label="Aula">
+                    <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')}/>
+                </InputRow>
+                <InputRow className="my-3" label="Grant">
+                    <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
+                </InputRow>
+                <InputRow className="my-3" label="Abstract">
+                    <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
+                </InputRow>
+            </Form>
+            {error && <div className="alert alert-danger">{error}</div>}
+            <div className="d-flex flex-row justify-content-end">
+                <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
+            </div>
+        </> : <>
+            titolo: {data.title}<br/>
+            ciclo: {data.category && data.category.name}<br/>
+            data: {data.startDatetime && data.startDatetime.toLocaleString()}<br/>
+            durata: {data.duration}<br/>
+            aula: {data.conferenceRoom && data.conferenceRoom.name}<br/>
+            grant: {data.grants && data.grants.map(g => g.name).join(', ')}<br/>
+            abstract: {data.abstract}<br/>
+            creato da: {data.createdBy.username}<br/>
+        </>}
         </Card.Body>
         {/* <Card.Footer>
             {JSON.stringify({data})}

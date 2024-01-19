@@ -149,6 +149,8 @@ router.patch('/:id', async (req, res) => {
             endDate: { $gte: pastDate() }}, 
         payload)
 
+    if (!visit) return res.status(404)
+    
     await log(req, visit, payload)
 
     res.send({})

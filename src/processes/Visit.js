@@ -11,6 +11,7 @@ import Loading from '../components/Loading'
 import {myDateFormat,setter} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
 import {SeminarDetailsBlock} from './Seminar'
+import { useEngine } from '../Engine'
 
 export default function Visit({variant}) {
     // variant è '' per /process/visit
@@ -31,6 +32,7 @@ function VisitForm({visit, variant}) {
     const queryClient = useQueryClient()
     const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
     const [seminar, setSeminar] = useState(null)
+    const user = useEngine().user
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -62,12 +64,30 @@ function VisitForm({visit, variant}) {
                 variant={variant}
             />
         }
-        { data.seminars.map(seminar => <div key={seminar._id}>
-            <SeminarDetailsBlock data={seminar}/>
-            {JSON.stringify(seminar)}
+        {   // mostra i seminari già inseriti
+            data.seminars.map(seminar => <div key={seminar._id}>
+            <Seminar seminar={seminar} 
+                active={activeSection===seminar._id} 
+                change={() => setActiveSection(seminar._id)}
+                done={() => {setActiveSection('')}}
+                variant={variant}
+                />
         </div>)}
+        {   // mostra il form per inserire un nuovo seminario
+            seminar && <Seminar seminar={seminar}
+                active={activeSection==='seminar'}
+                done={() => {setActiveSection('');setSeminar(null)}}
+                variant={variant}
+                />}
+        { data.seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
+            <Button className="mx-3" onClick={newSeminar}>Crea seminario</Button>}
         <Button className="mr-3" onClick={completed}>Indietro</Button>
     </PrefixProvider>
+
+    function newSeminar() {
+        setSeminar({speaker: data.person, grants: [...data.grants]})
+        setActiveSection('seminar')
+    }
 
     function nextStep() {
         let section = activeSection
@@ -159,10 +179,9 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
     </>
 
     function check() {
-        return data.startDate && data.endDate && data.startDate <= data.endDate
+        return data.startDate && data.endDate && new Date(data.startDate) <= new Date(data.endDate)
     }
 }
-
 
 function RoomAssignments({data, active, done, edit, variant}) {
     return <Card className="shadow mb-3">
@@ -198,3 +217,29 @@ function RoomAssignments({data, active, done, edit, variant}) {
     }
 }
 
+function Seminar({seminar, change, active, done, variant}) {
+    const [data, setData] = useState(seminar)
+    const [error, setError] = useState('')
+    const queryClient = useQueryClient()
+    const user = useEngine().user
+
+    const canModifySeminar = user.hasProcessPermission('/process/seminars')
+
+    return <SeminarDetailsBlock data={data} setData={setData} onCompleted={save} disabled={!canModifySeminar} change={change} active={active} error={error}/>
+
+    async function save() {
+        setError('')
+        console.log(`save seminar: ${JSON.stringify(data)}`)
+        try {
+            if (data._id) {
+                await api.patch(`/api/v0/process/seminars/${data._id}`, data)
+            } else {
+                await api.post(`/api/v0/process/seminars`, data)
+                queryClient.invalidateQueries(`/process/${variant}visits`.split('/'))
+            }
+            done()
+        } catch (e) {
+            setError(e.response?.data.error || e?.message || `${e}`)
+        }
+    }
+}
