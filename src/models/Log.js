@@ -20,7 +20,7 @@ export default class Log extends Model {
         this.columns = {
             'when': "quando",
             'who': "chi",
-            'where': "dove",
+            'where': {label: "dove", render: obj => obj.where.replace('/api/v0/process/','⠶').replace('/api/v0/','⠊')},
             'what': "cosa",
             'will': {label: "info", render: obj => JSON.stringify(obj.will||obj.was)},
         }

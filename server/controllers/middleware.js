@@ -6,7 +6,7 @@ const log = async (req, was, will) => {
         who: req.log_who,
         when: new Date(),
         what: req.method,
-        where: req.path,
+        where: req.originalUrl,
         was,
         will})
 }
@@ -81,10 +81,10 @@ const requirePathPermissions = async (req, res, next) => {
         req.log_who = req.user.username
     }
 
-    console.log(`checking permissions for ${req.log_who} on ${fullUrl}`)
+    console.log(`checking permissions for ${req.log_who} with roles ${JSON.stringify(req.roles)} on ${fullUrl}`)
 
     const hasPermission = req.roles?.includes('admin') || req.roles.reduce(
-        (x,y) => x || fullUrl.startsWith(y), false
+        (x,y) => x || fullUrl.startsWith(`/api/v0${y}`), false
     )
 
     if (! hasPermission) {

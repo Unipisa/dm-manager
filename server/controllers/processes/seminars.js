@@ -4,9 +4,6 @@ const { ObjectId } = require('mongoose').Types
 
 const EventSeminar = require('../../models/EventSeminar')
 
-const SeminarCategoryController = require('../SeminarCategoryController')
-const ConferenceRoomController = require('../ConferenceRoomController')
-const PersonController = require('../PersonController')
 const InstitutionController = require('../InstitutionController')
 const EventSeminarController = require('../EventSeminarController')
 const GrantController = require('../GrantController')
@@ -14,8 +11,10 @@ const Person = require('../../models/Person')
 const controller = new EventSeminarController()
 const {log} = require('../middleware')
 
-/* inject functionality for person select widget */
+/* inject functionality for widgets */
 require('./personSearch')(router)
+require('./conferenceRoomSearch')(router)
+require('./seminarCategorySearch')(router)
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined) {
@@ -59,7 +58,59 @@ router.get('/get/:id', async (req, res) => {
     }, res)
 })
 
-router.put('/save', async (req, res) => {
+router.post('/', async (req, res) => {
+    let payload = {
+        ...req.body,
+        createdBy: req.user._id,
+        updatedBy: req.user._id,
+    }
+
+    try {
+        const seminar = EventSeminar(payload)
+        await seminar.save()
+    } catch (error) {
+        res.status(400).send({ error: error.message })
+        return
+    }
+    await log(req, {}, payload)
+    res.send({})
+})
+
+router.patch('/:id', async (req, res) => {
+    const id = req.params.id
+    let _id
+    try {
+        _id = new ObjectId(id)
+    } catch (error) {
+        res.status(400).send({ error: 'invalid id' })
+        return
+    }
+
+    let payload = {
+        ...req.body,
+        createdBy: req.user._id,
+        updatedBy: req.user._id,
+    }
+
+    try {
+        const seminar = await EventSeminar.findById(_id)
+        if (!seminar.createdBy.equals(req.user._id)) {
+            res.status(403).json({ error: "Forbidden" })
+            return
+        }
+        
+        const was = {...seminar}
+        seminar.set({ ...seminar, ...payload })
+        await seminar.save()
+        await log(req, was, payload)
+        res.send({})
+    }
+    catch (error) {
+        res.status(400).send({ error: error.message })
+    }
+})
+
+router.put('/save', async (req, res) => {    
     let payload = {
         ...req.body,
         createdBy: req.user._id,
@@ -92,27 +143,17 @@ router.put('/save', async (req, res) => {
     }
 })
 
-router.get('/add/seminar-category/search', async (req, res) => {
-    const controller = new SeminarCategoryController()
-    await controller.search(req, res)
-})
-
-router.get('/add/conference-room/search', async (req, res) => {
-    const controller = new ConferenceRoomController()
-    await controller.search(req, res)
-})
-
-router.get('/add/institution/search', async (req, res) => {
+router.get('/institution/search', async (req, res) => {
     const controller = new InstitutionController()
     await controller.search(req, res)
 })
 
-router.put('/add/institution', async (req, res) => {
+router.put('/institution', async (req, res) => {
     const controller = new InstitutionController()
     await controller.put(req, res)
 })
 
-router.get('/add/grant/search', async (req, res) => {
+router.get('/grant/search', async (req, res) => {
     const controller = new GrantController()
     await controller.search(req, res)
 })

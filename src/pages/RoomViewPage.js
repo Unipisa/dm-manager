@@ -42,14 +42,20 @@ function RoomAssignments() {
         }
     })
 
+    function sortName(person) {
+        return person.lastName + '+' + person.firstName
+    }
+
     const currentNames = assignments
         .filter(assignment => {
             const start = notNullStartDate(assignment.startDate)
             const end = notNullEndDate(assignment.endDate)
             return start <= today && today <= end
         })
-        .filter(assignment => assignment.person)
-        .map(assignment => assignment.person.firstName + ' ' + assignment.person.lastName)
+        .map(assignment => assignment.person)
+        .filter(person => person)
+        .sort((a,b) => sortName(a).localeCompare(sortName(b)))
+        .map(person => person.firstName + ' ' + person.lastName)
 
     return <Card className="mt-2">
         <Card.Header>

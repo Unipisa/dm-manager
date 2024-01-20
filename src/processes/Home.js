@@ -60,8 +60,7 @@ export default function Home() {
                         </ul>         
                     </Card.Body>
                 </Card>
-            </div>            
-            }
+            </div> }
             { (user.hasProcessPermission('/process/roomLabels')) &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">
