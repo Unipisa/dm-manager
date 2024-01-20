@@ -4,6 +4,7 @@ const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
 const { log } = require('../middleware')
+const { notify } = require('../../models/Notification')
 
 const router = express.Router()
 module.exports = router
@@ -225,6 +226,67 @@ const GET_PIPELINE = [
 ]
 module.exports.GET_PIPELINE = GET_PIPELINE
 
+async function notifyVisit(visit_id, message) {
+    const visits = await Visit.aggregate([
+        { $match: {_id: new ObjectId(visit_id)}},
+        ...GET_PIPELINE,
+    ])
+    if (visits.length === 0) {
+        console.log(`notifyVisit: visit ${visit_id} not found`)
+        return
+    }
+    const visit = visits[0]
+
+    const person = visit.person
+    const affiliations = visit.affiliations.map(a => a.name).join(', ')
+    const grants = visit.grants.map(g => g.name).join(', ')
+    const startDate = visit.startDate.toLocaleDateString('it-IT')
+    const endDate = visit.endDate.toLocaleDateString('it-IT')
+    const tags = visit.tags.join(', ')
+    const notes = visit.notes
+    let text =  message
+
+    text +=`
+Visitatore: ${person.firstName} ${person.lastName}
+Affiliazioni: ${affiliations}
+Grants: ${grants}
+Data inizio: ${startDate}
+Data fine: ${endDate}
+Tags: ${tags}
+Note: ${notes}
+
+Creata da: ${visit.createdBy?.username} il ${visit.createdAt?.toLocaleDateString('it-IT')}
+Aggiornata da: ${visit.updatedBy?.username} il ${visit.updatedAt?.toLocaleDateString('it-IT')}
+`
+    for (ra of (visit?.roomAssignments || [])) {
+        text += `
+Assegnazione stanza: ${ra.room.code} ${ra.room.building} ${ra.room.floor} ${ra.room.number}
+Data inizio: ${ra.startDate?.toLocaleDateString('it-IT')}
+Data fine: ${ra.endDate?.toLocaleDateString('it-IT')}
+Creata da: ${ra.createdBy?.username} il ${ra.createdAt?.toLocaleDateString('it-IT')}
+        `
+    }
+
+    for(seminar of visit?.seminars || []) {
+        text += `
+Seminario: ${seminar.title}
+Categoria: ${seminar.category.label}
+Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
+Data fine: ${seminar.endDatetime?.toLocaleDateString('it-IT')}
+Durata: ${seminar.duration}
+Sala: ${seminar.conferenceRoom.name}
+Abstract: ${seminar.abstract}
+Grants: ${seminar.grants.map(g => g.name).join(', ')}
+Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
+Aggiornato da: ${seminar.updatedBy?.username} il ${seminar.updatedAt?.toLocaleDateString('it-IT')}
+        `
+    }
+
+    await notify('process/visits', `${visit_id}`, text)
+}
+
+module.exports.notifyVisit = notifyVisit
+
 router.get('/', async (req, res) => {    
     if (!req.user) {
         res.status(401).json({
@@ -244,7 +306,10 @@ router.get('/', async (req, res) => {
 })
 
 router.delete('/:id', async (req, res) => {
-    assert(req.user._id) 
+    assert(req.user._id)
+
+    await notifyVisit(req.params.id, `La visita è stata cancellata`)
+
     const visit = await Visit.findOneAndDelete({
         _id: new ObjectId(req.params.id),
         endDate: { $gte: pastDate() },
@@ -298,6 +363,7 @@ router.put('/', async (req, res) => {
     await visit.save()
 
     await log(req, {}, payload)
+    notifyVisit(visit._id)
 
     res.send({_id: visit._id})
 })
@@ -318,6 +384,7 @@ router.patch('/:id', async (req, res) => {
     if (!visit) return res.status(404)
 
     await log(req, visit, payload)
+    notifyVisit(visit._id)
 
     res.send({})
 })

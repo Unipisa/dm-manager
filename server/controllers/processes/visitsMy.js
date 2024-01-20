@@ -5,7 +5,7 @@ const { ObjectId } = require('mongoose').Types
 const Visit = require('../../models/Visit')
 const Person = require('../../models/Person')
 const { log } = require('../middleware')
-const { INDEX_PIPELINE, GET_PIPELINE, DAYS_BACK, pastDate } = require('./visits')
+const { INDEX_PIPELINE, GET_PIPELINE, DAYS_BACK, pastDate, notifyVisit} = require('./visits')
 
 const router = express.Router()
 module.exports = router
@@ -54,6 +54,8 @@ router.get('/', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
     assert(req.user._id) 
+
+    await this.notifyVisit(req.params.id, 'delete')
 
     if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
     const person = await getPersonByEmail(req.user.email)
@@ -124,6 +126,7 @@ router.put('/', async (req, res) => {
     await visit.save()
 
     await log(req, {}, payload)
+    notifyVisit(visit._id)
 
     res.send({_id: visit._id})
 })
@@ -152,6 +155,7 @@ router.patch('/:id', async (req, res) => {
     if (!visit) return res.status(404)
     
     await log(req, visit, payload)
+    notifyVisit(visit._id)
 
     res.send({})
 })
