@@ -65,6 +65,7 @@ function VisitForm({visit, variant}) {
             />
         }
         {   // mostra i seminari già inseriti
+            data.seminars &&
             data.seminars.map(seminar => <div key={seminar._id}>
             <Seminar seminar={seminar} 
                 active={activeSection===seminar._id} 
@@ -79,7 +80,7 @@ function VisitForm({visit, variant}) {
                 done={() => {setActiveSection('');setSeminar(null)}}
                 variant={variant}
                 />}
-        { data.seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
+        { data.seminars && data.seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
             <Button className="mx-3" onClick={newSeminar}>Crea seminario</Button>}
         <Button className="mr-3" onClick={completed}>Indietro</Button>
     </PrefixProvider>
