@@ -16,6 +16,7 @@ class Options {
         const GIT_BRANCH = current_branch()
 
         const options = {
+            SMTP_HOST: undefined,
             STATIC_FILES_PATH: (process.env.NODE_ENV === 'production' ? 'build' : 'public'),
             SESSION_SECRET: randomUUID(),
             JWT_SECRET: randomUUID(),
