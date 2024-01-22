@@ -35,6 +35,7 @@ jobs:
       with:
         images: harbor.cs.dm.unipi.it/dm-manager/dm-manager
         tags: |
+          type=raw,value=latest
           type=ref,event=tag
           type=ref,event=branch
           type=semver,pattern={{version}}
