@@ -6,7 +6,7 @@ const log = async (req, was, will) => {
         who: req.log_who,
         when: new Date(),
         what: req.method,
-        where: req.path,
+        where: req.originalUrl,
         was,
         will})
 }

@@ -1,8 +1,10 @@
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 
 import { myDateFormat } from '../Engine'
+import { ConfirmDeleteButton } from '../components/ModalDialog'
+import api from '../api'
 
 export default function ProcessVisits({variant}) {
     // variant è '' per /process/visits
@@ -21,6 +23,7 @@ export default function ProcessVisits({variant}) {
 }
 
 function VisitList({variant}) {
+    const queryClient = useQueryClient()
     const { isLoading, error, data } = useQuery(`process/${variant}visits`.split('/'))
 
     if (isLoading) {
@@ -42,10 +45,10 @@ function VisitList({variant}) {
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />
                         <strong>Periodo</strong>: {myDateFormat(visit.startDate)} – {myDateFormat(visit.endDate)}<br />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        
-                            {/*
-                            <button className="ms-2 btn btn-danger" onClick={() => deleteVisit(visit._id)}>
+                            {
+                            <ConfirmDeleteButton className="ms-2 btn btn-danger" objectName={`la visita di ${visit.person.firstName} ${visit.person.lastName}`} onConfirm={() => removeVisit(visit._id)}>
                                 Elimina
-                            </button>*/}
+                            </ConfirmDeleteButton>}
                             <Link className="ms-2" to={`/process/${variant}visits/${visit._id}`}>
                                 <button className="btn btn-primary">
                                     Modifica
@@ -57,4 +60,10 @@ function VisitList({variant}) {
             </div>
         })}
     </>
+
+    async function removeVisit(id) {
+        await api.del(`/api/v0/process/${variant}visits/${id}`)
+        queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
+    }
+
 }

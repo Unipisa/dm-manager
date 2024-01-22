@@ -6,7 +6,8 @@ import { CSVLink } from "react-csv"
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import Loading from './Loading'
 
-export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders}) {    const engine = useEngine()
+export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders}) {    
+    const engine = useEngine()
     const filter = useQueryFilter(defaultFilter || {})
     const query = engine.useIndex(path, filter.filter)
     const navigate = useNavigate()

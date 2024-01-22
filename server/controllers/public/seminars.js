@@ -60,6 +60,7 @@ async function seminarsQuery(req) {
 
     const pipeline = [
         { $match: match },
+        ...sort_and_limit,
         { $lookup: {
             from: 'people',
             localField: 'speaker',

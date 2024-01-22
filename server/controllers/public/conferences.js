@@ -66,7 +66,7 @@ async function conferencesQuery(req) {
             localField: 'grant',
             as: 'grant'
         }},
-        ...sort_and_limit, 
+        ...sort_and_limit,
         { $project: {
             _id: 1, 
             title: 1, 

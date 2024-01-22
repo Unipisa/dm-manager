@@ -12,6 +12,7 @@ const lessonsQuery = require('./controllers/public/lessons')
 const seminarCategoriesQuery = require('./controllers/public/seminar-categories')
 const conferencesQuery = require('./controllers/public/conferences')
 const processes = require('./controllers/processes/router.js')
+const roomsQuery = require('./controllers/public/rooms.js')
 
 const router = express.Router()
 
@@ -101,6 +102,10 @@ router.get('/public/conferences', async (req, res) => {
 
 router.get('/public/seminar-categories', async (req, res) => {
     res.send(await seminarCategoriesQuery(req))
+})
+
+router.get('/public/rooms', async (req, res) => {
+    res.json(await roomsQuery(req))
 })
 
 router.use('/process', processes)

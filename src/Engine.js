@@ -334,3 +334,9 @@ export function notNullEndDate(date) {
     if (typeof date === 'string') return new Date(date)
     return date
 }
+
+export function setter(setData, key) {
+    return (value) => {
+        setData(data => ({ ...data, [key]: value }))
+    }
+}

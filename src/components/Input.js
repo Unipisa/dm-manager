@@ -45,6 +45,17 @@ export function StringInput({ value, setValue }) {
     />
 }
 
+export function EmailInput({ value, setValue }) {
+    const id = useInputId()
+    return <input 
+        className="form-control col-sm-10"
+        id={ id } 
+        type="email"
+        value={ value || "" } 
+        onChange={ (evt) => {setValue(evt.target.value)} }
+    />
+}   
+
 export function AttachmentInput({ value, setValue, image }) {
     // const [uploading, setUploading] = useState(false)
     const engine = useEngine()

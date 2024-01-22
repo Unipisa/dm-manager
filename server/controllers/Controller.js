@@ -542,14 +542,15 @@ class Controller {
         console.log(`*** PATCH ${id} ${JSON.stringify(payload)}`)
         try {
             const was = await this.Model.findById(id)
-            await log(req, was, payload)
-            if (was.createdBy !== undefined) delete payload.createdBy
-            if (payload.createdBy) {
-                const user = await User.findOne({username: payload.createdBy})
-                if (!user) throw new Error(`user ${payload.createdBy} not found`)
-                payload.createdBy = user._id
-            }
-            was.set({...was, ...payload})
+            
+            const will = {...payload,
+                updatedBy: req.user._id}
+            delete will.createdAt
+            delete will.createdBy
+            delete will.updatedAt
+
+            await log(req, was, will)
+            was.set({...was, ...will})
             await was.save()
             res.send(was)
         } catch(error) {
@@ -617,13 +618,6 @@ class Controller {
             this.register_path(router, 'patch', `/${this.path}/:id`, 
                 this.managerRoles, 
                 (req, res) => {
-                    const payload = {...req.body,
-                        updatedBy: req.user._id
-                    }
-                    // è possibile modificare l'owner se undefined
-                    //delete payload.createdBy
-                    delete payload.createdAt
-                    delete payload.updatedAt
                     this.patch(req, res, req.params.id, payload)
                 }),
 

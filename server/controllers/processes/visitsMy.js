@@ -3,9 +3,12 @@ const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
+const Person = require('../../models/Person')
 const { log } = require('../middleware')
+const { INDEX_PIPELINE, GET_PIPELINE, DAYS_BACK, pastDate, notifyVisit} = require('./visits')
 
 const router = express.Router()
+module.exports = router
 
 // inject functionality on the current route
 require('./personSearch')(router)
@@ -14,16 +17,19 @@ require('./grantSearch')(router)
 // inject room assignment functionality
 // require('./roomAssignment')(router)
 
-const DAYS_BACK = 30
-
-function pastDate() {
-    const d = new Date()
-    d.setDate(d.getDate() - DAYS_BACK)
-    return d
+async function getPersonByEmail(email) {
+    const persons = await Person.aggregate([
+        { $match: {$or: [{email}, {alternativeEmails: email}]}},
+    ])
+    // console.log(`lookup person with email ${email}: ${JSON.stringify(persons)}`)
+    if (persons.length === 0) return null
+    if (persons.length > 0) {
+        console.log(`WARNING: found ${persons.length} persons with email ${email}`)
+    }
+    return persons[0]
 }
 
 router.get('/', async (req, res) => {    
-
     if (!req.user) {
         res.status(401).json({
             result: "Unauthorized"
@@ -31,51 +37,46 @@ router.get('/', async (req, res) => {
         return
     }
 
+    if (!req.user.email) return res.json({ data: [], note: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.json({ data: [], note: `no person found matching user ${req.user._id} email`})
+
     const data = await Visit.aggregate([
         { $match: { 
-            createdBy: req.user._id,
+            referencePeople: person._id,
             endDate: { $gte: pastDate() },
         }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
-        { $lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                }},
-            ]
-        }},
+        ...INDEX_PIPELINE,
     ])
 
-    res.json({ data, DAYS_BACK })
+    res.json({ data, person, DAYS_BACK })
 })
 
 router.delete('/:id', async (req, res) => {
     assert(req.user._id) 
+
+    await this.notifyVisit(req.params.id, 'delete')
+
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     const visit = await Visit.findOneAndDelete({
         _id: new ObjectId(req.params.id),
-        createdBy: req.user._id,
+        referencePeople: person._id,
         endDate: { $gte: pastDate() },
     })
-    log(req, visit, {})
+
+    await log(req, visit, {})
     res.json({})
 })
 
 router.get('/:id', async (req, res) => {
     assert(req.user._id)
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     if (req.params.id === '__new__') {
         // return empty object
         const visit = new Visit().toObject()
@@ -91,127 +92,30 @@ router.get('/:id', async (req, res) => {
     const data = await Visit.aggregate([
         { $match: { 
             _id,
-            createdBy: req.user._id,
+            referencePeople: person._id,
             endDate: { $gte: pastDate() },
         }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-            pipeline: [
-                { $lookup: {
-                    from: 'institutions',
-                    localField: 'affiliations',
-                    foreignField: '_id',
-                    as: 'affiliations',
-                    pipeline: [
-                        { $project: {
-                            _id: 1,
-                            name: 1,
-                        }},
-                    ]
-                }},
-                { $project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    affiliations: 1,
-                    email: 1,
-                }},
-            ]
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true,
-        }},
-        {$lookup: {
-            from: 'institutions',
-            localField: 'affiliations',
-            foreignField: '_id',
-            as: 'affiliations',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                }},
-            ]
-        }},
-        {$lookup: {
-            from: 'grants',
-            localField: 'grants',
-            foreignField: '_id',
-            as: 'grants',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                    identifier: 1,
-                }},
-            ]
-        
-        }},
-        {$lookup: {
-            from: "roomassignments",
-            let: { start: "$startDate", end: "$endDate" },
-            localField: 'person._id',
-            foreignField: "person",
-            as: 'roomAssignments',
-            pipeline: [
-                // inserisce i dati della stanza
-                {$lookup: {
-                    from: "rooms",
-                    localField: "room",
-                    foreignField: "_id",
-                    as: "room",
-                }},
-                {$project: {
-                    "startDate": 1,
-                    "endDate": 1,
-                    "room._id": 1,
-                    "room.code": 1,
-                    "room.building": 1,
-                    "room.floor": 1,
-                    "room.number": 1,
-                }},
-                // tiene solo le assegnazioni che includono il periodo [start, end] 
-                {$match: {
-                    $expr: {
-                        $and: [
-                            { $or: [
-                                { $eq: ["$$end", null] },
-                                { $eq: ["$startDate", null] },
-                                { $lte: ["$startDate", "$$end"] } ]},
-                            { $or: [
-                                { $eq: ["$$start", null] },
-                                { $eq: ["$endDate", null] },
-                                { $gte: ["$endDate", "$$start"] } ]}
-                        ]},
-                    },
-                },
-                {$unwind: {
-                    path: "$room",
-                    preserveNullAndEmptyArrays: true
-                }},
-                // ordina per data finale...
-                // l'ultima assegnazione dovrebbe essere quella attuale
-                {$sort: {"endDate": 1}},
-            ]
-        }},
+        ...GET_PIPELINE,
     ])
     if (data.length === 0) {
         res.status(404).json({ error: "Not found" })
         return
     }
-    res.json(data[0])
+    res.json({...data[0], user_person: person})
 })
 
 router.put('/', async (req, res) => {
     const payload = {...req.body}
 
+    assert(req.user._id)
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     // override fields that user cannot change
     payload.createdBy = req.user._id
     payload.updatedBy = req.user._id
+    payload.referencePeople = [person._id]
     delete payload._id
 
     if (!payload.endDate || new Date(payload.endDate) < pastDate()) {
@@ -221,7 +125,8 @@ router.put('/', async (req, res) => {
     const visit = new Visit(payload)
     await visit.save()
 
-    log(req, {}, payload)
+    await log(req, {}, payload)
+    notifyVisit(visit._id)
 
     res.send({_id: visit._id})
 })
@@ -229,20 +134,28 @@ router.put('/', async (req, res) => {
 router.patch('/:id', async (req, res) => {
     const payload = {...req.body}
 
+    assert(req.user._id)
+    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
+    const person = await getPersonByEmail(req.user.email)
+    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+
     // remove fields that user cannot change
     delete payload._id
     delete payload.createdBy
+    delete payload.referencePeople
     payload.updatedBy = req.user._id
 
     const visit = await Visit.findOneAndUpdate(
         {   _id: new ObjectId(req.params.id),
             createdBy: req.user._id,
+            referencePeople: [person._id],
             endDate: { $gte: pastDate() }}, 
         payload)
 
+    if (!visit) return res.status(404)
+    
     await log(req, visit, payload)
+    notifyVisit(visit._id)
 
     res.send({})
 })
-
-module.exports = router

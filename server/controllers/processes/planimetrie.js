@@ -4,6 +4,7 @@ const router = express.Router()
 
 const {ObjectId} = require('mongodb')
 const Room = require('../../models/Room')
+const {log} = require('../middleware')
 
 router.get('/', async (req, res) => {
     // Find all rooms, and return only the data required for the planimetrie module
@@ -65,6 +66,7 @@ router.post('/:id', async (req, res) => {
     if (polygon) { newdata.polygon = polygon }
 
     const ok = await Room.updateOne({ _id: id }, newdata)
+    await log(req, {}, newdata)
 
     if (ok.modifiedCount == 1) {
         res.json({})

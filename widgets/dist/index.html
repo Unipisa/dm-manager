@@ -66,6 +66,11 @@
                  data-target="#conference-tab" type="button" role="tab" aria-controls="conference" 
                  aria-selected="false">Conference</a>
           </li>
+          <li class="nav-item">
+              <a class="nav-link" href="#homeeventlist" id="homeeventlist-label" data-toggle="tab" 
+                 data-target="#homeeventlist-tab" type="button" role="tab" aria-controls="homeeventlist" 
+                 aria-selected="false">HomeEventList</a>
+          </li>
         </ul>
     </nav>
 
@@ -81,9 +86,8 @@
         </div>
           <div class="tab-pane fade p-3" id="seminar-tab"><div id="seminar"></div></div>
           <div class="tab-pane fade p-3" id="conferencelist-tab"><div id="conferencelist"></div></div>
-          <div class="tab-pane fade p-3" id="conference-tab">
-            <div id="conference"></div>
-        </div>
+          <div class="tab-pane fade p-3" id="conference-tab"><div id="conference"></div></div>
+          <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
         </div>
       </article>
     </main>
@@ -92,6 +96,8 @@
 
     <script>
         async function loader() {
+            dmwidgets.localDevelopment = true
+
             const seminar_id = (await (await fetch('http://localhost:8000/api/v0/public/seminars')).json()).data[0]._id
             const conference_id = (await (await fetch('http://localhost:8000/api/v0/public/conferences')).json()).data[0]._id
 
@@ -110,6 +116,9 @@
             dmwidgets.loadComponent(document.getElementById("conferencelist"), "ConferenceList", { 
                 // from: '2023-11-30', 
                 // category: '653b5d8d10c0279ad486c807'
+            })
+            dmwidgets.loadComponent(document.getElementById('homeeventlist'), "HomeEventList", {
+              
             })
         }
         loader();
