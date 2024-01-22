@@ -24,7 +24,7 @@ export function SeminarList({ from, to, category, grant, _sort, _limit }) {
     var events_block = []
     for (var i = 0; i < data.length; i++) {
         const e = data[i]
-        const link = getDMURL("seminario?id=" + e._id)
+        const link = getDMURL("en/seminar?id=" + e._id)
 
         events_block.push(
             <div key={e._id}>

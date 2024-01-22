@@ -26,7 +26,7 @@ export function ConferenceList({ from, to, grant, SSD, _sort, _limit }) {
     var events_block = []
     for (var i = 0; i < data.length; i++) {
         const e = data[i]
-        const link = getDMURL("conferenza?id=" + e._id)
+        const link = getDMURL("en/conference?id=" + e._id)
 
         events_block.push(
             <div key={e._id}>
