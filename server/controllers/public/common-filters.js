@@ -17,6 +17,11 @@ function createSortAndLimitFilters(req) {
             $limit: parseInt(req.query._limit)
         })
     }
+    else {
+        filters.push({
+            $limit: 10
+        })
+    }
 
     console.log(filters)
 
