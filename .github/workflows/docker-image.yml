@@ -63,7 +63,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
     - name: Build and push
-      id: docker_build
+      id: docker_build_worker
       uses: docker/build-push-action@v5
       if: ${{ github.event_name != 'pull_request' }}
       with:
