@@ -2,6 +2,7 @@ const ObjectId = require('mongoose').Types.ObjectId
 const EventConference = require('../../models/EventConference')
 
 const maxDate = new Date(8640000000000000);
+const { createSortAndLimitFilters } = require('./common-filters')
 
 async function conferencesQuery(req) {
     var from = undefined;
@@ -45,6 +46,8 @@ async function conferencesQuery(req) {
         match["SSD"] = req.query.SSD
     }
 
+    const sort_and_limit = createSortAndLimitFilters(req)
+
     const pipeline = [
         { $match: match },
         { $lookup: {
@@ -63,6 +66,7 @@ async function conferencesQuery(req) {
             localField: 'grant',
             as: 'grant'
         }},
+        ...sort_and_limit, 
         { $project: {
             _id: 1, 
             title: 1, 

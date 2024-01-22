@@ -9,15 +9,13 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function ConferenceList({ from, to, grant, SSD }) {
-    const filter = { from, to, grant, SSD }
+export function ConferenceList({ from, to, grant, SSD, _sort, _limit }) {
+    const filter = { from, to, grant, SSD, _sort, _limit }
 
     const { isLoading, error, data } = useQuery([ 'conferences', filter ], async () => {
         const res = await axios.get(getManageURL("public/conferences"), { params: filter })
         if (res.data) {
-            const ee = res.data.data
-            ee.sort((a,b) => new Date(a.startDatetime) - new Date(b.startDatetime))
-            return ee
+            return res.data.data
         }
     })
 

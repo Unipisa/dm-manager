@@ -2,6 +2,7 @@ const EventSeminar = require('../../models/EventSeminar')
 const ObjectId = require('mongoose').Types.ObjectId
 
 const maxDate = new Date(8640000000000000);
+const { createSortAndLimitFilters } = require('./common-filters')
 
 /** @param {import('@types/express').Request} req */
 async function seminarsQuery(req) {
@@ -55,6 +56,8 @@ async function seminarsQuery(req) {
         match["externalid"] = req.query.externalid
     }
 
+    const sort_and_limit = createSortAndLimitFilters(req)
+
     const pipeline = [
         { $match: match },
         { $lookup: {
@@ -106,7 +109,7 @@ async function seminarsQuery(req) {
             path: '$conferenceRoom',
             preserveNullAndEmptyArrays: true
         }},
-        { $limit: req.params._limit ?? 50 }, 
+        ...sort_and_limit,
         { $project: {
             _id: 1,
             title: 1,

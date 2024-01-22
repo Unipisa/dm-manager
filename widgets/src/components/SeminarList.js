@@ -9,16 +9,12 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function SeminarList({ from, to, category, grant }) {
-    const filter = { from, to, category, grant }
+export function SeminarList({ from, to, category, grant, _sort, _limit }) {
+    const filter = { from, to, category, grant, _sort, _limit }
 
     const { isLoading, error, data } = useQuery([ 'seminars', filter ], async () => {
         const res = await axios.get(getManageURL("public/seminars"), { params: filter })
-        if (res.data) {
-            const ee = res.data.data
-            ee.sort((a,b) => new Date(a.startDatetime) - new Date(b.startDatetime))
-            return ee
-        }
+        return res.data.data
     })
 
     if (isLoading || error) {

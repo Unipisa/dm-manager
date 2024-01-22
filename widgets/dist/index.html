@@ -77,7 +77,6 @@
           </div></div>
           <div class="tab-pane fade p-3" id="eventlist-tab"><div id="eventlist"></div></div>
           <div class="tab-pane fade p-3" id="seminarlist-tab">
-            <div id="seminarlist2"></div>
             <div id="seminarlist"></div>
         </div>
           <div class="tab-pane fade p-3" id="seminar-tab"><div id="seminar"></div></div>
@@ -105,10 +104,7 @@
             dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {})
             dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
                 from: '2023-12-20', 
-                // category: '653b5d8d10c0279ad486c807'
-            })
-            dmwidgets.loadComponent(document.getElementById("seminarlist2"), "SeminarList", { 
-                from: '2023-11-30', 
+                _sort: '-startDatetime'
                 // category: '653b5d8d10c0279ad486c807'
             })
             dmwidgets.loadComponent(document.getElementById("conferencelist"), "ConferenceList", { 
