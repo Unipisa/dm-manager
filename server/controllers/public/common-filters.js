@@ -23,8 +23,6 @@ function createSortAndLimitFilters(req) {
         })
     }
 
-    console.log(filters)
-
     return filters
 }
 

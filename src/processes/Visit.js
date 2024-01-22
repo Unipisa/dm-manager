@@ -47,17 +47,17 @@ function VisitForm({visit, variant}) {
             active={activeSection==='person'}
             prefix={`/api/v0/process/${variant}visits`}
         />
-        { data.person && 
-            <VisitDetailsBlock 
+        { visit.person && 
+            <VisitDetailsBlock
                 data={data} 
                 setData={setData} 
                 active={activeSection==='data'} 
                 done={() => {save();nextStep()}} 
                 edit={() => setActiveSection('data')}
             />}
-        { (data.requireRoom || data.roomAssignments?.length>0)  &&
+        { (visit.requireRoom || visit.roomAssignments?.length>0)  &&
             <RoomAssignments 
-                data={data} 
+                data={visit} 
                 active={activeSection==='room'}
                 done={nextStep}
                 edit={() => setActiveSection('room')}
@@ -65,8 +65,8 @@ function VisitForm({visit, variant}) {
             />
         }
         {   // mostra i seminari già inseriti
-            data.seminars &&
-            data.seminars.map(seminar => <div key={seminar._id}>
+            visit.seminars &&
+            visit.seminars.map(seminar => <div key={seminar._id}>
             <Seminar seminar={seminar} 
                 active={activeSection===seminar._id} 
                 change={() => setActiveSection(seminar._id)}
@@ -81,8 +81,8 @@ function VisitForm({visit, variant}) {
                 variant={variant}
                 />}
         { data.seminars && data.seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
-            <Button className="mx-3" onClick={newSeminar}>Crea seminario</Button>}
-        <Button className="mr-3" onClick={completed}>Indietro</Button>
+            <Button className="mt-3 me-3" onClick={newSeminar}>Crea seminario</Button>}
+        <Button className="mt-3" onClick={completed}>Indietro</Button>
     </PrefixProvider>
 
     function newSeminar() {
@@ -113,7 +113,7 @@ function VisitForm({visit, variant}) {
             console.log(`save response: ${JSON.stringify(res)}`)
             navigate(`/process/${variant}visits/${_id}`, {replace: true})
         }
-        queryClient.invalidateQueries(`/process/${variant}visits`.split('/'))
+        queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
     }
 
     async function completed() {
@@ -236,7 +236,7 @@ function Seminar({seminar, change, active, done, variant}) {
                 await api.patch(`/api/v0/process/seminars/${data._id}`, data)
             } else {
                 await api.post(`/api/v0/process/seminars`, data)
-                queryClient.invalidateQueries(`/process/${variant}visits`.split('/'))
+                queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
             }
             done()
         } catch (e) {
