@@ -80,7 +80,7 @@ module.exports = (router) => {
     router.patch('/person/:_id', async (req, res) => {
         const id = req.params._id
         const controller = new PersonController()
-        await controller.patch(req, res, id, req.body)
+        await controller.patch(req, res, id)
     })
 
     router.get('/institution/search', async (req, res) => {

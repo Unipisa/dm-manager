@@ -12,6 +12,11 @@ services:
       - 127.0.0.1:27017:27017
     restart: unless-stopped
 
+  worker:
+    image: robol/dm-worker
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
+
 #  nginx:
 #    image: nginx
 #    volumes:

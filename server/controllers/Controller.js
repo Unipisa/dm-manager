@@ -538,12 +538,12 @@ class Controller {
         }
     }
 
-    async patch(req, res, id, payload) {    
-        console.log(`*** PATCH ${id} ${JSON.stringify(payload)}`)
+    async patch(req, res, id) {    
+        console.log(`*** PATCH ${id} ${JSON.stringify(req.body)}`)
         try {
             const was = await this.Model.findById(id)
             
-            const will = {...payload,
+            const will = {...req.body,
                 updatedBy: req.user._id}
             delete will.createdAt
             delete will.createdBy
@@ -618,7 +618,7 @@ class Controller {
             this.register_path(router, 'patch', `/${this.path}/:id`, 
                 this.managerRoles, 
                 (req, res) => {
-                    this.patch(req, res, req.params.id, payload)
+                    this.patch(req, res, req.params.id)
                 }),
 
             this.register_path(router, 'delete', `/${this.path}/:id`, 

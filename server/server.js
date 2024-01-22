@@ -17,8 +17,6 @@ const migrations = require('./migrations')
 const MongoStore = require('connect-mongo')
 const crypto = require('crypto')
 
-const { sendEmail, setupSMTPAccount } = require('./email')
-
 // local password authentication
 passport.use(User.createStrategy())
 passport.serializeUser(User.serializeUser())
@@ -424,17 +422,13 @@ async function serve() {
     process.exit(123)
   }
 
-  await setupSMTPAccount()
-
   app.listen(parseInt(config.PORT), () => {
     console.log(`server started listening on port: ${config.PORT}`)
     console.log(`should be accessible from url: ${config.SERVER_URL}`)
   })
 }
 
-if (process.env.NODE_ENV !== 'test') {
-  serve() // start server
-}
+
 
 // export functionality for testing suite
 module.exports = {
@@ -442,5 +436,6 @@ module.exports = {
   setupDatabase,
   createOrUpdateUser,
   create_admin_user,
+  serve
 }
  

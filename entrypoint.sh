@@ -6,7 +6,7 @@ echo "ENTRYPOINT"
 mkdir -p /logs/
 mkdir -p /uploads
 
-node /app/server/server.js
+node /app/server/run-server.js
 
 
 

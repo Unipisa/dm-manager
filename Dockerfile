@@ -15,6 +15,7 @@ RUN npm ci --only=production
 COPY build ./build
 COPY server ./server
 COPY entrypoint.sh ./
+COPY worker.sh ./
 
 # Copy the dmwidgets script inside the assets folder
 COPY widgets/dist/dmwidgets.js ./build/static/
