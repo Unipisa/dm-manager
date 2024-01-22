@@ -145,7 +145,7 @@ export function getSSDLink(SSD) {
     }
     
     if (label != "") {
-        return <a key={"SSD-link-" + SSD} href={"https://www.dm.unipi.it/conferences?SSD=" + SSD.replace("/", "%2F")}>{SSD}</a>
+        return <a key={"SSD-link-" + SSD} href={"https://www.dm.unipi.it/en/conferences?SSD=" + SSD.replace("/", "%2F")}>{SSD}</a>
     }
 
     return ""
