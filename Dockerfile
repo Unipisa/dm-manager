@@ -1,4 +1,14 @@
 FROM node:18
+# Before building the docker image, you need to build the server 
+# and the widgets packages:
+#
+# $ npm run build
+# $ cd widgets
+# $ npm run build
+# $ cd ..
+#
+# Then:
+# $ docker build . -t dm-manager
 
 # Create app directory
 WORKDIR /app
@@ -15,7 +25,6 @@ RUN npm ci --only=production
 COPY build ./build
 COPY server ./server
 COPY entrypoint.sh ./
-COPY worker.sh ./
 
 # Copy the dmwidgets script inside the assets folder
 COPY widgets/dist/dmwidgets.js ./build/static/
@@ -23,7 +32,7 @@ COPY widgets/dist/dmwidgets.js.LICENSE.txt ./build/static/
 
 EXPOSE 8000
 
-CMD [ "./entrypoint.sh" ]
+CMD [ "./entrypoint.sh", "server" ]
 #ENTRYPOINT "tail -f /dev/null"
 
 # To build the image:

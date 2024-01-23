@@ -33,3 +33,4 @@ yarn-error.log*
 
 # widgets modules
 widgets/node_modules
+widgets/dist

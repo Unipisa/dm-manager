@@ -3,6 +3,7 @@ version: "2.1"
 services:
   dm-manager:
     image: harbor.cs.dm.unipi.it/dm-manager/dm-manager
+    entrypoint: ["./entrypoint.sh", "server"]
     restart: unless-stopped
     volumes:
       - ./logs:/logs
@@ -25,6 +26,15 @@ services:
       # REACT_APP_SERVER_URL: ""
     ports:
       - 8000:8000
+    networks:
+      - backend
+
+  worker:
+    image: harbor.cs.dm.unipi.it/dm-manager/dm-manager
+    entrypoint: ["./entrypoint.sh", "worker"]
+    restart: unless-stopped
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
     networks:
       - backend
 

@@ -1,4 +1,0 @@
-FROM harbor.cs.dm.unipi.it/dm-manager/dm-manager:latest
-
-# ENTRYPOINT 'bash'
-CMD [ "./worker.sh" ]
