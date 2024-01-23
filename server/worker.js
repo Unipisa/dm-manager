@@ -17,7 +17,7 @@ async function getEmailsForChannel(channel) {
     }
 
     const res = Array.from(await User.aggregate([
-        { $match: { 'roles': { $regex: '^subscribe/' + channel + '[$|/]' }}},
+        { $match: { 'roles': { $regex: `^${channel}($|/)` }}},
     ])).map(x => x.email)
 
     return res
@@ -30,11 +30,14 @@ async function handleNotifications() {
     // console.log(notifications)
     for (const notification of notifications) {
         const emails = await getEmailsForChannel(notification.channel)
-        if (emails.length == 0) continue
         try {
-            await sendEmail(emails, [], 'Notifica da DM-MANAGER', notification.message)
+            if (emails.length>0) {
+                await sendEmail(emails, [], 'Notifica da DM-MANAGER', notification.message)
+            } else {
+                console.log(`No emails found for channel ${notification.channel} (assign role: subscribe/${notification.channel})`)
+            }
             await Notification.deleteOne({ _id: notification._id })
-            console.log("Sent notification to: ", emails.join(", "))
+            console.log("Sent notification to: ", emails.length > 0 ? emails.join(", ") :"<nobody>")
         } catch (err) {
             console.log("Error while sending a notification")
             console.log(err)
