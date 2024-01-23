@@ -7,46 +7,51 @@ import { Conference } from './components/Conference'
 import { ConferenceList } from './components/ConferenceList';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { HomeEventList } from './components/HomeEventList';
+import { getManageURL } from './utils'
 
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
 
 const queryClient = new QueryClient()
 
 export const dmwidgets = {
-    localDevelopment: false,
+    localDevelopment: false
+}
 
-    loadComponent: function (target, name, props = {}) {
+dmwidgets.getManageURL = (path, query) => {
+    return getManageURL(path, query)
+}
 
-        var element = null
+dmwidgets.loadComponent = (target, name, props = {}) => {
 
-        switch (name) {
-            case 'EventList':
-                element = <EventList {...props}></EventList>
-                break;
-            case 'SeminarList':
-                element = <SeminarList {...props}></SeminarList>
-                break;
-            case 'Seminar':
-                element = <Seminar {...props}></Seminar>
-                break;
-            case 'Conference':
-                element = <Conference {...props}></Conference>
-                break;
-            case 'ConferenceList':
-                element = <ConferenceList {...props}></ConferenceList>
-                break;
-            case 'HomeEventList':
-                element = <HomeEventList></HomeEventList>
-                break;
-            default:
-                console.log("Unsupported element: " + name)
-        }
+    var element = null
 
-        if (element !== null) {
-            ReactDOM.createRoot(target).render(<QueryClientProvider client={queryClient}>
-                {element}
-            </QueryClientProvider>)
-        }
+    switch (name) {
+        case 'EventList':
+            element = <EventList {...props}></EventList>
+            break;
+        case 'SeminarList':
+            element = <SeminarList {...props}></SeminarList>
+            break;
+        case 'Seminar':
+            element = <Seminar {...props}></Seminar>
+            break;
+        case 'Conference':
+            element = <Conference {...props}></Conference>
+            break;
+        case 'ConferenceList':
+            element = <ConferenceList {...props}></ConferenceList>
+            break;
+        case 'HomeEventList':
+            element = <HomeEventList></HomeEventList>
+            break;
+        default:
+            console.log("Unsupported element: " + name)
+    }
+
+    if (element !== null) {
+        ReactDOM.createRoot(target).render(<QueryClientProvider client={queryClient}>
+            {element}
+        </QueryClientProvider>)
     }
 }
 
