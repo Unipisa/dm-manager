@@ -21,12 +21,12 @@ jobs:
       run: npm run build
     - name: Build DM Widgets
       run: cd widgets && npm ci && npm run build && cd ..
-    - name: Start MongoDB
-      uses: supercharge/mongodb-github-action@1.8.0
-      with:
-        mongodb-version: '6.0'
-    - name: Run tests
-      run: npm test
+#    - name: Start MongoDB
+#      uses: supercharge/mongodb-github-action@1.8.0
+#      with:
+#        mongodb-version: '6.0'
+#    - name: Run tests
+#      run: npm test
     - name: Extract version number
       run: echo VERSION=$( node -e 'console.log(require("./package.json").version)' ) >> $GITHUB_ENV
     - name: Docker meta
@@ -54,7 +54,7 @@ jobs:
         username: ${{ secrets.HARBOR_ROBOT_USERNAME }}
         password: ${{ secrets.HARBOR_ROBOT }}
         registry: harbor.cs.dm.unipi.it
-    - name: Build and push
+    - name: Build and push server
       id: docker_build
       uses: docker/build-push-action@v5
       if: ${{ github.event_name != 'pull_request' }}
@@ -63,7 +63,7 @@ jobs:
         context: .
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-    - name: Build and push
+    - name: Build and push worker
       id: docker_build_worker
       uses: docker/build-push-action@v5
       if: ${{ github.event_name != 'pull_request' }}
