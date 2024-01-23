@@ -4,6 +4,9 @@ const { setupDatabase } = require('./database')
 const { sendEmail, setupSMTPAccount } = require('./email')
 const Notification = require('./models/Notification')
 const User = require('./models/User')
+const config = require('./config')
+
+const ROLE_PREFIX = 'notify/'
 
 async function getEmailsForChannel(channel) {
     if (! channel) {
@@ -17,14 +20,14 @@ async function getEmailsForChannel(channel) {
     }
 
     const res = Array.from(await User.aggregate([
-        { $match: { 'roles': { $regex: `^${channel}($|/)` }}},
+        { $match: { roles: { $regex: `^${ROLE_PREFIX}${channel}($|/)` }}},
     ])).map(x => x.email)
 
     return res
 }
 
 async function handleNotifications() {
-    // console.log("=> Handling notifications")
+    console.log("=> Handling notifications")
 
     const notifications = await Notification.find()
     // console.log(notifications)
@@ -34,25 +37,25 @@ async function handleNotifications() {
             if (emails.length>0) {
                 await sendEmail(emails, [], 'Notifica da DM-MANAGER', notification.message)
             } else {
-                console.log(`No emails found for channel ${notification.channel} (assign role: subscribe/${notification.channel})`)
+                console.log(`No emails found for channel ${notification.channel} (assign role: ${ROLE_PREFIX}${notification.channel})`)
             }
             await Notification.deleteOne({ _id: notification._id })
-            console.log("Sent notification to: ", emails.length > 0 ? emails.join(", ") :"<nobody>")
+            console.log(`Sent notification ${notification.channel}/${notification.code} to: ${emails.length > 0 ? emails.join(", ") :"<nobody>"}`)
         } catch (err) {
-            console.log("Error while sending a notification")
+            console.log(`Error while sending a notification ${notification.channel}/${notification.code}`)
             console.log(err)
         }
     }
-
-    // await sendEmail([ 'leo@robol.it' ], [], 'Prova di email', 'xxx')
 }
 
 async function mainloop() {
+    const interval = parseInt(config.WORKER_NOTIFICATION_INTERVAL)
+    console.log(`Starting worker, interval: ${interval}ms`)
     await setupDatabase()
     await setupSMTPAccount()
 
     await handleNotifications()
-    setInterval(handleNotifications, 60000)
+    setInterval(handleNotifications, interval)
 }
 
 mainloop()

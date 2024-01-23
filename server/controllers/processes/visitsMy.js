@@ -23,7 +23,7 @@ async function getPersonByEmail(email) {
     ])
     // console.log(`lookup person with email ${email}: ${JSON.stringify(persons)}`)
     if (persons.length === 0) return null
-    if (persons.length > 0) {
+    if (persons.length > 1) {
         console.log(`WARNING: found ${persons.length} persons with email ${email}`)
     }
     return persons[0]
