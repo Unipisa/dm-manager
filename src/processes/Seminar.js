@@ -165,7 +165,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 aula: {data.conferenceRoom && data.conferenceRoom.name}<br/>
                 grant: {data.grants && data.grants.map(g => g.name).join(', ')}<br/>
                 abstract: {data.abstract}<br/>
-                creato da: {data.createdBy.username}<br/>
+                creato da: {data.createdBy?.username || '???'}<br/>
             </>}
             </Card.Body>
             {/* <Card.Footer>

@@ -33,6 +33,8 @@ function VisitForm({visit, variant}) {
     const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
     const [seminar, setSeminar] = useState(null)
     const user = useEngine().user
+    const seminars = visit.seminars
+    const roomAssignments = visit.roomAssignments
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -47,7 +49,7 @@ function VisitForm({visit, variant}) {
             active={activeSection==='person'}
             prefix={`/api/v0/process/${variant}visits`}
         />
-        { visit.person && 
+        { data.person && 
             <VisitDetailsBlock
                 data={data} 
                 setData={setData} 
@@ -55,9 +57,11 @@ function VisitForm({visit, variant}) {
                 done={() => {save();nextStep()}} 
                 edit={() => setActiveSection('data')}
             />}
-        { (visit.requireRoom || visit.roomAssignments?.length>0)  &&
+        { (data.requireRoom || roomAssignments?.length>0)  &&
             <RoomAssignments 
-                data={visit} 
+                visit={visit}
+                person={data.person}
+                roomAssignments={roomAssignments} 
                 active={activeSection==='room'}
                 done={nextStep}
                 edit={() => setActiveSection('room')}
@@ -65,8 +69,8 @@ function VisitForm({visit, variant}) {
             />
         }
         {   // mostra i seminari già inseriti
-            visit.seminars &&
-            visit.seminars.map(seminar => <div key={seminar._id}>
+            seminars &&
+            seminars.map(seminar => <div key={seminar._id}>
             <Seminar seminar={seminar} 
                 active={activeSection===seminar._id} 
                 change={() => setActiveSection(seminar._id)}
@@ -80,9 +84,14 @@ function VisitForm({visit, variant}) {
                 done={() => {setActiveSection('');setSeminar(null)}}
                 variant={variant}
                 />}
-        { data.seminars && data.seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
-            <Button className="mt-3 me-3" onClick={newSeminar}>Crea seminario</Button>}
-        <Button className="mt-3" onClick={completed}>Indietro</Button>
+        { seminars && seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
+            <Button className="mt-3 me-3" onClick={newSeminar}>
+                Crea seminario
+            </Button>
+        }
+        <Button className="mt-3" onClick={completed}>
+            Indietro
+        </Button>
     </PrefixProvider>
 
     function newSeminar() {
@@ -184,7 +193,7 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
     }
 }
 
-function RoomAssignments({data, active, done, edit, variant}) {
+function RoomAssignments({person, visit, roomAssignments, active, done, edit, variant}) {
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
@@ -200,14 +209,14 @@ function RoomAssignments({data, active, done, edit, variant}) {
         </Card.Header>
         <Card.Body>
             {active 
-                ? <RoomAssignmentHelper person={data.person} startDate={data.startDate} endDate={data.endDate} />
+                ? <RoomAssignmentHelper person={person} startDate={visit.startDate} endDate={visit.endDate} />
                 : <RoomAssignmentsDisplay />
             }
         </Card.Body>
     </Card>
 
     function RoomAssignmentsDisplay() {
-        if (data?.roomAssignments?.length > 0) return data.roomAssignments.map(r => 
+        if (roomAssignments?.length > 0) return roomAssignments.map(r => 
             <li key={r._id}>
                 stanza <b>{r.room.code}</b>: {}
                 dal <b>{myDateFormat(r.startDate)}</b> al <b>{myDateFormat(r.endDate)}</b>
