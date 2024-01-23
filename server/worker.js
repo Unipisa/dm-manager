@@ -1,6 +1,6 @@
 // Background worker handling notifications
 
-const { setupDatabase } = require('./server')
+const { setupDatabase } = require('./database')
 const { sendEmail, setupSMTPAccount } = require('./email')
 const Notification = require('./models/Notification')
 const User = require('./models/User')
@@ -17,7 +17,7 @@ async function getEmailsForChannel(channel) {
     }
 
     const res = Array.from(await User.aggregate([
-        { $match: { 'roles': { $regex: '^' + channel + '[$|/]' }}},
+        { $match: { 'roles': { $regex: '^subscribe/' + channel + '[$|/]' }}},
     ])).map(x => x.email)
 
     return res
@@ -30,6 +30,7 @@ async function handleNotifications() {
     // console.log(notifications)
     for (const notification of notifications) {
         const emails = await getEmailsForChannel(notification.channel)
+        if (emails.length == 0) continue
         try {
             await sendEmail(emails, [], 'Notifica da DM-MANAGER', notification.message)
             await Notification.deleteOne({ _id: notification._id })

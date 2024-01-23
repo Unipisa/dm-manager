@@ -95,6 +95,8 @@
   },
   "scripts": {
     "server": "nodemon --watch server server/run-server.js",
+    "command": "node server/command.js",
+    "worker": "nodemon --watch server server/worker.js",
     "clear-sessions": "node server/server.js --clear-sessions",
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",

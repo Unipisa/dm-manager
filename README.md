@@ -33,6 +33,11 @@ npm start
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
 For security reasons if you don't set the variable `SESSION_SECRET` the session secret is randomly generated.
 
+You can use the `command` module to clear session or show migrations. Check the usage with:
+```
+npm run command
+```
+
 ## deployment
 
 Build

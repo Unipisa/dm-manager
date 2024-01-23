@@ -8,40 +8,44 @@ const LocalStrategy = require('passport-local')
 const fs = require('fs')
 
 const User = require('./models/User')
-const Person = require('./models/Person')
 const Token = require('./models/Token')
+const Person = require('./models/Person')
 const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
 const migrations = require('./migrations')
 const MongoStore = require('connect-mongo')
 const crypto = require('crypto')
+const {setupDatabase, create_admin_user, create_secret_token} = require('./database')
 
-// local password authentication
-passport.use(User.createStrategy())
-passport.serializeUser(User.serializeUser())
-passport.deserializeUser(User.deserializeUser())
+function setup_passport() {
+  // local password authentication
+  passport.use(User.createStrategy())
+  passport.serializeUser(User.serializeUser())
+  passport.deserializeUser(User.deserializeUser())
 
-// unipi oauth2 authentication
-if (config.OAUTH2_CLIENT_ID) {
-  console.log(`OAUTH2 authentication enabled for CLIENT_ID ${config.OAUTH2_CLIENT_ID}`)
+  // unipi oauth2 authentication
+  if (config.OAUTH2_CLIENT_ID) {
+    console.log(`OAUTH2 authentication enabled for CLIENT_ID ${config.OAUTH2_CLIENT_ID}`)
 
-  const oauthStrategy = new UnipiAuthStrategy({
-    authorizationURL: config.OAUTH2_AUTHORIZE_URL,
-    tokenURL: config.OAUTH2_TOKEN_URL,
-    clientID: config.OAUTH2_CLIENT_ID,
-    clientSecret: config.OAUTH2_CLIENT_SECRET,
-    callbackURL: `${config.BASE_URL}/login/oauth2/callback`,
-    usernameField: config.OAUTH2_USERNAME_FIELD,
-  })
+    const oauthStrategy = new UnipiAuthStrategy({
+      authorizationURL: config.OAUTH2_AUTHORIZE_URL,
+      tokenURL: config.OAUTH2_TOKEN_URL,
+      clientID: config.OAUTH2_CLIENT_ID,
+      clientSecret: config.OAUTH2_CLIENT_SECRET,
+      callbackURL: `${config.BASE_URL}/login/oauth2/callback`,
+      usernameField: config.OAUTH2_USERNAME_FIELD,
+    })
 
-  passport.use(oauthStrategy)
-} else {
-  console.log("OAUTH2 authentication disabled")
-  console.log("set OAUTH2_CLIENT_ID to enable")
+    passport.use(oauthStrategy)
+  } else {
+    console.log("OAUTH2 authentication disabled")
+    console.log("set OAUTH2_CLIENT_ID to enable")
+  }
 }
 
 function setup_routes(app) {
+
   app.use(cors(
     {
       origin: "*",
@@ -260,115 +264,11 @@ function setup_routes(app) {
   })
 }
 
-async function createOrUpdateUser({
-    username, 
-    password,
-    roles, }) {
-  if (!username) throw new Error("username is required")
-
-  let user = await User.findOne({ username })
-  if (!user) {
-    user = await User.create({ 
-      username, 
-      lastName: username,
-      firstName: username,
-      email: `${username}@nomail.com`,
-    })
-    console.log(`Created new user ${user.username}`)
-  } else {
-      console.log(`Found user: ${user.username}`)
-  }
-  if (password) {
-      await user.setPassword(password)
-      await user.save()
-      console.log(`Password of user ${user.username} reset (password is ${password.length} characters long)`)
-  }
-
-  for (let role of roles) {
-    if (!user.roles.includes(role)) {
-      user.roles.push(role)
-      await user.save()
-      console.log(`Added role ${role} to user ${user.username}`)
-    } else {
-      console.log(`User ${user.username} already has role ${role}`)
-    }
-  } 
-
-  return user
-}
-
-async function create_admin_user() {
-  const username = config.ADMIN_USER
-  const password = config.ADMIN_PASSWORD
-  
-  if (username) {
-    const admin = createOrUpdateUser({
-      username,
-      password,
-      roles: ['admin'],
-    })
-    if (password) {
-        console.log(`Password reset for user "${admin.username}"`)
-    } else {
-      console.log(`Password not provided (set ADMIN_PASSWORD)`)
-    }
-  }
-
-  const n = await User.countDocuments({})
-  if ( n == 0) {
-    console.log(`No users in database. Create one by setting ADMIN_USER and ADMIN_PASSWORD`)
-  }
-}
-
-async function create_secret_token() {
-  const secret = config.TOKEN_SECRET
-  if (!secret) {
-    console.log(`No secret token created. Use web interface to create your first token or set SECRET_TOKEN`)
-    return
-  }
-  const name = 'automatic-secret-token'
-
-  let token = await Token.findOne({name})
-  if (token) {
-    token.token = secret 
-    token.roles = ['admin']
-    token.save()
-    console.log(`updated existing Token: "${name}" with provided TOKEN_SECRET`)
-  } else {
-    token = await Token.create({
-      name,
-      token: secret,
-      roles: ['admin'],
-    })
-    console.log(`create new Token: "${name}" with provided TOKEN_SECRET`)
-  }
-}
-
 function createApp() {
+  setup_passport()
   const app = express()
   setup_routes(app)
   return app
-}
-
-async function setupDatabase() {
-  if (process.env.NODE_ENV === 'test') {
-    try {
-      await mongoose.connect(config.MONGO_TEST_URI)
-    } catch(error) {
-      console.log(`Unable to connect to database: ${config.MONGO_URI_TEST}`)
-      return null
-    }
-    return mongoose.connection
-  }
-  console.log(`connecting to database: ${config.MONGO_URI}`)
-  try {
-    await mongoose.connect(config.MONGO_URI)
-  } catch(error) {
-    console.log(`ERROR: unable to connect to database... quitting`)
-    process.exit(1)
-  }
-  console.log('MongoDB is connected')
-  return mongoose.connection
 }
 
 async function serve() {
@@ -389,29 +289,13 @@ async function serve() {
     console.log(`    ${key}: ${val}`)
   }
 
+  console.log(`
+execute: npm run command
+to see available command line options
+e.g. to clear sessions collection or clean migrations
+  `)
+
   await setupDatabase()
-
-  console.log(`available command line options:`)
-  console.log(` --clear-sessions, -c: clear sessions collection`)
-  console.log(` --clean-migrations: clean removed migrations`)
-
-  console.log(`command line arguments: ${JSON.stringify(process.argv.slice(2))}`)
-
-  for (let arg of process.argv.slice(2)) {
-    if (arg === '--clear-sessions' || arg === '-c') {
-      console.log('clear sessions collection')
-      await mongoose.connection.db.collection('sessions').deleteMany({})
-      process.exit(0)
-    } else if (arg === '--clean-migrations') {
-      console.log('clean migrations collection')
-      await migrations.migrate(mongoose.connection.db, {clean: true})
-      process.exit(0)
-    } else {
-      console.log(`invalid argument: ${arg}`)
-      process.exit(1)
-    }
-  }
-  
   await create_admin_user()
   await create_secret_token()
   
@@ -433,9 +317,6 @@ async function serve() {
 // export functionality for testing suite
 module.exports = {
   createApp,
-  setupDatabase,
-  createOrUpdateUser,
-  create_admin_user,
   serve
 }
  
