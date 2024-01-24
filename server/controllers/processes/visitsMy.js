@@ -4,6 +4,8 @@ const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
 const Person = require('../../models/Person')
+const RoomAssignment = require('../../models/RoomAssignment')
+const EventSeminar = require('../../models/EventSeminar')
 const { log } = require('../middleware')
 const { INDEX_PIPELINE, GET_PIPELINE, DAYS_BACK, pastDate, notifyVisit} = require('./visits')
 
@@ -55,7 +57,7 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     assert(req.user._id) 
 
-    await this.notifyVisit(req.params.id, 'delete')
+    await notifyVisit(req.params.id, 'delete')
 
     if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
     const person = await getPersonByEmail(req.user.email)
@@ -66,8 +68,58 @@ router.delete('/:id', async (req, res) => {
         referencePeople: person._id,
         endDate: { $gte: pastDate() },
     })
+    if (!visit) return res.status(404)
 
     await log(req, visit, {})
+
+    const roomAssignments = await RoomAssignment.aggregate([
+        {$match: {
+            person: visit.person,
+            createdBy: req.user._id,
+            $expr: {
+                $and: [
+                    { $or: [
+                        { $eq: [visit.endDate, null] },
+                        { $eq: ["$startDate", null] },
+                        { $lte: ["$startDate", visit.endDate] } ]},
+                    { $or: [
+                        { $eq: [visit.startDate, null] },
+                        { $eq: ["$endDate", null] },
+                        { $gte: ["$endDate", visit.startDate] } ]}
+                ]},
+            },
+        },
+    ])
+    for (const roomAssignment of roomAssignments) {
+        await RoomAssignment.deleteOne({ _id: roomAssignment._id })
+        await log(req, roomAssignment, {})
+    }
+
+    const seminarsPipeline = [
+        { $match: { 
+            createdBy: req.user._id,
+            speaker: visit.person,
+            $expr: {
+                $and: [
+                    { $or: [
+                        { $eq: [visit.endDate, null] },
+                        { $eq: ["$startDatetime", null] },
+                        { $lte: ["$startDatetime", visit.endDate] } ]},
+                    { $or: [
+                        { $eq: [visit.startDate, null] },
+                        { $eq: ["$startDatetime", null] },
+                        { $gte: ["$startDatetime", visit.startDate] } ]}
+            ]},
+        }}
+    ]
+
+    const seminars = await EventSeminar.aggregate(seminarsPipeline)
+    for (const seminar of seminars) {
+        console.log(`deleting seminar ${seminar._id}`)
+        await EventSeminar.deleteOne({ _id: seminar._id })
+        await log(req, seminar, {})
+    }
+
     res.json({})
 })
 
