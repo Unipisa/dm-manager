@@ -55,7 +55,7 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     assert(req.user._id) 
 
-    await this.notifyVisit(req.params.id, 'delete')
+    await notifyVisit(req.params.id, 'delete')
 
     if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
     const person = await getPersonByEmail(req.user.email)

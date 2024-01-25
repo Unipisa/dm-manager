@@ -51,6 +51,20 @@ export function truncateText(text, len) {
     return text
 }
 
+export function truncateTextByWords(text, maxWords) {
+    let words = text.split(' ');
+
+    if (maxWords >= words.length) {
+        return text;  
+    }
+
+    let truncatedWords = words.slice(0, maxWords);
+    let truncatedText = truncatedWords.join(' ');
+    truncatedText += '...';
+
+    return truncatedText;
+}
+
 export function getManageURL(path, query) {
     if (query === undefined) {
         query = ""

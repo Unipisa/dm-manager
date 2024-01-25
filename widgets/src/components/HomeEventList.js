@@ -5,23 +5,14 @@ import { Button, Nav } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import { Loading } from './Loading';
 import axios from 'axios';
-import { formatDateInterval, getManageURL, formatDate, formatTime, truncateText } from '../utils';
-
+import { formatDateInterval, getManageURL, getDMURL, formatDate, formatTime, truncateText, truncateTextByWords } from '../utils';
+import './styles.css';
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-const eventtitle_style = {
-    fontSize: "1.2rem"
-}
-
-const date_style = {
-    fontSize: "0.9rem",
-    color: "#003c71"
-}
-
 export function HomeEventList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(4)
+    const [numberOfEntries, setNumberOfEntries] = useState(3)
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = []
@@ -62,24 +53,22 @@ export function HomeEventList({}) {
         return <EventBox event={x} key={x._id}></EventBox>
     })
 
-    const button_style = {
-        backgroundColor: "#003c71", 
-        borderRadius: 0
-    }
-
     return <div className="">
         <Tab.Container id="left-tabs-example" defaultActiveKey="all">
           <Nav variant="pills" className="flex-row d-flex justify-content-center">
             <Nav.Item>
-              <Nav.Link eventKey="all" style={button_style}>All</Nav.Link>
+              <Nav.Link eventKey="all" className="filter-link">Tutte</Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="second">Seminars</Nav.Link>
+              <Nav.Link eventKey="conferences" className="filter-link">Conferenze</Nav.Link>
+            </Nav.Item>           
+            <Nav.Item>
+              <Nav.Link eventKey="seminars" className="filter-link">Seminari</Nav.Link>
             </Nav.Item>
           </Nav>
           <Tab.Content>
             <Tab.Pane eventKey="all">
-                <div className="row m-2">
+                <div className="row">
                     {all_event_list}
                 </div>
             </Tab.Pane>
@@ -87,7 +76,7 @@ export function HomeEventList({}) {
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 4)}}>Load more</Button></div>
+            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 4)}}>Carica altro</Button></div>
     </div>
 }
 
@@ -97,6 +86,8 @@ function EventListBox() {
 
 function EventBox({ event }) {
     var date = undefined;
+    var link = undefined;
+    
     if (event.endDate) {
         date = formatDateInterval(event.startDate, event.endDate)
     }
@@ -104,11 +95,11 @@ function EventBox({ event }) {
         date = formatDate(event.startDatetime) + " - " + formatTime((event.startDatetime))
     }
 
-    return <div className="col-12 col-md-6 col-lg-4 mb-4 p-5" style={{ height: "300px", overflow: "hidden" }}>
-        <h2 className="title entry-title mb-1" style={eventtitle_style}>{truncateText(event.title, 48)}</h2>
-        <div style={date_style}>{date}</div>
-        <div style={{fontSize: "16px"}}>
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(event.abstract ? event.abstract : event.description, 150)}</Markdown>
+    return <div className="col-12 col-md-6 col-lg-4 mb-4 p-4" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
+        <h2 className="title entry-title mb-1" className="title_style">{truncateTextByWords(event.title, 20)}</h2>
+        <div className="date_style">{date}</div>
+        <div className="excerpt_style">
+            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}</Markdown>
         </div>
     </div>
 }
