@@ -312,9 +312,6 @@ e.g. to clear sessions collection or clean migrations
   })
 }
 
-
-
-// export functionality for testing suite
 module.exports = {
   createApp,
   serve
