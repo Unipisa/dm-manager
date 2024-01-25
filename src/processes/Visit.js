@@ -85,7 +85,7 @@ function VisitForm({visit, variant}) {
                 <Card.Header>
                 <div className="d-flex d-row justify-content-between">
                         <div>
-                            Nessun seminario inserito nel periodo
+                            Seminario
                         </div>
                         <div> 
                             <Button className="text-end btn-warning btn-sm" onClick={newSeminar}>
@@ -94,6 +94,9 @@ function VisitForm({visit, variant}) {
                         </div>
                     </div>  
                 </Card.Header>
+                <Card.Body>
+                    <i>nessun seminario inserito nel periodo della visita</i>
+                </Card.Body>
             </Card>
         }
         {   // mostra il form per inserire un nuovo seminario
