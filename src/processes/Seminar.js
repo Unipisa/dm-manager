@@ -121,7 +121,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     <div>
                         Dettagli del seminario
                     </div>
-                    <div>{ change && 
+                    <div>{ change && !active &&  
                         <Button className="text-end btn-warning btn-sm" onClick={change}>
                             Modifica
                         </Button>

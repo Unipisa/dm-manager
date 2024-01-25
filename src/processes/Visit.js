@@ -35,6 +35,7 @@ function VisitForm({visit, variant}) {
     const user = useEngine().user
     const seminars = visit.seminars
     const roomAssignments = visit.roomAssignments
+    const canCreateSeminar = user.hasProcessPermission('/process/seminars')
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -78,16 +79,33 @@ function VisitForm({visit, variant}) {
                 variant={variant}
                 />
         </div>)}
+        {   // mostra il pulsante per inserire un nuovo seminario
+            (!seminars || seminars.length === 0) && data.requireSeminar && !seminar && canCreateSeminar &&
+            <Card className="shadow">
+                <Card.Header>
+                <div className="d-flex d-row justify-content-between">
+                        <div>
+                            Seminario
+                        </div>
+                        <div> 
+                            <Button className="text-end btn-warning btn-sm" onClick={newSeminar}>
+                                Inserisci seminario
+                            </Button>
+                        </div>
+                    </div>  
+                </Card.Header>
+                <Card.Body>
+                    <i>nessun seminario inserito nel periodo della visita</i>
+                </Card.Body>
+            </Card>
+        }
         {   // mostra il form per inserire un nuovo seminario
             seminar && <Seminar seminar={seminar}
-                active={activeSection==='seminar'}
+                change={canCreateSeminar ? () => setActiveSection(seminar._id || 'seminar') : null}
+                active={activeSection==='seminar' || (seminar._id && activeSection===seminar._id)}
                 done={() => {setActiveSection('');setSeminar(null)}}
                 variant={variant}
-                />}
-        { seminars && seminars.length === 0 && data.requireSeminar && !seminar && user.hasProcessPermission('/process/seminars') &&
-            <Button className="mt-3 me-3" onClick={newSeminar}>
-                Crea seminario
-            </Button>
+                />
         }
         <Button className="mt-3" onClick={completed}>
             Indietro

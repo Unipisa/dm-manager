@@ -1,5 +1,19 @@
 version: "3.3"
 
+# This docker-compose configuration file is used to run 
+# all the external services which are required for the 
+# application to run locally.
+#
+# At the moment, the only external service is MongoDB.
+#
+# If you want to run the entire application in docker,
+# look instead at the configuration file
+#
+#  docker-compose-production.yml
+#
+# which will run both the application and the external services
+# in docker containers.
+
 services:
   mongodb:
     image: mongo:6
@@ -12,10 +26,10 @@ services:
       - 127.0.0.1:27017:27017
     restart: unless-stopped
 
-  #worker:
-  #  image: robol/dm-worker
-  #  environment:
-  #    MONGO_URI: "mongodb://mongodb:27017/dm-manager"
+  worker:
+    image: robol/dm-worker
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
 
 #  nginx:
 #    image: nginx

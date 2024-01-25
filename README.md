@@ -30,6 +30,11 @@ Finally, in another terminal, start the frontend:
 npm start
 ```
 
+To test the notification service you should also start the background worker. In yet another terminal:
+```
+npm run worker
+```
+
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
 For security reasons if you don't set the variable `SESSION_SECRET` the session secret is randomly generated.
 

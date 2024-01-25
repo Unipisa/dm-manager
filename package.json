@@ -51,6 +51,7 @@
     "mongoose-permissions": "^1.0.0",
     "mongoose-schema-jsonschema": "^2.0.2",
     "morgan": "^1.10.0",
+    "node-cron": "^3.0.3",
     "node-fetch": "^3.3.0",
     "nodemailer": "^6.9.8",
     "nodemon": "^2.0.19",
