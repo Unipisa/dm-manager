@@ -12,7 +12,7 @@ import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategory
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
-import { myDateFormat, myDatetimeFormat, setter } from '../Engine'
+import { myDatetimeFormat, setter } from '../Engine'
 
 export default function Seminar() {
     const { id } = useParams()
