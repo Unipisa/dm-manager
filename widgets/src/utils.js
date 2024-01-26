@@ -52,6 +52,9 @@ export function truncateText(text, len) {
 }
 
 export function truncateTextByWords(text, maxWords) {
+    if (! text) {
+        return ""
+    }
     let words = text.split(' ');
 
     if (maxWords >= words.length) {

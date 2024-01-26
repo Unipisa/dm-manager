@@ -53,6 +53,16 @@ export function HomeEventList({}) {
         return <EventBox event={x} key={x._id}></EventBox>
     })
 
+    const seminars = data.filter((event) => event.type === 'seminar');
+    const conferences = data.filter((event) => event.type === 'conference');
+
+    const seminar_list = seminars.map((seminar) => {
+        return <EventBox event={seminar} key={seminar._id}></EventBox>;
+    });
+    const conference_list = conferences.map((conference) => {
+        return <EventBox event={conference} key={conference._id}></EventBox>;
+    });
+
     return <div className="">
         <Tab.Container id="left-tabs-example" defaultActiveKey="all">
           <Nav variant="pills" className="flex-row d-flex justify-content-center">
@@ -72,11 +82,20 @@ export function HomeEventList({}) {
                     {all_event_list}
                 </div>
             </Tab.Pane>
-            <Tab.Pane eventKey="second">Second tab content</Tab.Pane>
+            <Tab.Pane eventKey="conferences">
+                <div className="row">
+                    {conference_list}    
+                </div>
+            </Tab.Pane>
+            <Tab.Pane eventKey="seminars">
+                <div className="row">
+                    {seminar_list}    
+                </div>
+            </Tab.Pane>
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 4)}}>Carica altro</Button></div>
+            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>Carica altro</Button></div>
     </div>
 }
 
@@ -95,11 +114,20 @@ function EventBox({ event }) {
         date = formatDate(event.startDatetime) + " - " + formatTime((event.startDatetime))
     }
 
+    if (event.type == 'seminar') {
+        link = getDMURL("seminario?id=" + event._id)
+    } 
+    else {
+        link = getDMURL("conferenza?id=" + event._id)
+    }
+
     return <div className="col-12 col-md-6 col-lg-4 mb-4 p-4" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
-        <h2 className="title entry-title mb-1 title_style">{truncateTextByWords(event.title, 20)}</h2>
+        <h2 className="mb-1 title_style">
+            <a href={link} className="title_style">{truncateTextByWords(event.title, 20)}</a>
+        </h2>
         <div className="date_style">{date}</div>
         <div className="excerpt_style">
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}</Markdown>
+            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 20)}</Markdown>
         </div>
     </div>
 }
