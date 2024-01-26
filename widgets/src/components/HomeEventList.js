@@ -41,7 +41,7 @@ export function HomeEventList({}) {
         })
 
         return events
-    })
+    }, {keepPreviousData: true})
 
     if (isLoading || error) {
         return <Loading widget="Lista degli eventi" error={error}></Loading>
