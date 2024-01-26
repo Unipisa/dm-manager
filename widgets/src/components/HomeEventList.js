@@ -1,7 +1,5 @@
-import React from 'react';
-import { useState } from 'react';
-import Tab from 'react-bootstrap/Tab';
-import { Button, Nav } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Button, Nav, Tab } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import { Loading } from './Loading';
 import axios from 'axios';
@@ -13,13 +11,12 @@ import remarkMath from 'remark-math'
 
 export function HomeEventList({}) {
     const [numberOfEntries, setNumberOfEntries] = useState(3);
-    const [totalEvents, setTotalEvents] = useState(0);
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = []
         const now = new Date()
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: "now"} })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -43,8 +40,6 @@ export function HomeEventList({}) {
             return new Date(dateA) - new Date(dateB)
         })
 
-        setTotalEvents(events.length);
-
         return events
     })
 
@@ -58,6 +53,7 @@ export function HomeEventList({}) {
 
     const seminars = data.filter((event) => event.type === 'seminar');
     const conferences = data.filter((event) => event.type === 'conference');
+    const colloquia = data.filter((event) => event.category?.name === 'Colloquium');
 
     const seminar_list = seminars.map((seminar) => {
         return <EventBox event={seminar} key={seminar._id}></EventBox>;
@@ -65,13 +61,16 @@ export function HomeEventList({}) {
     const conference_list = conferences.map((conference) => {
         return <EventBox event={conference} key={conference._id}></EventBox>;
     });
+    const colloquia_list = colloquia.map((colloquium) => {
+        return <EventBox event={colloquium} key={colloquium._id}></EventBox>;
+    });
 
     return <div className="">
         <Tab.Container id="left-tabs-example" defaultActiveKey="all">
           <Nav variant="pills" className="flex-row d-flex justify-content-center">
             <Nav.Item>
               <Nav.Link eventKey="all" className="filter-link">
-                {isEnglish() ? "All" : "Tutte"}
+                {isEnglish() ? "All" : "Tutti"}
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
@@ -83,6 +82,9 @@ export function HomeEventList({}) {
               <Nav.Link eventKey="seminars" className="filter-link">
                 {isEnglish() ? "Seminars" : "Seminari"}
               </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link eventKey="colloquia" className="filter-link">Colloquia</Nav.Link>
             </Nav.Item>
           </Nav>
           <Tab.Content>
@@ -101,6 +103,11 @@ export function HomeEventList({}) {
                     {seminar_list}    
                 </div>
             </Tab.Pane>
+            <Tab.Pane eventKey="colloquia">
+                <div className="row">
+                    {colloquia_list}    
+                </div>
+            </Tab.Pane>
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
@@ -115,7 +122,7 @@ function EventListBox() {
 function EventBox({ event }) {
     var date = undefined;
     var link = undefined;
-    
+
     if (event.endDate) {
         date = formatDateInterval(event.startDate, event.endDate)
     }
