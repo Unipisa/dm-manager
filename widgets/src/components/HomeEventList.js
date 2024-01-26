@@ -96,7 +96,7 @@ function EventBox({ event }) {
     }
 
     return <div className="col-12 col-md-6 col-lg-4 mb-4 p-4" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
-        <h2 className="title entry-title mb-1" className="title_style">{truncateTextByWords(event.title, 20)}</h2>
+        <h2 className="title entry-title mb-1 title_style">{truncateTextByWords(event.title, 20)}</h2>
         <div className="date_style">{date}</div>
         <div className="excerpt_style">
             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}</Markdown>
