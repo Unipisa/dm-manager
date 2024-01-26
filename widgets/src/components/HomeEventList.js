@@ -12,13 +12,13 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
 export function HomeEventList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(3)
+    const [numberOfEntries, setNumberOfEntries] = useState(6)
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = []
         const now = new Date()
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { limits: numberOfEntries, from: now } })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now } })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -27,7 +27,7 @@ export function HomeEventList({}) {
             events.push(...ec_label)
         }
 
-        const sem = await axios.get(getManageURL("public/seminars"), { params: { limit: numberOfEntries} })
+        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: now} })
         if (sem.data) {
             const es = sem.data.data
             const es_label = es.map(x => { 
@@ -95,7 +95,7 @@ export function HomeEventList({}) {
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>Carica altro</Button></div>
+            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 6)}}>Carica altro</Button></div>
     </div>
 }
 
@@ -115,10 +115,10 @@ function EventBox({ event }) {
     }
 
     if (event.type == 'seminar') {
-        link = getDMURL("seminario?id=" + event._id)
+        link = getDMURL("en/seminar?id=" + event._id)
     } 
     else {
-        link = getDMURL("conferenza?id=" + event._id)
+        link = getDMURL("en/conference?id=" + event._id)
     }
 
     return <div className="col-12 col-md-6 col-lg-4 mb-4 p-4" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
