@@ -12,13 +12,13 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
 export function HomeEventList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(6)
+    const [numberOfEntries, setNumberOfEntries] = useState(3)
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = []
         const now = new Date()
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now } })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -95,7 +95,7 @@ export function HomeEventList({}) {
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 6)}}>Carica altro</Button></div>
+            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>Carica altro</Button></div>
     </div>
 }
 
