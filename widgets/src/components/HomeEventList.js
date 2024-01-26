@@ -19,7 +19,7 @@ export function HomeEventList({}) {
         var events = []
         const now = new Date()
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: "2023-01-01"} })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -28,7 +28,7 @@ export function HomeEventList({}) {
             events.push(...ec_label)
         }
 
-        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: now} })
+        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: "2023-01-01"} })
         if (sem.data) {
             const es = sem.data.data
             const es_label = es.map(x => { 
@@ -104,13 +104,10 @@ export function HomeEventList({}) {
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            {data.length < totalEvents && (
                 <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>
                     {isEnglish() ? "Load more" : "Carica altro"}
                 </Button>
-            )}
         </div>
-            
     </div>
 }
 
