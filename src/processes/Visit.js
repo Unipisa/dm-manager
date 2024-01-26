@@ -179,7 +179,7 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
 
 function ActiveVisitDetailsBlock({data, setData, done}) {
     return <>
-        <Form>
+        <Form autocomplete="off">
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
             </InputRow>
