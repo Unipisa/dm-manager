@@ -111,12 +111,10 @@ export function HomeEventList({}) {
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>Carica altro</Button></div>
+            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>
+                {isEnglish() ? "Load more" : "Carica altro"}
+            </Button></div>
     </div>
-}
-
-function EventListBox() {
-    return <>Ciao</>
 }
 
 function EventBox({ event }) {
@@ -141,7 +139,7 @@ function EventBox({ event }) {
         <h2 className="mb-1 title_style">
             <a href={link} className="title_style">{truncateTextByWords(event.title, 20)}</a>
         </h2>
-        <div className="date_style">{date}</div>
+        <div className="date_style far fa-calendar"> {date}</div>
         <div className="excerpt_style">
             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}</Markdown>
         </div>

@@ -1,7 +1,3 @@
-/*.nav-link.active {
-    background-color: #ff0000 !important;
-}*/
-
 .filter-link {
     background-color: #00000000 !important;
     font-size: 1.125rem;
@@ -9,7 +5,6 @@
     padding: 3px 15px 3px 15px;
     margin: 0px 5px 0px 5px; 
 }
-
 
 .filter-link.active {
     color: #ffffff !important;
@@ -31,6 +26,13 @@
     font-size: 0.875rem;
     color: #003c71 !important;
     margin: 2px 0px 2px 0px;
+}
+.date_style.far.fa-calendar {
+    color: #003c71 !important;
+    font-family: "Titillium Web";
+}
+.date_style.far.fa-calendar::before {
+    font-family: 'Font Awesome 5 Free';
 }
 
 .title_style {
