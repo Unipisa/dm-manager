@@ -323,6 +323,16 @@ export function myDateFormat(date) {
     return moment(date).format('D.M.YYYY')
 }
 
+export function myDatetimeFormat(date) {
+    if (date === undefined) return '???'
+    if (date === null) return '---'
+    date = moment(date)
+    if (date < minDate) return '---'
+    if (date > maxDate) return '---'
+    return moment(date).format('D.M.YYYY, H:mm')
+}
+
+
 export function notNullStartDate(date) {
     if (date === null) return minDate
     if (typeof date === 'string') return new Date(date)

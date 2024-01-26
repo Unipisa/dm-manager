@@ -12,7 +12,7 @@ import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategory
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
-import { setter } from '../Engine'
+import { myDateFormat, myDatetimeFormat, setter } from '../Engine'
 
 export default function Seminar() {
     const { id } = useParams()
@@ -158,14 +158,14 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
                 </div>
             </> : <>
-                titolo: {data.title}<br/>
-                ciclo: {data.category && data.category.name}<br/>
-                data: {data.startDatetime && data.startDatetime.toLocaleString()}<br/>
-                durata: {data.duration}<br/>
-                aula: {data.conferenceRoom && data.conferenceRoom.name}<br/>
-                grant: {data.grants && data.grants.map(g => g.name).join(', ')}<br/>
-                abstract: {data.abstract}<br/>
-                creato da: {data.createdBy?.username || '???'}<br/>
+                titolo: <b>{data.title}</b><br/>
+                ciclo: <b>{data.category?.label || data.category?.name || '---'}</b><br/>
+                data: <b>{myDatetimeFormat(data.startDatetime)}</b><br/>
+                durata: <b>{data.duration}</b><br/>
+                aula: <b>{data.conferenceRoom && data.conferenceRoom.name}</b><br/>
+                grant: <b>{data.grants && data.grants.map(g => g.name).join(', ') || '---'}</b><br/>
+                abstract: <b>{data.abstract}</b><br/>
+                creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
             </>}
             </Card.Body>
             {/* <Card.Footer>
