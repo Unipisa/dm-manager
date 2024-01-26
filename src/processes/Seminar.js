@@ -12,7 +12,7 @@ import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategory
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
-import { myDateFormat, myDatetimeFormat, setter } from '../Engine'
+import { myDatetimeFormat, setter } from '../Engine'
 
 export default function Seminar() {
     const { id } = useParams()
@@ -163,7 +163,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 data: <b>{myDatetimeFormat(data.startDatetime)}</b><br/>
                 durata: <b>{data.duration}</b><br/>
                 aula: <b>{data.conferenceRoom && data.conferenceRoom.name}</b><br/>
-                grant: <b>{data.grants && data.grants.map(g => g.name).join(', ') || '---'}</b><br/>
+                grant: <b>{(data.grants && data.grants.map(g => g.name).join(', ')) || '---'}</b><br/>
                 abstract: <b>{data.abstract}</b><br/>
                 creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
             </>}
