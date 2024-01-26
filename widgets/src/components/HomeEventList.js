@@ -5,14 +5,15 @@ import { Button, Nav } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import { Loading } from './Loading';
 import axios from 'axios';
-import { formatDateInterval, getManageURL, getDMURL, formatDate, formatTime, truncateText, truncateTextByWords } from '../utils';
+import { formatDateInterval, getManageURL, getDMURL, formatDate, formatTime, truncateText, truncateTextByWords, isEnglish } from '../utils';
 import './styles.css';
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
 export function HomeEventList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(3)
+    const [numberOfEntries, setNumberOfEntries] = useState(3);
+    const [totalEvents, setTotalEvents] = useState(0);
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = []
@@ -42,6 +43,8 @@ export function HomeEventList({}) {
             return new Date(dateA) - new Date(dateB)
         })
 
+        setTotalEvents(events.length);
+
         return events
     })
 
@@ -67,13 +70,19 @@ export function HomeEventList({}) {
         <Tab.Container id="left-tabs-example" defaultActiveKey="all">
           <Nav variant="pills" className="flex-row d-flex justify-content-center">
             <Nav.Item>
-              <Nav.Link eventKey="all" className="filter-link">Tutte</Nav.Link>
+              <Nav.Link eventKey="all" className="filter-link">
+                {isEnglish() ? "All" : "Tutte"}
+              </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link eventKey="conferences" className="filter-link">Conferenze</Nav.Link>
+              <Nav.Link eventKey="conferences" className="filter-link">
+                {isEnglish() ? "Conferences" : "Conferenze"}
+              </Nav.Link>
             </Nav.Item>           
             <Nav.Item>
-              <Nav.Link eventKey="seminars" className="filter-link">Seminari</Nav.Link>
+              <Nav.Link eventKey="seminars" className="filter-link">
+                {isEnglish() ? "Seminars" : "Seminari"}
+              </Nav.Link>
             </Nav.Item>
           </Nav>
           <Tab.Content>
@@ -95,7 +104,13 @@ export function HomeEventList({}) {
           </Tab.Content>
         </Tab.Container>
         <div className="d-flex flex-row justify-content-center">
-            <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>Carica altro</Button></div>
+            {data.length < totalEvents && (
+                <Button onClick={x => {setNumberOfEntries(numberOfEntries + 3)}}>
+                    {isEnglish() ? "Load more" : "Carica altro"}
+                </Button>
+            )}
+        </div>
+            
     </div>
 }
 
@@ -127,7 +142,7 @@ function EventBox({ event }) {
         </h2>
         <div className="date_style">{date}</div>
         <div className="excerpt_style">
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 20)}</Markdown>
+            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}</Markdown>
         </div>
     </div>
 }
