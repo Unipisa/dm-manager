@@ -64,8 +64,11 @@ export default function Header() {
                   [
                   '', // nessun ruolo
                   '/process/roomLabel',
+                  '/process/visit',
+                  'notify/process/visit',
+                  'notify/portineria',
                   'supervisor', 
-                  'assignment-manager',
+/*                  'assignment-manager',
                   'assignment-supervisor',
                   'grant-manager',
                   'grant-supervisor',
@@ -79,7 +82,7 @@ export default function Header() {
                   'staff-manager',
                   'staff-supervisor',
                   'visit-manager',
-                  'visit-supervisor',
+                  'visit-supervisor',*/
                   ].map(role => <NavDropdown.Item 
                     key={role} 
                     onClick={ async () => {
