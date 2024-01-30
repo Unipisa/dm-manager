@@ -131,7 +131,24 @@ function EventBox({ event }) {
 
     const link = event.type === 'seminar' ? getDMURL(`en/seminar?id=${event._id}`) : getDMURL(`en/conference?id=${event._id}`);
 
+    let tags;
 
+    if (event.type === "seminar") {
+      tags = [
+        <a href={getDMURL("en/seminars")} key="seminars-category">Seminars</a>
+      ];
+    
+      if (event.category !== undefined) {
+        const link = getDMURL(`en/seminars/?category=${event.category._id}`);
+        tags.push(
+          <span key={event.category._id}>
+            , <a href={link}>{event.category.name}</a>
+          </span>
+        );
+      }
+    } else {
+      <a href={event.url}>Web</a>
+    }
 
     return <div className="col-6 col-md-6 col-lg-4 event-box">
         <h2 className="title_style">
@@ -141,9 +158,10 @@ function EventBox({ event }) {
         </h2>
         <div className="subtitle_style far fa-calendar"> {date}</div>
         <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name}</div>
+        <div className="subtitle_style fa fa-tags"> {tags}</div>
         <div className="excerpt_style">
             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
-                {truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}
+                {truncateTextByWords(event.abstract ? event.abstract : event.description, 30)}
             </Markdown>
         </div>
     </div>

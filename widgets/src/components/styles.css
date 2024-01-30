@@ -59,6 +59,15 @@
     font-family: 'Font Awesome 5 Free';
     font-weight: bold;
 }
+.subtitle_style.fa.fa-tags {
+    color: #003c71 !important;
+    font-weight: normal;
+    font-family: "Titillium Web"; 
+}
+.subtitle_style.fa.fa-tags::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: bold;
+}
 
 .title_style {
     font-size: 0.875rem;
