@@ -246,12 +246,14 @@ async function notifyVisit(visit_id, message) {
     const endDate = visit.endDate.toLocaleDateString('it-IT')
     const tags = visit.tags.join(', ')
     const notes = visit.notes
+    const universityFunded = visit.universityFunded ? 'sì' : 'no'
     let text =  message
 
     text +=`
 Visitatore: ${person.firstName} ${person.lastName}
 Affiliazioni: ${affiliations}
 Grants: ${grants}
+Fondi di Ateneo: ${universityFunded}
 Data inizio: ${startDate}
 Data fine: ${endDate}
 Tags: ${tags}
