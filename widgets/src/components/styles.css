@@ -29,11 +29,12 @@
     margin: 0px 5px 0px 5px;
 }
 
-.date_style {
+.subtitle_style {
+    display: block;
     font-size: 0.75rem;
     color: #003c71 !important;
     margin: 2px 0px 2px 0px;
-
+    padding: 4px 0px 4px 0px;
         
     @media (min-width: 768px) {
         font-size: 0.875rem;
@@ -42,16 +43,43 @@
         font-size: 0.875rem;
     }
 }
-.date_style.far.fa-calendar {
+.subtitle_style.far.fa-calendar {
     color: #003c71 !important;
     font-family: "Titillium Web";
 }
-.date_style.far.fa-calendar::before {
+.subtitle_style.far.fa-calendar::before {
     font-family: 'Font Awesome 5 Free';
+}
+.subtitle_style.fas.fa-map-marker-alt {
+    color: #003c71 !important;
+    font-weight: normal;
+    font-family: "Titillium Web"; 
+}
+.subtitle_style.fas.fa-map-marker-alt::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: bold;
+}
+.subtitle_style.fa.fa-tags {
+    color: #003c71 !important;
+    font-weight: normal;
+    font-family: "Titillium Web"; 
+}
+.subtitle_style.fa.fa-tags::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: bold;
+}
+.subtitle_style.fa.fa-link {
+    color: #003c71 !important;
+    font-weight: normal;
+    font-family: "Titillium Web"; 
+}
+.subtitle_style.fa.fa-link::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: bold;
 }
 
 .title_style {
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: #003c71;
     margin: 0px 0px 0px 0px; 
     font-weight: bold;
@@ -71,19 +99,20 @@
 
 .excerpt_style {
     color: #000000;
-    font-size: 0.75rem;
+    font-size: 1rem;
     overflow: hidden;
 
-    @media (min-width: 768px) {
+    @media (max-width: 768px) {
         font-size: 0.875rem;
     }
-    @media (min-width: 1383px) {
-        font-size: 1rem;
+    @media (max-width: 440px) {
+        display: none;
     }
 }
 
 .load-button {
     font-size: 0.75rem !important;
+    background-color: #003c71 !important;
     padding: 8px 20px 8px 20px !important;
     margin: 10px 0px 0px 0px; 
     border: none;
@@ -108,15 +137,17 @@
 
 .event-box {
     width: 300px;
-    height: 270px;
+    height: 150px;
     overflow: hidden;
-    padding: 0px 14px 0px 14px;
+    padding: 1rem;
     margin-bottom: 1rem;
 
     @media (min-width: 768px) {
-        padding: 10px 20px 10px 20px;
+        padding: 1.5rem;
+        height: 220px;
     }
     @media (min-width: 1383px) {
         padding: 2rem;
+        height: 270px;
     }    
 }
