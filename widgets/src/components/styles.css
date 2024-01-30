@@ -51,7 +51,7 @@
 }
 
 .title_style {
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: #003c71;
     margin: 0px 0px 0px 0px; 
     font-weight: bold;
@@ -71,19 +71,22 @@
 
 .excerpt_style {
     color: #000000;
-    font-size: 0.75rem;
+    font-size: 1rem;
     overflow: hidden;
 
-    @media (min-width: 768px) {
+    @media (max-width: 768px) {
         font-size: 0.875rem;
     }
-    @media (min-width: 1383px) {
-        font-size: 1rem;
+    @media (max-width: 360px) {
+        .mobile-hidden {
+          display: none;
+        }
     }
 }
 
 .load-button {
     font-size: 0.75rem !important;
+    background-color: #003c71 !important;
     padding: 8px 20px 8px 20px !important;
     margin: 10px 0px 0px 0px; 
     border: none;
@@ -108,15 +111,17 @@
 
 .event-box {
     width: 300px;
-    height: 270px;
+    height: 200px;
     overflow: hidden;
-    padding: 0px 14px 0px 14px;
+    padding: 1rem;
     margin-bottom: 1rem;
 
     @media (min-width: 768px) {
-        padding: 10px 20px 10px 20px;
+        padding: 1.5rem;
+        height: 220px;
     }
     @media (min-width: 1383px) {
         padding: 2rem;
+        height: 270px;
     }    
 }

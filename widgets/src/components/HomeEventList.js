@@ -138,7 +138,7 @@ function EventBox({ event }) {
             </a>
         </h2>
         <div className="date_style far fa-calendar"> {date}</div>
-        <div className="excerpt_style">
+        <div className="excerpt_style mobile-hidden">
             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                 {truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}
             </Markdown>
