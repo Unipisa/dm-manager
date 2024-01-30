@@ -23,7 +23,7 @@ module.exports = (router) => {
                 endDate: { $gte: "$$NOW" },
             }},*/
             { $match: { $or: [
-                { title: { $regex }},
+                { name: { $regex }},
                 { code: { $regex }},
                 { 'pi.lastName': { $regex }},
             ]}},
