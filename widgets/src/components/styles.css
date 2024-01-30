@@ -96,14 +96,27 @@
     }
 }
 
+.load-button:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
 .load-button:hover {
     background-color: #003C7187 !important;
     border: none;
 }
+
 .event-box {
     width: 300px;
     height: 270px;
     overflow: hidden;
-    padding: 2rem;
+    padding: 0px 14px 0px 14px;
     margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+        padding: 10px 20px 10px 20px;
+    }
+    @media (min-width: 1383px) {
+        padding: 2rem;
+    }    
 }
