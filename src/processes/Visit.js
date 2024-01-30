@@ -167,6 +167,8 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
             <br />
             grants: {data?.grants?.length ? data.grants.map(grant => <span key={grant._id}><b>{grant.identifier}</b>&nbsp;</span>) : <i>nessun grant utilizzato</i>}
             <br />
+            fondi di ateneo: {data.universityFunded ? 'sì' : 'no'}
+            <br />
             stanza: {data.requireRoom ? "è richiesta una stanza" : "non è richiesta una stanza"}
             <br />
             seminario: {data.requireSeminar ? "è previsto un seminario" : "non è previsto un seminario"}
@@ -188,6 +190,10 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
             </InputRow>
             <InputRow className="my-3" label="Grants">
                 <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} />
+            </InputRow>
+            <InputRow className="my-3" label="Fondi di Ateneo">
+                <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})}/>
+                {} Visita su fondi di Ateneo
             </InputRow>
             <InputRow className="my-3" label="Stanza">
                 <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})}/>
