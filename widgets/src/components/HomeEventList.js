@@ -16,7 +16,7 @@ export function HomeEventList({}) {
         var events = []
         const now = new Date()
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: "2023-01-01"} })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -25,7 +25,7 @@ export function HomeEventList({}) {
             events.push(...ec_label)
         }
 
-        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: "2023-01-01"} })
+        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: now} })
         if (sem.data) {
             const es = sem.data.data
             const es_label = es.map(x => { 
