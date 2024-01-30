@@ -163,6 +163,7 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
         { active 
         ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} />
         : <>
+            referenti: <b>{data.referencePeople.map(person => `${person.firstName} ${person.lastName} <${person.email}>`).join(', ')}</b><br />
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
             <br />
             grants: {data?.grants?.length ? data.grants.map(grant => <span key={grant._id}><b>{grant.identifier}</b>&nbsp;</span>) : <i>nessun grant utilizzato</i>}
