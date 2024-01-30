@@ -29,11 +29,12 @@
     margin: 0px 5px 0px 5px;
 }
 
-.date_style {
+.subtitle_style {
+    display: block;
     font-size: 0.75rem;
     color: #003c71 !important;
     margin: 2px 0px 2px 0px;
-
+    padding: 4px 0px 4px 0px;
         
     @media (min-width: 768px) {
         font-size: 0.875rem;
@@ -42,12 +43,21 @@
         font-size: 0.875rem;
     }
 }
-.date_style.far.fa-calendar {
+.subtitle_style.far.fa-calendar {
     color: #003c71 !important;
     font-family: "Titillium Web";
 }
-.date_style.far.fa-calendar::before {
+.subtitle_style.far.fa-calendar::before {
     font-family: 'Font Awesome 5 Free';
+}
+.subtitle_style.fas.fa-map-marker-alt {
+    color: #003c71 !important;
+    font-weight: normal;
+    font-family: "Titillium Web"; 
+}
+.subtitle_style.fas.fa-map-marker-alt::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: bold;
 }
 
 .title_style {
@@ -78,9 +88,7 @@
         font-size: 0.875rem;
     }
     @media (max-width: 360px) {
-        .mobile-hidden {
-          display: none;
-        }
+        display: none;
     }
 }
 

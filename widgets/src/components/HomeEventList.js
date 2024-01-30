@@ -131,14 +131,17 @@ function EventBox({ event }) {
 
     const link = event.type === 'seminar' ? getDMURL(`en/seminar?id=${event._id}`) : getDMURL(`en/conference?id=${event._id}`);
 
+
+
     return <div className="col-6 col-md-6 col-lg-4 event-box">
         <h2 className="title_style">
             <a href={link} className="title_style">
                 {truncateTextByWords(event.title, 20)}
             </a>
         </h2>
-        <div className="date_style far fa-calendar"> {date}</div>
-        <div className="excerpt_style mobile-hidden">
+        <div className="subtitle_style far fa-calendar"> {date}</div>
+        <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name}</div>
+        <div className="excerpt_style">
             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                 {truncateTextByWords(event.abstract ? event.abstract : event.description, 40)}
             </Markdown>
