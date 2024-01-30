@@ -1,9 +1,16 @@
 .filter-link {
     background-color: #00000000 !important;
-    font-size: 1.125rem;
+    font-size: 1rem;
     border-radius: 0;
     padding: 3px 15px 3px 15px;
     margin: 0px 5px 0px 5px; 
+    
+    @media (min-width: 768px) {
+        font-size: 1rem;
+    }
+    @media (min-width: 1383px) {
+        font-size: 1.125rem;
+    }
 }
 
 .filter-link.active {
@@ -23,9 +30,17 @@
 }
 
 .date_style {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
     color: #003c71 !important;
     margin: 2px 0px 2px 0px;
+
+        
+    @media (min-width: 768px) {
+        font-size: 0.875rem;
+    }
+    @media (min-width: 1383px) {
+        font-size: 0.875rem;
+    }
 }
 .date_style.far.fa-calendar {
     color: #003c71 !important;
@@ -36,11 +51,18 @@
 }
 
 .title_style {
-    font-size: 1.25rem;
+    font-size: 1rem;
     color: #003c71;
     margin: 0px 0px 0px 0px; 
     font-weight: bold;
     text-decoration: none !important;
+
+    @media (min-width: 768px) {
+        font-size: 1.25rem;
+    }
+    @media (min-width: 1383px) {
+        font-size: 1.25rem;
+    }
 }
 
 .title_style:hover {
@@ -49,14 +71,28 @@
 
 .excerpt_style {
     color: #000000;
-    font-size: 1rem;
+    font-size: 0.75rem;
     overflow: hidden;
+
+    @media (min-width: 768px) {
+        font-size: 0.875rem;
+    }
+    @media (min-width: 1383px) {
+        font-size: 1rem;
+    }
 }
 
 .load-button {
-    font-size: 0.875rem !important;
+    font-size: 0.75rem !important;
     padding: 8px 20px 8px 20px !important;
     margin: 10px 0px 0px 0px; 
+
+    @media (min-width: 768px) {
+        font-size: 0.875rem !important;
+    }
+    @media (min-width: 1383px) {
+        font-size: 0.875rem !important;
+    }
 }
 
 .event-box {
