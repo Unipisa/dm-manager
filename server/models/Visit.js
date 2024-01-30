@@ -18,6 +18,7 @@ const visitSchema = new Schema({
     requireSeminar: { type: Boolean, label: 'richiede seminario', default: false },
     publish: { type: Boolean, label: 'pubblica', default: true },
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
+    universityFunded: { type: Boolean, label: 'visita su fondi di Ateneo', default: false},
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     SSD,
     notes: {type: String, label: 'note', widget: 'text', default: ""},
