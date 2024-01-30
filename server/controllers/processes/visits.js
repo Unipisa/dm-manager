@@ -83,6 +83,20 @@ const GET_PIPELINE = [
         path: '$person',
         preserveNullAndEmptyArrays: true,
     }},
+    { $lookup: {
+        from: 'people',
+        localField: 'referencePeople',
+        foreignField: '_id',
+        as: 'referencePeople',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+            }},
+        ]
+    }},
     {$lookup: {
         from: 'institutions',
         localField: 'affiliations',
@@ -154,6 +168,19 @@ const GET_PIPELINE = [
             // ordina per data finale...
             // l'ultima assegnazione dovrebbe essere quella attuale
             {$sort: {"endDate": 1}},
+            // espande createdBy
+            {$lookup:{
+                from: "users",
+                localField: "createdBy",
+                foreignField: "_id",
+                as: "createdBy",
+                pipeline: [
+                    {$project: {
+                        _id: 1,
+                        username: 1,
+                    }},
+                ],
+            }}
         ]
     }},
     {$lookup: {
@@ -208,6 +235,19 @@ const GET_PIPELINE = [
                 path: "$createdBy",
                 preserveNullAndEmptyArrays: true
             }},
+            // espande createdBy
+            {$lookup:{
+                from: "users",
+                localField: "createdBy",
+                foreignField: "_id",
+                as: "createdBy",
+                pipeline: [
+                    {$project: {
+                        _id: 1,
+                        username: 1,
+                    }},
+                ],
+            }},
             {$project: {
                 "startDatetime": 1,
                 "title": 1,
@@ -219,8 +259,7 @@ const GET_PIPELINE = [
                 "conferenceRoom._id": 1,
                 "conferenceRoom.name": 1,
                 "duration": 1,
-                "createdBy._id": 1,
-                "createdBy.username": 1,
+                "createdBy": 1,
             }},
             {$sort: {"startDatetime": 1}},
         ]
@@ -229,10 +268,12 @@ const GET_PIPELINE = [
 module.exports.GET_PIPELINE = GET_PIPELINE
 
 async function notifyVisit(visit_id, message) {
+    console.log(`notifyVisit ${visit_id}`)
     const visits = await Visit.aggregate([
         { $match: {_id: new ObjectId(visit_id)}},
         ...GET_PIPELINE,
     ])
+    console.log(JSON.stringify(visits,null,2))
     if (visits.length === 0) {
         console.log(`notifyVisit: visit ${visit_id} not found`)
         return
@@ -244,12 +285,13 @@ async function notifyVisit(visit_id, message) {
     const grants = visit.grants.map(g => g.name).join(', ')
     const startDate = visit.startDate.toLocaleDateString('it-IT')
     const endDate = visit.endDate.toLocaleDateString('it-IT')
-    const tags = visit.tags.join(', ')
+    const tags = (visit.tags || []).join(', ')
     const notes = visit.notes
     const universityFunded = visit.universityFunded ? 'sì' : 'no'
-    let text =  message
+    let text =  message || ''
 
     text +=`
+Referenti: ${visit.referencePeople.map(p => `${p.firstName} ${p.lastName} <${p.email}>`).join(', ')}
 Visitatore: ${person.firstName} ${person.lastName}
 Affiliazioni: ${affiliations}
 Grants: ${grants}
@@ -258,9 +300,6 @@ Data inizio: ${startDate}
 Data fine: ${endDate}
 Tags: ${tags}
 Note: ${notes}
-
-Creata da: ${visit.createdBy?.username} il ${visit.createdAt?.toLocaleDateString('it-IT')}
-Aggiornata da: ${visit.updatedBy?.username} il ${visit.updatedAt?.toLocaleDateString('it-IT')}
 `
     for (ra of (visit?.roomAssignments || [])) {
         text += `
@@ -285,6 +324,8 @@ Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateSt
 Aggiornato da: ${seminar.updatedBy?.username} il ${seminar.updatedAt?.toLocaleDateString('it-IT')}
         `
     }
+
+    console.log(text)
 
     await notify('process/visits', `${visit_id}`, text)
 }
