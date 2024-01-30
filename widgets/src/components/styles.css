@@ -52,3 +52,17 @@
     font-size: 1rem;
     overflow: hidden;
 }
+
+.load-button {
+    font-size: 0.875rem !important;
+    padding: 8px 20px 8px 20px !important;
+    margin: 10px 0px 0px 0px; 
+}
+
+.event-box {
+    width: 300px;
+    height: 270px;
+    overflow: hidden;
+    padding: 2rem;
+    margin-bottom: 1rem;
+}

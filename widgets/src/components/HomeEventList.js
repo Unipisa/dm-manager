@@ -107,8 +107,8 @@ export function HomeEventList({}) {
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>
-          <div className="d-flex flex-row justify-content-center">
-            <Button onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
+          <div className="d-flex flex-row justify-content-center load-button">
+            <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
               {isEnglish() ? 'Load more' : 'Carica altro'}
             </Button>
           </div>
@@ -131,8 +131,8 @@ function EventBox({ event }) {
 
     const link = event.type === 'seminar' ? getDMURL(`en/seminar?id=${event._id}`) : getDMURL(`en/conference?id=${event._id}`);
 
-    return <div className="col-12 col-md-6 col-lg-4 mb-4 p-4" style={{ width: "300px", height: "300px", overflow: "hidden" }}>
-        <h2 className="mb-1 title_style">
+    return <div className="col-12 col-md-6 col-lg-4 event-box">
+        <h2 className="title_style">
             <a href={link} className="title_style">
                 {truncateTextByWords(event.title, 20)}
             </a>
