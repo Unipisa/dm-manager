@@ -147,7 +147,7 @@ function EventBox({ event }) {
         );
       }
     } else {
-      <a href={event.url}>Web</a>
+      tags = <a href={event.url}>{isEnglish() ? 'Website' : 'Sito web'}</a>
     }
 
     return <div className="col-6 col-md-6 col-lg-4 event-box">
@@ -158,7 +158,7 @@ function EventBox({ event }) {
         </h2>
         <div className="subtitle_style far fa-calendar"> {date}</div>
         <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name}</div>
-        <div className="subtitle_style fa fa-tags"> {tags}</div>
+        <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>
         <div className="excerpt_style">
             <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
                 {truncateTextByWords(event.abstract ? event.abstract : event.description, 30)}
