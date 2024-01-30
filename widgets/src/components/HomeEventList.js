@@ -107,7 +107,7 @@ export function HomeEventList({}) {
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>
-          <div className="d-flex flex-row justify-content-center load-button">
+          <div className="d-flex flex-row justify-content-center">
             <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
               {isEnglish() ? 'Load more' : 'Carica altro'}
             </Button>

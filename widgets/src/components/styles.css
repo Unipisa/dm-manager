@@ -86,6 +86,7 @@
     font-size: 0.75rem !important;
     padding: 8px 20px 8px 20px !important;
     margin: 10px 0px 0px 0px; 
+    border: none;
 
     @media (min-width: 768px) {
         font-size: 0.875rem !important;
@@ -95,6 +96,10 @@
     }
 }
 
+.load-button:hover {
+    background-color: #003C7187 !important;
+    border: none;
+}
 .event-box {
     width: 300px;
     height: 270px;
