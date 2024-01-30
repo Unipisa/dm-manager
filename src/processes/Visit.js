@@ -201,7 +201,7 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
             </InputRow>
             <InputRow className="my-3" label="Seminario">
                 <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})}/>
-                {} E' previsto un seminario
+                {} È previsto un seminario
             </InputRow>
             <InputRow className="my-3" label="Note">
                 <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
