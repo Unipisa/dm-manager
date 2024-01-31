@@ -163,16 +163,16 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
         { active 
         ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} />
         : <>
-            referenti: <b>{data.referencePeople.map(person => `${person.firstName} ${person.lastName} <${person.email}>`).join(', ')}</b><br />
+            {data.referencePeople.map(person => <>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></>)}
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
             <br />
             grants: {data?.grants?.length ? data.grants.map(grant => <span key={grant._id}><b>{grant.identifier}</b>&nbsp;</span>) : <i>nessun grant utilizzato</i>}
             <br />
-            fondi di ateneo: {data.universityFunded ? 'sì' : 'no'}
+            fondi di ateneo: <b>{data.universityFunded ? 'sì' : 'no'}</b>
             <br />
-            stanza: {data.requireRoom ? "è richiesta una stanza" : "non è richiesta una stanza"}
+            stanza: {data.requireRoom ? <b>è richiesta una stanza</b> : "non è richiesta una stanza"}
             <br />
-            seminario: {data.requireSeminar ? "è previsto un seminario" : "non è previsto un seminario"}
+            seminario: {data.requireSeminar ? <b>è previsto un seminario</b> : "non è previsto un seminario"}
             <br />
             note: <b>{ data.notes || 'nessuna nota'}</b>
         </>}

@@ -51,7 +51,7 @@ function VisitList({variant}) {
                             </ConfirmDeleteButton>}
                             <Link className="ms-2" to={`/process/${variant}visits/${visit._id}`}>
                                 <button className="btn btn-primary">
-                                    Modifica
+                                    Modifica / Visualizza
                                 </button>
                             </Link>
                         </div>
