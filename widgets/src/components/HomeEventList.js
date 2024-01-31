@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { Button, Nav, Tab } from 'react-bootstrap';
 import { useQuery } from 'react-query';
-import { Loading } from './Loading';
 import axios from 'axios';
-import { formatDateInterval, getManageURL, getDMURL, formatDate, formatTime, truncateText, truncateTextByWords, isEnglish } from '../utils';
-import './styles.css';
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import { Loading } from './Loading';
+import {
+  formatDateInterval,
+  getManageURL,
+  getDMURL,
+  formatDate,
+  formatTime,
+  truncateText,
+  truncateTextByWords,
+  isEnglish
+} from '../utils';
+import './styles.css';
 
 export function HomeEventList({}) {
     const [numberOfEntries, setNumberOfEntries] = useState(3);
