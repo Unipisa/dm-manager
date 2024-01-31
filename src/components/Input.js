@@ -253,7 +253,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
             if (! multiple)
                 newoptions = [ { noObjectSelected: true }, ...newoptions ]
 
-            if (searchoptions.length === 0) {
+            if (searchoptions.length === 0 && new_object) {
                 newoptions = [{
                     newObjectEntry: true,
                     query: query
@@ -371,7 +371,7 @@ export function PersonInput({ value, setValue, multiple }) {
     />
 }
 
-export function GrantInput({ value, setValue, multiple, api_prefix }) {
+export function GrantInput({ value, setValue, multiple, disableCreation }) {
     return <ObjectInput 
         value={value} 
         setValue={setValue} 
@@ -380,7 +380,7 @@ export function GrantInput({ value, setValue, multiple, api_prefix }) {
         objName="grant"
         oa="o"
         render={_ => `${_.name} (${_.pi ? _.pi.lastName : ''} - ${_.identifier})`}
-        new_object={q => ({identifier: q})}
+        new_object={disableCreation ? null : q => ({identifier: q})}
         inputs={{
                 identifier: 'Identificativo',
         }}

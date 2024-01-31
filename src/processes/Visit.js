@@ -190,7 +190,7 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
                 <DateInput value={data.endDate} setValue={setter(setData, "endDate")}/>
             </InputRow>
             <InputRow className="my-3" label="Grants">
-                <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} />
+                <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} disableCreation={true} />
             </InputRow>
             <InputRow className="my-3" label="Fondi di Ateneo">
                 <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})}/>
