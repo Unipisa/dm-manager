@@ -35,7 +35,7 @@ function VisitList({variant}) {
     }
 
     return <>
-        {data.data.map(
+        {data.data.sort(sortFn).map(
             visit => {
             return <div className="p-3 col-lg-6 p-0" key={visit._id}>
                 <Card className="shadow">
@@ -64,6 +64,12 @@ function VisitList({variant}) {
     async function removeVisit(id) {
         await api.del(`/api/v0/process/${variant}visits/${id}`)
         queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
+    }
+
+    function sortFn(a, b) {
+        if (a.startDate < b.startDate) return 1
+        if (a.startDate > b.startDate) return -1
+        return 0
     }
 
 }
