@@ -59,7 +59,7 @@ async function notificaPortineria() {
             as: 'person',
             pipeline: [
                 {$project: {
-                    _id: 1, firstName: 1, lastName: 1
+                    _id: 1, firstName: 1, lastName: 1, email: 1,
                 }}
             ]
         }},
@@ -106,24 +106,28 @@ async function notificaPortineria() {
 
     // Prepare the email
     const visitorList = res.map(x => {
-        const visitorName = `${x['person']['firstName']} ${x['person']["lastName"]}`
+        let text = ""
+        const visitorName = `${x.person.firstName} ${x.person.lastName}`
         var affiliation = ""
-        if (x['affiliations'].length > 0) {
-            affiliation = "(" + x['affiliations'].map(x => x['name']).join(", ") + ")"
+        if (x.affiliations.length > 0) {
+            affiliation = "(" + x.affiliations.map(x => x.name).join(", ") + ")"
         }
-        const visitorNameAndAffiliation = `${visitorName} ${affiliation}`
-
-        const rooms = x['roomAssignments'].map(x => {
-            r = x['room']
-            start = x['startDate'].toLocaleDateString('it-IT')
-            end = x['endDate'].toLocaleDateString('it-IT')
-            return `Building ${r['building']}, Floor ${r['floor']}, Room ${r['number']} (${start} -- ${end})`
-        }).join(" - ")
-
-        return `
-Visitatore: ${visitorNameAndAffiliation}
-Assegnazioni stanze: ${rooms}
-`
+        text += `Visitatore: ${visitorName} ${affiliation} ${x.person?.email||""}\n`
+        text += `Periodo: ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} -- ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
+        for (const person of x.referencePeople) {
+            text += `Referente: ${person.firstName} ${person.lastName}\n`
+        }
+        if (!x.requireRoom) text += "Stanza non richiesta\n"
+        if (x.roomAssignments.length > 0) {
+            text += "Assegnazioni stanze: "
+            text += x.roomAssignments.map(x => {
+                r = x.room
+                start = x.startDate?.toLocaleDateString('it-IT') || ""
+                end = x.endDate?.toLocaleDateString('it-IT') || ""
+                return `Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
+            }).join(" - ")
+        }         
+        return text
     }).join("\n\n")
 
     const emailBody = `
@@ -131,6 +135,8 @@ I seguenti visitatori sono in arrivo nei prossimi giorni:
 
 ${visitorList}
 `
+
+    // console.log(emailBody)
 
     const emails = await getEmailsForChannel('portineria')
     console.log(emails)
