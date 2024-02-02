@@ -800,45 +800,6 @@ const migrations = {
         return true
     },
 
-    D20231117_convert_abstract_1: async function (db) {
-        const seminar_ids = [
-            "655770ed442cf09480d9c243",
-            "655770ed442cf09480d9c244",
-            "655770ed442cf09480d9c248",
-            "655770ed442cf09480d9c249",
-            "655770ee442cf09480d9c24d",
-            "655770ee442cf09480d9c24f",
-            "655770ee442cf09480d9c251",
-            "655770ee442cf09480d9c254",
-            "655770ee442cf09480d9c256",
-            "655770ee442cf09480d9c257",
-            "655770ee442cf09480d9c259",
-            "655770ee442cf09480d9c25b",
-            "655770ee442cf09480d9c25d",
-            "655770ee442cf09480d9c25e",
-            "655770ee442cf09480d9c25f",
-            "655770ee442cf09480d9c260",
-            "655770ee442cf09480d9c262",
-            "655770ee442cf09480d9c264",
-            "655770f1442cf09480d9c265",
-            "655770f3442cf09480d9c267",
-            "655770f4442cf09480d9c268",
-            "655770f6442cf09480d9c26a",
-        ]
-        for (const seminar_id of seminar_ids) {
-            console.log(`processing seminar ${seminar_id}`)
-            const seminar = await db.collection('eventseminars').findOne({ _id: new ObjectId(seminar_id) })
-            if (!seminar) {
-                console.log(`seminar ${seminar_id} not found!`)
-                continue
-            }
-            const abstract = seminar.abstract
-            const parsed = parseHTML(abstract)
-            await db.collection('eventseminars').updateOne({ _id: seminar_id }, { $set: { abstract: parsed } })
-        }
-        return true
-    },
-
     D20231123_create_group_indexes: async function(db) {
         db.collection('groups').createIndex({startDate: 1, endDate: 1})
         return true
@@ -852,6 +813,28 @@ const migrations = {
         }
         return true
     },
+
+    D20240202_add_person_to_user_1: async function(db) {
+        const users = db.collection('users')
+        const people = db.collection('people')
+        for (const user of await users.find({person: null}).toArray()) {
+            if (!user.username) continue
+            const ps = await people.aggregate([{
+                $match: { $or: [
+                    {email: user.username },
+                    {alternativeEmails: user.username }
+                ]}}]).toArray()
+            if (ps.length >=1) {
+                if (ps.length > 1) {
+                    console.log(`WARNING: multiple people found for user ${user.username}`)
+                    continue
+                }
+                const person = ps[0]
+                await users.updateOne({ _id: user._id }, { $set: { person: person._id } })
+            }
+        }
+        return true
+    }
 }
 
 async function migrate(db, options) {
