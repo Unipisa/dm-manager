@@ -491,7 +491,7 @@ router.patch('/:id', async (req, res) => {
             endDate: { $gte: pastDate() }}, 
         payload)
 
-    if (!visit) return res.status(404)
+    if (!visit) return res.status(404).send({ error: "Not found" })
 
     await log(req, visit, payload)
     notifyVisit(visit._id)

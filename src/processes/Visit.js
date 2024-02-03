@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { GrantInput, InputRow, DateInput, TextInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, TextInput, SelectInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -131,7 +131,7 @@ function VisitForm({visit, variant}) {
         if (data.person.affiliations && !data.affiliations?.length) {
             data.affiliations = data.person.affiliations
         }
-        data.affiliations = data.affiliations.map(_ => _._id)
+        // data.affiliations = data.affiliations.map(_ => typeof(_) === 'object' ? _._id : _)
         if (visit._id) {
             await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
         } else {
@@ -163,8 +163,10 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
         { active 
         ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} />
         : <>
-            {data.referencePeople.map(person => <>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></>)}
+            {data.referencePeople.map(person => <div key={person._id}>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></div>)}
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
+            <br />
+            SSD: <b>{data.SSD}</b>
             <br />
             grants: {data?.grants?.length ? data.grants.map(grant => <span key={grant._id}><b>{grant.identifier}</b>&nbsp;</span>) : <i>nessun grant utilizzato</i>}
             <br />
@@ -182,12 +184,15 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
 
 function ActiveVisitDetailsBlock({data, setData, done}) {
     return <>
-        <Form autocomplete="off">
+        <Form autoComplete="off">
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
             </InputRow>
             <InputRow label="Data partenza" className="my-3">
                 <DateInput value={data.endDate} setValue={setter(setData, "endDate")}/>
+            </InputRow>
+            <InputRow label="SSD" className="my-3">
+                <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
             </InputRow>
             <InputRow className="my-3" label="Grants">
                 <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} disableCreation={true} />

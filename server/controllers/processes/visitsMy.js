@@ -200,11 +200,11 @@ router.patch('/:id', async (req, res) => {
     const visit = await Visit.findOneAndUpdate(
         {   _id: new ObjectId(req.params.id),
             createdBy: req.user._id,
-            referencePeople: [person._id],
+            referencePeople: person._id,
             endDate: { $gte: pastDate() }}, 
         payload)
 
-    if (!visit) return res.status(404)
+    if (!visit) return res.status(404).send({ error: "Not found" })
     
     await log(req, visit, payload)
     notifyVisit(visit._id)
