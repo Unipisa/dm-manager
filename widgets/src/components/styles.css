@@ -1,94 +1,49 @@
+.event-box {
+    width: 300px;
+    height: 150px;
+    overflow: hidden;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+        padding: 1.5rem;
+        height: 240px;
+    }
+    @media (min-width: 1383px) {
+        padding: 2rem;
+        height: 270px;
+    }
+}
+
 .filter-link {
     background-color: #00000000 !important;
     font-size: 1rem;
     border-radius: 0;
-    padding: 3px 15px 3px 15px;
-    margin: 0px 5px 0px 5px; 
-    
-    @media (min-width: 768px) {
-        font-size: 1rem;
-    }
+    padding: 3px 15px;
+    margin: 0px 5px;
+
     @media (min-width: 1383px) {
         font-size: 1.125rem;
     }
 }
 
-.filter-link.active {
-    color: #ffffff !important;
-    background-color: #003c71 !important;
-    border-radius: 0;
-    padding: 3px 15px 3px 15px;
-    margin: 0px 5px 0px 5px;
-}
-
+.filter-link.active,
 .filter-link:hover {
     color: #ffffff !important;
     background-color: #003c71 !important;
     border-radius: 0;
-    padding: 3px 15px 3px 15px;
-    margin: 0px 5px 0px 5px;
-}
-
-.subtitle_style {
-    display: block;
-    font-size: 0.75rem;
-    color: #003c71 !important;
-    margin: 2px 0px 2px 0px;
-    padding: 4px 0px 4px 0px;
-        
-    @media (min-width: 768px) {
-        font-size: 0.875rem;
-    }
-    @media (min-width: 1383px) {
-        font-size: 0.875rem;
-    }
-}
-.subtitle_style.far.fa-calendar {
-    color: #003c71 !important;
-    font-family: "Titillium Web";
-}
-.subtitle_style.far.fa-calendar::before {
-    font-family: 'Font Awesome 5 Free';
-}
-.subtitle_style.fas.fa-map-marker-alt {
-    color: #003c71 !important;
-    font-weight: normal;
-    font-family: "Titillium Web"; 
-}
-.subtitle_style.fas.fa-map-marker-alt::before {
-    font-family: 'Font Awesome 5 Free';
-    font-weight: bold;
-}
-.subtitle_style.fa.fa-tags {
-    color: #003c71 !important;
-    font-weight: normal;
-    font-family: "Titillium Web"; 
-}
-.subtitle_style.fa.fa-tags::before {
-    font-family: 'Font Awesome 5 Free';
-    font-weight: bold;
-}
-.subtitle_style.fa.fa-link {
-    color: #003c71 !important;
-    font-weight: normal;
-    font-family: "Titillium Web"; 
-}
-.subtitle_style.fa.fa-link::before {
-    font-family: 'Font Awesome 5 Free';
-    font-weight: bold;
+    padding: 3px 15px;
+    margin: 0px 5px;
 }
 
 .title_style {
     font-size: 0.875rem;
     color: #003c71;
-    margin: 0px 0px 0px 0px; 
+    margin: 0px;
     font-weight: bold;
     text-decoration: none !important;
 
     @media (min-width: 768px) {
-        font-size: 1.25rem;
-    }
-    @media (min-width: 1383px) {
         font-size: 1.25rem;
     }
 }
@@ -97,10 +52,38 @@
     color: #003C7187 !important;
 }
 
+.subtitle_style {
+    display: block;
+    font-size: 0.75rem;
+    color: #003c71 !important;
+    margin: 2px 0px;
+    padding: 4px 0px;
+
+    @media (min-width: 768px) {
+        font-size: 0.875rem;
+    }
+}
+
+.subtitle_style.far.fa-calendar,
+.subtitle_style.fas.fa-map-marker-alt,
+.subtitle_style.fa.fa-tags,
+.subtitle_style.fa.fa-link {
+    color: #003c71 !important;
+    font-family: "Titillium Web";
+    font-weight: normal;
+}
+
+.subtitle_style.far.fa-calendar::before,
+.subtitle_style.fas.fa-map-marker-alt::before,
+.subtitle_style.fa.fa-tags::before,
+.subtitle_style.fa.fa-link::before {
+    font-family: 'Font Awesome 5 Free';
+    font-weight: bold;
+}
+
 .excerpt_style {
     color: #000000;
     font-size: 1rem;
-    overflow: hidden;
 
     @media (max-width: 768px) {
         font-size: 0.875rem;
@@ -113,14 +96,11 @@
 .load-button {
     font-size: 0.75rem !important;
     background-color: #003c71 !important;
-    padding: 8px 20px 8px 20px !important;
-    margin: 10px 0px 0px 0px; 
+    padding: 8px 20px !important;
+    margin: 10px 0px;
     border: none;
 
     @media (min-width: 768px) {
-        font-size: 0.875rem !important;
-    }
-    @media (min-width: 1383px) {
         font-size: 0.875rem !important;
     }
 }
@@ -128,26 +108,9 @@
 .load-button:focus {
     outline: none;
     box-shadow: none;
-  }
+}
 
 .load-button:hover {
     background-color: #003C7187 !important;
     border: none;
-}
-
-.event-box {
-    width: 300px;
-    height: 150px;
-    overflow: hidden;
-    padding: 1rem;
-    margin-bottom: 1rem;
-
-    @media (min-width: 768px) {
-        padding: 1.5rem;
-        height: 220px;
-    }
-    @media (min-width: 1383px) {
-        padding: 2rem;
-        height: 270px;
-    }    
 }

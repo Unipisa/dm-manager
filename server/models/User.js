@@ -7,6 +7,7 @@ const userSchema = new Schema({
     email: {type: String, label: 'email'},
     username: {type: String, label: 'username', help: 'corrisponde all\'email per gli utenti autenticati con credenziali di ateneo'},
     roles: [{type: String, label: 'ruoli'}],
+    person: {type: Schema.Types.ObjectId, ref: 'Person', label: 'persona', null: true, default: null},
  }, { timestamps: true })
 
 userSchema.plugin(passportLocalMongoose)

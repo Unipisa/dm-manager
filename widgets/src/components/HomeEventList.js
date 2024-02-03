@@ -1,13 +1,22 @@
 import React, { useState } from 'react';
 import { Button, Nav, Tab } from 'react-bootstrap';
 import { useQuery } from 'react-query';
-import { Loading } from './Loading';
 import axios from 'axios';
-import { formatDateInterval, getManageURL, getDMURL, formatDate, formatTime, truncateText, truncateTextByWords, isEnglish } from '../utils';
-import './styles.css';
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import { Loading } from './Loading';
+import {
+  formatDateInterval,
+  getManageURL,
+  getDMURL,
+  formatDate,
+  formatTime,
+  truncateText,
+  truncateTextByWords,
+  isEnglish
+} from '../utils';
+import './styles.css';
 
 export function HomeEventList({}) {
     const [numberOfEntries, setNumberOfEntries] = useState(3);
@@ -47,7 +56,7 @@ export function HomeEventList({}) {
         return <Loading widget="Lista degli eventi" error={error}></Loading>
     }
 
-    const all_event_list = data.map((x) => (
+      const all_event_list = data.map((x) => (
         <EventBox event={x} key={x._id}></EventBox>
       ));
     
@@ -66,6 +75,8 @@ export function HomeEventList({}) {
           <EventBox event={colloquium} key={colloquium._id}></EventBox>
         )
       );
+      
+      const showButton = numberOfEntries * 2 <= data.length + 6;
 
       return (
         <div className="">
@@ -107,11 +118,13 @@ export function HomeEventList({}) {
               </Tab.Pane>
             </Tab.Content>
           </Tab.Container>
+          {showButton && (
           <div className="d-flex flex-row justify-content-center">
             <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
               {isEnglish() ? 'Load more' : 'Carica altro'}
             </Button>
           </div>
+          )}
         </div>
       );
 }
