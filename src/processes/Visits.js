@@ -43,6 +43,7 @@ function VisitList({variant}) {
                     <Card.Body>
                         {/*JSON.stringify(visit)*/}
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />
+                        { variant==='' && visit.referencePeople.map(p => <span key={p._id}><strong>Referente</strong>: {p.firstName} {p.lastName}<br /></span>)}
                         <strong>Periodo</strong>: {myDateFormat(visit.startDate)} – {myDateFormat(visit.endDate)}<br />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        
                             {

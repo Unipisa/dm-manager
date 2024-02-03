@@ -49,7 +49,22 @@ const INDEX_PIPELINE = [
                 name: 1,
             }},
         ]
-    }}]
+    }},
+    { $lookup: {
+        from: 'people',
+        localField: 'referencePeople',
+        foreignField: '_id',
+        as: 'referencePeople',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+            }},
+        ]
+    }}
+]
 module.exports.INDEX_PIPELINE = INDEX_PIPELINE
 
 const GET_PIPELINE = [
