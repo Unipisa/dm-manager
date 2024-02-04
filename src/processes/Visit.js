@@ -20,10 +20,20 @@ export default function Visit({variant}) {
     const { id } = useParams()
     const path = `process/${variant||''}visits/${id || '__new__'}`
     const query = useQuery(path.split('/'))
+    const user = useEngine().user
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento: {query.error.response.data?.error || `${query.error}`}</div>
 
-    return <VisitForm visit={query.data} variant={variant||''}/>
+    let visit = {...query.data}
+
+    // set SSD from user staffs info
+    if (id === '__new__' && variant === 'my/') {
+        for (const staff of user.staffs) {
+            if (staff.SSD) visit.SSD = staff.SSD
+        }
+    }
+
+    return <VisitForm visit={visit} variant={variant||''}/>
 }
 
 function VisitForm({visit, variant}) {
