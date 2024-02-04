@@ -86,10 +86,13 @@ export function useCreateEngine() {
         connect: async () => {
             try {
                 const config = await api.get('/config')
-                let { user } = await api.post('/login')
+                let { user, person, roles, staffs} = await api.post('/login')
 
                 if (user != null) {
-                    user = new_user(user);
+                    user.roles = roles
+                    user.person = person
+                    user.staffs = staffs
+                    user = new_user(user)
                 }
 
                 const ServerModels = (await api.get('/api/v0/Models'))

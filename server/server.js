@@ -10,6 +10,7 @@ const fs = require('fs')
 const User = require('./models/User')
 const Token = require('./models/Token')
 const Person = require('./models/Person')
+const Staff = require('./models/Staff')
 const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
@@ -17,6 +18,7 @@ const migrations = require('./migrations')
 const MongoStore = require('connect-mongo')
 const crypto = require('crypto')
 const {setupDatabase, create_admin_user, create_secret_token} = require('./database')
+const { UNSAFE_RouteContext } = require('react-router')
 
 function setup_passport() {
   // local password authentication
@@ -83,51 +85,48 @@ function setup_routes(app) {
 
   app.use(async (req, res, next) => {
     const user = req.user
-    if (user && user.email) {
-      /* attach roles to user */
-      const persons = await Person.aggregate([
-        { $match: {$or: [
-          {email: user.email }, 
-          {alternativeEmails: user.email}] }
-        },
-        {
-          $lookup: {
-            from: 'staffs',
-            let: { person_id: '$_id'},
-            pipeline: [
-              { $match: {
-                  $expr: { 
-                    $and: [
-                      { $eq: [ '$person', '$$person_id' ]},
-                      { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
-                      { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
-                    ]
-                  }
-                }
-              }
-            ],
-            as: 'staff',
+    req.person = null
+    req.roles = []
+    req.staffs = []
+
+    // get person
+    if (user?.person) {
+      req.person = await Person.findById(user.person)
+    }
+
+    // get staffs
+    if (user?.person) {
+      req.staffs = await Staff.aggregate([
+        { $match: { person: user.person }},
+        { $match: {
+            $expr: { 
+              $and: [
+                { $or: [ {$eq: ['$startDate', null]}, {$lte: ['$startDate', '$$NOW']}]},
+                { $or: [ {$eq: ['$endDate', null]}, {$gte: ['$endDate', '$$NOW']}]},
+              ]
+            }
           }
-        }, 
-        {
-          $unwind: {
-            path: '$staff',
-            preserveNullAndEmptyArrays: false,
+        },
+      ])
+    }
+
+    // get roles
+    if (user) {
+      req.roles = [...user.roles]
+      for (staff of req.staffs) {
+        if (staff.isInternal) {
+          add_role('/process/seminars')
+          if (staff.qualification !== 'PTA') {
+            add_role('/process/my/visits')
           }
         }
-      ])
-
-      const isInternal = persons.reduce((acc, person) => acc || person.staff.isInternal, false)
-
-      if (isInternal) add_role('/process/seminars')
-
-      // TODO: includere solo il personale docente
-      if (isInternal) add_role('/process/my/visits')
+      }
 
       function add_role(role) {
-        if (!user.roles.includes(role)) user.roles.push(role)
+        if (!req.roles.includes(role)) req.roles.push(role)
       }
-      // console.log(`sending user ${JSON.stringify(user)}`)
+
+      // console.log(`sending user ${JSON.stringify({...user}, null, 2)}`)
     }
 
     next()
@@ -146,8 +145,12 @@ function setup_routes(app) {
   })
   
   app.post('/login', async function(req, res) {
-    const user = req.user || null
-    res.send({ user })
+    res.send({ 
+      user: req.user || null, 
+      person: req.person,
+      roles: req.roles, 
+      staffs: req.staffs 
+    })
   })
   
   app.post('/login/password',
@@ -176,7 +179,6 @@ function setup_routes(app) {
             })
         })
     })
-    
   }
   
   app.get('/login/oauth2/callback',
