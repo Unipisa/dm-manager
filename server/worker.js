@@ -150,6 +150,11 @@ async function getEmailsForChannel(channel) {
         return []
     }
 
+    // If it's an email, return it as is
+    if (channel.includes('@')) {
+        return [channel]
+    }
+
     // Remove trailing slash, if any
     if (channel[channel.length - 1] == '/') {
         channel = channel.substr(0, channel.length - 1)

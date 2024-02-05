@@ -3,6 +3,8 @@ const mongoose = require('mongoose')
 const {setupDatabase} = require('./database')
 const migrations = require('./migrations')
 const {notifyVisit} = require('./controllers/processes/visits')
+const Notification = require('./models/Notification')
+const Log = require('./models/Log')
 
 async function main() {
     await setupDatabase()
@@ -21,8 +23,9 @@ available command line options:
  show-migrations: show migrations state
  apply-migrations: apply pending migrations
  clean-migrations: clean removed migrations
+ pending-notifications: show pending notifications
  notify-visit <visit_id> [<message>]: send visit notification message
-
+ logs: show logs
     `)
 
     console.log(`given command line arguments: ${JSON.stringify(process.argv.slice(2))}`)
@@ -49,7 +52,10 @@ available command line options:
     } else if (command === 'clean-migrations') {
         console.log('* clean migrations collection')
         await migrations.migrate(mongoose.connection.db, {clean: true})
-
+    } else if (command === 'pending-notifications') {
+        console.log('* show pending notifications')
+        const notifications = await Notification.find()
+        console.log(notifications)
     } else if (command === 'notify-visit') {
         const visit_id = args[0]
         const message = args[1] || ''
@@ -59,7 +65,13 @@ available command line options:
             return
         }
         await notifyVisit(visit_id, message)
-    
+    } else if (command === 'logs') {
+        console.log('* show logs')
+        const logs = await Log.aggregate([
+            { $sort: { createdAt: -1 }},
+            { $limit: 10 },
+        ])
+        console.log(logs)
     } else {
         console.log(`invalid argument: ${command}`)
     }
