@@ -27,6 +27,8 @@ available command line options:
 
     console.log(`given command line arguments: ${JSON.stringify(process.argv.slice(2))}`)
 
+    if (process.argv.length < 3) return
+
     const command = process.argv[2]
     const args = process.argv.slice(3)
 
@@ -59,7 +61,7 @@ available command line options:
         await notifyVisit(visit_id, message)
     
     } else {
-        console.log(`invalid argument: ${arg}`)
+        console.log(`invalid argument: ${command}`)
     }
 }
 
