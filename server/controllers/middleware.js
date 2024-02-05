@@ -27,31 +27,6 @@ const requireUser = (req, res, next) => {
     }
 }
 
-const requireRoles = (req, res, next) => {
-    if (req.roles !== undefined) next()
-    const PREFIX = 'Bearer '
-    if (req.headers.authorization?.startsWith(PREFIX)) {
-        const token = req.headers.authorization.slice(PREFIX.length)
-        Token.findOne({ token }, (err, tok) => {
-            if (err) {
-                res.status(401)
-                res.send({error: "invalid token"})
-            } else {
-                req.roles = tok.roles || []
-                req.log_who = tok.name || tok.token
-                next()
-            }
-        })
-    } else if (req.user) {
-        req.roles = req.user.roles || []
-        req.log_who = req.user.username
-        next()
-    } else {
-        res.status(401)
-        res.send({error: `not logged in`})
-    }
-}
-
 const requirePathPermissions = async (req, res, next) => {
     const fullUrl = req.baseUrl + req.path
     const PREFIX = 'Bearer '
@@ -102,16 +77,14 @@ const hasSomeRole = (req, ...roles) => {
 }
 
 const requireSomeRole = (...roles) => ((req, res, next) => {
-    requireRoles(req, res, () => {
-        if (hasSomeRole(req, ...roles)) {
-            next()
-        } else {
-            res.status(403)
-            const error = `some role in [${roles.join(", ")}] required, your roles: [${req.roles.join(", ")}]`
-            console.log(error)
-            res.send({error})
-        }
+    if (hasSomeRole(req, ...roles)) {
+        next()
+    } else {
+        res.status(403)
+        const error = `some role in [${roles.join(", ")}] required, your roles: [${req.roles.join(", ")}]`
+        console.log(error)
+        res.send({error})
     }
-)})
+})
 
-module.exports = {log, requireUser, hasSomeRole, allowAnonymous, requireRoles, requireSomeRole, requirePathPermissions}
+module.exports = {log, requireUser, hasSomeRole, allowAnonymous, requireSomeRole, requirePathPermissions}

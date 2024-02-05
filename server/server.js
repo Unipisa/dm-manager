@@ -121,12 +121,28 @@ function setup_routes(app) {
           }
         }
       }
+      req.log_who = user.username || `${user._id}`
 
       function add_role(role) {
         if (!req.roles.includes(role)) req.roles.push(role)
       }
 
       // console.log(`sending user ${JSON.stringify({...user}, null, 2)}`)
+    }
+
+    // se c'è un token usa i roles del token
+    const PREFIX = 'Bearer '
+    if (req.headers.authorization?.startsWith(PREFIX)) {
+      const token = req.headers.authorization.slice(PREFIX.length)
+      Token.findOne({ token }, (err, tok) => {
+          if (err) {
+              res.status(401)
+              res.send({error: "invalid token"})
+              return
+          }
+          req.roles = tok.roles || []
+          req.log_who = tok.name || tok.token
+      })
     }
 
     next()

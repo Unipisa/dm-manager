@@ -89,7 +89,7 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
 export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
     return Object.entries(schema)
         .filter(([field]) => !RESERVED_FIELDS.includes(field))
-        .map(([field, field_schema]) => (
+        .map(([field, field_schema]) => <>
             <ModelInput 
                 modified={modifiedFields.includes(field)}
                 key={field}
@@ -101,7 +101,7 @@ export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
                     setObj(obj => ({...obj, [field]: value}))
                 }}
                 edit={true} />
-        ))
+        </>)
 }
 
 export function emptyObject(Model) {
