@@ -285,7 +285,7 @@ const GET_PIPELINE = [
 module.exports.GET_PIPELINE = GET_PIPELINE
 
 async function notifyVisit(visit_id, message) {
-    console.log(`notifyVisit ${visit_id}`)
+//    console.log(`notifyVisit ${visit_id}`)
     const visits = await Visit.aggregate([
         { $match: {_id: new ObjectId(visit_id)}},
         ...GET_PIPELINE,
@@ -314,6 +314,7 @@ Visitatore: ${person.firstName} ${person.lastName}
 Affiliazioni: ${affiliations}
 Grants: ${grants}
 Fondi di Ateneo: ${universityFunded}
+Richiede albergo: ${visit.requireHotel}
 Richiede stanza: ${visit.requireRoom ? 'sì' : 'no'}
 Prevede seminario: ${visit.requireSeminar ? 'sì' : 'no'}
 Data inizio: ${startDate}

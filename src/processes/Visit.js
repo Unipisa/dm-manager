@@ -183,6 +183,8 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
             <br />
             fondi di ateneo: <b>{data.universityFunded ? 'sì' : 'no'}</b>
             <br />
+            albergo: <b>{data.requireHotel || '???'}</b>
+            <br />
             stanza: {data.requireRoom ? <b>è richiesta una stanza</b> : "non è richiesta una stanza"}
             <br />
             seminario: {data.requireSeminar ? <b>è previsto un seminario</b> : "non è previsto un seminario"}
@@ -216,6 +218,9 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             <InputRow className="my-3" label="Fondi di Ateneo">
                 <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})}/>
                 {} Visita su fondi di Ateneo
+            </InputRow>
+            <InputRow className="my-3" label="Albergo">
+                <SelectInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
             </InputRow>
             <InputRow className="my-3" label="Stanza">
                 <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})}/>
