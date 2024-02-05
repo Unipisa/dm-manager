@@ -347,6 +347,9 @@ Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateSt
     console.log(text)
 
     await notify('process/visits', `${visit_id}`, text)
+    for (const person of visit.referencePeople) {
+        if (person.email) await notify(person.email, `${visit_id}`, text)
+    }
 }
 
 module.exports.notifyVisit = notifyVisit

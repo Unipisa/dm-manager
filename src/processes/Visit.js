@@ -46,6 +46,7 @@ function VisitForm({visit, variant}) {
     const seminars = visit.seminars
     const roomAssignments = visit.roomAssignments
     const canCreateSeminar = user.hasProcessPermission('/process/seminars')
+    const addMessage = useEngine().addMessage
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -144,7 +145,11 @@ function VisitForm({visit, variant}) {
         }
         // data.affiliations = data.affiliations.map(_ => typeof(_) === 'object' ? _._id : _)
         if (visit._id) {
-            await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
+            try {
+                await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
+            } catch (e) {
+                addMessage(`${e}`)
+            }
         } else {
             const res = await api.put(`/api/v0/process/${variant}visits`, data)
             const _id = res._id

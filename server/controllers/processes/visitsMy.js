@@ -167,6 +167,7 @@ router.put('/', async (req, res) => {
 })
 
 router.patch('/:id', async (req, res) => {
+    console.log(`PATCH visitsMy ${req.params.id}`)
     const payload = {...req.body}
 
     assert(req.user._id)
@@ -181,7 +182,6 @@ router.patch('/:id', async (req, res) => {
 
     const visit = await Visit.findOneAndUpdate(
         {   _id: new ObjectId(req.params.id),
-            createdBy: req.user._id,
             referencePeople: person._id,
             endDate: { $gte: pastDate() }}, 
         payload)
