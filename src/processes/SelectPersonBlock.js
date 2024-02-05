@@ -48,7 +48,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 <Button className="mx-3" onClick={createNew} disabled={!lastName || !firstName || !email || !affiliations.length}>
                     Crea una nuova persona
                 </Button>
-                <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} />
+                <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} prefix={prefix}/>
             </>}
 
             {person && edit && <>
@@ -132,7 +132,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
     }
 
     async function createNew() {
-        const res = await api.post(`${prefix}/person`, {
+        const res = await api.post(`/api/v0/${prefix}/person`, {
             lastName,
             firstName,
             email,
@@ -152,7 +152,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         const patch = diff();
         console.log(`patch: ${JSON.stringify(patch)}`)
         if (patch) {
-            await api.patch(`${prefix}/person/${person._id}`, patch)
+            await api.patch(`/api/v0/${prefix}/person/${person._id}`, patch)
             setPerson({...person, ...patch})
         }
         done()
@@ -167,8 +167,8 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
     }
 }
 
-function PersonSuggestions({query, onClick}) {
-    const {isLoading, error, data} = useQuery([...'process/my/visits/person/'.split('/'), query])
+function PersonSuggestions({query, onClick, prefix}) {
+    const {isLoading, error, data} = useQuery([...`${prefix}/person`.split('/'), query])
 
     if (error) return "Error: " + error.message
     if (!isLoading && data.data.length === 0) return null

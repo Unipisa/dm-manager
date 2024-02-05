@@ -12,6 +12,56 @@ const PersonController = require('../PersonController')
  * @param {*} router 
  */
 
+const PERSON_SEARCH_PIPELINE = [
+    {$lookup: {
+        from: 'institutions',
+        localField: 'affiliations',
+        foreignField: '_id',
+        as: 'affiliations',
+        pipeline: [
+            {$project: {
+                _id: 1,
+                name: 1,
+            }}
+        ]
+    }},
+    {$lookup: {
+        from: 'staffs',
+        localField: '_id',
+        foreignField: 'person',
+        as: 'staffs',
+        pipeline: [
+            {$match: {
+                $expr: {
+                    $and: [
+                        { $or: [
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$NOW"] } ]},
+                        { $or: [
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$NOW"] } ]}
+                    ]},
+                },
+            },
+            {$project: {
+                _id: 1,
+                qualification: 1,
+                SSD: 1,
+            }}
+        ]
+    }},
+    {$sort: { modifiedAt: -1 }},
+    {$limit: 20},
+    {$project: {
+        _id: 1,
+        firstName: 1,
+        lastName: 1,
+        email: 1,
+        affiliations: 1,
+        staffs: 1,
+    }},
+]
+
 module.exports = (router) => {
     router.get('/person', async (req, res) => {        
         const { lastName, firstName, email, affiliation } = req.query
@@ -46,27 +96,32 @@ module.exports = (router) => {
 
         const persons = await Person.aggregate([
             {$match: { $and }},
-            {$lookup: {
-                from: 'institutions',
-                localField: 'affiliations',
-                foreignField: '_id',
-                as: 'affiliations',
-                pipeline: [
-                    {$project: {
-                        _id: 1,
-                        name: 1,
-                    }}
-                ]
-            }},
-            {$sort: { modifiedAt: -1 }},
-            {$limit: 20},
-            {$project: {
-                _id: 1,
-                firstName: 1,
-                lastName: 1,
-                email: 1,
-                affiliations: 1,
-            }},
+            ...PERSON_SEARCH_PIPELINE,
+        ])
+
+        return res.json({ data: persons })
+    })
+
+    router.get('/person/search', async (req, res) => {        
+        const { q } = req.query
+        const $or = []
+
+        $or.push({ 
+            lastName: { 
+                $regex: new RegExp(escapeRegExp(q), 'i') 
+            }})
+        $or.push({
+            firstName: {
+                $regex: new RegExp(escapeRegExp(q), 'i')
+            }})
+        $or.push({
+            email: {
+                $regex: new RegExp(escapeRegExp(q), 'i')
+            }}) 
+
+        const persons = await Person.aggregate([
+            {$match: { $or }},
+            ...PERSON_SEARCH_PIPELINE,
         ])
 
         return res.json({ data: persons })
