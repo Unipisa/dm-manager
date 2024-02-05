@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { GrantInput, InputRow, DateInput, TextInput, SelectInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -58,7 +58,7 @@ function VisitForm({visit, variant}) {
             done={nextStep}
             change={() => {setData({...data, person: null});setActiveSection('person')}}
             active={activeSection==='person'}
-            prefix={`/api/v0/process/${variant}visits`}
+            prefix={`process/${variant}visits`}
         />
         { data.person && 
             <VisitDetailsBlock
@@ -67,6 +67,7 @@ function VisitForm({visit, variant}) {
                 active={activeSection==='data'} 
                 done={() => {save();nextStep()}} 
                 edit={() => setActiveSection('data')}
+                variant={variant}
             />}
         { (data.requireRoom || roomAssignments?.length>0)  &&
             <RoomAssignments 
@@ -158,7 +159,7 @@ function VisitForm({visit, variant}) {
     }
 }
 
-function VisitDetailsBlock({data, setData, active, done, edit}) {
+function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
@@ -171,7 +172,7 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
         </Card.Header>
         <Card.Body>
         { active 
-        ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} />
+        ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} variant={variant}/>
         : <>
             {data.referencePeople.map(person => <div key={person._id}>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></div>)}
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
@@ -192,9 +193,14 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
     </Card>
 }
 
-function ActiveVisitDetailsBlock({data, setData, done}) {
+function ActiveVisitDetailsBlock({data, setData, done, variant}) {
     return <>
         <Form autoComplete="off">
+            { variant === '' &&
+                <InputRow label="Referenti" className="my-3">
+                    <PersonInput multiple={true} value={data.referencePeople} setValue={setReferencePeople} />
+                </InputRow>
+            }
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
             </InputRow>
@@ -230,6 +236,20 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
 
     function check() {
         return data.startDate && data.endDate && new Date(data.startDate) <= new Date(data.endDate)
+    }
+
+    function setReferencePeople(people) {
+        setData(data => ({...data, referencePeople: people}))
+        if (!data.SSD) {
+            for (const person of people) {
+                if (!person.staffs) continue
+                for (const staff of person.staffs) {
+                    if (staff.SSD) {
+                        setData(data => ({...data, SSD: staff.SSD}))
+                    }
+                }
+            }
+        }
     }
 }
 

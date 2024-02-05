@@ -101,7 +101,7 @@ export function SeminarBody({ seminar, forbidden }) {
             active={!personDone}
             done={() => setPersonDone(true)}
             change={() => {setPersonDone(false);setter(setData,'speaker')(null)}}
-            prefix="/api/v0/process/seminars"
+            prefix="process/seminars"
             /> 
         {personDone && <SeminarDetailsBlock 
             data={data} setData={setData}
