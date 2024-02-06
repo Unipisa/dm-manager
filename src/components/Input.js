@@ -359,7 +359,7 @@ export function PersonInput({ value, setValue, multiple }) {
         objName="persona"
         oa="a"
         render={_ => {
-            const affiliations = _.affiliations.map(x => x.name).join(" and ")
+            const affiliations = (_.affiliations || []).map(x => x.name).join(" and ")
             return `${_.firstName} ${_.lastName} (${affiliations})`}}
         new_object={q => ({firstName: "", lastName: q, affiliation: ""})}
         inputs={{
