@@ -40,7 +40,7 @@ class Options {
             BASE_URL: "http://localhost:3000",
             SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
             UPLOAD_DIRECTORY: __dirname + '/../uploads',
-            WORKER_NOTIFICATION_INTERVAL: '60000',
+            WORKER_NOTIFICATION_INTERVAL: '300000', // 5 minutes
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val

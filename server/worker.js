@@ -175,9 +175,14 @@ async function handleNotifications() {
     console.log("=> Handling notifications")
 
     const notifications = await Notification.find()
-    // console.log(notifications)
     for (const notification of notifications) {
         const emails = await getEmailsForChannel(notification.channel)
+        const timestamp = notification.updatedAt || notification.createdAt
+        const now = new Date()
+        if (timestamp && now - timestamp < config.WORKER_NOTIFICATION_INTERVAL) {
+            console.log(`Skipping notification ${notification.channel}/${notification.code} because it was updated too recently`)
+            continue
+        }
         try {
             if (emails.length>0) {
                 await sendEmail(emails, [], 'Notifica da DM-MANAGER', notification.message)
@@ -194,8 +199,7 @@ async function handleNotifications() {
 }
 
 async function mainloop() {
-    const interval = parseInt(config.WORKER_NOTIFICATION_INTERVAL)
-    console.log(`Starting worker, interval: ${interval}ms`)
+    console.log(`Starting worker`)
     await setupDatabase()
     await setupSMTPAccount()
 
@@ -204,7 +208,7 @@ async function mainloop() {
     // Setup the cron schedule
     scheduleCronJob('0 6 * * *', notificaPortineria)
 
-    setInterval(handleNotifications, interval)
+    setInterval(handleNotifications, 30000) // 30 seconds
 }
 
 mainloop()
