@@ -79,6 +79,7 @@ function VisitForm({visit, variant}) {
                 done={nextStep}
                 edit={() => setActiveSection('room')}
                 variant={variant}
+                onChange={save /* save visit to force notification */} 
             />
         }
         {   // mostra i seminari già inseriti
@@ -263,7 +264,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
     }
 }
 
-function RoomAssignments({person, visit, roomAssignments, active, done, edit, variant}) {
+function RoomAssignments({person, visit, roomAssignments, active, done, edit, variant, onChange}) {
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
@@ -279,7 +280,7 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
         </Card.Header>
         <Card.Body>
             {active 
-                ? <RoomAssignmentHelper person={person} startDate={visit.startDate} endDate={visit.endDate} />
+                ? <RoomAssignmentHelper person={person} startDate={visit.startDate} endDate={visit.endDate} onChange={onChange}/>
                 : <RoomAssignmentsDisplay />
             }
         </Card.Body>
