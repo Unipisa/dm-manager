@@ -48,7 +48,7 @@ function RoomListing({rooms, createAssignment}) {
     </>
 }
 
-export default function RoomAssignmentHelper({ person, startDate, endDate }) {
+export default function RoomAssignmentHelper({ person, startDate, endDate, onChange }) {
     const prefix = usePrefix()
     const {useIndex,usePut,usePatch,useDelete,addMessage} = useEngine()
     startDate = startDate ? new Date(startDate) : minDate
@@ -143,6 +143,7 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
         putRoomAssignment(assignment, () => {
             console.log(`assignment created`)
             addMessage(`Assegnata stanza ${room.building}${room.floor} ${room.number} a ${person.lastName} ${person.firstName}`, 'success')
+            onChange()
         })
     }
 
@@ -165,7 +166,7 @@ export default function RoomAssignmentHelper({ person, startDate, endDate }) {
                     <Button className='m-1' onClick={() => patchRoomAssignment({_id: assignment._id, endDate})}>
                         metti data fine {myDateFormat(endDate)}
                     </Button>}
-                {} <Button className='m-1' size='sm' variant='danger' onClick={() => deleteRoomAssignment(assignment)}>
+                {} <Button className='m-1' size='sm' variant='danger' onClick={async () => {await deleteRoomAssignment(assignment);onChange()}}>
                         rimuovi
                     </Button>
             </li>)}
