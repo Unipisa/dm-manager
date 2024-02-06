@@ -88,7 +88,10 @@ function VisitForm({visit, variant}) {
             <Seminar seminar={seminar} 
                 active={activeSection===seminar._id} 
                 change={() => setActiveSection(seminar._id)}
-                done={() => {setActiveSection('')}}
+                done={() => {
+                    setActiveSection('')
+                    save() // save visit to force notification
+                }}
                 variant={variant}
                 />
         </div>)}
@@ -116,7 +119,11 @@ function VisitForm({visit, variant}) {
             seminar && <Seminar seminar={seminar}
                 change={canCreateSeminar ? () => setActiveSection(seminar._id || 'seminar') : null}
                 active={activeSection==='seminar' || (seminar._id && activeSection===seminar._id)}
-                done={() => {setActiveSection('');setSeminar(null)}}
+                done={() => {
+                    setActiveSection('');
+                    setSeminar(null);
+                    save() // save visit to force notification
+                }}
                 variant={variant}
                 />
         }
