@@ -134,15 +134,17 @@ function setup_routes(app) {
     const PREFIX = 'Bearer '
     if (req.headers.authorization?.startsWith(PREFIX)) {
       const token = req.headers.authorization.slice(PREFIX.length)
-      Token.findOne({ token }, (err, tok) => {
-          if (err) {
-              res.status(401)
-              res.send({error: "invalid token"})
-              return
-          }
-          req.roles = tok.roles || []
-          req.log_who = tok.name || tok.token
-      })
+      try {
+        tok = await Token.findOne({ token })
+        req.roles = tok.roles || []
+        req.log_who = tok.name || tok.token
+        console.log('Roles: ', req.roles)
+      }
+      catch (err) {
+        res.status(401)
+        res.send({error: "invalid token"})
+        return
+      }
     }
 
     next()
