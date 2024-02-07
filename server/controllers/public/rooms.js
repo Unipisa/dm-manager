@@ -1,4 +1,5 @@
 const Room = require('../../models/Room')
+const RoomAssignment = require('../../models/RoomAssignment')
 
 async function roomsQuery(req, res) {
     // Find all rooms, and return only the data required for the planimetrie module
@@ -8,8 +9,9 @@ async function roomsQuery(req, res) {
             name: 1,
             notes: 1,
             code: 1, 
-            polygon: 1
-        }}
+            polygon: 1,
+        }},
+        ...RoomAssignment.roomRoomAssignmentPipeline('$$NOW', '$$NOW'),
     ])
 
     return { 

@@ -43,10 +43,10 @@ Room.relatedModels.push({
     field: 'room',
 })
 
-RoomAssignment.personRoomAssignmentPipeline = () => ([
+RoomAssignment.personRoomAssignmentPipeline = (startDate = '$startDate', endDate = '$endDate') => ([
     {$lookup: {
         from: "roomassignments",
-        let: { start: "$startDate", end: "$endDate" },
+        let: { start: startDate, end: endDate },
         localField: 'person._id',
         foreignField: "person",
         as: 'roomAssignments',
@@ -101,10 +101,10 @@ RoomAssignment.personRoomAssignmentPipeline = () => ([
     }}
 ])
 
-RoomAssignment.roomRoomAssignmentPipeline = () => ([
+RoomAssignment.roomRoomAssignmentPipeline = (startDate = '$startDate', endDate = '$endDate') => ([
     {$lookup: {
         from: "roomassignments",
-        let: { start: "$startDate", end: "$endDate" },
+        let: { start: startDate, end: endDate },
         localField: '_id',
         foreignField: "room",
         as: 'roomAssignments',
