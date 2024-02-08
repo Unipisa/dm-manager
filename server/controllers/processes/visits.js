@@ -113,6 +113,23 @@ const GET_PIPELINE = [
             }},
         ]
     }},
+    // espande createdBy
+    {$lookup:{
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy",
+        pipeline: [
+            {$project: {
+                _id: 1,
+                username: 1,
+            }},
+        ],
+    }},
+    {$unwind: {
+        path: "$createdBy",
+        preserveNullAndEmptyArrays: true
+    }},
     {$lookup: {
         from: 'institutions',
         localField: 'affiliations',
@@ -321,6 +338,8 @@ Data inizio: ${startDate}
 Data fine: ${endDate}
 Tags: ${tags}
 Note: ${notes}
+Creato da: ${visit?.createdBy?.username||visit?.createdBy||'???'}
+Ultima modifica: ${(visit.updatedAt || visit.createdAt).toLocaleDateString('it-IT')}
 `
     for (ra of (visit?.roomAssignments || [])) {
         text += `
@@ -339,7 +358,6 @@ Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
 Sala: ${seminar.conferenceRoom.name}
 Grants: ${seminar.grants.map(g => g.name).join(', ')}
-${JSON.stringify(seminar)}
 Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
         `
     }
