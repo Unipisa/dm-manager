@@ -14,7 +14,7 @@ const eventSeminarSchema = new Schema({
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
     startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },
     duration: { type: Number, label: 'Durata (in minuti)', default: 60 },
-    category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: true, can_sort: ['name'] },
+    category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: false, can_sort: ['name'] },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     abstract: { type: String, label: "Abstract", widget: 'text' },
     oldUrl: { type: String, label: 'URL vecchio', widget: 'url' },

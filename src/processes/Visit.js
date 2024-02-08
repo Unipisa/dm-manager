@@ -198,9 +198,9 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
             <br />
             albergo: <b>{data.requireHotel || '???'}</b>
             <br />
-            stanza: {data.requireRoom ? <b>è richiesta una stanza</b> : "non è richiesta una stanza"}
+            scrivania: {data.requireRoom ? <b>è richiesta una scrivania</b> : <>non è richiesta una scrivania</>}
             <br />
-            seminario: {data.requireSeminar ? <b>è previsto un seminario</b> : "non è previsto un seminario"}
+            seminario: {data.requireSeminar ? <b>è previsto un seminario</b> : <>non è previsto un seminario</>}
             <br />
             note: <b>{ data.notes || 'nessuna nota'}</b>
         </>}
@@ -235,9 +235,9 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             <InputRow className="my-3" label="Albergo">
                 <SelectInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
             </InputRow>
-            <InputRow className="my-3" label="Stanza">
+            <InputRow className="my-3" label="Scrivania">
                 <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})}/>
-                {} Richiedi una stanza
+                {} Richiedi una scrivania
             </InputRow>
             <InputRow className="my-3" label="Seminario">
                 <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})}/>
@@ -275,7 +275,7 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
-                <div>Assegnazione stanza</div>
+                <div>Assegnazione scrivania</div>
                 <div>
                     {variant === 'my/' && "[gestito dalla segreteria]"}
                     {variant === '' && !active &&
