@@ -332,7 +332,7 @@ Affiliazioni: ${affiliations}
 Grants: ${grants}
 Fondi di Ateneo: ${universityFunded}
 Richiede albergo: ${visit.requireHotel}
-Richiede stanza: ${visit.requireRoom ? 'sì' : 'no'}
+Richiede scrivania: ${visit.requireRoom ? 'sì' : 'no'}
 Prevede seminario: ${visit.requireSeminar ? 'sì' : 'no'}
 Data inizio: ${startDate}
 Data fine: ${endDate}
