@@ -334,12 +334,11 @@ Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateStrin
     for(seminar of visit?.seminars || []) {
         text += `
 Seminario: ${seminar.title}
-Categoria: ${seminar.category.label}
+Categoria: ${seminar.category?.label || '---'}
 Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
 Sala: ${seminar.conferenceRoom.name}
 Grants: ${seminar.grants.map(g => g.name).join(', ')}
-${JSON.stringify(seminar)}
 Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
         `
     }
