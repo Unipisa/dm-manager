@@ -316,7 +316,7 @@ async function notifyVisit(visit_id, message) {
 
     const person = visit.person
     const affiliations = visit.affiliations.map(a => a.name).join(', ')
-    const grants = visit.grants.map(g => g.name).join(', ')
+    const grants = (visit.grants || []).map(g => g.name).join(', ')
     const startDate = visit.startDate.toLocaleDateString('it-IT')
     const endDate = visit.endDate.toLocaleDateString('it-IT')
     const tags = (visit.tags || []).join(', ')
@@ -332,7 +332,7 @@ Affiliazioni: ${affiliations}
 Grants: ${grants}
 Fondi di Ateneo: ${universityFunded}
 Richiede albergo: ${visit.requireHotel}
-Richiede stanza: ${visit.requireRoom ? 'sì' : 'no'}
+Richiede scrivania: ${visit.requireRoom ? 'sì' : 'no'}
 Prevede seminario: ${visit.requireSeminar ? 'sì' : 'no'}
 Data inizio: ${startDate}
 Data fine: ${endDate}
@@ -357,7 +357,7 @@ Categoria: ${seminar.category?.label || '---'}
 Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
 Sala: ${seminar.conferenceRoom.name}
-Grants: ${seminar.grants.map(g => g.name).join(', ')}
+Grants: ${(seminar.grants || []).map(g => g.name).join(', ')}
 Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
         `
     }
