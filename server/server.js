@@ -11,6 +11,7 @@ const User = require('./models/User')
 const Token = require('./models/Token')
 const Person = require('./models/Person')
 const Staff = require('./models/Staff')
+const { notify } = require('./models/Notification')
 const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
@@ -284,6 +285,20 @@ function setup_routes(app) {
   })
 }
 
+function catch_errors(err,origin) {
+  console.error(`**** uncaughtException`)
+  console.error(`origin: ${origin}`)
+  console.log(err)
+  console.log(err.stack)
+  notify("notify/admin", "uncaughtException", `
+uncaughtException: ${err}
+
+origin: ${origin}
+
+${err.stack}
+  `)
+}
+
 function createApp() {
   setup_passport()
   const app = express()
@@ -318,6 +333,8 @@ e.g. to clear sessions collection or clean migrations
   await setupDatabase()
   await create_admin_user()
   await create_secret_token()
+
+  process.on('uncaughtException', catch_errors)
   
   const app = createApp()
 
