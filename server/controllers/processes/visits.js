@@ -357,7 +357,7 @@ Categoria: ${seminar.category?.label || '---'}
 Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
 Sala: ${seminar.conferenceRoom.name}
-Grants: ${seminar.grants.map(g => g.name).join(', ')}
+Grants: ${(seminar.grants || []).map(g => g.name).join(', ')}
 Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
         `
     }
