@@ -316,7 +316,7 @@ async function notifyVisit(visit_id, message) {
 
     const person = visit.person
     const affiliations = visit.affiliations.map(a => a.name).join(', ')
-    const grants = visit.grants.map(g => g.name).join(', ')
+    const grants = (visit.grants || []).map(g => g.name).join(', ')
     const startDate = visit.startDate.toLocaleDateString('it-IT')
     const endDate = visit.endDate.toLocaleDateString('it-IT')
     const tags = (visit.tags || []).join(', ')
