@@ -117,7 +117,7 @@ async function notificaPortineria() {
         for (const person of x.referencePeople) {
             text += `Referente: ${person.firstName} ${person.lastName}\n`
         }
-        if (!x.requireRoom) text += "Stanza non richiesta\n"
+        if (!x.requireRoom) text += "Scrivania non richiesta\n"
         if (x.roomAssignments.length > 0) {
             text += "Assegnazioni stanze: "
             text += x.roomAssignments.map(x => {
