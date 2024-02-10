@@ -8,13 +8,60 @@ const InstitutionController = require('../InstitutionController')
 const EventSeminarController = require('../EventSeminarController')
 const GrantController = require('../GrantController')
 const Person = require('../../models/Person')
+const Visit = require('../../models/Visit')
 const controller = new EventSeminarController()
 const {log} = require('../middleware')
+const { notify } = require('../../models/Notification')
+const { Speaker } = require('react-bootstrap-icons')
 
 /* inject functionality for widgets */
 require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
 require('./seminarCategorySearch')(router)
+
+async function notifySeminar(seminar) {
+    // For matching visitors, we only care about the days, and ignore the actualy time 
+    // at which the seminar is scheduled.
+    const startDate = new Date(seminar.startDatetime); startDate.setHours(0)
+    const endDate = new Date(seminar.startDatetime); endDate.setHours(0)
+
+    // Find out if the seminar is given by a visitor; if that is the case, people 
+    // with a notify/process/visit permission should be notified.
+    const pipeline = [
+        { $match: {
+            startDate: { $lte: startDate },
+            endDate: { $gte: endDate },
+            publish: true, 
+            person: seminar.speaker._id
+        }}, 
+        { $lookup: {
+            from: 'people',
+            localField: 'person',
+            foreignField: '_id',
+            as: 'person',
+        }},
+        { $unwind: {
+            path: '$person',
+            preserveNullAndEmptyArrays: true,
+        }}
+    ]
+    console.log(JSON.stringify(pipeline, null, 2))
+    const visits = await Visit.aggregate(pipeline)
+
+    visits.map(async (v) => {
+        const startDate = v.startDate.toLocaleDateString('it-IT')
+        const endDate = v.endDate.toLocaleDateString('it-IT')
+
+        const text = `
+È stato creato o modificato un seminario per l'ospite ${v.person.firstName} ${v.person.lastName}, 
+in visita da ${startDate} a ${endDate}.
+
+Il titolo del seminario è ${seminar.title}; l'abstract è disponibile al link https://www.dm.unipi.it/en/seminars/${seminar._id}. 
+        `;
+        await notify('process/visits', `${v._id}`, text)
+    })
+
+}
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined) {
@@ -68,6 +115,7 @@ router.post('/', async (req, res) => {
     try {
         const seminar = EventSeminar(payload)
         await seminar.save()
+        await notifySeminar(seminar)
     } catch (error) {
         res.status(400).send({ error: error.message })
         return
@@ -102,6 +150,7 @@ router.patch('/:id', async (req, res) => {
         const was = {...seminar}
         seminar.set({ ...seminar, ...payload })
         await seminar.save()
+        await notifySeminar(seminar)
         await log(req, was, payload)
         res.send({})
     }
@@ -121,6 +170,7 @@ router.put('/save', async (req, res) => {
         if (! payload._id) {
             const seminar = EventSeminar(payload)
             await seminar.save()
+            await notifySeminar(seminar)
             await log(req, {}, payload)
         }
         else {
@@ -134,7 +184,9 @@ router.put('/save', async (req, res) => {
             const was = {...seminar}
             seminar.set({ ...seminar, ...payload })
             await seminar.save()
+            await notifySeminar(seminar)
             await log(req, was, payload)
+
         }
         res.send({})
     }

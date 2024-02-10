@@ -172,7 +172,8 @@ async function getEmailsForChannel(channel) {
 }
 
 async function handleNotifications() {
-    console.log("=> Handling notifications")
+    const now = new Date().toLocaleString('it-IT')
+    console.log(`[${now}] Handling periodic notifications (WORKER_NOTIFICATION_INTERVAL = ${config.WORKER_NOTIFICATION_INTERVAL})`)
 
     const notifications = await Notification.find()
     for (const notification of notifications) {
