@@ -1,0 +1,994 @@
+[
+  {
+    "input_html": "<p><a href=\"http://www.crm.sns.it/event/507/\" rel=\"noreferrer noopener\" target=\"_blank\">Statistical and Computational Aspects of Dynamics<br/></a>Organized by Buddhima Kasun Fernando Akurugodage (Centro di ricerca matematica Ennio De Giorgi \u2013 SNS), Paolo Giulietti, and Tanja Isabelle Schindler (Universit\u00e4t Wien, Austria). Centro De Giorgi \u2013 SNS, Pisa. December 13 \u2013 16, 2022.</p>",
+    "raw_output": " {\n\"title\": \"Statistical and Computational Aspects of Dynamics\",\n\"url\": \"http://www.crm.sns.it/event/507/\",\n\"description\": \"Organized by Buddhima Kasun Fernando Akurugodage (Centro di ricerca matematica Ennio De Giorgi \u2013 SNS), Paolo Giulietti, and Tanja Isabelle Schindler (Universit\u00e4t Wien, Austria).\\nLocation: Centro De Giorgi \u2013 SNS, Pisa\",\n\"startDate\": \"2022-12-13\",\n\"endDate\": \"2022-12-16\"\n}",
+    "success": true,
+    "json": {
+      "title": "Statistical and Computational Aspects of Dynamics",
+      "url": "http://www.crm.sns.it/event/507/",
+      "description": "Organized by Buddhima Kasun Fernando Akurugodage (Centro di ricerca matematica Ennio De Giorgi \u2013 SNS), Paolo Giulietti, and Tanja Isabelle Schindler (Universit\u00e4t Wien, Austria).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2022-12-13",
+      "endDate": "2022-12-16"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/126/\" rel=\"noreferrer noopener\" target=\"_blank\">Weekend di lavoro su Calcolo delle Variazioni<br/></a>Organized by Giuseppe Buttazzo, Maria Stella Gelli, and Aldo Pratelli. Grand Hotel Tettuccio Montecatini. November 25 \u2013 27, 2022.</p>",
+    "raw_output": " {\"title\": \"Weekend di lavoro su Calcolo delle Variazioni\", \"url\": \"https://events.dm.unipi.it/event/126/\", \"description\": \"Organized by Giuseppe Buttazzo, Maria Stella Gelli, and Aldo Pratelli.\\n\\nLocation: Grand Hotel Tettuccio Montecatini\", \"startDate\": \"2022-11-25\", \"endDate\": \"2022-11-27\"}",
+    "success": true,
+    "json": {
+      "title": "Weekend di lavoro su Calcolo delle Variazioni",
+      "url": "https://events.dm.unipi.it/event/126/",
+      "description": "Organized by Giuseppe Buttazzo, Maria Stella Gelli, and Aldo Pratelli.",
+      "location": "Grand Hotel Tettuccio Montecatini, Sala Conferenze",
+      "startDate": "2022-11-25",
+      "endDate": "2022-11-27"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/109/\" rel=\"noreferrer noopener\" target=\"_blank\">Incontri di geometria algebrica ed aritmetica Milano \u2013 Pisa<br/></a>Department of Mathematics, Pisa. November 16 \u2013 17, 2022.</p>",
+    "raw_output": " {\n\"title\": \"Incontri di geometria algebrica ed aritmetica Milano \u2013 Pisa\",\n\"url\": \"https://events.dm.unipi.it/event/109/\",\n\"description\": \"\",\n\"location\": \"Department of Mathematics, Pisa\",\n\"startDate\": \"2022-11-16\",\n\"endDate\": \"2022-11-17\"\n}",
+    "success": true,
+    "json": {
+      "title": "Incontri di geometria algebrica ed aritmetica Milano \u2013 Pisa",
+      "url": "https://events.dm.unipi.it/event/109/",
+      "description": "",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-11-16",
+      "endDate": "2022-11-17"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://www.velichkov.it/workshop-CVFBP-4.html\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop \u201cCalculus of Variations and Free Boundary Problems IV\u201d<br/></a>Organized by Giulia Bevilacqua and Bozhidar Velichkov.<br/>Department of Mathematics, Pisa. November 8, 2022.</p>",
+    "raw_output": " {\"title\": \"Workshop \u2018Calculus of Variations and Free Boundary Problems IV\", \"url\": \"http://www.velichkov.it/workshop-CVFBP-4.html\", \"description\": \"Organized by Giulia Bevilacqua and Bozhidar Velichkov.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2022-11-08\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop \u2018Calculus of Variations and Free Boundary Problems IV",
+      "url": "http://www.velichkov.it/workshop-CVFBP-4.html",
+      "description": "Organized by Giulia Bevilacqua and Bozhidar Velichkov.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-11-08"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://www.dm.unipi.it/wp-content/uploads/2022/09/ProSTEAM_pisa_meeting_overview-1.pdf\" rel=\"noreferrer noopener\" target=\"_blank\">ProSTEAM Pisa Meeting<br/></a>Department of Mathematics, Pisa. October 17 \u2013 18, 2022.</p>",
+    "raw_output": " {\"title\": \"ProSTEAM Pisa Meeting\", \"url\": \"https://www.dm.unipi.it/wp-content/uploads/2022/09/ProSTEAM_pisa_meeting_overview-1.pdf\", \"description\": \"Location: Department of Mathematics, Pisa\", \"startDate\": \"2022-10-17\", \"endDate\": \"2022-10-18\"}",
+    "success": true,
+    "json": {
+      "title": "ProSTEAM Pisa Meeting",
+      "url": "https://www.dm.unipi.it/wp-content/uploads/2022/09/ProSTEAM_pisa_meeting_overview-1.pdf",
+      "description": "",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-10-17",
+      "endDate": "2022-10-18"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://www.albertocogliati.it/wp-content/uploads/2022/06/Locandina-2022-1.pdf\" rel=\"noreferrer noopener\" target=\"_blank\">Glimpses of Geometry: the Italian schools in the years around 1900</a><br/>Organized by Alberto Cogliati. Department of Mathematics, Pisa. September 29 \u2013 30, 2022.</p>",
+    "raw_output": " {\"title\": \"Glimpses of Geometry: the Italian schools in the years around 1900\", \"url\": \"http://www.albertocogliati.it/wp-content/uploads/2022/06/Locandina-2022-1.pdf\", \"description\": \"Location: Department of Mathematics, Pisa\", \"startDate\": \"2022-09-29\", \"endDate\": \"2022-09-30\"}",
+    "success": true,
+    "json": {
+      "title": "Glimpses of Geometry: the Italian schools in the years around 1900",
+      "url": "http://www.albertocogliati.it/wp-content/uploads/2022/06/Locandina-2022-1.pdf",
+      "description": "Organized by Alberto Cogliati.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-09-29",
+      "endDate": "2022-09-30"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://people.dm.unipi.it/talpo/conferences/researchers2022/researchersAG2022.html\" rel=\"noreferrer noopener\" target=\"_blank\">Young Researchers Meeting in Algebra and Geometry 2022</a><br/>Organized by Andrea Appel (Universit\u00e0 di Parma), Antonio Lerario (SISSA, Trieste), Francesco Sala, Sarah Scherotzke (University of Luxembourg), Nicol\u00f2 Sibilla (SISSA, Trieste), and Mattia Talpo. SISSA, Trieste, Italy. September 28 \u2013 30, 2022.</p>",
+    "raw_output": " {\"title\": \"Young Researchers Meeting in Algebra and Geometry 2022\", \"url\": \"https://people.dm.unipi.it/talpo/conferences/researchers2022/researchersAG2022.html\", \"description\": \"Organized by Andrea Appel (Universit\u00e0 di Parma), Antonio Lerario (SISSA, Trieste), Francesco Sala, Sarah Scherotzke (University of Luxembourg), Nicol\u00f2 Sibilla (SISSA, Trieste), and Mattia Talpo.\\n\\nLocation: SISSA, Trieste, Italy\", \"startDate\": \"2022-09-28\", \"endDate\": \"2022-09-30\"}",
+    "success": true,
+    "json": {
+      "title": "Young Researchers Meeting in Algebra and Geometry 2022",
+      "url": "https://people.dm.unipi.it/talpo/conferences/researchers2022/researchersAG2022.html",
+      "description": "Organized by Andrea Appel (Universit\u00e0 di Parma), Antonio Lerario (SISSA, Trieste), Francesco Sala, Sarah Scherotzke (University of Luxembourg), Nicol\u00f2 Sibilla (SISSA, Trieste), and Mattia Talpo.",
+      "location": "SISSA, Italy",
+      "startDate": "2022-09-28",
+      "endDate": "2022-09-30"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://sites.google.com/view/prin20hpdes/workshops/first-school-and-workshop?authuser=0\" rel=\"noreferrer noopener\" target=\"_blank\">First school &amp; workshop PRIN on Hamiltonian and Dispersive PDEs<br/></a>Department of Mathematics, Pisa. September 12 \u2013 16, 2022.</p>",
+    "raw_output": " {\"title\": \"First school &amp; workshop PRIN on Hamiltonian and Dispersive PDEs\", \"url\": \"https://sites.google.com/view/prin20hpdes/workshops/first-school-and-workshop?authuser=0\", \"description\": \"Location: Department of Mathematics, Pisa\", \"startDate\": \"2022-09-12\", \"endDate\": \"2022-09-16\"}",
+    "success": true,
+    "json": {
+      "title": "First school &amp; workshop PRIN on Hamiltonian and Dispersive PDEs",
+      "url": "https://sites.google.com/view/prin20hpdes/workshops/first-school-and-workshop?authuser=0",
+      "description": "",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-09-12",
+      "endDate": "2022-09-16"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/15/\" rel=\"noreferrer noopener\" target=\"_blank\">Geometry and Arithmetic of Moduli Spaces<br/></a>Organized by Andrea Bandini, Francesco Sala, Tam\u00e1s Szamuely, Mattia Talpo. Department of Mathematics, Pisa. July 18 \u2013 22, 2022.</p>",
+    "raw_output": " {\"title\": \"Geometry and Arithmetic of Moduli Spaces\", \"url\": \"https://events.dm.unipi.it/event/15/\", \"description\": \"Organized by Andrea Bandini, Francesco Sala, Tam\u00e1s Szamuely, Mattia Talpo.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2022-07-18\", \"endDate\": \"2022-07-22\"}",
+    "success": true,
+    "json": {
+      "title": "Geometry and Arithmetic of Moduli Spaces",
+      "url": "https://events.dm.unipi.it/event/15/",
+      "description": "Organized by Andrea Bandini, Francesco Sala, Tam\u00e1s Szamuely, Mattia Talpo.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-07-18",
+      "endDate": "2022-07-22"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://www.velichkov.it/workshop-FBGVP-2.html\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop \u201cRegularity Theory for Free Boundary and Geometric Variational Problems II\u201d<br/></a>Organized by Luca Spolaor (UC San Diego, USA) and Bozhidar Velichkov. Department of Mathematics, Pisa, July 10 \u2013 15, 2022. </p>",
+    "raw_output": " {\"title\": \"Workshop \u2018Regularity Theory for Free Boundary and Geometric Variational Problems II\", \"url\": \"http://www.velichkov.it/workshop-FBGVP-2.html\", \"description\": \"Organized by Luca Spolaor (UC San Diego, USA) and Bozhidar Velichkov.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2022-07-10\", \"endDate\": \"2022-07-15\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop \u2018Regularity Theory for Free Boundary and Geometric Variational Problems II",
+      "url": "http://www.velichkov.it/workshop-FBGVP-2.html",
+      "description": "Organized by Luca Spolaor (UC San Diego, USA) and Bozhidar Velichkov.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-07-10",
+      "endDate": "2022-07-15"
+    }
+  },
+  {
+    "input_html": "<p>Geometric Representation Theory. ICM Satellite Conference<br/>Organized by Tomoyuki Arakawa (RIMS, Kyoto, Japan), Joel Kamnitzer (University of Toronto, Japan), Hiraku Nakajima (Kavli IPMU, Japan), Markus Reineke (Ruhr-Universit\u00e4t Bochum), Francesco Sala, and Vera Serganova (University of California Berkeley, USA). Online. June 27 \u2013 July 2,  2022.</p>",
+    "raw_output": " {\n\"title\": \"Geometric Representation Theory. ICM Satellite Conference\",\n\"url\": null,\n\"description\": \"Organized by Tomoyuki Arakawa (RIMS, Kyoto, Japan), Joel Kamnitzer (University of Toronto, Japan), Hiraku Nakajima (Kavli IPMU, Japan), Markus Reineke (Ruhr-Universit\u00e4t Bochum), Francesco Sala, and Vera Serganova (University of California Berkeley, USA).\\n\\nLocation: Online\",\n\"startDate\": \"2022-06-27\",\n\"endDate\": \"2022-07-02\"\n}",
+    "success": true,
+    "json": {
+      "title": "Geometric Representation Theory. ICM Satellite Conference",
+      "url": null,
+      "description": "Organized by Tomoyuki Arakawa (RIMS, Kyoto, Japan), Joel Kamnitzer (University of Toronto, Japan), Hiraku Nakajima (Kavli IPMU, Japan), Markus Reineke (Ruhr-Universit\u00e4t Bochum), Francesco Sala, and Vera Serganova (University of California Berkeley, USA).",
+      "location": "Online",
+      "startDate": "2022-06-27",
+      "endDate": "2022-07-02"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/14/\" rel=\"noreferrer noopener\" target=\"_blank\">Isoperimetric Problems<br/></a>Organized by Nicola Fusco (Universit\u00e0 di Napoli Federico II), Matteo Novaga, Emanuele Paolini, Marco Pozzetta (Universit\u00e0 di Napoli Federico II), and Eugene Stepanov (St. Petersburg Branch of the Steklov Research Institute of Mathematics of the Russian Academy of Sciences, Russia). Department of Mathematics, Pisa. June 20 \u2013 24, 2022.</p>",
+    "raw_output": " {\"title\": \"Isoperimetric Problems\", \"url\": \"https://events.dm.unipi.it/event/14/\", \"description\": \"Organized by Nicola Fusco (Universit\u00e0 di Napoli Federico II), Matteo Novaga, Emanuele Paolini, Marco Pozzetta ( Universit\u00e0 di Napoli Federico II), and Eugene Stepanov (St. Petersburg Branch of the Steklov Research Institute of Mathematics of the Russian Academy of Sciences, Russia).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2022-06-20\", \"endDate\": \"2022-06-24\"}",
+    "success": true,
+    "json": {
+      "title": "Isoperimetric Problems",
+      "url": "https://events.dm.unipi.it/event/14/",
+      "description": "Organized by Nicola Fusco (Universit\u00e0 di Napoli Federico II), Matteo Novaga, Emanuele Paolini, Marco Pozzetta ( Universit\u00e0 di Napoli Federico II), and Eugene Stepanov (St. Petersburg Branch of the Steklov Research Institute of Mathematics of the Russian Academy of Sciences, Russia).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-06-20",
+      "endDate": "2022-06-24"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://arnold.dm.unipi.it/wp/tmscm/\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop \u201cTheory, models and simulations in Celestial Mechanics\u201d<br/></a>Organized by Giulio Ba\u00f9, Irene Cavallari, Clara Grassi, Giovanni F. Gronchi, \u00d3scar Rodr\u00edguez del R\u00edo. Department of Mathematics, Pisa, and online. June 14 \u2013 16, 2022. </p>",
+    "raw_output": " {\"title\": \"Workshop \u2018Theory, models and simulations in Celestial Mechanics\", \"url\": \"https://arnold.dm.unipi.it/wp/tmscm/\", \"description\": \"Organized by Giulio Ba\u00f9, Irene Cavallari, Clara Grassi, Giovanni F. Gronchi, \u00d3scar Rodr\u00edguez del R\u00edo.\\n\\nLocation: Department of Mathematics, Pisa and online\", \"startDate\": \"2022-06-14\", \"endDate\": \"2022-06-16\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop \u2018Theory, models and simulations in Celestial Mechanics",
+      "url": "https://arnold.dm.unipi.it/wp/tmscm/",
+      "description": "Organized by Giulio Ba\u00f9, Irene Cavallari, Clara Grassi, Giovanni F. Gronchi, \u00d3scar Rodr\u00edguez del R\u00edo.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-06-14",
+      "endDate": "2022-06-16"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/13/\" rel=\"noreferrer noopener\" target=\"_blank\">New Perspectives on Hyperk\u00e4hler Manifolds \u2013 A Celebration of Dimitri Markushevich\u2019s (60+2)nd Birthday<br/></a>Organized by Ugo Bruzzo (SISSA, Trieste), Gr\u00e9goire Menet (Universit\u00e9 de Lille), and Francesco Sala. Levico Terme, Italy. June 13 \u2013 17, 2022.</p>",
+    "raw_output": " {\"title\": \"New Perspectives on Hyperk\u00e4hler Manifolds \u2013 A Celebration of Dimitri Markushevich\u2019s (60+2)nd Birthday\", \"url\": \"https://events.dm.unipi.it/event/13/\", \"description\": \"Organized by Ugo Bruzzo (SISSA, Trieste), Gr\u00e9goire Menet (Universit\u00e9 de Lille), and Francesco Sala.\\n\\nLocation: Levico Terme, Italy\", \"startDate\": \"2022-06-13\", \"endDate\": \"2022-06-17\"}",
+    "success": true,
+    "json": {
+      "title": "New Perspectives on Hyperk\u00e4hler Manifolds \u2013 A Celebration of Dimitri Markushevich\u2019s (60+2)nd Birthday",
+      "url": "https://events.dm.unipi.it/event/13/",
+      "description": "Organized by Ugo Bruzzo (SISSA, Trieste), Gr\u00e9goire Menet (Universit\u00e9 de Lille), and Francesco Sala.",
+      "location": "Levico Terme, Italy",
+      "startDate": "2022-06-13",
+      "endDate": "2022-06-17"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/75/\" rel=\"noreferrer noopener\" target=\"_blank\">A journey in numerical linear algebra: a workshop in honor of Michele Benzi\u2019s 60th birthday<br/></a>Organized by Francesca Arrigo (University of Strathclyde), Paola Boito, Christine Klymko (Lawrence Livermore National Laboratory), Beatrice Meini, and Leonardo Robol. Department of Mathematics, Pisa. June 10 \u2013 11, 2022.</p>",
+    "raw_output": " {\"title\": \"A journey in numerical linear algebra: a workshop in honor of Michele Benzi\u2019s 60th birthday\", \"url\": \"https://events.dm.unipi.it/event/75/\", \"description\": \"Organized by Francesca Arrigo (University of Strathclyde), Paola Boito, Christine Klymko (Lawrence Livermore National Laboratory), Beatrice Meini, and Leonardo Robol.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2022-06-10\", \"endDate\": \"2022-06-11\"}",
+    "success": true,
+    "json": {
+      "title": "A journey in numerical linear algebra: a workshop in honor of Michele Benzi\u2019s 60th birthday",
+      "url": "https://events.dm.unipi.it/event/75/",
+      "description": "Organized by Francesca Arrigo (University of Strathclyde), Paola Boito, Christine Klymko (Lawrence Livermore National Laboratory), Beatrice Meini, and Leonardo Robol.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-06-10",
+      "endDate": "2022-06-11"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://mate.unipv.it/~stoppino/pardini2020/index.php?SMExt=SMPages&amp;SMPagesFilename=Index\" rel=\"noreferrer noopener\" target=\"_blank\">Classical Elegance: the Geometry of Algebraic varieties. A Conference in honour of Rita Pardini\u2019s 62th birthday<br/></a>Organized by Barbara Fantechi (Sissa, Trieste, Italy), Marco Franciosi, and Lidia Stoppino (Universit\u00e0 di Pavia, Italy). Palazzone di Cortona. June 7 \u2013 10, 2022. </p>",
+    "raw_output": " {\"title\": \"Classical Elegance: the Geometry of Algebraic varieties. A Conference in honour of Rita Pardini\u2019s 62th birthday\", \"url\": \"https://mate.unipv.it/~stoppino/pardini2020/index.php?SMExt=SMPages&amp;SMPagesFilename=Index\", \"description\": \"Organized by Barbara Fantechi (SISSA, Trieste, Italy), Marco Franciosi, and Lidia Stoppino (Universit\\u00e4 di Pavia, Italy).\\n\\nLocation: Palazzone di Cortona\", \"startDate\": \"2022-06-07\", \"endDate\": \"2022-06-10\"}",
+    "success": true,
+    "json": {
+      "title": "Classical Elegance: the Geometry of Algebraic varieties. A Conference in honour of Rita Pardini\u2019s 62th birthday",
+      "url": "https://mate.unipv.it/~stoppino/pardini2020/index.php?SMExt=SMPages&amp;SMPagesFilename=Index",
+      "description": "Organized by Barbara Fantechi (SISSA, Trieste, Italy), Marco Franciosi, and Lidia Stoppino (Universit\u00e4 di Pavia, Italy).",
+      "location": "Palazzone di Cortona, Italy",
+      "startDate": "2022-06-07",
+      "endDate": "2022-06-10"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://www.ultramath.it/\" rel=\"noreferrer noopener\" target=\"_blank\">ULTRAMATH 2022<br/></a>Organized by Mauro Di Nasso, Lorenzo Luperi Baglini (Universit\u00e0 di Milano, Italia), Rosario Mennuni, Moreno Pierobon, Mariaclara Ragosta. Department of Mathematics and Polo Congressuale Le Benedettine, Pisa. June 6 \u2013 11, 2022.</p>",
+    "raw_output": " {\"title\": \"ULTRAMATH 2022\", \"url\": \"https://www.ultramath.it/\", \"description\": \"Organized by Mauro Di Nasso, Lorenzo Luperi Baglini (Universit\u00e0 di Milano, Italia), Rosario Mennuni, Moreno Pierobon, Mariaclara Ragosta.\\n\\nLocation: Department of Mathematics and Polo Congressuale Le Benedettine, Pisa\", \"startDate\": \"2022-06-06\", \"endDate\": \"2022-06-11\"}",
+    "success": true,
+    "json": {
+      "title": "ULTRAMATH 2022",
+      "url": "https://www.ultramath.it/",
+      "description": "Organized by Mauro Di Nasso, Lorenzo Luperi Baglini (Universit\u00e0 di Milano, Italia), Rosario Mennuni, Moreno Pierobon, Mariaclara Ragosta.",
+      "location": "Centro Congressi Le Benedettine",
+      "startDate": "2022-06-06",
+      "endDate": "2022-06-11"
+    }
+  },
+  {
+    "input_html": "<p>DCP22 \u2013 Dynamics and Complexity Pisa 2022<br/>Museo del Calcolo, Pisa. May 26 \u2013 28, 2022. </p>",
+    "raw_output": " {\"title\": \"DCP22 \u2013 Dynamics and Complexity Pisa 2022\", \"url\": null, \"description\": \"Location: Museo del Calcolo, Pisa\", \"startDate\": \"2022-05-26\", \"endDate\": \"2022-05-28\"}",
+    "success": true,
+    "json": {
+      "title": "DCP22 \u2013 Dynamics and Complexity Pisa 2022",
+      "url": null,
+      "description": "",
+      "location": "Museo del Calcolo, Pisa",
+      "startDate": "2022-05-26",
+      "endDate": "2022-05-28"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://www.rnta.eu/Amoroso60/\" rel=\"noreferrer noopener\" target=\"_blank\">La grandezza dei punti piccoli. Celebrating Francesco Amoroso\u2019s 60th birthday<br/></a>Organized by Yuri Bilu (Universit\u00e9 de Bordeaux, France), Ilaria Del Corso, Aurelien Galateau (Universit\u00e9 de Franche-Compt\u00e9, France), Francesco Pappalardi (Universit\u00e0 di Roma 3), Fabien Pazuki (University of Copenhagen), Valerio Talamanca (Universit\u00e0 di Roma 3). Department of Mathematics, Pisa. May 23 \u2013 25, 2022.</p>",
+    "raw_output": " {\"title\": \"La grandezza dei punti piccoli. Celebrating Francesco Amoroso\u2019s 60th birthday\", \"url\": \"http://www.rnta.eu/Amoroso60/\", \"description\": \"Organized by Yuri Bilu (Universit\u00e9 de Bordeaux, France), Ilaria Del Corso, Aurelien Galateau ( Universit\u00e9 de Franche-Compt\u00e9, France), Francesco Pappalardi (Universit\u00e0 di Roma 3), Fabien Pazuki (University of Copenhagen), Valerio Talamanca (Universit\u00e0 di Roma 3).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2022-05-23\", \"endDate\": \"2022-05-25\"}",
+    "success": true,
+    "json": {
+      "title": "La grandezza dei punti piccoli. Celebrating Francesco Amoroso\u2019s 60th birthday",
+      "url": "http://www.rnta.eu/Amoroso60/",
+      "description": "Organized by Yuri Bilu (Universit\u00e9 de Bordeaux, France), Ilaria Del Corso, Aurelien Galateau ( Universit\u00e9 de Franche-Compt\u00e9, France), Francesco Pappalardi (Universit\u00e0 di Roma 3), Fabien Pazuki (University of Copenhagen), Valerio Talamanca (Universit\u00e0 di Roma 3).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2022-05-23",
+      "endDate": "2022-05-25"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://people.dm.unipi.it/talpo/conferences/ricercatori2020/ricercatoriAG2020.html\" rel=\"noreferrer noopener\" target=\"_blank\">Young Researchers Meeting in Algebra and Geometry 2020<br/></a>Organized by Andrea Appel (Universit\u00e0 degli Studi di Parma), Andreas Hochenegger (Politecnico di Milano), Mauro Porta (Universit\u00e9 de Strasbourg), Francesco Sala, Sarah Scherotzke (Universit\u00e9 du Luxembourg), and Mattia Talpo. SNS, Pisa. September 30 \u2013 October 1, 2021.</p>",
+    "raw_output": " {\"title\": \"Young Researchers Meeting in Algebra and Geometry 2020\", \"url\": \"https://people.dm.unipi.it/talpo/conferences/ricercatori2020/ricercatoriAG2020.html\", \"description\": \"Organized by Andrea Appel (Universit\u00e0 degli Studi di Parma), Andreas Hochenegger (Politecnico di Milano), Mauro Porta (Universit\u00e9 de Strasbourg), Francesco Sala, Sarah Scherotzke (Universit\u00e9 du Luxembourg), and Mattia Talpo.\\n\\nLocation: SNS, Pisa\", \"startDate\": \"2021-09-30\", \"endDate\": \"2021-10-01\"}",
+    "success": true,
+    "json": {
+      "title": "Young Researchers Meeting in Algebra and Geometry 2020",
+      "url": "https://people.dm.unipi.it/talpo/conferences/ricercatori2020/ricercatoriAG2020.html",
+      "description": "Organized by Andrea Appel (Universit\u00e0 degli Studi di Parma), Andreas Hochenegger (Politecnico di Milano), Mauro Porta (Universit\u00e9 de Strasbourg), Francesco Sala, Sarah Scherotzke (Universit\u00e9 du Luxembourg), and Mattia Talpo.",
+      "location": "Aula Bianchi Scienze (Scuola Normale Superiore)",
+      "startDate": "2021-09-30",
+      "endDate": "2021-10-01"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://www.velichkov.it/workshop_levico_1.html\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop \u201cRegularity Theory for Free Boundary and Geometric Variational Problems\u201d<br/></a>Organized by Luca Spolaor (UC San Diego, USA) and Bozhidar Velichkov. Levico Terme, Italy. September 5 \u2013 10, 2021.</p>",
+    "raw_output": " {\"title\": \"Workshop \u2018Regularity Theory for Free Boundary and Geometric Variational Problems\", \"url\": \"http://www.velichkov.it/workshop_levico_1.html\", \"description\": \"Organized by Luca Spolaor (UC San Diego, USA) and Bozhidar Velichkov.\", \"location\": \"Levico Terme, Italy\", \"startDate\": \"2021-09-05\", \"endDate\": \"2021-09-10\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop \u2018Regularity Theory for Free Boundary and Geometric Variational Problems",
+      "url": "http://www.velichkov.it/workshop_levico_1.html",
+      "description": "Organized by Luca Spolaor (UC San Diego, USA) and Bozhidar Velichkov.",
+      "location": "Levico Terme, Italy",
+      "startDate": "2021-09-05",
+      "endDate": "2021-09-10"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://indico.math.cnrs.fr/event/5382/\" rel=\"noreferrer noopener\" target=\"_blank\">IH\u00c9S Summer School \u201cEnumerative Geometry, Physics and Representation Theory\u201d<br/></a>Organized by Andrei Negut (MIT, USA), Francesco Sala, and Olivier Schiffmann (CNRS and Universit\u00e9 de Paris-Saclay, France). IH\u00c9S, France. July 5 \u2013 16, 2021.</p>",
+    "raw_output": " {\"title\": \"IH\u00c9S Summer School \u201cEnumerative Geometry, Physics and Representation Theory\", \"url\": \"https://indico.math.cnrs.fr/event/5382/\", \"description\": \"Organized by Andrei Negut (MIT, USA), Francesco Sala, and Olivier Schiffmann (CNRS and Universit\u00e9 de Paris-Saclay, France).\\n\\nLocation: IH\u00c9S, France\", \"startDate\": \"2021-07-05\", \"endDate\": \"2021-07-16\"}",
+    "success": true,
+    "json": {
+      "title": "IH\u00c9S Summer School \u201cEnumerative Geometry, Physics and Representation Theory",
+      "url": "https://indico.math.cnrs.fr/event/5382/",
+      "description": "Organized by Andrei Negut (MIT, USA), Francesco Sala, and Olivier Schiffmann (CNRS and Universit\u00e9 de Paris-Saclay, France).",
+      "location": "IH\u00c9S, France",
+      "startDate": "2021-07-05",
+      "endDate": "2021-07-16"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://pagine.dm.unipi.it/berselli/meeting2020/\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop on Variational problems, PDEs and applications<br/></a></em>Organized by Luigi Berselli, Giuseppe Buttazzo, Matteo Novaga, and Andrea Malchiodi (Scuola Normale Superiore, Pisa). Department of Mathematics, Pisa. January 17 \u2013 18, 2020.</p>",
+    "raw_output": " {\n\"title\": \"Workshop on Variational problems, PDEs and applications\",\n\"url\": \"http://pagine.dm.unipi.it/berselli/meeting2020/\",\n\"description\": \"Organized by Luigi Berselli, Giuseppe Buttazzo, Matteo Novaga, and Andrea Malchiodi (Scuola Normale Superiore, Pisa).\\n\\nLocation: Department of Mathematics, Pisa\",\n\"startDate\": \"2020-01-17\",\n\"endDate\": \"2020-01-18\"\n}",
+    "success": true,
+    "json": {
+      "title": "Workshop on Variational problems, PDEs and applications",
+      "url": "http://pagine.dm.unipi.it/berselli/meeting2020/",
+      "description": "Organized by Luigi Berselli, Giuseppe Buttazzo, Matteo Novaga, and Andrea Malchiodi (Scuola Normale Superiore, Pisa).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2020-01-17",
+      "endDate": "2020-01-18"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2020_2_Dispersive.htm\" rel=\"noreferrer noopener\" target=\"_blank\">Dispersive equations of Math Physics<br/></a></em>Organized by Alessandro Palmieri, Vladimir Georgiev, and Kazumasa Fujiwara (Tohoku University). Department of Mathematics, Pisa. February 6 \u2013 8, 2020.</p>",
+    "raw_output": " {\"title\": \"Dispersive equations of Math Physics\", \"url\": \"http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2020_2_Dispersive.htm\", \"description\": \"Organized by Alessandro Palmieri, Vladimir Georgiev, and Kazumasa Fujiwara (Tohoku University).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2020-02-06\", \"endDate\": \"2020-02-08\"}",
+    "success": true,
+    "json": {
+      "title": "Dispersive equations of Math Physics",
+      "url": "http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2020_2_Dispersive.htm",
+      "description": "Organized by Alessandro Palmieri, Vladimir Georgiev, and Kazumasa Fujiwara (Tohoku University).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2020-02-06",
+      "endDate": "2020-02-08"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://www.crm.sns.it/event/464/\" rel=\"noreferrer noopener\" target=\"_blank\">Dispersive and subelliptic PDEs<br/></a></em>Organized by Ferruccio Colombini, Vladimir Georgiev, Valentino Magnani, and Luigi Ambrosio (Scuola Normale Superiore, Pisa), Tokio Matsuyama (Chuo University). Centro De Giorgi, Pisa. February 10 \u2013 12, 2020.</p>",
+    "raw_output": " {\"title\": \"Dispersive and subelliptic PDEs\", \"url\": \"http://www.crm.sns.it/event/464/\", \"description\": \"Organized by Ferruccio Colombini, Vladimir Georgiev, Valentino Magnani, and Luigi Ambrosio (Scuola Normale Superiore, Pisa), Tokio Matsuyama (Chuo University).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2020-02-10\", \"endDate\": \"2020-02-12\"}",
+    "success": true,
+    "json": {
+      "title": "Dispersive and subelliptic PDEs",
+      "url": "http://www.crm.sns.it/event/464/",
+      "description": "Organized by Ferruccio Colombini, Vladimir Georgiev, Valentino Magnani, and Luigi Ambrosio (Scuola Normale Superiore, Pisa), Tokio Matsuyama (Chuo University).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2020-02-10",
+      "endDate": "2020-02-12"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://winterbraids.math.cnrs.fr/archives/winterbraids10/\" rel=\"noreferrer noopener\" target=\"_blank\">Winter Braids X<br/></a></em>Organized by Filippo Callegaro and Paolo Bellingeri (Universit\u00e9 Caen-Normandie), Vincent Florens (Universit\u00e9 de Pau et des pays de l\u2019Adour), JB Meilhan (Universit\u00e9 Grenoble-Alpes), Emmanuel Wagner (Universit\u00e9 Paris Diderot). Centro De Giorgi, Pisa. February 17 \u2013 21, 2020.</p>",
+    "raw_output": " {\"title\": \"Winter Braids X\", \"url\": \"http://winterbraids.math.cnrs.fr/archives/winterbraids10/\", \"description\": \"Organized by Filippo Callegaro and Paolo Bellingeri (Universit\u00e9 Caen-Normandie), Vincent Florens (Universit\u00e9 de Pau et des pays de l\u2019Adour), JB Meilhan (Universit\u00e9 Grenoble-Alpes), Emmanuel Wagner (Universit\u00e9 Paris Diderot).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2020-02-17\", \"endDate\": \"2020-02-21\"}",
+    "success": true,
+    "json": {
+      "title": "Winter Braids X",
+      "url": "http://winterbraids.math.cnrs.fr/archives/winterbraids10/",
+      "description": "Organized by Filippo Callegaro and Paolo Bellingeri (Universit\u00e9 Caen-Normandie), Vincent Florens (Universit\u00e9 de Pau et des pays de l\u2019Adour), JB Meilhan (Universit\u00e9 Grenoble-Alpes), Emmanuel Wagner (Universit\u00e9 Paris Diderot).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2020-02-17",
+      "endDate": "2020-02-21"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/~gaiffi/webpage2020/index.html\" rel=\"noreferrer noopener\" target=\"_blank\">Winter School Geometry, Algebra and Combinatorics of Moduli Spaces and Configurations IV<br/></a></em>Organized by Marco Franciosi, Giovanni Gaiffi, Rita Pardini, Mario Salvetti, and Paolo Papi (Sapienza Universit\u00e0 di Roma). Dobbiaco (Toblach). February 24 \u2013 28, 2020.</p>",
+    "raw_output": " {\"title\": \"Winter School Geometry, Algebra and Combinatorics of Moduli Spaces and Configurations IV\", \"url\": \"http://people.dm.unipi.it/~gaiffi/webpage2020/index.html\", \"description\": \"Organized by Marco Franciosi, Giovanni Gaiffi, Rita Pardini, Mario Salvetti, and Paolo Papi (Sapienza Universit\u00e0 di Roma).\\n\\nLocation: Dobbiaco (Toblach)\", \"startDate\": \"2020-02-24\", \"endDate\": \"2020-02-28\"}",
+    "success": true,
+    "json": {
+      "title": "Winter School Geometry, Algebra and Combinatorics of Moduli Spaces and Configurations IV",
+      "url": "http://people.dm.unipi.it/~gaiffi/webpage2020/index.html",
+      "description": "Organized by Marco Franciosi, Giovanni Gaiffi, Rita Pardini, Mario Salvetti, and Paolo Papi (Sapienza Universit\u00e0 di Roma).",
+      "location": "Dobbiaco (Toblach)",
+      "startDate": "2020-02-24",
+      "endDate": "2020-02-28"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://www.sism2020.unito.it/\" rel=\"noreferrer noopener\" target=\"_blank\">XIX Congresso Nazionale della Societ\u00e0 Italiana di Storia delle Matematiche<br/></a></em>Organized by Alberto Cogliati, Pier Daniele Napolitani, and Beatrice Sisana (Universit\u00e0 di Roma 3). Online. November 12 \u2013 13, 2020.</p>",
+    "raw_output": " {\"title\": \"XIX Congresso Nazionale della Societ\u00e0 Italiana di Storia delle Matematiche\", \"url\": \"https://www.sism2020.unito.it/\", \"description\": \"Organized by Alberto Cogliati, Pier Daniele Napolitani, and Beatrice Sisana (Universit\u00e0 di Roma 3).\\n\\nLocation: Online\", \"startDate\": \"2020-11-12\", \"endDate\": \"2020-11-13\"}",
+    "success": true,
+    "json": {
+      "title": "XIX Congresso Nazionale della Societ\u00e0 Italiana di Storia delle Matematiche",
+      "url": "https://www.sism2020.unito.it/",
+      "description": "Organized by Alberto Cogliati, Pier Daniele Napolitani, and Beatrice Sisana (Universit\u00e0 di Roma 3).",
+      "location": "Online",
+      "startDate": "2020-11-12",
+      "endDate": "2020-11-13"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2020_2_Navier_Stokes.htm\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop on Navier-Stokes equation<br/></a></em>Organized by Luigi Berselli and Vladimir Georgiev. Department of Mathematics, Pisa. March 4 \u2013 5, 2020.</p>",
+    "raw_output": " {\"title\": \"Workshop on Navier-Stokes equation\", \"url\": \"http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2020_2_Navier_Stokes.htm\", \"description\": \"Organized by Luigi Berselli and Vladimir Georgiev.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2020-03-04\", \"endDate\": \"2020-03-05\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop on Navier-Stokes equation",
+      "url": "http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2020_2_Navier_Stokes.htm",
+      "description": "Organized by Luigi Berselli and Vladimir Georgiev.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2020-03-04",
+      "endDate": "2020-03-05"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/~gaiffi/webpage2019/index.html\" rel=\"noreferrer noopener\" target=\"_blank\">Winter School Geometry, Algebra and Combinatorics of Moduli Spaces and Configurations III<br/></a></em>Organized by Marco Franciosi, Giovanni Gaiffi, Rita Pardini, Mario Salvetti, and Paolo Papi (Sapienza Universit\u00e0 di Roma). Dobbiaco (Toblach). February 17 \u2013 29, 2019.</p>",
+    "raw_output": " {\"title\": \"Winter School Geometry, Algebra and Combinatorics of Moduli Spaces and Configurations III\", \"url\": \"http://people.dm.unipi.it/~gaiffi/webpage2019/index.html\", \"description\": \"Organized by Marco Franciosi, Giovanni Gaiffi, Rita Pardini, Mario Salvetti, and Paolo Papi (Sapienza Universit\u00e0 di Roma).\\n\\nLocation: Dobbiaco (Toblach)\", \"startDate\": \"2019-02-17\", \"endDate\": \"2019-02-29\"}",
+    "success": true,
+    "json": {
+      "title": "Winter School Geometry, Algebra and Combinatorics of Moduli Spaces and Configurations III",
+      "url": "http://people.dm.unipi.it/~gaiffi/webpage2019/index.html",
+      "description": "Organized by Marco Franciosi, Giovanni Gaiffi, Rita Pardini, Mario Salvetti, and Paolo Papi (Sapienza Universit\u00e0 di Roma).",
+      "location": "Dobbiaco (Toblach)",
+      "startDate": "2019-02-17",
+      "endDate": "2019-02-29"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://www.crm.sns.it/event/446/\" rel=\"noreferrer noopener\" target=\"_blank\">Some topics of Geometric Analysis and Geometric Measure Theory<br/></a></em>Organized by Giovanni Alberti, Valentino Magnani, Dario Trevisan, Davide Vittone (Universit\u00e0 di Padova). Centro De Giorgi, Pisa. April 16 \u2013 17, 2019.</p>",
+    "raw_output": " {\"title\": \"Some topics of Geometric Analysis and Geometric Measure Theory\", \"url\": \"http://www.crm.sns.it/event/446/\", \"description\": \"Organized by Giovanni Alberti, Valentino Magnani, Dario Trevisan, Davide Vittone (Universit\u00e0 di Padova).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2019-04-16\", \"endDate\": \"2019-04-17\"}",
+    "success": true,
+    "json": {
+      "title": "Some topics of Geometric Analysis and Geometric Measure Theory",
+      "url": "http://www.crm.sns.it/event/446/",
+      "description": "Organized by Giovanni Alberti, Valentino Magnani, Dario Trevisan, Davide Vittone (Universit\u00e0 di Padova).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2019-04-16",
+      "endDate": "2019-04-17"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://www.dm.unipi.it/webnew/it/seminari/giornata-onore-dellamico-sergio-steffe\" rel=\"noreferrer noopener\" target=\"_blank\">Giornata in onore dell\u2019amico Sergio Steff\u00e8<br/></a></em>Organized by Dario Andrea Bini and Beatrice Meini. Department of Mathematics, Pisa. January 24, 2019.</p>",
+    "raw_output": " {\"title\": \"Giornata in onore dell\u2019amico Sergio Steff\u00e8\", \"url\": \"https://www.dm.unipi.it/webnew/it/seminari/giornata-onore-dellamico-sergio-steffe\", \"description\": \"Organized by Dario Andrea Bini and Beatrice Meini.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2019-01-24\"}",
+    "success": true,
+    "json": {
+      "title": "Giornata in onore dell\u2019amico Sergio Steff\u00e8",
+      "url": "https://www.dm.unipi.it/webnew/it/seminari/giornata-onore-dellamico-sergio-steffe",
+      "description": "Organized by Dario Andrea Bini and Beatrice Meini.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2019-01-24"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://pagine.dm.unipi.it/berselli/meeting2019/index.html\" rel=\"noreferrer noopener\" target=\"_blank\">Variational problems, PDEs and applications</a></em><br/>Organized by Luigi Berselli, Giuseppe Buttazzo, Matteo Novaga, and Andrea Malchiodi (Scuola Normale Superiore, Pisa). Department of Mathematics, Pisa. January 17 \u2013 19, 2019.</p>",
+    "raw_output": " {\"title\": \"Variational problems, PDEs and applications\", \"url\": \"http://pagine.dm.unipi.it/berselli/meeting2019/index.html\", \"description\": \"Organized by Luigi Berselli, Giuseppe Buttazzo, Matteo Novaga, and Andrea Malchiodi (Scuola Normale Superiore, Pisa).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2019-01-17\", \"endDate\": \"2019-01-19\"}",
+    "success": true,
+    "json": {
+      "title": "Variational problems, PDEs and applications",
+      "url": "http://pagine.dm.unipi.it/berselli/meeting2019/index.html",
+      "description": "Organized by Luigi Berselli, Giuseppe Buttazzo, Matteo Novaga, and Andrea Malchiodi (Scuola Normale Superiore, Pisa).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2019-01-17",
+      "endDate": "2019-01-19"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/~georgiev/convegni/Pisa2019/PISA_2019_2_PISALAquila.htm\" rel=\"noreferrer noopener\" target=\"_blank\">PDE Workshop Waseda \u2013 GSSI, L\u2019Aquila \u2013 Pisa</a></em><br/>Organized by Vladimir Georgiev and Kazumasa Fujiwara (Scuola Normale Superiore, Pisa). Department of Mathematics, Pisa. February 21, 2019. </p>",
+    "raw_output": " {\"title\": \"PDE Workshop Waseda \u2013 GSSI, L\u2019Aquila \u2013 Pisa\", \"url\": \"http://people.dm.unipi.it/~georgiev/convegni/Pisa2019/PISA_2019_2_PISALaquila.htm\", \"description\": \"Organized by Vladimir Georgiev and Kazumasa Fujiwara (Scuola Normale Superiore, Pisa).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2019-02-21\"}",
+    "success": true,
+    "json": {
+      "title": "PDE Workshop Waseda \u2013 GSSI, L\u2019Aquila \u2013 Pisa",
+      "url": "http://people.dm.unipi.it/~georgiev/convegni/Pisa2019/PISA_2019_2_PISALaquila.htm",
+      "description": "Organized by Vladimir Georgiev and Kazumasa Fujiwara (Scuola Normale Superiore, Pisa).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2019-02-21"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://www.crm.sns.it/event/450/\" rel=\"noreferrer noopener\" target=\"_blank\">DINAMICI VI \u2013 The Sixth Workshop of Italian Dynamicists<br/></a></em>Organized by Claudio Bonanno, Paolo Giulietti, Marco Lenci (Universit\u00e0 di Bologna), Alfonso Sorrentino (Universit\u00e0 di Roma Tor Vergata). Centro De Giorgi, Pisa. June 4 \u2013 7, 2019.</p>",
+    "raw_output": " {\"title\": \"DINAMICI VI \u2013 The Sixth Workshop of Italian Dynamicists\", \"url\": \"http://www.crm.sns.it/event/450/\", \"description\": \"Organized by Claudio Bonanno, Paolo Giulietti, Marco Lenci (Universit\u00e0 di Bologna), Alfonso Sorrentino (Universit\u00e0 di Roma Tor Vergata).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2019-06-04\", \"endDate\": \"2019-06-07\"}",
+    "success": true,
+    "json": {
+      "title": "DINAMICI VI \u2013 The Sixth Workshop of Italian Dynamicists",
+      "url": "http://www.crm.sns.it/event/450/",
+      "description": "Organized by Claudio Bonanno, Paolo Giulietti, Marco Lenci (Universit\u00e0 di Bologna), Alfonso Sorrentino (Universit\u00e0 di Roma Tor Vergata).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2019-06-04",
+      "endDate": "2019-06-07"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://sites.google.com/view/spdespisa/\" rel=\"noreferrer noopener\" target=\"_blank\">Recent Trends in Stochastic Analysis and SPDEs. Celebrating Franco Flandoli\u2019s 60th birthday</a></em><br/>Organized by Marco Romito, Dario Trevisan, and David Barbato (Universit\u00e0 di Padova), Hakima Bessaih (University of Wyoming), Luigi Amedeo Bianchi (Universit\u00e0 degli Studi di Trento), Benedetta Ferrario (Universit\u00e0 di Pavia). Department of Mathematics, Pisa. June 18 \u2013 20, 2019.</p>",
+    "raw_output": " {\"title\": \"Recent Trends in Stochastic Analysis and SPDEs. Celebrating Franco Flandoli\u2019s 60th birthday\", \"url\": \"https://sites.google.com/view/spdespisa/\", \"description\": \"Organized by Marco Romito, Dario Trevisan, and David Barbato (Universit\u00e0 di Padova), Hakima Bessaih (University of Wyoming), Luigi Amedeo Bianchi (Universit\u00e0 degli Studi di Trento), Benedetta Ferrario (Universit\u00e0 di Pavia).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2019-06-18\", \"endDate\": \"2019-06-20\"}",
+    "success": true,
+    "json": {
+      "title": "Recent Trends in Stochastic Analysis and SPDEs. Celebrating Franco Flandoli\u2019s 60th birthday",
+      "url": "https://sites.google.com/view/spdespisa/",
+      "description": "Organized by Marco Romito, Dario Trevisan, and David Barbato (Universit\u00e0 di Padova), Hakima Bessaih (University of Wyoming), Luigi Amedeo Bianchi (Universit\u00e0 degli Studi di Trento), Benedetta Ferrario (Universit\u00e0 di Pavia).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2019-06-18",
+      "endDate": "2019-06-20"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://sites.google.com/view/dcp19-pisa/home\" rel=\"noreferrer noopener\" target=\"_blank\">DCP\u201919  Pisa \u2013 Dynamics and Complexity<br/></a></em>Organized by Stefano Galatolo. CNR, Pisa. July 1 \u2013 3, 2019.</p>",
+    "raw_output": " {\"title\": \"DCP\u201919  Pisa \u2013 Dynamics and Complexity\", \"url\": \"https://sites.google.com/view/dcp19-pisa/home\", \"description\": \"Organized by Stefano Galatolo.\\n\\nLocation: CNR, Pisa\", \"startDate\": \"2019-07-01\", \"endDate\": \"2019-07-03\"}",
+    "success": true,
+    "json": {
+      "title": "DCP\u201919  Pisa \u2013 Dynamics and Complexity",
+      "url": "https://sites.google.com/view/dcp19-pisa/home",
+      "description": "Organized by Stefano Galatolo.",
+      "location": "CNR, Pisa",
+      "startDate": "2019-07-01",
+      "endDate": "2019-07-03"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://crm.sns.it/event/440/\" rel=\"noreferrer noopener\" target=\"_blank\">Alessio Figalli, Fields medallist 2018<br/></a></em>Organized by Carlo Petronio, Luigi Ambrosio (Scuola Normale Superiore, Pisa), and Piermarco Cannarsa<br/>Universit\u00e0 di Roma Tor Vergata and UMI). Centro De Giorgi, Pisa. January 14 \u2013 17, 2019.</p>",
+    "raw_output": " {\"title\": \"Alessio Figalli, Fields medallist 2018\", \"url\": \"https://crm.sns.it/event/440/\", \"description\": \"Organized by Carlo Petronio, Luigi Ambrosio (Scuola Normale Superiore, Pisa), and Piermarco Cannarsa\\nUniversit\u00e0 di Roma Tor Vergata and UMI).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2019-01-14\", \"endDate\": \"2019-01-17\"}",
+    "success": true,
+    "json": {
+      "title": "Alessio Figalli, Fields medallist 2018",
+      "url": "https://crm.sns.it/event/440/",
+      "description": "Organized by Carlo Petronio, Luigi Ambrosio (Scuola Normale Superiore, Pisa), and Piermarco Cannarsa\nUniversit\u00e0 di Roma Tor Vergata and UMI).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2019-01-14",
+      "endDate": "2019-01-17"
+    }
+  },
+  {
+    "input_html": "<p><em>Progress in Mathematical Fluid Dynamics</em><br/>Organized by Luigi Berselli and Michael Ruzicka. Cetraro. June 17 \u2013 21, 2019.</p>",
+    "raw_output": " {\"title\": \"Progress in Mathematical Fluid Dynamics\", \"url\": null, \"description\": \"Organized by Luigi Berselli and Michael Ruzicka.\\n\\nLocation: Cetraro\", \"startDate\": \"2019-06-17\", \"endDate\": \"2019-06-21\"}",
+    "success": true,
+    "json": {
+      "title": "Progress in Mathematical Fluid Dynamics",
+      "url": null,
+      "description": "Organized by Luigi Berselli and Michael Ruzicka.",
+      "location": "Cetraro, Italy",
+      "startDate": "2019-06-17",
+      "endDate": "2019-06-21"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://events.dimai.unifi.it/FIPISI/secondo-incontro/\" rel=\"noreferrer noopener\" target=\"_blank\">Incontri di Analisi matematica tra Firenze, Pisa e Siena<br/></a></em>Organized by Emanuele Paolini, Giovanni Bellettini, Francesca Bucci, Elisabetta Chiodaroli, Andrea Colesanti, Nicola Visciglia. Department of Mathematics, Pisa. </p>",
+    "raw_output": " {\"title\": \"Incontri di Analisi matematica tra Firenze, Pisa e Siena\", \"url\": \"http://events.dimai.unifi.it/FIPISI/secondo-incontro/\", \"description\": \"Organized by Emanuele Paolini, Giovanni Bellettini, Francesca Bucci, Elisabetta Chiodaroli, Andrea Colesanti.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": null, \"endDate\": null}\n\nNote: The provided input does not contain start and end dates for this event.",
+    "success": false,
+    "json": {
+      "title": "Incontri di Analisi matematica tra Firenze, Pisa e Siena",
+      "url": "http://events.dimai.unifi.it/FIPISI/secondo-incontro/",
+      "description": "Organized by Emanuele Paolini, Giovanni Bellettini, Francesca Bucci, Elisabetta Chiodaroli, Andrea Colesanti.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2019-11-22"
+    }
+  },
+  {
+    "input_html": "<p><em>Geometry and Analysis Beyond spectral gaps \u2013 Pansu\u2019s Fest, for the birthday of Pierre Pansu<br/></em>Organized by Enrico Le Donne. University of Oxford, UK. September 23 \u2013 October 3, 2019.</p>",
+    "raw_output": " {\"title\": \"Geometry and Analysis Beyond spectral gaps \u2013 Pansu\u2019s Fest\", \"url\": null, \"description\": \"Organized by Enrico Le Donne.\\n\\nLocation: University of Oxford, UK\", \"startDate\": \"2019-09-23\", \"endDate\": \"2019-10-03\"}",
+    "success": true,
+    "json": {
+      "title": "Geometry and Analysis Beyond spectral gaps \u2013 Pansu\u2019s Fest",
+      "url": null,
+      "description": "Organized by Enrico Le Donne.",
+      "location": "University of Oxford, UK",
+      "startDate": "2019-09-23",
+      "endDate": "2019-10-03"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://www.crm.sns.it/event/417/\" rel=\"noreferrer noopener\" target=\"_blank\">Equazioni alle Derivate Parziali nella Dinamica dei Fluidi<br/></a></em>Organized by Carlo Romano Grisanti and Francesca Crispo (Universit\u00e0 della Campania \u201cL. Vanvitelli\u201d). Centro De Giorgi, Pisa. February 5 \u2013 7, 2018.</p>",
+    "raw_output": " {\"title\": \"Equazioni alle Derivate Parziali nella Dinamica dei Fluidi\", \"url\": \"http://www.crm.sns.it/event/417/\", \"description\": \"Organized by Carlo Romano Grisanti and Francesca Crispo (Universit\u00e0 della Campania \u2018\u2018L. Vanvitelli\u2019\u2019).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2018-02-05\", \"endDate\": \"2018-02-07\"}",
+    "success": true,
+    "json": {
+      "title": "Equazioni alle Derivate Parziali nella Dinamica dei Fluidi",
+      "url": "http://www.crm.sns.it/event/417/",
+      "description": "Organized by Carlo Romano Grisanti and Francesca Crispo (Universit\u00e0 della Campania \u2018\u2018L. Vanvitelli\u2019\u2019).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2018-02-05",
+      "endDate": "2018-02-07"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://ramseyequations.sciencesconf.org/\" rel=\"noreferrer noopener\" target=\"_blank\">Ramsey Theory of Equations and related topics<br/></a></em>Organized by Mauro Di Nasso and Lorenzo Luperi Baglini (University of Vienna). Department of Mathematics, Pisa. February 16 \u2013 17, 2018.</p>",
+    "raw_output": " {\"title\": \"Ramsey Theory of Equations and related topics\", \"url\": \"https://ramseyequations.sciencesconf.org/\", \"description\": \"Organized by Mauro Di Nasso and Lorenzo Luperi Baglini (University of Vienna).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2018-02-16\", \"endDate\": \"2018-02-17\"}",
+    "success": true,
+    "json": {
+      "title": "Ramsey Theory of Equations and related topics",
+      "url": "https://ramseyequations.sciencesconf.org/",
+      "description": "Organized by Mauro Di Nasso and Lorenzo Luperi Baglini (University of Vienna).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2018-02-16",
+      "endDate": "2018-02-17"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA_2018.htm\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop on Harmonic analysis and Nonlinear Evolution Equations<br/></a></em>Organized by Vladimir Georgiev and Jacopo Bellazzini (Universit\u00e0 di Sassari), Kazumasa Fujiwara (Scuola Normale Superiore, Pisa). Department of Mathematics, Pisa. February 23, 2018.</p>",
+    "raw_output": " {\"title\": \"Workshop on Harmonic analysis and Nonlinear Evolution Equations\", \"url\": \"http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA\\_2018.htm\", \"description\": \"Organized by Vladimir Georgiev and Jacopo Bellazzini (Universit\u00e0 di Sassari), Kazumasa Fujiwara (Scuola Normale Superiore, Pisa).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2018-02-23\"}",
+    "success": false,
+    "json": {
+      "title": "Workshop on Harmonic analysis and Nonlinear Evolution Equations",
+      "url": "http://people.dm.unipi.it/~georgiev/convegni/Pisa2018/PISA\\_2018.htm",
+      "description": "Organized by Vladimir Georgiev and Jacopo Bellazzini (Università di Sassari), Kazumasa Fujiwara (Scuola Normale Superiore, Pisa).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2018-02-23"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://crm.sns.it/event/419/\" rel=\"noreferrer noopener\" target=\"_blank\">From order to chaos<br/></a></em>Organized by Carlo Carminati and Mauro Artigiani (Centro De Giorgi, Pisa), Arnaud Hilion (AMU \u2013 Aix-Marseille Universit\u00e9), and J\u00e9r\u00f4me Los (CNRS, Aix-Marseille Universit\u00e9). Centro De Giorgi, Pisa. April 9 \u2013 13, 2018.</p>",
+    "raw_output": " {\"title\": \"From order to chaos\", \"url\": \"https://crm.sns.it/event/419/\", \"description\": \"Organized by Carlo Carminati and Mauro Artigiani (Centro De Giorgi, Pisa), Arnaud Hilion (AMU \u2013 Aix-Marseille Universit\u00e9), and J\u00e9r\u00f4me Los (CNRS, Aix-Marseille Universit\u00e9).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2018-04-09\", \"endDate\": \"2018-04-13\"}",
+    "success": true,
+    "json": {
+      "title": "From order to chaos",
+      "url": "https://crm.sns.it/event/419/",
+      "description": "Organized by Carlo Carminati and Mauro Artigiani (Centro De Giorgi, Pisa), Arnaud Hilion (AMU \u2013 Aix-Marseille Universit\u00e9), and J\u00e9r\u00f4me Los (CNRS, Aix-Marseille Universit\u00e9).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2018-04-09",
+      "endDate": "2018-04-13"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://crm.sns.it/event/415/\" rel=\"noreferrer noopener\" target=\"_blank\">New Methods in Finsler Geometry</a></em><br/>Organized by Marco Abate and Alberto Abbondandolo (Ruhr-Universit\u00e4t Bochum &amp; Universit\u00e0 di Pisa), Vladimir Matveev (Friedrich Schiller University of Jena), Zhongmin Shen (Indiana University \u2013 Purdue University Indianapolis). Centro De Giorgi, Pisa. May 21 \u2013 25, 2018.</p>",
+    "raw_output": " {\"title\": \"New Methods in Finsler Geometry\", \"url\": \"https://crm.sns.it/event/415/\", \"description\": \"Organized by Marco Abate and Alberto Abbondandolo (Ruhr-Universit\u00e4t Bochum & Universit\u00e0 di Pisa), Vladimir Matveev (Friedrich Schiller University of Jena), Zhongmin Shen (Indiana University \u2013 Purdue University Indianapolis).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2018-05-21\", \"endDate\": \"2018-05-25\"}",
+    "success": true,
+    "json": {
+      "title": "New Methods in Finsler Geometry",
+      "url": "https://crm.sns.it/event/415/",
+      "description": "Organized by Marco Abate and Alberto Abbondandolo (Ruhr-Universit\u00e4t Bochum & Universit\u00e0 di Pisa), Vladimir Matveev (Friedrich Schiller University of Jena), Zhongmin Shen (Indiana University \u2013 Purdue University Indianapolis).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2018-05-21",
+      "endDate": "2018-05-25"
+    }
+  },
+  {
+    "input_html": "<p><em>A tale of algebra and geometry, A conference to celebrate Angelo Vistoli\u2019s 60th birthday<br/></em>Organized by Rita Pardini and Michele Bolognesi (Universit\u00e9 de Montpellier), Mirella Manaresi (Universit\u00e0 di Bologna), Luca Migliorini (Universit\u00e0 di Bologna), Gabriele Vezzosi (Universit\u00e0 di Firenze). Department of Mathematics, Pisa. June 4 \u2013 7, 2018.</p>",
+    "raw_output": " {\"title\": \"A tale of algebra and geometry, A conference to celebrate Angelo Vistoli\u2019s 60th birthday\", \"url\": null, \"description\": \"Organized by Rita Pardini and Michele Bolognesi (Universit\u00e9 de Montpellier), Mirella Manaresi ( Universit\u00e0 di Bologna), Luca Migliorini (Universit\u00e0 di Bologna), Gabriele Vezzosi (Universit\u00e0 di Firenze).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2018-06-04\", \"endDate\": \"2018-06-07\"}",
+    "success": true,
+    "json": {
+      "title": "A tale of algebra and geometry, A conference to celebrate Angelo Vistoli\u2019s 60th birthday",
+      "url": null,
+      "description": "Organized by Rita Pardini and Michele Bolognesi (Universit\u00e9 de Montpellier), Mirella Manaresi ( Universit\u00e0 di Bologna), Luca Migliorini (Universit\u00e0 di Bologna), Gabriele Vezzosi (Universit\u00e0 di Firenze).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2018-06-04",
+      "endDate": "2018-06-07"
+    }
+  },
+  {
+    "input_html": "<p><em>Stable surfaces<br/></em>Organized by Marco Franciosi. Department of Mathematics, Pisa. June 25 \u2013 30, 2018.</p>",
+    "raw_output": " {\"title\": \"Stable surfaces\", \"url\": null, \"description\": \"Organized by Marco Franciosi.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2018-06-25\", \"endDate\": \"2018-06-30\"}",
+    "success": true,
+    "json": {
+      "title": "Stable surfaces",
+      "url": null,
+      "description": "Organized by Marco Franciosi.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2018-06-25",
+      "endDate": "2018-06-30"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://people.dm.unipi.it/spass/workshop/20180629/\" rel=\"noreferrer noopener\" target=\"_blank\">Workshop in honour of Maurizio Pratelli<br/></a></em>Organized by Franco Flandoli and Marco Romito. Department of Mathematics, Pisa. June 29, 2018.</p>",
+    "raw_output": " {\"title\": \"Workshop in honour of Maurizio Pratelli\", \"url\": \"http://people.dm.unipi.it/spass/workshop/20180629/\", \"description\": \"Organized by Franco Flandoli and Marco Romito.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2018-06-29\", \"endDate\": \"2018-06-29\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop in honour of Maurizio Pratelli",
+      "url": "http://people.dm.unipi.it/spass/workshop/20180629/",
+      "description": "Organized by Franco Flandoli and Marco Romito.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2018-06-29",
+      "endDate": "2018-06-29"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://www.crm.sns.it/event/432/\" rel=\"noreferrer noopener\" target=\"_blank\">Pisa-Hokkaido-Roma2 Summer School on Mathematics and its Applications <br/></a></em>Organized by Carlo Carminati, Giovanni Gaiffi, Stefano Galatolo, Davide Lombardo, and Simona Settepanella (Hokkaido University), Alfonso Sorrentino (Universit\u00e0 di Roma Tor Vergata). Centro De Giorgi, Pisa. August 27 \u2013 September 8, 2018.</p>",
+    "raw_output": " {\"title\": \"Pisa-Hokkaido-Roma2 Summer School on Mathematics and its Applications\", \"url\": \"https://www.crm.sns.it/event/432/\", \"description\": \"Organized by Carlo Carminati, Giovanni Gaiffi, Stefano Galatolo, Davide Lombardo, and Simona Settepanella (Hokkaido University), Alfonso Sorrentino (Universit\u00e0 di Roma Tor Vergata).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2018-08-27\", \"endDate\": \"2018-09-08\"}",
+    "success": true,
+    "json": {
+      "title": "Pisa-Hokkaido-Roma2 Summer School on Mathematics and its Applications",
+      "url": "https://www.crm.sns.it/event/432/",
+      "description": "Organized by Carlo Carminati, Giovanni Gaiffi, Stefano Galatolo, Davide Lombardo, and Simona Settepanella (Hokkaido University), Alfonso Sorrentino (Universit\u00e0 di Roma Tor Vergata).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2018-08-27",
+      "endDate": "2018-09-08"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://www.dm.unipi.it/webnew/it/system/files/Locandina.pdf\" rel=\"noreferrer noopener\" target=\"_blank\">2018 $AMC_{70}$ Between Mathematics and Astronomy <br/></a></em>Organized by Giulio Ba\u00f9, Giovanni Federico Gronchi, Daniele Serra, and Giacomo Tommei. Department of Mathematics, Pisa. September 3 \u2013 5, 2018.</p>",
+    "raw_output": " {\"title\": \"2018 $AMC\\_{70}$ Between Mathematics and Astronomy\", \"url\": \"https://www.dm.unipi.it/webnew/it/system/files/Locandina.pdf\", \"description\": \"Organized by Giulio Ba\u00f9, Giovanni Federico Gronchi, Daniele Serra, and Giacomo Tommei.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2018-09-03\", \"endDate\": \"2018-09-05\"}",
+    "success": false,
+    "json": {
+      "title": "2018 AMC_70 Between Mathematics and Astronomy",
+      "url": "https://www.dm.unipi.it/webnew/it/system/files/Locandina.pdf",
+      "description": "Organized by Giulio Baù, Giovanni Federico Gronchi, Daniele Serra, and Giacomo Tommei.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2018-09-03",
+      "endDate": "2018-09-05"
+    }
+  },
+  {
+    "input_html": "<p><em>Recent Progresses in PDEs<br/></em>Organized by Luigi Berselli, Ferruccio Colombini, Nicola Visciglia. Centro De Giorgi, Pisa. January 19 \u2013 20, 2017</p>",
+    "raw_output": " {\"title\": \"Recent Progresses in PDEs\", \"url\": null, \"description\": \"Organized by Luigi Berselli, Ferruccio Colombini, Nicola Visciglia.\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2017-01-19\", \"endDate\": \"2017-01-20\"}",
+    "success": true,
+    "json": {
+      "title": "Recent Progresses in PDEs",
+      "url": null,
+      "description": "Organized by Luigi Berselli, Ferruccio Colombini, Nicola Visciglia.",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2017-01-19",
+      "endDate": "2017-01-20"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://events.dm.unipi.it/event/5/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>METT VII \u2013 7th Workshop on Matrix Equations and Tensor Techniques<br/></em></a>Organized by Dario Bini and Beatrice Meini. Dipartimento di Matematica, Pisa. January 19 \u2013 20, 2017.</p>",
+    "raw_output": " {\"title\": \"METT VII \u2013 7th Workshop on Matrix Equations and Tensor Techniques\", \"url\": \"https://events.dm.unipi.it/event/5/\", \"description\": \"Organized by Dario Bini and Beatrice Meini.\\n\\nLocation: Dipartimento di Matematica, Pisa\", \"startDate\": \"2017-01-19\", \"endDate\": \"2017-01-20\"}",
+    "success": true,
+    "json": {
+      "title": "METT VII \u2013 7th Workshop on Matrix Equations and Tensor Techniques",
+      "url": "https://events.dm.unipi.it/event/5/",
+      "description": "Organized by Dario Bini and Beatrice Meini.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-01-19",
+      "endDate": "2017-01-20"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://people.dm.unipi.it/~gaiffi/dobbiaco/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Geometry, Algebra, and Combinatorics of Moduli Spaces and Configurations<br/></em></a>Organized by Filippo Callegaro, Giovanni Gaiffi, Rita Pardini, and Mario Salvetti. Dobbiaco (BZ). February 19 \u2013 25, 2017.</p>",
+    "raw_output": " {\"title\": \"Geometry, Algebra, and Combinatorics of Moduli Spaces and Configurations\", \"url\": \"http://people.dm.unipi.it/~gaiffi/dobbiaco/\", \"description\": \"Organized by Filippo Callegaro, Giovanni Gaiffi, Rita Pardini, and Mario Salvetti.\\n\\nLocation: Dobbiaco (BZ)\", \"startDate\": \"2017-02-19\", \"endDate\": \"2017-02-25\"}",
+    "success": true,
+    "json": {
+      "title": "Geometry, Algebra, and Combinatorics of Moduli Spaces and Configurations",
+      "url": "http://people.dm.unipi.it/~gaiffi/dobbiaco/",
+      "description": "Organized by Filippo Callegaro, Giovanni Gaiffi, Rita Pardini, and Mario Salvetti.",
+      "location": "Dobbiaco (Toblach)",
+      "startDate": "2017-02-19",
+      "endDate": "2017-02-25"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://people.dm.unipi.it/spass/workshop/20170227/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Stochastic Analysis Day<br/></em></a>Organized by Franco Flandoli, Marco Romito, Dario Trevisan, Maurizio Pratelli. Dipartimento di Matematica. February 27, 2017</p>",
+    "raw_output": " {\"title\": \"Stochastic Analysis Day\", \"url\": \"https://people.dm.unipi.it/spass/workshop/20170227/\", \"description\": \"\", \"location\": \"Dipartimento di Matematica\", \"startDate\": \"2017-02-27\", \"endDate\": \"2017-02-27\"}",
+    "success": true,
+    "json": {
+      "title": "Stochastic Analysis Day",
+      "url": "https://people.dm.unipi.it/spass/workshop/20170227/",
+      "description": "Organized by Franco Flandoli, Marco Romito, Dario Trevisan, Maurizio Pratelli.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-02-27",
+      "endDate": "2017-02-27"
+    }
+  },
+  {
+    "input_html": "<p><em>AAA Algebraic Algorithms and Applications<br/></em>Organized by Carlo Traverso. Department of Mathematics, Pisa. March 30 \u2013 April 4, 2017.</p>",
+    "raw_output": " {\"title\": \"AAA Algebraic Algorithms and Applications\", \"url\": null, \"description\": \"Organized by Carlo Traverso.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2017-03-30\", \"endDate\": \"2017-04-04\"}",
+    "success": true,
+    "json": {
+      "title": "AAA Algebraic Algorithms and Applications",
+      "url": null,
+      "description": "Organized by Carlo Traverso.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-03-30",
+      "endDate": "2017-04-04"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://www.dm.unipi.it/webnew/it/content/giornata-onore-di-margherita-galbiati-0\" rel=\"noreferrer noopener\" target=\"_blank\"><em>A day in honor of Margherita Galbiati<br/></em></a>Organized by Riccardo Benedetti, Fabrizio Broglia, Carlo Petronio. Department of Mathematics, Pisa. May 2, 2017.</p>",
+    "raw_output": " {\"title\": \"A day in honor of Margherita Galbiati\", \"url\": \"https://www.dm.unipi.it/webnew/it/content/giornata-onore-di-margherita-galbiati-0\", \"description\": \"Organized by Riccardo Benedetti, Fabrizio Broglia, and Carlo Petronio.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2017-05-02\"}",
+    "success": true,
+    "json": {
+      "title": "A day in honor of Margherita Galbiati",
+      "url": "https://www.dm.unipi.it/webnew/it/content/giornata-onore-di-margherita-galbiati-0",
+      "description": "Organized by Riccardo Benedetti, Fabrizio Broglia, and Carlo Petronio.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-05-02"
+    }
+  },
+  {
+    "input_html": "<p><em>Perspectives in algebraic topology: a day in honor of Mario Salvetti<br/></em>Organized by Giovanni Gaiffi, Filippo Callegaro. Department of Mathematics, Pisa. June 5, 2017.</p>",
+    "raw_output": " {\"title\": \"Perspectives in algebraic topology: a day in honor of Mario Salvetti\", \"url\": null, \"description\": \"Organized by Giovanni Gaiffi, Filippo Callegaro.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2017-06-05\"}",
+    "success": true,
+    "json": {
+      "title": "Perspectives in algebraic topology: a day in honor of Mario Salvetti",
+      "url": null,
+      "description": "Organized by Giovanni Gaiffi, Filippo Callegaro.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-06-05"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://crm.sns.it/event/405/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Arrangements and Beyond: Combinatorics, geometry, topology, and applications<br/></em></a>Organized by Filippo Callegaro and Giovanni Gaiffi, and Corrado De Concini (Sapienza Universit\u00e0 di Roma), Emanuele Delucchi (Universit\u00e9 de Fribourg), Alexandru Suciu (Northeastern University),  Masahiko Yoshinaga (Hokkaido University). Centro De Giorgi, Pisa. June 6 \u2013 9, 2017.</p>",
+    "raw_output": " {\"title\": \"Arrangements and Beyond: Combinatorics, geometry, topology, and applications\", \"url\": \"https://crm.sns.it/event/405/\", \"description\": \"Organized by Filippo Callegaro and Giovanni Gaiffi (Sapienza Universit\u00e0 di Roma), Emanuele Delucchi (Universit\u00e9 de Fribourg), Alexandru Suciu (Northeastern University), Masahiko Yoshinaga (Hokkaido University).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2017-06-06\", \"endDate\": \"2017-06-09\"}",
+    "success": true,
+    "json": {
+      "title": "Arrangements and Beyond: Combinatorics, geometry, topology, and applications",
+      "url": "https://crm.sns.it/event/405/",
+      "description": "Organized by Filippo Callegaro and Giovanni Gaiffi (Sapienza Universit\u00e0 di Roma), Emanuele Delucchi (Universit\u00e9 de Fribourg), Alexandru Suciu (Northeastern University), Masahiko Yoshinaga (Hokkaido University).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2017-06-06",
+      "endDate": "2017-06-09"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://people.dm.unipi.it/martelli/Cortona2017/Cortona.html\" rel=\"noreferrer noopener\" target=\"_blank\"><em>INdAM Meeting. Geometric topology in Cortona<br/></em></a>Organized by Bruno Martelli and Francesco Bonsante (Pavia), Jeff Brock (Brown), Ken Bromberg (Utah), Dick Canary (Michigan), and Gabriele Mondello (Roma). Palazzone di Cortona, Italy. June 4 \u2013 10, 2017.</p>",
+    "raw_output": " {\"title\": \"INdAM Meeting. Geometric topology in Cortona\", \"url\": \"http://people.dm.unipi.it/martelli/Cortona2017/Cortona.html\", \"description\": \"Organized by Bruno Martelli and Francesco Bonsante (Pavia), Jeff Brock (Brown), Ken Bromberg (Utah), Dick Canary (Michigan), and Gabriele Mondello (Roma).\\n\\nLocation: Palazzone di Cortona, Italy\", \"startDate\": \"2017-06-04\", \"endDate\": \"2017-06-10\"}",
+    "success": true,
+    "json": {
+      "title": "INdAM Meeting. Geometric topology in Cortona",
+      "url": "http://people.dm.unipi.it/martelli/Cortona2017/Cortona.html",
+      "description": "Organized by Bruno Martelli and Francesco Bonsante (Pavia), Jeff Brock (Brown), Ken Bromberg (Utah), Dick Canary (Michigan), and Gabriele Mondello (Roma).",
+      "location": "Palazzone di Cortona, Italy",
+      "startDate": "2017-06-04",
+      "endDate": "2017-06-10"
+    }
+  },
+  {
+    "input_html": "<p><em>Workshop INdAM \u2013 DinAmicI V \u2013 Modern Trends in the Ergodic Theory of Dynamical Systems<br/></em>Organized by Claudio Bonanno. Rome. June 5 \u2013 9, 2017.</p>",
+    "raw_output": " {\"title\": \"Workshop INdAM \u2013 DinAmicI V \u2013 Modern Trends in the Ergodic Theory of Dynamical Systems\", \"url\": null, \"description\": \"Organized by Claudio Bonanno.\\n\\nLocation: Rome\", \"startDate\": \"2017-06-05\", \"endDate\": \"2017-06-09\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop INdAM \u2013 DinAmicI V \u2013 Modern Trends in the Ergodic Theory of Dynamical Systems",
+      "url": null,
+      "description": "Organized by Claudio Bonanno.",
+      "location": "Rome, Italy",
+      "startDate": "2017-06-05",
+      "endDate": "2017-06-09"
+    }
+  },
+  {
+    "input_html": "<p><em>From Regensburg to Pisa: two days of Analysis under the leaning tower<br/></em>Organized by Alessandra Pluda and Valerio Pagliari (TU Vienna). Department of Mathematics, Pisa. June 30 \u2013 July 1, 2017.</p>",
+    "raw_output": " {\"title\": \"From Regensburg to Pisa: two days of Analysis under the leaning tower\", \"url\": null, \"description\": \"Organized by Alessandra Pluda and Valerio Pagliari (TU Vienna).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2017-06-30\", \"endDate\": \"2017-07-01\"}",
+    "success": true,
+    "json": {
+      "title": "From Regensburg to Pisa: two days of Analysis under the leaning tower",
+      "url": null,
+      "description": "Organized by Alessandra Pluda and Valerio Pagliari (TU Vienna).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-06-30",
+      "endDate": "2017-07-01"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://www.crm.sns.it/event/411/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Curves and networks in geometric analysis<br/></em></a>Organized by Matteo Novaga and Carlo Mantegazza (Universit\u00e0 di Napoli \u201cFederico II\u201d), and Giandomenico Orlandi (Universit\u00e0 di Verona). Centro De Giorgi, Pisa. June 26 \u2013 30, 2017.</p>",
+    "raw_output": " {\"title\": \"Curves and networks in geometric analysis\", \"url\": \"http://www.crm.sns.it/event/411/\", \"description\": \"Organized by Matteo Novaga and Carlo Mantegazza (Universit\u00e0 di Napoli \\u0027Federico II\\u0027), and Giandomenico Orlandi (Universit\u00e0 di Verona).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2017-06-26\", \"endDate\": \"2017-06-30\"}",
+    "success": true,
+    "json": {
+      "title": "Curves and networks in geometric analysis",
+      "url": "http://www.crm.sns.it/event/411/",
+      "description": "Organized by Matteo Novaga and Carlo Mantegazza (Universit\u00e0 di Napoli 'Federico II'), and Giandomenico Orlandi (Universit\u00e0 di Verona).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2017-06-26",
+      "endDate": "2017-06-30"
+    }
+  },
+  {
+    "input_html": "<p><em>Satellite Dynamics and Space Missions: Theory and Applications of Celestial Mechanics<br/></em>Organized by Giovanni Federico Gronchi. San Martino al Cimino (VT). August 28 \u2013 September 2, 2017.</p>",
+    "raw_output": " {\"title\": \"Satellite Dynamics and Space Missions: Theory and Applications of Celestial Mechanics\", \"url\": null, \"description\": \"Organized by Giovanni Federico Gronchi.\\n\\nLocation: San Martino al Cimino (VT)\", \"startDate\": \"2017-08-28\", \"endDate\": \"2017-09-02\"}",
+    "success": true,
+    "json": {
+      "title": "Satellite Dynamics and Space Missions: Theory and Applications of Celestial Mechanics",
+      "url": null,
+      "description": "Organized by Giovanni Federico Gronchi.",
+      "location": "San Martino al Cimino, Italy",
+      "startDate": "2017-08-28",
+      "endDate": "2017-09-02"
+    }
+  },
+  {
+    "input_html": "<p><em>Celmec VII<br/></em>Organized by Giovanni Federico Gronchi. San Martino al Cimino (VT). September 3 \u2013 9, 2017.</p>",
+    "raw_output": " {\"title\": \"Celmec VII\", \"url\": null, \"description\": \"Organized by Giovanni Federico Gronchi.\\n\\nLocation: San Martino al Cimino (VT)\", \"startDate\": \"2017-09-03\", \"endDate\": \"2017-09-09\"}",
+    "success": true,
+    "json": {
+      "title": "Celmec VII",
+      "url": null,
+      "description": "Organized by Giovanni Federico Gronchi.",
+      "location": "San Martino al Cimino, Italy",
+      "startDate": "2017-09-03",
+      "endDate": "2017-09-09"
+    }
+  },
+  {
+    "input_html": "<p><em>INdAM Meeting. Structured Matrices in Numerical Linear Algebra: Analysis, Algorithms, and Applications<br/></em>Organized by Dario Bini. Palazzone di Cortona, Italy. September 4 \u2013 8, 2017.</p>",
+    "raw_output": " {\"title\": \"INdAM Meeting. Structured Matrices in Numerical Linear Algebra: Analysis, Algorithms, and Applications\", \"url\": null, \"description\": \"Organized by Dario Bini.\\n\\nLocation: Palazzone di Cortona, Italy\", \"startDate\": \"2017-09-04\", \"endDate\": \"2017-09-08\"}",
+    "success": true,
+    "json": {
+      "title": "INdAM Meeting. Structured Matrices in Numerical Linear Algebra: Analysis, Algorithms, and Applications",
+      "url": null,
+      "description": "Organized by Dario Bini.",
+      "location": "Palazzone di Cortona, Italy",
+      "startDate": "2017-09-04",
+      "endDate": "2017-09-08"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"https://www.ventoteneinternationalworkshops.net/ventotene-2017/\" rel=\"noreferrer noopener\" target=\"_blank\">Ventotene International Workshop 2017: Moduli Spaces</a><br/></em>Organized by Roberto Frigerio and Stefano Francaviglia (Universit\u00e0 di Bologna), Alessandra Iozzi (ETH Z\u00fcrich), Kate Juschenko (Northwestern University), Michah Sageev (Technion). Ventotene. September 11 \u2013 16, 2017.</p>",
+    "raw_output": " {\"title\": \"Ventotene International Workshop 2017: Moduli Spaces\", \"url\": \"https://www.ventoteneinternationalworkshops.net/ventotene-2017/\", \"description\": \"Organized by Roberto Frigerio and Stefano Francaviglia (Universit\u00e0 di Bologna), Alessandra Iozzi (ETH Z\u00fcrich), Kate Juschenko (Northwestern University), Michah Sageev (Technion).\\n\\nLocation: Ventotene\", \"startDate\": \"2017-09-11\", \"endDate\": \"2017-09-16\"}",
+    "success": true,
+    "json": {
+      "title": "Ventotene International Workshop 2017: Moduli Spaces",
+      "url": "https://www.ventoteneinternationalworkshops.net/ventotene-2017/",
+      "description": "Organized by Roberto Frigerio and Stefano Francaviglia (Universit\u00e0 di Bologna), Alessandra Iozzi (ETH Z\u00fcrich), Kate Juschenko (Northwestern University), Michah Sageev (Technion).",
+      "location": "Ventotene, Pisa",
+      "startDate": "2017-09-11",
+      "endDate": "2017-09-16"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://www.crm.sns.it/event/409/\" rel=\"noreferrer noopener\" target=\"_blank\">Mathematical Modelling in Life Sciences (Probability Summer School)<br/></a></em>Organized by Franco Flandoli, Marco Romito, Dario Trevisan and Lisa Beck (University of Augsburg), Luigi Amedeo Bianchi (TU Berlin), Dirk Bl\u00f6mker (University of Augsburg). Centro De Giorgi, Pisa. September 15 \u2013 18, 2017.</p>",
+    "raw_output": " {\"title\": \"Mathematical Modelling in Life Sciences (Probability Summer School)\",\n  \"url\": \"http://www.crm.sns.it/event/409/\",\n  \"description\": \"Organized by Franco Flandoli, Marco Romito, Dario Trevisan and Lisa Beck (University of Augsburg), Luigi Amedeo Bianchi (TU Berlin), Dirk Bl\u00f6mker (University of Augsburg).\\n\\nLocation: Centro De Giorgi, Pisa\",\n  \"startDate\": \"2017-09-15\",\n  \"endDate\": \"2017-09-18\"}",
+    "success": true,
+    "json": {
+      "title": "Mathematical Modelling in Life Sciences (Probability Summer School)",
+      "url": "http://www.crm.sns.it/event/409/",
+      "description": "Organized by Franco Flandoli, Marco Romito, Dario Trevisan and Lisa Beck (University of Augsburg), Luigi Amedeo Bianchi (TU Berlin), Dirk Bl\u00f6mker (University of Augsburg).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2017-09-15",
+      "endDate": "2017-09-18"
+    }
+  },
+  {
+    "input_html": "<p><em>Linear and nonlinear hyperbolic equations<br/></em>Organized by Ferruccio Colombini and Vladimir Georgiev. Department of Mathematics, Pisa. November 30 \u2013 December 1, 2017.</p>",
+    "raw_output": " {\"title\": \"Linear and nonlinear hyperbolic equations\", \"url\": null, \"description\": \"Organized by Ferruccio Colombini and Vladimir Georgiev.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2017-11-30\", \"endDate\": \"2017-12-01\"}",
+    "success": true,
+    "json": {
+      "title": "Linear and nonlinear hyperbolic equations",
+      "url": null,
+      "description": "Organized by Ferruccio Colombini and Vladimir Georgiev.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2017-11-30",
+      "endDate": "2017-12-01"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://people.dm.unipi.it/~gaiffi/webpagePisafeb2016/main.html\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Arrangements: topology, combinatorics, and stability<br/></em></a>Organized by Filippo Callegaro, Giovanni Gaiffi, and Mario Salvetti. Department of Mathematics, Pisa. February 3 \u2013 6, 2016.</p>",
+    "raw_output": " {\"title\": \"Arrangements: topology, combinatorics, and stability\", \"url\": \"http://people.dm.unipi.it/~gaiffi/webpagePisafeb2016/main.html\", \"description\": \"Organized by Filippo Callegaro, Giovanni Gaiffi, and Mario Salvetti.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2016-02-03\", \"endDate\": \"2016-02-06\"}",
+    "success": true,
+    "json": {
+      "title": "Arrangements: topology, combinatorics, and stability",
+      "url": "http://people.dm.unipi.it/~gaiffi/webpagePisafeb2016/main.html",
+      "description": "Organized by Filippo Callegaro, Giovanni Gaiffi, and Mario Salvetti.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2016-02-03",
+      "endDate": "2016-02-06"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://crm.sns.it/event/360/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Renormalization in Dynamics \u2013 Pisa 2016<br/></em></a>Organized by Claudio Bonanno, Carlo Carminati, and Milton Minervino (Aix Marseille University). Centro De Giorgi, Pisa. April 4 \u2013 8, 2016.</p>",
+    "raw_output": " {\"title\": \"Renormalization in Dynamics \u2013 Pisa 2016\", \"url\": \"https://crm.sns.it/event/360/\", \"description\": \"Organized by Claudio Bonanno, Carlo Carminati, and Milton Minervino (Aix Marseille University).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2016-04-04\", \"endDate\": \"2016-04-08\"}",
+    "success": true,
+    "json": {
+      "title": "Renormalization in Dynamics \u2013 Pisa 2016",
+      "url": "https://crm.sns.it/event/360/",
+      "description": "Organized by Claudio Bonanno, Carlo Carminati, and Milton Minervino (Aix Marseille University).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2016-04-04",
+      "endDate": "2016-04-08"
+    }
+  },
+  {
+    "input_html": "<p><em><a href=\"http://www.crm.sns.it/event/367/\" rel=\"noreferrer noopener\" target=\"_blank\">Nilpotent Orbits and Representation Theory</a><br/></em>Organized by Andrea Maffei and Paolo Bravi (Sapienza Universit\u00e0 di Roma), Rocco Chiriv\u00ec (Universit\u00e0 del Salento), Alberto De Sole (Sapienza Universit\u00e0 di Roma), Jacopo Gandini (Scuola Normale Superiore, Pisa). Centro De Giorgi, Pisa. June 13 \u2013 17, 2016.</p>",
+    "raw_output": " {\"title\": \"Nilpotent Orbits and Representation Theory\", \"url\": \"http://www.crm.sns.it/event/367/\", \"description\": \"Organized by Andrea Maffei and Paolo Bravi (Sapienza Universit\u00e0 di Roma), Rocco Chiriv\u00ec (Universit\u00e0 del Salento), Alberto De Sole (Sapienza Universit\u00e0 di Roma), Jacopo Gandini (Scuola Normale Superiore, Pisa).\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2016-06-13\", \"endDate\": \"2016-06-17\"}",
+    "success": true,
+    "json": {
+      "title": "Nilpotent Orbits and Representation Theory",
+      "url": "http://www.crm.sns.it/event/367/",
+      "description": "Organized by Andrea Maffei and Paolo Bravi (Sapienza Universit\u00e0 di Roma), Rocco Chiriv\u00ec (Universit\u00e0 del Salento), Alberto De Sole (Sapienza Universit\u00e0 di Roma), Jacopo Gandini (Scuola Normale Superiore, Pisa).",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2016-06-13",
+      "endDate": "2016-06-17"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://people.dm.unipi.it/~georgiev/convegni/Pisa2016/PISA_HOKK_2016_links.htm\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Perspectives on arrangements and configuration spaces<br/></em></a>Organized by Giovanni Gaiffi and Michele Torielli (Hokkaido University). Centro Puteano, Pisa. September 9, 2016.</p>",
+    "raw_output": " {\"title\": \"Perspectives on arrangements and configuration spaces\", \"url\": \"https://people.dm.unipi.it/~georgiev/convegni/Pisa2016/PISA_HOKK_2016_links.htm\", \"description\": \"Organized by Giovanni Gaiffi and Michele Torielli (Hokkaido University).\\n\\nLocation: Centro Puteano, Pisa\", \"startDate\": \"2016-09-09\"}",
+    "success": true,
+    "json": {
+      "title": "Perspectives on arrangements and configuration spaces",
+      "url": "https://people.dm.unipi.it/~georgiev/convegni/Pisa2016/PISA_HOKK_2016_links.htm",
+      "description": "Organized by Giovanni Gaiffi and Michele Torielli (Hokkaido University).",
+      "location": "Sala Conferenze (Collegio Puteano, Centro de Giorgi, SNS)",
+      "startDate": "2016-09-09"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"http://pagine.dm.unipi.it/chamm/\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Chaotic phenomena in mathematical models<br/></em></a>Organized by S. Galatolo, G. Gronchi, V. Georgiev. Department of Mathematics, Pisa. September 9 \u2013 10, 2016.</p>",
+    "raw_output": " {\"title\": \"Chaotic phenomena in mathematical models\", \"url\": \"http://pagine.dm.unipi.it/chamm/\", \"description\": \"Organized by S. Galatolo, G. Gronchi, V. Georgiev.\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2016-09-09\", \"endDate\": \"2016-09-10\"}",
+    "success": true,
+    "json": {
+      "title": "Chaotic phenomena in mathematical models",
+      "url": "http://pagine.dm.unipi.it/chamm/",
+      "description": "Organized by S. Galatolo, G. Gronchi, V. Georgiev.",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2016-09-09",
+      "endDate": "2016-09-10"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://people.dm.unipi.it/~georgiev/convegni/Pisa2016/PISA_HOKK_Workshop_2016_s.htm\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Perspective on Ricci flow, the dispersive equation, and related topics<br/></em></a>Organized by Anna Rita Giammetta and Hideo Kubo (Hokkaido University), Tommaso Paccini (Scuola Normale Superiore, Pisa). Department of Mathematics, Pisa. September 12, 2016.</p>",
+    "raw_output": " {\"title\": \"Perspective on Ricci flow, the dispersive equation, and related topics\", \"url\": \"https://people.dm.unipi.it/~georgiev/convegni/Pisa2016/PISA_HOKK_Workshop_2016_s.htm\", \"description\": \"Organized by Anna Rita Giammetta and Hideo Kubo (Hokkaido University), Tommaso Paccini (Scuola Normale Superiore, Pisa).\\n\\nLocation: Department of Mathematics, Pisa\", \"startDate\": \"2016-09-12\"}",
+    "success": true,
+    "json": {
+      "title": "Perspective on Ricci flow, the dispersive equation, and related topics",
+      "url": "https://people.dm.unipi.it/~georgiev/convegni/Pisa2016/PISA_HOKK_Workshop_2016_s.htm",
+      "description": "Organized by Anna Rita Giammetta and Hideo Kubo (Hokkaido University), Tommaso Paccini (Scuola Normale Superiore, Pisa).",
+      "location": "Department of Mathematics, Pisa",
+      "startDate": "2016-09-12"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://fibonacci.dm.unipi.it/webnew/en/node/766\" rel=\"noreferrer noopener\" target=\"_blank\"><em>Workshop on Residues and Dynamics<br/></em></a>Organized by Marco Abate, Filippo Bracci, Toru Ohmoto, and Jasmin Raissy. Centro De Giorgi, Pisa. September 12 \u2013 13, 2016.</p>",
+    "raw_output": " {\"title\": \"Workshop on Residues and Dynamics\", \"url\": \"https://fibonacci.dm.unipi.it/webnew/en/node/766\", \"description\": \"Organized by Marco Abate, Filippo Bracci, Toru Ohmoto, and Jasmin Raissy.\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2016-09-12\", \"endDate\": \"2016-09-13\"}",
+    "success": true,
+    "json": {
+      "title": "Workshop on Residues and Dynamics",
+      "url": "https://fibonacci.dm.unipi.it/webnew/en/node/766",
+      "description": "Organized by Marco Abate, Filippo Bracci, Toru Ohmoto, and Jasmin Raissy.",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2016-09-12",
+      "endDate": "2016-09-13"
+    }
+  },
+  {
+    "input_html": "<p><a href=\"https://crm.sns.it/event/394/speakers.html?page=1#title\" rel=\"noreferrer noopener\" target=\"_blank\"><em>New trends in Partial Differential Equations<br/></em></a>Organized by Ferruccio Colombini, Marco Ghimenti, Marina Ghisi, Carlo Romano Grisanti, and Nicola Visciglia. Centro De Giorgi, Pisa. October 3 \u2013 7. 2016.</p>",
+    "raw_output": " {\"title\": \"New trends in Partial Differential Equations\", \"url\": \"https://crm.sns.it/event/394/speakers.html?page=1#title\", \"description\": \"Organized by Ferruccio Colombini, Marco Ghimenti, Marina Ghisi, Carlo Romano Grisanti, and Nicola Visciglia.\\n\\nLocation: Centro De Giorgi, Pisa\", \"startDate\": \"2016-10-03\", \"endDate\": \"2016-10-07\"}",
+    "success": true,
+    "json": {
+      "title": "New trends in Partial Differential Equations",
+      "url": "https://crm.sns.it/event/394/speakers.html?page=1#title",
+      "description": "Organized by Ferruccio Colombini, Marco Ghimenti, Marina Ghisi, Carlo Romano Grisanti, and Nicola Visciglia.",
+      "location": "Centro De Giorgi, SNS",
+      "startDate": "2016-10-03",
+      "endDate": "2016-10-07"
+    }
+  }
+]
