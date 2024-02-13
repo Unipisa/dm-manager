@@ -1,10 +1,10 @@
-import { Button, Card, Form } from 'react-bootstrap'
+import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
+import { GrantInput, HotelInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -226,18 +226,43 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                 <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
             </InputRow>
             <InputRow className="my-3" label="Grants">
-                <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} disableCreation={true} />
+                <div className="d-flex align-items-center">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
+                        cercando tramite il nome del grant oppure il cognome del PI (nazionale)</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>
+                    <GrantInput multiple={true} value={data.grants} setValue={setter(setData, 'grants')} disableCreation={true}/>
+                </div>
             </InputRow>
             <InputRow className="my-3" label="Fondi di Ateneo">
-                <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})}/>
-                {} Visita su fondi di Ateneo
+                <div className="d-flex align-items-center">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Se utilizzate i vostri fondi di Ateneo per la visita, si prega di spuntare la corrispondente casella</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>
+                    <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})} style={{marginRight: '5px'}}/>
+                    {} Visita su fondi di Ateneo
+                </div>
             </InputRow>
-            <InputRow className="my-3" label="Albergo">
-                <SelectInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
+            <InputRow className="my-3" label="Prenotazione albergo">
+                <div className="d-flex align-items-center">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Se volete che l'Unità Ricerca si occupi della prenotazione dell'albergo, si prega di selezionare uno degli alberghi presenti in nel menù</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>
+                    <HotelInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
+                </div>
             </InputRow>
-            <InputRow className="my-3" label="Scrivania">
-                <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})}/>
-                {} Richiedi una scrivania
+            <InputRow className="my-3" label="Ufficio in Dipartimento">
+                <div className="d-flex align-items-center">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Se volete che venga assegnata una postazione in un ufficio in Dipartimento, si prega di spuntare la corrispondente casella</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>                
+                    <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})} style={{marginRight: '5px'}}/>
+                    {} Richiedi un ufficio in Dipartimento
+                </div>
             </InputRow>
             <InputRow className="my-3" label="Seminario">
                 <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})}/>
