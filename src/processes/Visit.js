@@ -22,7 +22,7 @@ export default function Visit({variant}) {
     const query = useQuery(path.split('/'))
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento: {query.error.response.data?.error || `${query.error}`}</div>
-
+    
     return <VisitForm visit={query.data} variant={variant||''}/>
 }
 
@@ -188,7 +188,7 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
             </InputRow>
             <InputRow label="Data partenza" className="my-3">
                 <DateInput value={data.endDate} setValue={setter(setData, "endDate")}/>
-            </InputRow>
+            </InputRow>    
             <InputRow className="my-3" label="Grants">
                 <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} disableCreation={true} />
             </InputRow>

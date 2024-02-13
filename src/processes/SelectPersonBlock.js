@@ -44,7 +44,9 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                         <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
                     </InputRow>
                 </Form>
-                Solo se la persona non esiste, inserisci tutti i dati e poi
+                <p>Se la persona esiste ma vuoi aggiornare i dati, selezionala e poi clicca su "Aggiorna i dati"</p>
+                <p>Se il nome o il cognome sono sbagliati, scrivi un'email a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></p>
+                <u>Se sei sicuro che la persona non esiste</u>, inserisci tutti i dati e poi
                 <Button className="mx-3" onClick={createNew} disabled={!lastName || !firstName || !email || !affiliations.length}>
                     Crea una nuova persona
                 </Button>
