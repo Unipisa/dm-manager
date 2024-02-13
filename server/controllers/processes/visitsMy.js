@@ -3,7 +3,6 @@ const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
 
 const Visit = require('../../models/Visit')
-const Person = require('../../models/Person')
 const RoomAssignment = require('../../models/RoomAssignment')
 const EventSeminar = require('../../models/EventSeminar')
 const { log } = require('../middleware')
@@ -19,18 +18,6 @@ require('./grantSearch')(router)
 // inject room assignment functionality
 // require('./roomAssignment')(router)
 
-async function getPersonByEmail(email) {
-    const persons = await Person.aggregate([
-        { $match: {$or: [{email}, {alternativeEmails: email}]}},
-    ])
-    // console.log(`lookup person with email ${email}: ${JSON.stringify(persons)}`)
-    if (persons.length === 0) return null
-    if (persons.length > 1) {
-        console.log(`WARNING: found ${persons.length} persons with email ${email}`)
-    }
-    return persons[0]
-}
-
 router.get('/', async (req, res) => {    
     if (!req.user) {
         res.status(401).json({
@@ -39,9 +26,8 @@ router.get('/', async (req, res) => {
         return
     }
 
-    if (!req.user.email) return res.json({ data: [], note: `user ${req.user._id} has no email`})
-    const person = await getPersonByEmail(req.user.email)
-    if (!person) return res.json({ data: [], note: `no person found matching user ${req.user._id} email`})
+    const person = req.person
+    if (!person) return res.json({ data: [], person, DAYS_BACK, note: `user ${req.user?.username} has no associated person`})
 
     const data = await Visit.aggregate([
         { $match: { 
@@ -59,9 +45,8 @@ router.delete('/:id', async (req, res) => {
 
     await notifyVisit(req.params.id, 'delete')
 
-    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
-    const person = await getPersonByEmail(req.user.email)
-    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+    const person = req.person
+    if (!person) return res.status(404).json({ error: `user ${req.user?.username} has no associated person`})
 
     const visit = await Visit.findOneAndDelete({
         _id: new ObjectId(req.params.id),
@@ -125,9 +110,8 @@ router.delete('/:id', async (req, res) => {
 
 router.get('/:id', async (req, res) => {
     assert(req.user._id)
-    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
-    const person = await getPersonByEmail(req.user.email)
-    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+    const person = req.person
+    if (!person) return res.status(404).json({ error: `user ${req.user?.username} has no associated person`})
 
     if (req.params.id === '__new__') {
         // return empty object
@@ -160,9 +144,8 @@ router.put('/', async (req, res) => {
     const payload = {...req.body}
 
     assert(req.user._id)
-    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
-    const person = await getPersonByEmail(req.user.email)
-    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+    const person = req.person
+    if (!person) return res.status(404).json({ error: `user ${req.user?.username} has not associated person`})
 
     // override fields that user cannot change
     payload.createdBy = req.user._id
@@ -184,12 +167,12 @@ router.put('/', async (req, res) => {
 })
 
 router.patch('/:id', async (req, res) => {
+    console.log(`PATCH visitsMy ${req.params.id}`)
     const payload = {...req.body}
 
     assert(req.user._id)
-    if (!req.user.email) return res.status(404).json({ error: `user ${req.user._id} has no email`})
-    const person = await getPersonByEmail(req.user.email)
-    if (!person) return res.status(404).json({ error: `no person found matching user ${req.user._id} email`})
+    const person = req.person
+    if (!person) return res.status(404).json({ error: `user ${req.user.username} has no associated person`})
 
     // remove fields that user cannot change
     delete payload._id
@@ -199,12 +182,11 @@ router.patch('/:id', async (req, res) => {
 
     const visit = await Visit.findOneAndUpdate(
         {   _id: new ObjectId(req.params.id),
-            createdBy: req.user._id,
-            referencePeople: [person._id],
+            referencePeople: person._id,
             endDate: { $gte: pastDate() }}, 
         payload)
 
-    if (!visit) return res.status(404)
+    if (!visit) return res.status(404).send({ error: "Not found" })
     
     await log(req, visit, payload)
     notifyVisit(visit._id)

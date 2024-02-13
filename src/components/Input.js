@@ -350,7 +350,7 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
     </>
 }
 
-export function PersonInput({ value, setValue, multiple }) {
+export function PersonInput({ value, setValue, multiple, disableCreation }) {
     return <ObjectInput 
         value={value} 
         setValue={setValue} 
@@ -359,9 +359,9 @@ export function PersonInput({ value, setValue, multiple }) {
         objName="persona"
         oa="a"
         render={_ => {
-            const affiliations = _.affiliations.map(x => x.name).join(" and ")
+            const affiliations = (_.affiliations || []).map(x => x.name).join(" and ")
             return `${_.firstName} ${_.lastName} (${affiliations})`}}
-        new_object={q => ({firstName: "", lastName: q, affiliation: ""})}
+        new_object={disableCreation ? null : q => ({firstName: "", lastName: q, affiliation: ""})}
         inputs={{
                 firstName: 'Nome',
                 lastName: 'Cognome',
@@ -459,7 +459,7 @@ export function RoomInput({ value, setValue }) {
     />
 }
 
-export function ConferenceRoomInput({ value, setValue }) {
+export function ConferenceRoomInput({ value, setValue, disableCreation }) {
     return <ObjectInput
         value={value}
         setValue={setValue}
@@ -467,7 +467,7 @@ export function ConferenceRoomInput({ value, setValue }) {
         objName="aula per conferenza"
         oa="a"
         render={conferenceRoom => conferenceRoom.name ?? '???'}
-        new_object={q => ({ name: '' })}
+        new_object={disableCreation ? null : q => ({ name: '' })}
         inputs={{
             name: 'Nome',
         }}
@@ -475,7 +475,7 @@ export function ConferenceRoomInput({ value, setValue }) {
     />
 }
 
-export function SeminarCategoryInput({ value, setValue }) {
+export function SeminarCategoryInput({ value, setValue, disableCreation }) {
     return <ObjectInput
         value={value}
         setValue={setValue}
@@ -483,7 +483,7 @@ export function SeminarCategoryInput({ value, setValue }) {
         objName="ciclo di seminari"
         oa="o"
         render={seminarCategory => seminarCategory.name}
-        new_object={q => ({ name: q, label: '' })}
+        new_object={disableCreation ? null : q => ({ name: q, label: '' })}
         inputs={{
             name: 'Nome',
             label: 'Label',
@@ -518,7 +518,7 @@ export function SeminarCategoryInput({ value, setValue }) {
 //     />
 // }
 
-export function InstitutionInput({ value, setValue, multiple }) {
+export function InstitutionInput({ value, setValue, multiple, disableCreation }) {
     return <ObjectInput 
         value={value} 
         setValue={setValue} 
@@ -527,7 +527,7 @@ export function InstitutionInput({ value, setValue, multiple }) {
         objName="institution"
         oa="o"
         render={_ => `${_.name} ${_.city ? '('+_.city + ')' : ''}`}
-        new_object={q => ({name: q})}
+        new_object={disableCreation ? null : q => ({name: q})}
         inputs={{
                 name: 'nome',
         }}

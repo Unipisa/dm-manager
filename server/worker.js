@@ -59,7 +59,7 @@ async function notificaPortineria() {
             as: 'person',
             pipeline: [
                 {$project: {
-                    _id: 1, firstName: 1, lastName: 1
+                    _id: 1, firstName: 1, lastName: 1, email: 1,
                 }}
             ]
         }},
@@ -106,24 +106,28 @@ async function notificaPortineria() {
 
     // Prepare the email
     const visitorList = res.map(x => {
-        const visitorName = `${x['person']['firstName']} ${x['person']["lastName"]}`
+        let text = ""
+        const visitorName = `${x.person.firstName} ${x.person.lastName}`
         var affiliation = ""
-        if (x['affiliations'].length > 0) {
-            affiliation = "(" + x['affiliations'].map(x => x['name']).join(", ") + ")"
+        if (x.affiliations.length > 0) {
+            affiliation = "(" + x.affiliations.map(x => x.name).join(", ") + ")"
         }
-        const visitorNameAndAffiliation = `${visitorName} ${affiliation}`
-
-        const rooms = x['roomAssignments'].map(x => {
-            r = x['room']
-            start = x['startDate'].toLocaleDateString('it-IT')
-            end = x['endDate'].toLocaleDateString('it-IT')
-            return `Building ${r['building']}, Floor ${r['floor']}, Room ${r['number']} (${start} -- ${end})`
-        }).join(" - ")
-
-        return `
-Visitatore: ${visitorNameAndAffiliation}
-Assegnazioni stanze: ${rooms}
-`
+        text += `Visitatore: ${visitorName} ${affiliation} ${x.person?.email||""}\n`
+        text += `Periodo: ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} -- ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
+        for (const person of x.referencePeople) {
+            text += `Referente: ${person.firstName} ${person.lastName}\n`
+        }
+        if (!x.requireRoom) text += "Scrivania non richiesta\n"
+        if (x.roomAssignments.length > 0) {
+            text += "Assegnazioni stanze: "
+            text += x.roomAssignments.map(x => {
+                r = x.room
+                start = x.startDate?.toLocaleDateString('it-IT') || ""
+                end = x.endDate?.toLocaleDateString('it-IT') || ""
+                return `Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
+            }).join(" - ")
+        }         
+        return text
     }).join("\n\n")
 
     const emailBody = `
@@ -131,6 +135,8 @@ I seguenti visitatori sono in arrivo nei prossimi giorni:
 
 ${visitorList}
 `
+
+    // console.log(emailBody)
 
     const emails = await getEmailsForChannel('portineria')
     console.log(emails)
@@ -142,6 +148,11 @@ async function getEmailsForChannel(channel) {
     if (! channel) {
         console.log("Warning: empty channel in getEmailsForChannel(); ignoring")
         return []
+    }
+
+    // If it's an email, return it as is
+    if (channel.includes('@')) {
+        return [channel]
     }
 
     // Remove trailing slash, if any
@@ -161,12 +172,18 @@ async function getEmailsForChannel(channel) {
 }
 
 async function handleNotifications() {
-    console.log("=> Handling notifications")
+    const now = new Date().toLocaleString('it-IT')
+    console.log(`[${now}] Handling periodic notifications (WORKER_NOTIFICATION_INTERVAL = ${config.WORKER_NOTIFICATION_INTERVAL})`)
 
     const notifications = await Notification.find()
-    // console.log(notifications)
     for (const notification of notifications) {
         const emails = await getEmailsForChannel(notification.channel)
+        const timestamp = notification.updatedAt || notification.createdAt
+        const now = new Date()
+        if (timestamp && now - timestamp < config.WORKER_NOTIFICATION_INTERVAL) {
+            console.log(`Skipping notification ${notification.channel}/${notification.code} because it was updated too recently`)
+            continue
+        }
         try {
             if (emails.length>0) {
                 await sendEmail(emails, [], 'Notifica da DM-MANAGER', notification.message)
@@ -183,8 +200,7 @@ async function handleNotifications() {
 }
 
 async function mainloop() {
-    const interval = parseInt(config.WORKER_NOTIFICATION_INTERVAL)
-    console.log(`Starting worker, interval: ${interval}ms`)
+    console.log(`Starting worker`)
     await setupDatabase()
     await setupSMTPAccount()
 
@@ -193,7 +209,7 @@ async function mainloop() {
     // Setup the cron schedule
     scheduleCronJob('0 6 * * *', notificaPortineria)
 
-    setInterval(handleNotifications, interval)
+    setInterval(handleNotifications, 30000) // 30 seconds
 }
 
 mainloop()

@@ -16,6 +16,7 @@ const visitSchema = new Schema({
     endDate,
     requireRoom: { type: Boolean, label: 'richiede stanza', default: false },
     requireSeminar: { type: Boolean, label: 'richiede seminario', default: false },
+    requireHotel: { type: String, label: 'albergo', default: ''},
     publish: { type: Boolean, label: 'pubblica', default: true },
     referencePeople: [{ type: ObjectId, label: 'referenti', ref: 'Person' }],
     universityFunded: { type: Boolean, label: 'visita su fondi di Ateneo', default: false},

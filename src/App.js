@@ -46,7 +46,8 @@ const queryClient = new QueryClient({
               }
               const out = await axios.get(url, {params})
               return out.data
-          }
+          },
+        keepPreviousData: true,
       }
   }
 })

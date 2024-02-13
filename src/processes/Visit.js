@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { GrantInput, InputRow, DateInput, TextInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -20,10 +20,20 @@ export default function Visit({variant}) {
     const { id } = useParams()
     const path = `process/${variant||''}visits/${id || '__new__'}`
     const query = useQuery(path.split('/'))
+    const user = useEngine().user
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento: {query.error.response.data?.error || `${query.error}`}</div>
-    
-    return <VisitForm visit={query.data} variant={variant||''}/>
+
+    let visit = {...query.data}
+
+    // set SSD from user staffs info
+    if (id === '__new__' && variant === 'my/') {
+        for (const staff of user.staffs) {
+            if (staff.SSD) visit.SSD = staff.SSD
+        }
+    }
+
+    return <VisitForm visit={visit} variant={variant||''}/>
 }
 
 function VisitForm({visit, variant}) {
@@ -36,6 +46,7 @@ function VisitForm({visit, variant}) {
     const seminars = visit.seminars
     const roomAssignments = visit.roomAssignments
     const canCreateSeminar = user.hasProcessPermission('/process/seminars')
+    const addMessage = useEngine().addMessage
 
     return <PrefixProvider value={`process/${variant}visits`}>
         <h1 className="text-primary pb-4">{visit._id 
@@ -48,7 +59,7 @@ function VisitForm({visit, variant}) {
             done={nextStep}
             change={() => {setData({...data, person: null});setActiveSection('person')}}
             active={activeSection==='person'}
-            prefix={`/api/v0/process/${variant}visits`}
+            prefix={`process/${variant}visits`}
         />
         { data.person && 
             <VisitDetailsBlock
@@ -57,6 +68,7 @@ function VisitForm({visit, variant}) {
                 active={activeSection==='data'} 
                 done={() => {save();nextStep()}} 
                 edit={() => setActiveSection('data')}
+                variant={variant}
             />}
         { (data.requireRoom || roomAssignments?.length>0)  &&
             <RoomAssignments 
@@ -67,6 +79,7 @@ function VisitForm({visit, variant}) {
                 done={nextStep}
                 edit={() => setActiveSection('room')}
                 variant={variant}
+                onChange={save /* save visit to force notification */} 
             />
         }
         {   // mostra i seminari già inseriti
@@ -75,7 +88,10 @@ function VisitForm({visit, variant}) {
             <Seminar seminar={seminar} 
                 active={activeSection===seminar._id} 
                 change={() => setActiveSection(seminar._id)}
-                done={() => {setActiveSection('')}}
+                done={() => {
+                    setActiveSection('')
+                    save() // save visit to force notification
+                }}
                 variant={variant}
                 />
         </div>)}
@@ -103,7 +119,11 @@ function VisitForm({visit, variant}) {
             seminar && <Seminar seminar={seminar}
                 change={canCreateSeminar ? () => setActiveSection(seminar._id || 'seminar') : null}
                 active={activeSection==='seminar' || (seminar._id && activeSection===seminar._id)}
-                done={() => {setActiveSection('');setSeminar(null)}}
+                done={() => {
+                    setActiveSection('');
+                    setSeminar(null);
+                    save() // save visit to force notification
+                }}
                 variant={variant}
                 />
         }
@@ -131,9 +151,13 @@ function VisitForm({visit, variant}) {
         if (data.person.affiliations && !data.affiliations?.length) {
             data.affiliations = data.person.affiliations
         }
-        data.affiliations = data.affiliations.map(_ => _._id)
+        // data.affiliations = data.affiliations.map(_ => typeof(_) === 'object' ? _._id : _)
         if (visit._id) {
-            await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
+            try {
+                await api.patch(`/api/v0/process/${variant}visits/${visit._id}`, data)
+            } catch (e) {
+                addMessage(`${e}`)
+            }
         } else {
             const res = await api.put(`/api/v0/process/${variant}visits`, data)
             const _id = res._id
@@ -148,7 +172,7 @@ function VisitForm({visit, variant}) {
     }
 }
 
-function VisitDetailsBlock({data, setData, active, done, edit}) {
+function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
@@ -161,18 +185,22 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
         </Card.Header>
         <Card.Body>
         { active 
-        ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} />
+        ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} variant={variant}/>
         : <>
-            referenti: <b>{data.referencePeople.map(person => `${person.firstName} ${person.lastName} <${person.email}>`).join(', ')}</b><br />
+            {data.referencePeople.map(person => <div key={person._id}>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></div>)}
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
+            <br />
+            SSD: <b>{data.SSD}</b>
             <br />
             grants: {data?.grants?.length ? data.grants.map(grant => <span key={grant._id}><b>{grant.identifier}</b>&nbsp;</span>) : <i>nessun grant utilizzato</i>}
             <br />
-            fondi di ateneo: {data.universityFunded ? 'sì' : 'no'}
+            fondi di ateneo: <b>{data.universityFunded ? 'sì' : 'no'}</b>
             <br />
-            stanza: {data.requireRoom ? "è richiesta una stanza" : "non è richiesta una stanza"}
+            albergo: <b>{data.requireHotel || '???'}</b>
             <br />
-            seminario: {data.requireSeminar ? "è previsto un seminario" : "non è previsto un seminario"}
+            scrivania: {data.requireRoom ? <b>è richiesta una scrivania</b> : <>non è richiesta una scrivania</>}
+            <br />
+            seminario: {data.requireSeminar ? <b>è previsto un seminario</b> : <>non è previsto un seminario</>}
             <br />
             note: <b>{ data.notes || 'nessuna nota'}</b>
         </>}
@@ -180,15 +208,23 @@ function VisitDetailsBlock({data, setData, active, done, edit}) {
     </Card>
 }
 
-function ActiveVisitDetailsBlock({data, setData, done}) {
+function ActiveVisitDetailsBlock({data, setData, done, variant}) {
     return <>
-        <Form autocomplete="off">
+        <Form autoComplete="off">
+            { variant === '' &&
+                <InputRow label="Referenti" className="my-3">
+                    <PersonInput multiple={true} value={data.referencePeople} setValue={setReferencePeople} />
+                </InputRow>
+            }
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
             </InputRow>
             <InputRow label="Data partenza" className="my-3">
                 <DateInput value={data.endDate} setValue={setter(setData, "endDate")}/>
             </InputRow>    
+            <InputRow label="SSD" className="my-3">
+                <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
+            </InputRow>
             <InputRow className="my-3" label="Grants">
                 <GrantInput multiple={true} value={data.grants} setValue={setter(setData,'grants')} disableCreation={true} />
             </InputRow>
@@ -196,9 +232,12 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
                 <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})}/>
                 {} Visita su fondi di Ateneo
             </InputRow>
-            <InputRow className="my-3" label="Stanza">
+            <InputRow className="my-3" label="Albergo">
+                <SelectInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
+            </InputRow>
+            <InputRow className="my-3" label="Scrivania">
                 <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})}/>
-                {} Richiedi una stanza
+                {} Richiedi una scrivania
             </InputRow>
             <InputRow className="my-3" label="Seminario">
                 <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})}/>
@@ -216,13 +255,27 @@ function ActiveVisitDetailsBlock({data, setData, done}) {
     function check() {
         return data.startDate && data.endDate && new Date(data.startDate) <= new Date(data.endDate)
     }
+
+    function setReferencePeople(people) {
+        setData(data => ({...data, referencePeople: people}))
+        if (!data.SSD) {
+            for (const person of people) {
+                if (!person.staffs) continue
+                for (const staff of person.staffs) {
+                    if (staff.SSD) {
+                        setData(data => ({...data, SSD: staff.SSD}))
+                    }
+                }
+            }
+        }
+    }
 }
 
-function RoomAssignments({person, visit, roomAssignments, active, done, edit, variant}) {
+function RoomAssignments({person, visit, roomAssignments, active, done, edit, variant, onChange}) {
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
-                <div>Assegnazione stanza</div>
+                <div>Assegnazione scrivania</div>
                 <div>
                     {variant === 'my/' && "[gestito dalla segreteria]"}
                     {variant === '' && !active &&
@@ -234,7 +287,7 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
         </Card.Header>
         <Card.Body>
             {active 
-                ? <RoomAssignmentHelper person={person} startDate={visit.startDate} endDate={visit.endDate} />
+                ? <RoomAssignmentHelper person={person} startDate={visit.startDate} endDate={visit.endDate} onChange={onChange}/>
                 : <RoomAssignmentsDisplay />
             }
         </Card.Body>

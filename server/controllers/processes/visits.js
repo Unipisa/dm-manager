@@ -7,6 +7,7 @@ const RoomAssignment = require('../../models/RoomAssignment')
 const EventSeminar = require('../../models/EventSeminar')
 const { log } = require('../middleware')
 const { notify } = require('../../models/Notification')
+const config = require('../../config')
 
 const router = express.Router()
 module.exports = router
@@ -48,7 +49,22 @@ const INDEX_PIPELINE = [
                 name: 1,
             }},
         ]
-    }}]
+    }},
+    { $lookup: {
+        from: 'people',
+        localField: 'referencePeople',
+        foreignField: '_id',
+        as: 'referencePeople',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+            }},
+        ]
+    }}
+]
 module.exports.INDEX_PIPELINE = INDEX_PIPELINE
 
 const GET_PIPELINE = [
@@ -96,6 +112,23 @@ const GET_PIPELINE = [
                 email: 1,
             }},
         ]
+    }},
+    // espande createdBy
+    {$lookup:{
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy",
+        pipeline: [
+            {$project: {
+                _id: 1,
+                username: 1,
+            }},
+        ],
+    }},
+    {$unwind: {
+        path: "$createdBy",
+        preserveNullAndEmptyArrays: true
     }},
     {$lookup: {
         from: 'institutions',
@@ -145,6 +178,8 @@ const GET_PIPELINE = [
                 "room.building": 1,
                 "room.floor": 1,
                 "room.number": 1,
+                "createdBy": 1,
+                "createdAt": 1,
             }},
             // tiene solo le assegnazioni che intersecano il periodo [start, end] 
             {$match: {
@@ -180,7 +215,11 @@ const GET_PIPELINE = [
                         username: 1,
                     }},
                 ],
-            }}
+            }},
+            {$unwind: {
+                path: "$createdBy",
+                preserveNullAndEmptyArrays: true
+            }},
         ]
     }},
     {$lookup: {
@@ -225,16 +264,6 @@ const GET_PIPELINE = [
                 path: "$conferenceRoom",
                 preserveNullAndEmptyArrays: true
             }},
-            {$lookup: {
-                from: 'users',
-                localField: 'createdBy',
-                foreignField: '_id',
-                as: 'createdBy',
-            }},
-            {$unwind: {
-                path: "$createdBy",
-                preserveNullAndEmptyArrays: true
-            }},
             // espande createdBy
             {$lookup:{
                 from: "users",
@@ -248,6 +277,10 @@ const GET_PIPELINE = [
                     }},
                 ],
             }},
+            {$unwind: {
+                path: "$createdBy",
+                preserveNullAndEmptyArrays: true
+            }},
             {$project: {
                 "startDatetime": 1,
                 "title": 1,
@@ -260,6 +293,7 @@ const GET_PIPELINE = [
                 "conferenceRoom.name": 1,
                 "duration": 1,
                 "createdBy": 1,
+                "createdAt": 1,
             }},
             {$sort: {"startDatetime": 1}},
         ]
@@ -268,12 +302,12 @@ const GET_PIPELINE = [
 module.exports.GET_PIPELINE = GET_PIPELINE
 
 async function notifyVisit(visit_id, message) {
-    console.log(`notifyVisit ${visit_id}`)
+//    console.log(`notifyVisit ${visit_id}`)
     const visits = await Visit.aggregate([
         { $match: {_id: new ObjectId(visit_id)}},
         ...GET_PIPELINE,
     ])
-    console.log(JSON.stringify(visits,null,2))
+    // console.log(JSON.stringify(visits,null,2))
     if (visits.length === 0) {
         console.log(`notifyVisit: visit ${visit_id} not found`)
         return
@@ -282,7 +316,7 @@ async function notifyVisit(visit_id, message) {
 
     const person = visit.person
     const affiliations = visit.affiliations.map(a => a.name).join(', ')
-    const grants = visit.grants.map(g => g.name).join(', ')
+    const grants = (visit.grants || []).map(g => g.name).join(', ')
     const startDate = visit.startDate.toLocaleDateString('it-IT')
     const endDate = visit.endDate.toLocaleDateString('it-IT')
     const tags = (visit.tags || []).join(', ')
@@ -291,43 +325,49 @@ async function notifyVisit(visit_id, message) {
     let text =  message || ''
 
     text +=`
-Referenti: ${visit.referencePeople.map(p => `${p.firstName} ${p.lastName} <${p.email}>`).join(', ')}
+Manage: ${config.BASE_URL}/process/visits/${visit_id}
+${visit.referencePeople.map(p => `Referente: ${p.firstName} ${p.lastName} <${p.email}>`).join('\n')}
 Visitatore: ${person.firstName} ${person.lastName}
 Affiliazioni: ${affiliations}
 Grants: ${grants}
 Fondi di Ateneo: ${universityFunded}
+Richiede albergo: ${visit.requireHotel}
+Richiede scrivania: ${visit.requireRoom ? 'sì' : 'no'}
+Prevede seminario: ${visit.requireSeminar ? 'sì' : 'no'}
 Data inizio: ${startDate}
 Data fine: ${endDate}
 Tags: ${tags}
 Note: ${notes}
+Creato da: ${visit?.createdBy?.username||visit?.createdBy||'???'}
+Ultima modifica: ${(visit.updatedAt || visit.createdAt).toLocaleDateString('it-IT')}
 `
     for (ra of (visit?.roomAssignments || [])) {
         text += `
-Assegnazione stanza: ${ra.room.code} ${ra.room.building} ${ra.room.floor} ${ra.room.number}
+Assegnazione stanza: ${ra.room.code} edificio ${ra.room.building}, piano ${ra.room.floor}, stanza ${ra.room.number}
 Data inizio: ${ra.startDate?.toLocaleDateString('it-IT')}
 Data fine: ${ra.endDate?.toLocaleDateString('it-IT')}
-Creata da: ${ra.createdBy?.username} il ${ra.createdAt?.toLocaleDateString('it-IT')}
+Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateString('it-IT')}
         `
     }
 
     for(seminar of visit?.seminars || []) {
         text += `
 Seminario: ${seminar.title}
-Categoria: ${seminar.category.label}
+Categoria: ${seminar.category?.label || '---'}
 Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
-Data fine: ${seminar.endDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
 Sala: ${seminar.conferenceRoom.name}
-Abstract: ${seminar.abstract}
-Grants: ${seminar.grants.map(g => g.name).join(', ')}
+Grants: ${(seminar.grants || []).map(g => g.name).join(', ')}
 Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
-Aggiornato da: ${seminar.updatedBy?.username} il ${seminar.updatedAt?.toLocaleDateString('it-IT')}
         `
     }
 
     console.log(text)
 
     await notify('process/visits', `${visit_id}`, text)
+    for (const person of visit.referencePeople) {
+        if (person.email) await notify(person.email, `${visit_id}`, text)
+    }
 }
 
 module.exports.notifyVisit = notifyVisit
@@ -473,7 +513,7 @@ router.patch('/:id', async (req, res) => {
             endDate: { $gte: pastDate() }}, 
         payload)
 
-    if (!visit) return res.status(404)
+    if (!visit) return res.status(404).send({ error: "Not found" })
 
     await log(req, visit, payload)
     notifyVisit(visit._id)

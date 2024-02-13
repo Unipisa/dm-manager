@@ -101,7 +101,7 @@ export function SeminarBody({ seminar, forbidden }) {
             active={!personDone}
             done={() => setPersonDone(true)}
             change={() => {setPersonDone(false);setter(setData,'speaker')(null)}}
-            prefix="/api/v0/process/seminars"
+            prefix="process/seminars"
             /> 
         {personDone && <SeminarDetailsBlock 
             data={data} setData={setData}
@@ -112,7 +112,7 @@ export function SeminarBody({ seminar, forbidden }) {
 }
 
 export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
-    const confirm_enabled = (data.title !== "") && (data.startDatetime !== null) && (data.duration > 0) && (data.conferenceRoom !== null) && (data.category !== null)
+    const confirm_enabled = (data.title !== "") && (data.startDatetime !== null) && (data.duration > 0) && data.conferenceRoom
 
     return <PrefixProvider value="process/seminars">
         <Card className="shadow">
@@ -135,7 +135,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                         <StringInput value={data.title} setValue={setter(setData,'title')} />
                     </InputRow>
                     <InputRow label="Ciclo di seminari" className="my-3">
-                        <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')}/>
+                        <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
                     </InputRow>
                     <InputRow label="Data e ora" className="my-3">
                         <DatetimeInput value={data.startDatetime} setValue={setter(setData,'startDatetime')}/>
@@ -144,7 +144,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                         <NumberInput value={data.duration} setValue={setter(setData,'duration')}/>
                     </InputRow>
                     <InputRow className="my-3" label="Aula">
-                        <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')}/>
+                        <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
                     </InputRow>
                     <InputRow className="my-3" label="Grant">
                         <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
