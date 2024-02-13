@@ -132,7 +132,7 @@ export default function RoomAssignmentHelper({ person, startDate, endDate, onCha
         }
     })
 
-    function createAssignment(room) {
+    async function createAssignment(room) {
         console.log(`create assignment for ${person.lastName} ${person.firstName} in room ${room._id}`)
         const assignment = {
             person: person._id,
@@ -140,11 +140,10 @@ export default function RoomAssignmentHelper({ person, startDate, endDate, onCha
             startDate: startDate,
             endDate: endDate,
         }
-        putRoomAssignment(assignment, () => {
-            console.log(`assignment created`)
-            addMessage(`Assegnata stanza ${room.building}${room.floor} ${room.number} a ${person.lastName} ${person.firstName}`, 'success')
-            onChange()
-        })
+        await putRoomAssignment(assignment)
+        console.log(`assignment created`)
+        addMessage(`Assegnata stanza ${room.building}${room.floor} ${room.number} a ${person.lastName} ${person.firstName}`, 'success')
+        onChange()
     }
 
     const user_assignments = assignments.filter(assignment => assignment.person._id === person._id)
