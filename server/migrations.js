@@ -523,13 +523,13 @@ const migrations = {
             }
         }
 
-        const normalizeTitle = (title) => {
-            return title.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/\s+/g, "-");
+        const hashConference = ({title, startDate}) => {
+            return title.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/\s+/g, "-") + (startDate ? "-" + startDate.getFullYear() : "") ;
         };
 
         const names = new Set()
-        for (const {title} of await conferences.find({}).toArray()) {
-            names.add(normalizeTitle(title));
+        for (const conf of await conferences.find({}).toArray()) {
+            names.add(hashConference(conf));
         }
 
         const toUTCDate = (s) => {
@@ -538,7 +538,7 @@ const migrations = {
         };
 
         for (const { json: conference } of data) {
-            if (names.has(normalizeTitle(conference.title))) {
+            if (names.has(hashConference(conference))) {
                 console.log(`Conference ${conference.title} already loaded. Skipping!`);
                 continue;
             }
