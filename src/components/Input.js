@@ -124,13 +124,13 @@ export function NumberInput({ value, setValue }) {
     />
 }
 
-export function DateInput({ value, setValue }) {
+export function DateInput({ value, setValue, defaultDate }) {
     const id = useInputId()
 
     return <UtcDatePicker 
         id={ id }
         className="form-control"
-        selected={ value ? new Date(value) : null }  
+        selected={ value ? new Date(value) : (defaultDate ? new Date(defaultDate) : null) }  
         dateFormat="d.MM.yyyy"
         onChange={ date => setValue(date) } 
     />

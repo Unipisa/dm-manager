@@ -198,7 +198,7 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
             <br />
             albergo: <b>{data.requireHotel || '???'}</b>
             <br />
-            scrivania: {data.requireRoom ? <b>è richiesta una scrivania</b> : <>non è richiesta una scrivania</>}
+            ufficio: {data.requireRoom ? <b>è richiesto un ufficio in Dipartimento</b> : <>non è richiesto un ufficio in Dipartimento</>}
             <br />
             seminario: {data.requireSeminar ? <b>è previsto un seminario</b> : <>non è previsto un seminario</>}
             <br />
@@ -220,7 +220,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                 <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
             </InputRow>
             <InputRow label="Data partenza" className="my-3">
-                <DateInput value={data.endDate} setValue={setter(setData, "endDate")}/>
+                <DateInput value={data.endDate} setValue={setter(setData, "endDate")} defaultDate={data.startDate}/>
             </InputRow>    
             <InputRow label="SSD" className="my-3">
                 <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
@@ -269,7 +269,14 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                 {} È previsto un seminario
             </InputRow>
             <InputRow className="my-3" label="Note">
-                <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
+                <div className="d-flex align-items-start">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                    Si consiglia di utilizzare le note per scrivere tutte le info rilevanti per Francesca, in particolare si suggerisce di utilizzare le note 
+                    per indicare il "tema della collaborazione" da inserire nella lettera di incarico che Francesca dovrà scrivere</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>
+                    <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
+                </div>
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
@@ -300,7 +307,7 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
-                <div>Assegnazione scrivania</div>
+                <div>Assegnazione ufficio in Dipartimento</div>
                 <div>
                     {variant === 'my/' && "[gestito dalla segreteria]"}
                     {variant === '' && !active &&
@@ -321,11 +328,11 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
     function RoomAssignmentsDisplay() {
         if (roomAssignments?.length > 0) return roomAssignments.map(r => 
             <li key={r._id}>
-                stanza <b>{r.room.code}</b>: {}
+                ufficio in Dipartimento <b>{r.room.code}</b>: {}
                 dal <b>{myDateFormat(r.startDate)}</b> al <b>{myDateFormat(r.endDate)}</b>
             </li>)
         else return <i>
-            nessuna stanza assegnata nel periodo della visita
+            nessun ufficio in Dipartimento assegnata nel periodo della visita
         </i>
     }
 }
