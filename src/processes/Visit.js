@@ -328,8 +328,12 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
     function RoomAssignmentsDisplay() {
         if (roomAssignments?.length > 0) return roomAssignments.map(r => 
             <li key={r._id}>
-                ufficio in Dipartimento <b>{r.room.code}</b>: {}
-                dal <b>{myDateFormat(r.startDate)}</b> al <b>{myDateFormat(r.endDate)}</b>
+                ufficio <b>{r.room.code}</b>: {}
+                edificio {r.room.building}, {r.room.floor === '0' ? 'piano terra' : 
+                r.room.floor === '1' ? 'primo piano' : 
+                r.room.floor === '2' ? 'secondo piano' : 
+                'piano ' + r.room.floor}, 
+                ufficio {r.room.number} dal <b>{myDateFormat(r.startDate)}</b> al <b>{myDateFormat(r.endDate)}</b>
             </li>)
         else return <i>
             nessun ufficio in Dipartimento assegnata nel periodo della visita
