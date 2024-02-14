@@ -5,7 +5,7 @@ const { execSync } = require('child_process')
 
 function current_branch(next) {
     try {
-        return execSync('git rev-parse --abbrev-ref HEAD').toString().trim()
+        return execSync('git rev-parse --abbrev-ref HEAD',stdio=['pipe','pipe','ignore']).toString().trim()
     } catch(err) {
         return null
     }

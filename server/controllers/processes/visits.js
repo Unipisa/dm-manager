@@ -319,31 +319,32 @@ async function notifyVisit(visit_id, message) {
     const grants = (visit.grants || []).map(g => g.name).join(', ')
     const startDate = visit.startDate.toLocaleDateString('it-IT')
     const endDate = visit.endDate.toLocaleDateString('it-IT')
-    const tags = (visit.tags || []).join(', ')
     const notes = visit.notes
     const universityFunded = visit.universityFunded ? 'sì' : 'no'
     let text =  message || ''
 
     text +=`
-Manage: ${config.BASE_URL}/process/visits/${visit_id}
+Entrata su DM Manager: ${config.BASE_URL}/process/visits/${visit_id}
 ${visit.referencePeople.map(p => `Referente: ${p.firstName} ${p.lastName} <${p.email}>`).join('\n')}
-Visitatore: ${person.firstName} ${person.lastName}
-Affiliazioni: ${affiliations}
-Grants: ${grants}
-Fondi di Ateneo: ${universityFunded}
-Richiede albergo: ${visit.requireHotel}
-Richiede scrivania: ${visit.requireRoom ? 'sì' : 'no'}
-Prevede seminario: ${visit.requireSeminar ? 'sì' : 'no'}
-Data inizio: ${startDate}
-Data fine: ${endDate}
-Tags: ${tags}
+Visitatore/trice: ${person.firstName} ${person.lastName}
+Affiliazione/i: ${affiliations}
+Grant(s) utilizzato/i: ${grants}
+Utilizzo di fondi di Ateneo: ${universityFunded}
+Albergo di cui si richiede la prenotazione di una camera: ${visit.requireHotel}
+Richiesta di una postazione in un ufficio di Dipartimento: ${visit.requireRoom ? 'sì' : 'no'}
+È previsto un seminario: ${visit.requireSeminar ? 'sì' : 'no'}
+Data di inizio della visita: ${startDate}
+Data di fine della visita: ${endDate}
 Note: ${notes}
 Creato da: ${visit?.createdBy?.username||visit?.createdBy||'???'}
 Ultima modifica: ${(visit.updatedAt || visit.createdAt).toLocaleDateString('it-IT')}
 `
     for (ra of (visit?.roomAssignments || [])) {
         text += `
-Assegnazione stanza: ${ra.room.code} edificio ${ra.room.building}, piano ${ra.room.floor}, stanza ${ra.room.number}
+Ufficio del Dipartimento assegnato: ${ra.room.code} -> Edificio ${ra.room.building}, ${ra.room.floor === '0' ? 'piano terra' : 
+ra.room.floor === '1' ? 'primo piano' : 
+ra.room.floor === '2' ? 'secondo piano' : 
+'piano ' + ra.room.floor}, ufficio ${ra.room.number}
 Data inizio: ${ra.startDate?.toLocaleDateString('it-IT')}
 Data fine: ${ra.endDate?.toLocaleDateString('it-IT')}
 Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateString('it-IT')}
@@ -352,12 +353,12 @@ Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateStrin
 
     for(seminar of visit?.seminars || []) {
         text += `
-Seminario: ${seminar.title}
-Categoria: ${seminar.category?.label || '---'}
-Data inizio: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
+Titolo del seminario: ${seminar.title}
+Ciclo di seminari: ${seminar.category?.name || '---'}
+Data del seminario: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
-Sala: ${seminar.conferenceRoom.name}
-Grants: ${(seminar.grants || []).map(g => g.name).join(', ')}
+Aula del seminario: ${seminar.conferenceRoom.name}
+Grant(s) utilizzato/i: ${(seminar.grants || []).map(g => g.name).join(', ')}
 Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
         `
     }

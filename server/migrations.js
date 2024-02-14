@@ -834,6 +834,65 @@ const migrations = {
             }
         }
         return true
+    },
+
+       // Load server/past-conferences.json into eventconferences
+       D20240212_update_past_conferences_1: async function (db) {
+        return true
+        const conferences = db.collection("eventconferences");
+        const conferencerooms = db.collection("conferencerooms");
+        const data = require("./past-conferences.json");
+
+        const room_mapping = {};
+        for (const room of await conferencerooms.find({}).toArray()) {
+            room_mapping[room.name] = room._id;
+            for (const name of room.names || []) {
+                room_mapping[name] = room._id;
+            }
+        }
+
+        const normalizeTitle = (title) => {
+            return title.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/\s+/g, "-");
+        };
+
+        const names = new Set()
+        for (const {title} of await conferences.find({}).toArray()) {
+            names.add(normalizeTitle(title));
+        }
+
+        const toUTCDate = (s) => {
+            const [year, month, day] = s.split("-");
+            return new Date(Date.UTC(year, month - 1, day));
+        };
+
+        for (const { json: conference } of data) {
+            if (names.has(normalizeTitle(conference.title))) {
+                console.log(`Conference ${conference.title} already loaded. Skipping!`);
+                continue;
+            }
+            if (!room_mapping[conference.location]) {
+                const res = await conferencerooms.insertOne({
+                    name: conference.location,
+                });
+                room_mapping[conference.location] = res.insertedId;
+            }
+            const object = {
+                title: conference.title,
+                startDate: toUTCDate(conference.startDate),
+                endDate: conference.endDate ? toUTCDate(conference.endDate) : toUTCDate(conference.startDate),
+                url: conference.url,
+                conferenceRoom: new ObjectId(
+                    room_mapping[conference.location]
+                ),
+                grants: [],
+                description: conference.description,
+            };
+            if (!(await conferences.insertOne(object))) {
+                console.log("Error");
+                return false;
+            }
+        }
+        return true;
     }
 }
 

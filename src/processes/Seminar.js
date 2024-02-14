@@ -1,4 +1,4 @@
-import { Button, Card, Form } from 'react-bootstrap'
+import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
@@ -135,7 +135,14 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                         <StringInput value={data.title} setValue={setter(setData,'title')} />
                     </InputRow>
                     <InputRow label="Ciclo di seminari" className="my-3">
-                        <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                Si prega di selezionare tra uno dei cicli di seminari presenti nella lista. 
+                                Se il ciclo di seminari che cerchi è assente, si prega di contattare <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>                
+                            <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
+                        </div>
                     </InputRow>
                     <InputRow label="Data e ora" className="my-3">
                         <DatetimeInput value={data.startDatetime} setValue={setter(setData,'startDatetime')}/>
@@ -147,10 +154,24 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                         <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
                     </InputRow>
                     <InputRow className="my-3" label="Grant">
-                        <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
+                                cercando tramite il nome del grant oppure il cognome del PI (nazionale)</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>   
+                            <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
+                        </div>
                     </InputRow>
                     <InputRow className="my-3" label="Abstract">
-                        <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
+                        <div className="d-flex align-items-start">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
+                                che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a></Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>   
+                            <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
+                        </div>
                     </InputRow>
                 </Form>
                 {error && <div className="alert alert-danger">{error}</div>}
