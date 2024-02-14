@@ -16,7 +16,6 @@ const eventConferenceSchema = new Schema({
     endDate,
     SSD: multipleSSDs,
     url: { type: String, label: 'Sito web', widget: 'url' },
-    oldUrl: { type: String, label: 'URL vecchio', widget: 'url' },
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     description: { type: String, label: 'Descrizione', widget: 'text'},
