@@ -112,14 +112,14 @@ async function notificaPortineria() {
         if (x.affiliations.length > 0) {
             affiliation = "(" + x.affiliations.map(x => x.name).join(", ") + ")"
         }
-        text += `Visitatore: ${visitorName} ${affiliation} ${x.person?.email||""}\n`
+        text += `Nome, cognome, affiliazione e indirizzo email: ${visitorName} ${affiliation} ${x.person?.email||""}\n`
         text += `Periodo: ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} -- ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
         for (const person of x.referencePeople) {
             text += `Referente: ${person.firstName} ${person.lastName}\n`
         }
-        if (!x.requireRoom) text += "Scrivania non richiesta\n"
+        if (!x.requireRoom) text += "Postazione in un ufficio del Dipartimento non richiesta\n"
         if (x.roomAssignments.length > 0) {
-            text += "Assegnazioni stanze: "
+            text += "Assegnazioni uffici in Dipartimento: "
             text += x.roomAssignments.map(x => {
                 r = x.room
                 start = x.startDate?.toLocaleDateString('it-IT') || ""
@@ -131,7 +131,7 @@ async function notificaPortineria() {
     }).join("\n\n")
 
     const emailBody = `
-I seguenti visitatori sono in arrivo nei prossimi giorni:
+Le seguenti persone sono in arrivo nei prossimi giorni:
 
 ${visitorList}
 `
@@ -141,7 +141,7 @@ ${visitorList}
     const emails = await getEmailsForChannel('portineria')
     console.log(emails)
     if (emails.length > 0)
-        await sendEmail(emails, [], 'Visitatori in arrivo nei prossimi giorni', emailBody)
+        await sendEmail(emails, [], 'Persone in arrivo nei prossimi giorni', emailBody)
 }
 
 async function getEmailsForChannel(channel) {
