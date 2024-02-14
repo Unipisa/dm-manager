@@ -10,7 +10,6 @@ import {
     GrantInput,
     DateInput,
     SelectInput,
-    HotelInput,
     StringInput,
     TextInput,
     MultipleSelectInput,

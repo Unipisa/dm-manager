@@ -388,25 +388,6 @@ export function GrantInput({ value, setValue, multiple, disableCreation }) {
     />
 }
 
-export function HotelInput({ options, value, setValue, displayFunction }) {
-    const id = useInputId()
-
-    value = value || ""
-    if (! options.includes(value)) {
-        options = [value, ...options]
-    }
-    return <select 
-        className="form-control"
-        id={ id } 
-        value={ value || "" } 
-        onChange={ (evt) => {
-            // console.log(`OnChange ${evt.target.value}`)
-            setValue(evt.target.value) 
-        }}>
-        { options.map(value => <option key={value} value={value}>{ displayFunction ? displayFunction(value) : value }</option>)}
-    </select>
-}
-
 export function SelectInput({ options, value, setValue, displayFunction }) {
     const id = useInputId()
 
@@ -416,7 +397,7 @@ export function SelectInput({ options, value, setValue, displayFunction }) {
         options = [value, ...options]
     }
     return <select 
-        className="form-control col-sm-10"
+        className="form-control"
         id={ id } 
         value={ value || "" } 
         onChange={ (evt) => {

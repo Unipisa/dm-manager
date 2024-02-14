@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import SelectPersonBlock from './SelectPersonBlock'
-import { GrantInput, HotelInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -251,7 +251,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                         Se volete che l'Unità Ricerca si occupi della prenotazione dell'albergo, si prega di selezionare uno degli alberghi presenti nel menù</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>
-                    <HotelInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
+                    <SelectInput value={data.requireHotel} setValue={setter(setData, "requireHotel")} options={["non richiesto", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]} style={{width: '10px'}}/>
                 </div>
             </InputRow>
             <InputRow className="my-3" label="Ufficio in Dipartimento">
