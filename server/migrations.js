@@ -442,170 +442,6 @@ const migrations = {
         return true
     },
 
-    D20231027_update_events_1: async function(db) {
-        const people = db.collection('people')
-        const conferences = db.collection('eventconferences')
-        const seminars = db.collection('eventseminars')
-        const conferencerooms = db.collection('conferencerooms')
-        const seminarcategories = db.collection('seminarcategories')
-
-        const created_categories = []
-    
-        for (let seminarcategory of await seminarcategories.find({}).toArray()) {
-            created_categories[seminarcategory.old_id] = seminarcategory._id
-        }
-
-        const room_mapping = {}
-
-        for (const room of await conferencerooms.find({}).toArray()) {
-            console.log(`room ${room._id} names: ${room.names}`)
-            for (const name of (room.names || [])) {
-                room_mapping[name] = room._id
-            }
-        }
-
-        toUTCDate = s => {
-            const sd = new Date(s * 1000)
-            const date = new Date(sd.getFullYear(), sd.getUTCMonth(), sd.getUTCDate(), sd.getUTCHours(), sd.getUTCMinutes())
-            return date
-        }
-
-        categoryToSSD = c => {
-            return {
-                '198': 'MAT/01',
-                '162': 'MAT/02',
-                '152': 'MAT/03',
-                '200': 'MAT/04',
-                '114': 'MAT/05',
-                '190': 'MAT/06',
-                '191': 'MAT/07',
-                '154': 'MAT/08'
-            }[c];
-        }
-
-        // await people.deleteMany({created_by_migration: true})
-        // await conferences.deleteMany({})
-        // await seminars.deleteMany({})
-
-        var offset = 0;
-        const batch_size = 97;
-
-        var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
-        while (res.data.length > 0) {
-            const events = res.data
-            for (const event of events) {   
-                const taxonomy = event.unipievents_taxonomy             
-                const title = he.decode(event.title.rendered)
-                let conferenceRoom = room_mapping[event.unipievents_place]
-                const startDatetime = toUTCDate(event.unipievents_startdate)
-                const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
-                const notes = event.content.rendered
-                const abstract = event.content.rendered
-                const oldUrl = event.link
-
-                let found = await conferences.findOne({ oldUrl })
-
-                if (found) {
-                    console.log(`Already loaded ${oldUrl} as conference ${found._id}. Skipping!`)
-                    continue
-                }
-
-                found = await seminars.findOne({ oldUrl })
-
-                if (found) {
-                    console.log(`Already loaded ${oldUrl} as seminar ${found._id}. Skipping!`)
-                    continue
-                }
-
-
-                if (event.unipievents_place && !conferenceRoom) {
-                    const res = await conferencerooms.insertOne({
-                        name: event.unipievents_place,
-                    })
-                    conferenceRoom = res.insertedId
-                    console.log(`**** creatd new room: ${event.unipievents_place}`)
-                }
-
-                if (taxonomy.includes(90)) {
-                    console.log("> Conference", event.link)
-
-
-                    const object = {
-                        title,
-                        startDate: toUTCDate(event.unipievents_startdate),
-                        endDate: toUTCDate(event.unipievents_enddate),
-                        SSD: event.unipievents_taxonomy.map(categoryToSSD).filter(x => x),
-                        url: "",
-                        oldUrl,
-                        conferenceRoom,
-                        grants: [],
-                        notes,
-                    }
-                    if (! await conferences.insertOne(object)) {
-                        console.log("Error")
-                        return false
-                    }
-                } else if (taxonomy.includes(175)) {
-                    console.log("> Colloquium", event.link)
-                    const speaker = title.split('–')[1].split('(')[0].trim()
-                    const affiliation = title.split('–')[1].split('(')[1].trim().trim(')')   
-                    const person = await findPerson2(people, speaker, affiliation)
-                    const object = {
-                        title: title.split('–')[0].trim(),
-                        category: created_categories[175],
-                        conferenceRoom,
-                        startDatetime,
-                        speaker: person,
-                        duration,
-                        abstract,     
-                        oldUrl,               
-                        grants: [],
-                    }
-                    await seminars.insertOne(object)
-                } else {
-                    // console.log("> Seminar", event.link)
-                    console.log(taxonomy, event.link)
-                    // console.log("title", title)
-                    const category = created_categories[taxonomy[0]] || created_categories[taxonomy[1]]
-
-                    let speaker = null
-                    try {
-                        speaker = title.split('–')[1].split('(')[0].trim()
-                    } catch (e) {
-                    }
-                    let affiliation = ""
-                    try {
-                        affiliation = title.split('–').at(-1).split('(')[1].trim().trim(')')   
-                    } catch (e) {
-                    }
-                    const person = speaker 
-                        ? await findPerson2(people, speaker, affiliation)
-                        : null
-                    const object = {
-                        speaker: person,
-                        title: title.split('–')[0].trim(),
-                        conferenceRoom,
-                        startDatetime,
-                        duration,
-                        category,
-                        grants: [],
-                        oldUrl,
-                        abstract: notes,                    
-                    }
-                    // console.log(object)
-                    const res = await seminars.insertOne(object)
-                    console.log(`inserted seminar ${res.insertedId}`)
-                }
-                
-            }
-            res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=${offset}`)
-            console.log(`>>>> BATCH ${offset}`)
-            offset += batch_size
-        }
-
-        return true
-    },
-
     D20231027_save_old_abstract_1: async function(db) {
         const seminars = db.collection('eventseminars')
         for(const seminar of await seminars.find({}).toArray()) {
@@ -633,170 +469,6 @@ const migrations = {
     D20231029_rename_conference_description_1: async function(db) {
         const seminars = db.collection('eventconferences')
         await seminars.updateMany({}, { $rename: { notes: 'description' } })
-        return true
-    },
-
-    D20231117_update_events_1: async function(db) {
-        const people = db.collection('people')
-        const conferences = db.collection('eventconferences')
-        const seminars = db.collection('eventseminars')
-        const conferencerooms = db.collection('conferencerooms')
-        const seminarcategories = db.collection('seminarcategories')
-
-        const created_categories = []
-
-        for (let seminarcategory of await seminarcategories.find({}).toArray()) {
-            created_categories[seminarcategory.old_id] = seminarcategory._id
-        }
-
-        const room_mapping = {}
-
-        for (const room of await conferencerooms.find({}).toArray()) {
-            if (room.names !== undefined) {
-                for (const name of room.names) {
-                    room_mapping[name] = room._id
-                }
-            }
-        }
-
-        toUTCDate = s => {
-            const sd = new Date(s * 1000)
-            const date = new Date(sd.getFullYear(), sd.getUTCMonth(), sd.getUTCDate(), sd.getUTCHours(), sd.getUTCMinutes())
-            return date
-        }
-
-        categoryToSSD = c => {
-            return {
-                '198': 'MAT/01',
-                '162': 'MAT/02',
-                '152': 'MAT/03',
-                '200': 'MAT/04',
-                '114': 'MAT/05',
-                '190': 'MAT/06',
-                '191': 'MAT/07',
-                '154': 'MAT/08'
-            }[c];
-        }
-
-        var offset = 0;
-        const batch_size = 97;
-
-        var res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=0`)
-        while (res.data.length > 0) {
-            const events = res.data
-            for (const event of events) {   
-                const taxonomy = event.unipievents_taxonomy             
-                const title = he.decode(event.title.rendered)
-                let conferenceRoom = room_mapping[event.unipievents_place]
-                const startDatetime = toUTCDate(event.unipievents_startdate)
-                const duration = (event.unipievents_enddate - event.unipievents_startdate) / 60
-                let abstract = event.content.rendered
-                const oldUrl = event.link
-
-                let found = await conferences.findOne({ oldUrl })
-
-                if (found) {
-                    console.log(`Already loaded ${oldUrl} as conference ${found._id}. Skipping!`)
-                    continue
-                }
-
-                found = await seminars.findOne({ oldUrl })
-
-                if (found) {
-                    console.log(`Already loaded ${oldUrl} as seminar ${found._id}. Skipping!`)
-                    continue
-                }
-
-                if (abstract) {
-                    abstract = parseHTML(abstract)
-                }
-
-                const notes = abstract
-
-                if (event.unipievents_place && !conferenceRoom) {
-                    const res = await conferencerooms.insertOne({
-                        name: event.unipievents_place,
-                    })
-                    conferenceRoom = res.insertedId
-                    console.log(`**** creatd new room: ${event.unipievents_place}`)
-                }
-
-                if (taxonomy.includes(90)) {
-                    console.log("> Conference", event.link)
-
-                    const object = {
-                        title,
-                        startDate: toUTCDate(event.unipievents_startdate),
-                        endDate: toUTCDate(event.unipievents_enddate),
-                        SSD: event.unipievents_taxonomy.map(categoryToSSD).filter(x => x),
-                        url: "",
-                        oldUrl,
-                        conferenceRoom,
-                        grants: [],
-                        notes,
-                    }
-                    if (! await conferences.insertOne(object)) {
-                        console.log("Error")
-                        return false
-                    }
-                } else if (taxonomy.includes(175)) {
-                    console.log("> Colloquium", event.link)
-                    const speaker = title.split('–')[1].split('(')[0].trim()
-                    const affiliation = title.split('–')[1].split('(')[1].trim().trim(')')   
-                    const person = await findPerson2(people, speaker, affiliation)
-                    const object = {
-                        title: title.split('–')[0].trim(),
-                        category: created_categories[175],
-                        conferenceRoom,
-                        startDatetime,
-                        speaker: person,
-                        duration,
-                        abstract,     
-                        oldUrl,               
-                        grants: [],
-                    }
-                    await seminars.insertOne(object)
-                } else {
-                    // console.log("> Seminar", event.link)
-                    console.log(taxonomy, event.link)
-                    // console.log("title", title)
-                    const category = created_categories[taxonomy[0]] || created_categories[taxonomy[1]]
-
-                    let speaker = null
-                    try {
-                        speaker = title.split('–')[1].split('(')[0].trim()
-                    } catch (e) {
-                    }
-                    let affiliation = ""
-                    try {
-                        affiliation = title.split('–').at(-1).split('(')[1].trim().trim(')')   
-                    } catch (e) {
-                    }
-                    const person = speaker 
-                        ? await findPerson2(people, speaker, affiliation)
-                        : null
-                    const object = {
-                        speaker: person,
-                        title: title.split('–')[0].trim(),
-                        conferenceRoom,
-                        startDatetime,
-                        duration,
-                        category,
-                        grants: [],
-                        oldUrl,
-                        abstract: notes,                    
-                    }
-                    // console.log(object)
-                    const res = await seminars.insertOne(object)
-                    console.log(`inserted seminar ${res.insertedId}`)
-                }
-                
-            }
-            res = await axios.get(`https://www.dm.unipi.it/wp-json/wp/v2/unipievents?per_page=${batch_size}&offset=${offset}`)
-            console.log(`>>>> BATCH ${offset}`)
-            offset += batch_size
-        }
-
         return true
     },
 
@@ -838,6 +510,7 @@ const migrations = {
 
        // Load server/past-conferences.json into eventconferences
        D20240212_update_past_conferences_1: async function (db) {
+        return true
         const conferences = db.collection("eventconferences");
         const conferencerooms = db.collection("conferencerooms");
         const data = require("./past-conferences.json");
@@ -850,13 +523,13 @@ const migrations = {
             }
         }
 
-        const normalizeTitle = (title) => {
-            return title.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/\s+/g, "-");
+        const hashConference = ({title, startDate}) => {
+            return title.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/\s+/g, "-") + (startDate ? "-" + startDate.getFullYear() : "") ;
         };
 
         const names = new Set()
-        for (const {title} of await conferences.find({}).toArray()) {
-            names.add(normalizeTitle(title));
+        for (const conf of await conferences.find({}).toArray()) {
+            names.add(hashConference(conf));
         }
 
         const toUTCDate = (s) => {
@@ -865,7 +538,7 @@ const migrations = {
         };
 
         for (const { json: conference } of data) {
-            if (names.has(normalizeTitle(conference.title))) {
+            if (names.has(hashConference(conference))) {
                 console.log(`Conference ${conference.title} already loaded. Skipping!`);
                 continue;
             }
