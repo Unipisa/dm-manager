@@ -9,6 +9,7 @@ const config = require('./config')
 var cron = require('node-cron');
 
 const { personRoomAssignmentPipeline } = require('./models/RoomAssignment')
+const RoomAssignment = require('./models/RoomAssignment')
 
 const ROLE_PREFIX = 'notify/'
 
@@ -100,7 +101,48 @@ async function notificaPortineria() {
     // Questa e-mail viene inviata solo se c'è effettivamente qualcosa da comunicare.
     const res = await Visit.aggregate(visit_pipeline)
 
-    if (res.length == 0) {
+    // Facciamo una seconda query, per vedere tutte le stanze che vengono assegnate negli stessi
+    // giorni; queste comprenderanno i visitatori di cui sopra, ma anche cambi di ufficio del 
+    // personale, e/o nuove entrate.
+    const rooms_pipeline = [
+        { $match: { 
+            startDate: { $gte: startDate, $lt: endDate }
+        }},
+        { $lookup: {
+            from: 'people',
+            localField: 'person',
+            foreignField: '_id',
+            as: 'person',
+            pipeline: [
+                {$project: {
+                    _id: 1, firstName: 1, lastName: 1, email: 1,
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$person',
+            preserveNullAndEmptyArrays: true
+        }},
+        {$lookup: {
+            from: 'rooms',
+            localField: 'room',
+            foreignField: '_id',
+            as: 'room',
+            pipeline: [
+                {$project: {
+                    _id: 1, building: 1, floor: 1, number: 1
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$room',
+            preserveNullAndEmptyArrays: true
+        }},
+    ]
+
+    const rooms_res = await RoomAssignment.aggregate(rooms_pipeline)
+
+    if (res.length == 0 && rooms_res.length == 0) {
         return
     }
 
@@ -130,16 +172,37 @@ async function notificaPortineria() {
         return text
     }).join("\n\n")
 
+    let changesList = ""
+    try {
+        changesList = rooms_res.map(x => {
+            let text = ""
+            const personName = `${x.person.firstName} ${x.person.lastName}`
+            text += `Nome, cognome, affiliazione e indirizzo email: ${personName} ${x.person?.email||""}\n`
+            const r = x.room
+            start = x.startDate?.toLocaleDateString('it-IT') || ""
+            end = x.endDate?.toLocaleDateString('it-IT') || ""
+            text += `Assegnazione stanza: Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
+            return text
+        }).join("\n\n")
+    
+    }
+    catch (e) {
+        changesList = "Si è verificato un errore nella generazione di questa lista"
+        console.log(e)
+    }
+    
     const emailBody = `
-Le seguenti persone sono in arrivo nei prossimi giorni:
+I seguenti visitator* sono in arrivo nei prossimi giorni:
 
 ${visitorList}
+
+I seguenti assegnamenti di stanza avverranno nei prossimi giorni (includono visitatori, prese di servizio, cambi di ufficio, ecc.):
+${changesList}
 `
 
     // console.log(emailBody)
 
     const emails = await getEmailsForChannel('portineria')
-    console.log(emails)
     if (emails.length > 0)
         await sendEmail(emails, [], 'Persone in arrivo nei prossimi giorni', emailBody)
 }
@@ -208,6 +271,7 @@ async function mainloop() {
 
     // Setup the cron schedule
     scheduleCronJob('0 6 * * *', notificaPortineria)
+    notificaPortineria()
 
     setInterval(handleNotifications, 30000) // 30 seconds
 }
