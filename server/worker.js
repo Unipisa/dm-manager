@@ -113,18 +113,18 @@ async function notificaPortineria() {
             affiliation = "(" + x.affiliations.map(x => x.name).join(", ") + ")"
         }
         text += `Nome, cognome, affiliazione e indirizzo email: ${visitorName} ${affiliation} ${x.person?.email||""}\n`
-        text += `Periodo: ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} -- ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
+        text += `Periodo: dal ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} al ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
         for (const person of x.referencePeople) {
             text += `Referente: ${person.firstName} ${person.lastName}\n`
         }
         if (!x.requireRoom) text += "Postazione in un ufficio del Dipartimento non richiesta\n"
         if (x.roomAssignments.length > 0) {
-            text += "Assegnazioni uffici in Dipartimento: "
+            text += "Ufficio in Dipartimento assegnato: "
             text += x.roomAssignments.map(x => {
                 r = x.room
                 start = x.startDate?.toLocaleDateString('it-IT') || ""
                 end = x.endDate?.toLocaleDateString('it-IT') || ""
-                return `Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
+                return `Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (dal ${start} al ${end})`
             }).join(" - ")
         }         
         return text
