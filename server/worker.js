@@ -193,11 +193,11 @@ async function notificaPortineria() {
     }
     
     const emailBody = `
-I seguenti visitator* sono in arrivo nei prossimi giorni:
+Le seguenti persone sono in arrivo nei prossimi giorni:
 
 ${visitorList}
 
-I seguenti assegnamenti di stanza avverranno nei prossimi giorni (includono visitatori, prese di servizio, cambi di ufficio, ecc.):
+I seguenti uffici in Dipartimento sono stati assegnati nei prossimi giorni (includono visitatori, prese di servizio, cambi di ufficio, ecc.):
 ${changesList}
 `
 
