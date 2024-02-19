@@ -336,7 +336,7 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
                 ufficio {r.room.number} dal <b>{myDateFormat(r.startDate)}</b> al <b>{myDateFormat(r.endDate)}</b>
             </li>)
         else return <i>
-            nessun ufficio in Dipartimento assegnata nel periodo della visita
+            nessun ufficio in Dipartimento assegnato nel periodo della visita
         </i>
     }
 }

@@ -121,10 +121,11 @@ async function notificaPortineria() {
         if (x.roomAssignments.length > 0) {
             text += "Ufficio in Dipartimento assegnato: "
             text += x.roomAssignments.map(x => {
-                r = x.room
-                start = x.startDate?.toLocaleDateString('it-IT') || ""
-                end = x.endDate?.toLocaleDateString('it-IT') || ""
-                return `Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (dal ${start} al ${end})`
+                const r = x.room
+                const start = x.startDate?.toLocaleDateString('it-IT') || ""
+                const end = x.endDate?.toLocaleDateString('it-IT') || ""
+                const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building;
+                return `Edificio ${buildingName}, Piano ${r.floor}, Stanza ${r.number} (dal ${start} al ${end})`
             }).join(" - ")
         }         
         return text
