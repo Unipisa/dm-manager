@@ -180,9 +180,10 @@ async function notificaPortineria() {
             const personName = `${x.person.firstName} ${x.person.lastName}`
             text += `Nome, cognome, affiliazione e indirizzo email: ${personName} ${x.person?.email||""}\n`
             const r = x.room
-            start = x.startDate?.toLocaleDateString('it-IT') || ""
-            end = x.endDate?.toLocaleDateString('it-IT') || ""
-            text += `Assegnazione stanza: Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
+            const start = x.startDate?.toLocaleDateString('it-IT') || ""
+            const end = x.endDate?.toLocaleDateString('it-IT') || ""
+            const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building;
+            text += `Postazione in ufficio del Dipartimento: Edificio ${r.buildingName}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
             return text
         }).join("\n\n")
     
@@ -197,7 +198,7 @@ Le seguenti persone sono in arrivo nei prossimi giorni:
 
 ${visitorList}
 
-I seguenti uffici in Dipartimento sono stati assegnati nei prossimi giorni (includono visitatori, prese di servizio, cambi di ufficio, ecc.):
+Le seguenti postazioni in uffici del Dipartimento sono state assegnate nei prossimi giorni (includono visitatori, prese di servizio, cambi di ufficio, ecc.):
 ${changesList}
 `
 
