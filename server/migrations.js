@@ -523,8 +523,18 @@ const migrations = {
             }
         }
 
-        const hashConference = ({title, startDate}) => {
-            return title.toLowerCase().replace(/[^a-z0-9-]/g, "").replace(/\s+/g, "-") + (startDate ? "-" + startDate.getFullYear() : "") ;
+        const hashConference = ({ title, startDate }) => {
+            return (
+                title
+                    .toLowerCase()
+                    .replace(/[^a-z0-9-\s]/g, "")
+                    .replace(/\s+/g, "-") +
+                (startDate
+                    ? typeof startDate === "string"
+                        ? startDate.slice(0, 4)
+                        : startDate.getFullYear()
+                    : "")
+            );
         };
 
         const names = new Set()
@@ -538,7 +548,9 @@ const migrations = {
         };
 
         for (const { json: conference } of data) {
-            if (names.has(hashConference(conference))) {
+            const hash = hashConference(conference)
+            console.dir(hash)
+            if (names.has(hash)) {
                 console.log(`Conference ${conference.title} already loaded. Skipping!`);
                 continue;
             }
