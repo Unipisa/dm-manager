@@ -509,8 +509,7 @@ const migrations = {
     },
 
        // Load server/past-conferences.json into eventconferences
-       D20240212_update_past_conferences_1: async function (db) {
-        return true
+       D20240212_update_past_conferences_2: async function (db) {
         const conferences = db.collection("eventconferences");
         const conferencerooms = db.collection("conferencerooms");
         const data = require("./past-conferences.json");
