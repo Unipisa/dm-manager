@@ -151,7 +151,14 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                         <NumberInput value={data.duration} setValue={setter(setData,'duration')}/>
                     </InputRow>
                     <InputRow className="my-3" label="Aula">
-                        <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                Si ricorda che la prenotazione su <a href="https://rooms.dm.unipi.it/">Rooms</a> non è automatica
+                                e va effettuata indipendentemente</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>   
+                            <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
+                        </div>
                     </InputRow>
                     <InputRow className="my-3" label="Grant">
                         <div className="d-flex align-items-center">

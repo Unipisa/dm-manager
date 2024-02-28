@@ -28,27 +28,77 @@ async function notificaPortineria() {
     const startDate = new Date(today)
     const endDate = new Date(today)
 
-    // Se oggi è un giorno feriale, aggiungiamo un giorno; se è venerdì, andiamo al lunedì. Altrimenti, niente notifica
     switch (today.getDay()) {
-        case 1:
+        case 1: // Mon we notify for the same day and the day after
+            startDate.setDate(today.getDate())
+            endDate.setDate(today.getDate() + 2)
+            break;
         case 2:
-        case 3: // Mon -- Wed we notify for the day after
+        case 3: // Tue and Wed we notify for the day after
             startDate.setDate(today.getDate() + 1)
             endDate.setDate(today.getDate() + 2)
             break;
-        case 4: // Thursday we notification for Fri -- Sun
+        case 4: // Thur we notification for Fri -- Sun
             startDate.setDate(today.getDate() + 1)
             endDate.setDate(today.getDate() + 3)
             break;
-        case 5: // Fri we notify for Mon
+        case 5: // Fri we notify for next week
             startDate.setDate(today.getDate() + 3)
-            endDate.setDate(today.getDate() + 4)
+            endDate.setDate(today.getDate() + 9)
             break;
         default:
             return; // No notification in the weekend
-
     }
 
+    // Facciamo una query per vedere tutte le stanze che vengono assegnate
+    // queste comprenderanno i visitatori, ma anche cambi di ufficio del 
+    // personale, e/o nuove entrate.
+    const rooms_pipeline = [
+        { $match: { 
+            startDate: { $gte: startDate, $lt: endDate }
+        }},
+        { $lookup: {
+            from: 'people',
+            localField: 'person',
+            foreignField: '_id',
+            as: 'person',
+            pipeline: [
+                {$project: {
+                    _id: 1, firstName: 1, lastName: 1, email: 1, affiliations: 1
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$person',
+            preserveNullAndEmptyArrays: true
+        }},
+        {$lookup: {
+            from: 'rooms',
+            localField: 'room',
+            foreignField: '_id',
+            as: 'room',
+            pipeline: [
+                {$project: {
+                    _id: 1, building: 1, floor: 1, number: 1
+                }}
+            ]
+        }},
+        { $unwind: {
+            path: '$room',
+            preserveNullAndEmptyArrays: true
+        }},
+        { $lookup: {
+            from: 'institutions',
+            localField: 'person.affiliations', 
+            foreignField: '_id',
+            as: 'person.affiliations'
+        }},
+    ]
+
+    const rooms_res = await RoomAssignment.aggregate(rooms_pipeline)
+
+    // Facciamo una query per vedere tutte le visite della prossima settimana
+    // Queste vengono inviate solo il venerdì
     const visit_pipeline = [
         { $match: { 
             startDate: { $gte: startDate, $lt: endDate }
@@ -97,91 +147,32 @@ async function notificaPortineria() {
         }},
     ]
 
-    // Troviamo le visite che iniziano oggi, e le riportiamo alla segreteria.
-    // Questa e-mail viene inviata solo se c'è effettivamente qualcosa da comunicare.
-    const res = await Visit.aggregate(visit_pipeline)
+    const visits_res = await Visit.aggregate(visit_pipeline)
 
-    // Facciamo una seconda query, per vedere tutte le stanze che vengono assegnate negli stessi
-    // giorni; queste comprenderanno i visitatori di cui sopra, ma anche cambi di ufficio del 
-    // personale, e/o nuove entrate.
-    const rooms_pipeline = [
-        { $match: { 
-            startDate: { $gte: startDate, $lt: endDate }
-        }},
-        { $lookup: {
-            from: 'people',
-            localField: 'person',
-            foreignField: '_id',
-            as: 'person',
-            pipeline: [
-                {$project: {
-                    _id: 1, firstName: 1, lastName: 1, email: 1,
-                }}
-            ]
-        }},
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true
-        }},
-        {$lookup: {
-            from: 'rooms',
-            localField: 'room',
-            foreignField: '_id',
-            as: 'room',
-            pipeline: [
-                {$project: {
-                    _id: 1, building: 1, floor: 1, number: 1
-                }}
-            ]
-        }},
-        { $unwind: {
-            path: '$room',
-            preserveNullAndEmptyArrays: true
-        }},
-    ]
-
-    const rooms_res = await RoomAssignment.aggregate(rooms_pipeline)
-
-    if (res.length == 0 && rooms_res.length == 0) {
+    if (today.getDay() == 5 && visits_res.length == 0 && rooms_res.length == 0) {
+        return
+    } 
+    if (rooms_res.length == 0) {
         return
     }
 
     // Prepare the email
-    const visitorList = res.map(x => {
-        let text = ""
-        const visitorName = `${x.person.firstName} ${x.person.lastName}`
-        var affiliation = ""
-        if (x.affiliations.length > 0) {
-            affiliation = "(" + x.affiliations.map(x => x.name).join(", ") + ")"
-        }
-        text += `Nome, cognome, affiliazione e indirizzo email: ${visitorName} ${affiliation} ${x.person?.email||""}\n`
-        text += `Periodo: dal ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} al ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
-        for (const person of x.referencePeople) {
-            text += `Referente: ${person.firstName} ${person.lastName}\n`
-        }
-        if (!x.requireRoom) text += "Postazione in un ufficio del Dipartimento non richiesta\n"
-        if (x.roomAssignments.length > 0) {
-            text += "Ufficio in Dipartimento assegnato: "
-            text += x.roomAssignments.map(x => {
-                r = x.room
-                start = x.startDate?.toLocaleDateString('it-IT') || ""
-                end = x.endDate?.toLocaleDateString('it-IT') || ""
-                return `Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (dal ${start} al ${end})`
-            }).join(" - ")
-        }         
-        return text
-    }).join("\n\n")
-
     let changesList = ""
     try {
         changesList = rooms_res.map(x => {
             let text = ""
-            const personName = `${x.person.firstName} ${x.person.lastName}`
-            text += `Nome, cognome, affiliazione e indirizzo email: ${personName} ${x.person?.email||""}\n`
+            text += `Nome, cognome e indirizzo email: ${x.person.firstName} ${x.person.lastName}, ${x.person?.email||""}\n`
+            var affiliation = ""
+            if (x.person.affiliations.length > 0) {
+                affiliation = x.person.affiliations.map(x => x.name).join(", ")
+            }        
+            text += `Affiliazione: ${affiliation}\n`
             const r = x.room
-            start = x.startDate?.toLocaleDateString('it-IT') || ""
-            end = x.endDate?.toLocaleDateString('it-IT') || ""
-            text += `Assegnazione stanza: Edificio ${r.building}, Piano ${r.floor}, Stanza ${r.number} (${start} -- ${end})`
+            const start = x.startDate?.toLocaleDateString('it-IT') || ""
+            const end = x.endDate?.toLocaleDateString('it-IT') || ""
+            const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building;
+            text += `Ufficio in Dipartimento assegnato: Edificio ${buildingName}, Piano ${r.floor}, Stanza ${r.number}\n`
+            text += `Periodo: dal ${start} al ${end}`
             return text
         }).join("\n\n")
     
@@ -190,13 +181,42 @@ async function notificaPortineria() {
         changesList = "Si è verificato un errore nella generazione di questa lista"
         console.log(e)
     }
-    
+
+    const visitorList = visits_res.map(x => {
+        let text = ""
+        text += `Nome, cognome e indirizzo email: ${x.person.firstName} ${x.person.lastName}, ${x.person?.email||""}\n`
+        var affiliation = ""
+        if (x.affiliations.length > 0) {
+            affiliation = x.affiliations.map(x => x.name).join(", ")
+        }
+        text += `Affiliazione: ${affiliation}\n`
+        text += `Periodo: dal ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} al ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
+        for (const person of x.referencePeople) {
+            text += `Referente: ${person.firstName} ${person.lastName}\n`
+        }
+        if (!x.requireRoom) text += "Ufficio in Dipartimento: non richiesto"
+        if (x.roomAssignments.length > 0) {
+            text += "Ufficio in Dipartimento assegnato: "
+            text += x.roomAssignments.map(x => {
+                const r = x.room
+                const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building;
+                return `Edificio ${buildingName}, Piano ${r.floor}, Stanza ${r.number}`
+            }).join(" - ")
+        } else {
+            text += "Ufficio: da assegnare";
+        }
+        return text
+    }).join("\n\n")
+
     const emailBody = `
-I seguenti visitator* sono in arrivo nei prossimi giorni:
+${(today.getDay() == 5) ? `Le seguenti persone sono in arrivo la prossima settimana:
 
-${visitorList}
+${visitorList}` : ''}
 
-I seguenti assegnamenti di stanza avverranno nei prossimi giorni (includono visitatori, prese di servizio, cambi di ufficio, ecc.):
+Le seguenti postazioni in uffici del Dipartimento sono state assegnate ${
+    (today.getDay() == 4) ? 'tra domani e il weekend' : today.getDay() == 5 ? 'dalla prossima settimana' : (today.getDay() == 1 ? 'tra oggi e domani' : 'da domani')
+  }:
+
 ${changesList}
 `
 
@@ -204,7 +224,7 @@ ${changesList}
 
     const emails = await getEmailsForChannel('portineria')
     if (emails.length > 0)
-        await sendEmail(emails, [], 'Persone in arrivo nei prossimi giorni', emailBody)
+        await sendEmail(emails, [], today.getDay() === 5 ? 'Persone in arrivo e nuove assegnazioni di postazioni in Dipartimento' : 'Nuove assegnazioni di postazioni in Dipartimento', emailBody);
 }
 
 async function getEmailsForChannel(channel) {
@@ -263,17 +283,21 @@ async function handleNotifications() {
 }
 
 async function mainloop() {
-    console.log(`Starting worker`)
-    await setupDatabase()
-    await setupSMTPAccount()
+    try {
+        console.log(`Starting worker`);
+        await setupDatabase();
+        await setupSMTPAccount();
 
-    await handleNotifications()
+        await handleNotifications();
 
-    // Setup the cron schedule
-    scheduleCronJob('0 6 * * *', notificaPortineria)
-    notificaPortineria()
+        // Setup cron schedule
+        scheduleCronJob('0 6 * * *', notificaPortineria);
+        notificaPortineria();
 
-    setInterval(handleNotifications, 30000) // 30 seconds
+        setInterval(handleNotifications, 30000); // 30 seconds
+    } catch (error) {
+        console.error('Error in mainloop:', error);
+    }
 }
 
 mainloop()
