@@ -194,19 +194,21 @@ async function notificaPortineria() {
         for (const person of x.referencePeople) {
             text += `Referente: ${person.firstName} ${person.lastName}\n`
         }
-        if (!x.requireRoom) text += "Ufficio in Dipartimento: non richiesto"
         if (x.roomAssignments.length > 0) {
-            text += "Ufficio in Dipartimento assegnato: "
-            text += x.roomAssignments.map(x => {
-                const r = x.room
-                const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building;
-                return `Edificio ${buildingName}, Piano ${r.floor}, Stanza ${r.number}`
-            }).join(" - ")
+            for (ra of x.roomAssignments) {
+                text += "Ufficio in Dipartimento assegnato: "
+                const r = ra.room
+                const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building
+                text += `Edificio ${buildingName}, Piano ${r.floor}, Stanza ${r.number}\n`
+            }
+        } else if (x.requireRoom) {
+            text += "Ufficio in Dipartimento: da assegnare\n"
         } else {
-            text += "Ufficio: da assegnare";
+            text += "Ufficio in Dipartimento: non richiesto\n"
         }
+
         return text
-    }).join("\n\n")
+    }).join("\n")
 
     const emailBody = `
 ${(today.getDay() == 5) ? `Le seguenti persone sono in arrivo la prossima settimana:
@@ -292,7 +294,7 @@ async function mainloop() {
 
         // Setup cron schedule
         scheduleCronJob('0 6 * * *', notificaPortineria);
-        notificaPortineria();
+        if (false) notificaPortineria() // for testing 
 
         setInterval(handleNotifications, 30000); // 30 seconds
     } catch (error) {
