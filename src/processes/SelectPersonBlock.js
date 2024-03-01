@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, Form, Table, Button } from 'react-bootstrap'
+import { Card, Form, Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
 
 import { InputRow, PersonInput, StringInput, EmailInput, InstitutionInput } from '../components/Input'
 import { useQuery } from 'react-query'
@@ -41,7 +41,14 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                         <EmailInput value={email} setValue={setEmail} />
                     </InputRow>
                     <InputRow label="affiliazione">
-                        <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                È possibile scegliere più di un'affiliazione selezionandone una alla volta, 
+                                oppure selezionare "N/A" per nessuna affiliazione</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>
+                            <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
+                        </div>
                     </InputRow>
                 </Form>
                 <p>Se la persona esiste ma vuoi aggiornare i dati, selezionala e poi clicca su "Aggiorna i dati"</p>
