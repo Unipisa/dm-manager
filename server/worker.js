@@ -294,7 +294,7 @@ async function mainloop() {
 
         // Setup cron schedule
         scheduleCronJob('0 6 * * *', notificaPortineria);
-        notificaPortineria();
+        if (false) notificaPortineria() // for testing 
 
         setInterval(handleNotifications, 30000); // 30 seconds
     } catch (error) {
