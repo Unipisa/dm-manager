@@ -226,7 +226,7 @@ const GET_PIPELINE = [
         from: "eventseminars",
         let: { start: "$startDate", end: "$endDate" },
         localField: 'person._id',
-        foreignField: "speaker",
+        foreignField: "speakers",
         as: 'seminars',
         pipeline: [
             // tiene solo i seminari che intersecano il periodo [start, end] 
@@ -427,7 +427,7 @@ router.delete('/:id', async (req, res) => {
 
     const seminarsPipeline = [
         { $match: { 
-            speaker: visit.person,
+            speakers: visit.person,
             $expr: {
                 $and: [
                     { $or: [

@@ -56,14 +56,18 @@ function SeminarList() {
 
     for (var i = 0; i < data.data.length; i++) {
         const seminar = data.data[i]
-        const speaker = seminar.speaker
+        const speakers = seminar.speakers
         seminar_block.push(
             <div className="p-3 col-lg-6 p-0" key={"seminar-" + seminar._id}>
             <Card className="shadow">
                 <Card.Header className="h6">Seminario</Card.Header>
                 <Card.Body>
                     <strong>Titolo</strong>: {seminar.title} <br></br>
-                    <strong>Speaker</strong>: {speaker.firstName} { speaker.lastName } ({speaker.affiliations.map(x => x.name).join(", ")})<br></br>
+                    {speakers.map(speaker =>
+                        <div id={speaker._id}>
+                            <strong>Speaker</strong>: {speaker.firstName} { speaker.lastName } ({speaker.affiliations.map(x => x.name).join(", ")})<br></br>
+                        </div>
+                    )}
                     <strong>Data</strong>: {seminar.startDatetime}<br></br>
                     <div className="mt-2 d-flex flex-row justify-content-end">                        
                         <button className="ms-2 btn btn-danger" onClick={() => confirmDeleteSeminar(seminar._id)}>

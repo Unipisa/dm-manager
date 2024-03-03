@@ -94,13 +94,6 @@ and that a token `$TOKEN_SECRET` has been inserted in the database.
 If you start a developmnet server as described above these condition 
 are met. 
 
-The following command will try to consume some API end points. 
-See the source file `api/test.js`. 
-
-```
-npm run test-api
-```
-
 The api request path has the following form:
 * `GET /api/v0/<model>?_sort=[-]<sort_key>&_limit=<n_items>&filter_key=filter_val&...` to obtain a list of objects of the specified `model` filtered with given `filter_key`s sorted by `sort_key` (descending if a `-` is prepended). 
 On some supported fields you can append `__lt`, `__gt`, `__lte`, `__gte` to implement an inequality comparison filter. 

@@ -9,7 +9,7 @@ const {
 const Grant = require('./Grant')
 
 const eventSeminarSchema = new Schema({
-    speaker: { type: ObjectId, label: 'Speaker', ref: 'Person', required: true },
+    speakers: [{ type: ObjectId, label: 'Speakers', ref: 'Person', required: true }],
     title: { type: String, label: 'Titolo' },
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
     startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },
@@ -41,8 +41,8 @@ Person.relatedModels.push({
     model: EventSeminar,
     modelName: 'EventSeminar',
     url: 'event-seminar',
-    field: 'speaker',
-    multiple: false,
+    field: 'speakers',
+    multiple: true,
 })
 
 const ConferenceRoom = require('./ConferenceRoom')

@@ -22,7 +22,7 @@ export default function Seminar() {
 
     const { isLoading, error, data } = useQuery([ 'process', 'seminar', id, preFill ], async function () {
         var seminar = {
-            speaker: null, 
+            speakers: [], 
             title: "", 
             stateDatetime: null,
             duration: 60,
@@ -64,7 +64,7 @@ export default function Seminar() {
 }
 
 export function SeminarBody({ seminar, forbidden }) {
-    const [personDone, setPersonDone] = useState(seminar.speaker !== null)
+    const [personDone, setPersonDone] = useState(seminar.speakers.length>0)
     const [data, setData] = useState(seminar)
     const navigate = useNavigate()
 
@@ -73,7 +73,7 @@ export function SeminarBody({ seminar, forbidden }) {
             <h4>Accesso negato</h4>
             <p>
                 Il seminario selezionato non esiste, oppure è stato creato da un altro utente.
-                Nel secondo caso, solo l'utente che l'ha originariamente creato (o un amministratore) 
+                Nel secondo caso, solo l'utente che l'ha originariamente creato (o un amministratore)  
                 può modificarne il contenuto. 
             </p>
             <p>
@@ -97,10 +97,10 @@ export function SeminarBody({ seminar, forbidden }) {
         </h1>
         <SelectPersonBlock 
             label="Speaker" 
-            person={data.speaker} setPerson={setter(setData,'speaker')} 
+            person={data.speakers.length ? data.speakers[0] : null} setPerson={person => setData(data => ({...data,speakers: person?[person]:[]}))} 
             active={!personDone}
             done={() => setPersonDone(true)}
-            change={() => {setPersonDone(false);setter(setData,'speaker')(null)}}
+            change={() => {setPersonDone(false);setter(setData,'speaker')([])}}
             prefix="process/seminars"
             /> 
         {personDone && <SeminarDetailsBlock 

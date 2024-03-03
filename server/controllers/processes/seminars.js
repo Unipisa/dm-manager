@@ -20,7 +20,7 @@ require('./conferenceRoomSearch')(router)
 require('./seminarCategorySearch')(router)
 
 async function notifySeminar(seminar) {
-    // For matching visitors, we only care about the days, and ignore the actualy time 
+    // For matching visitors, we only care about the days, and ignore the actual time 
     // at which the seminar is scheduled.
     const startDate = new Date(seminar.startDatetime); startDate.setHours(0)
     const endDate = new Date(seminar.startDatetime); endDate.setHours(0)
@@ -32,7 +32,7 @@ async function notifySeminar(seminar) {
             startDate: { $lte: startDate },
             endDate: { $gte: endDate },
             publish: true, 
-            person: seminar.speaker._id
+            person: { $in: seminar.speakers },
         }}, 
         { $lookup: {
             from: 'people',
