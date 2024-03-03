@@ -1,5 +1,4 @@
 import { Route } from 'react-router-dom'
-import { Link } from 'react-router-dom'
 
 import ModelEditPage from '../pages/ModelEditPage'
 import ModelsPage from '../pages/ModelsPage'
