@@ -55,17 +55,7 @@ export default class EventConference {
             },
         ] : [];
     }
-
-    homeElements(user) {
-        if (user.hasSomeRole(...this.schema.managerRoles)) {
-            return [<Link to={this.indexUrl()}>Gestire le Conferenze</Link>]
-        } else if (user.hasSomeRole(...this.schema.supervisorRoles)) {
-            return [<Link to={this.indexUrl()}>Visualizzare le Conferenza</Link>]
-        } else {
-            return []
-        }    
-    }
-
+    
     // brief description of given object
     describe(obj) {
         return `"${obj.title}"`;

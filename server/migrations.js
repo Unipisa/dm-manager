@@ -508,75 +508,17 @@ const migrations = {
         return true
     },
 
-       // Load server/past-conferences.json into eventconferences
-       D20240212_update_past_conferences_2: async function (db) {
-        const conferences = db.collection("eventconferences");
-        const conferencerooms = db.collection("conferencerooms");
-        const data = require("./past-conferences.json");
-
-        const room_mapping = {};
-        for (const room of await conferencerooms.find({}).toArray()) {
-            room_mapping[room.name] = room._id;
-            for (const name of room.names || []) {
-                room_mapping[name] = room._id;
+    D20240302_multiple_speakers_in_seminars: async function(db) {
+        const seminars = db.collection('eventseminars')
+        const people = db.collection('people')
+        for (const seminar of await seminars.find({}).toArray()) {
+            if (seminar.speaker) {
+                await seminars.updateOne({ _id: seminar._id }, { $set: { speakers: [seminar.speaker] } })
             }
         }
+        return true
+    },
 
-        const hashConference = ({ title, startDate }) => {
-            return (
-                title
-                    .toLowerCase()
-                    .replace(/[^a-z0-9-\s]/g, "")
-                    .replace(/\s+/g, "-") +
-                (startDate
-                    ? typeof startDate === "string"
-                        ? startDate.slice(0, 4)
-                        : startDate.getFullYear()
-                    : "")
-            );
-        };
-
-        const names = new Set()
-        for (const conf of await conferences.find({}).toArray()) {
-            names.add(hashConference(conf));
-        }
-
-        const toUTCDate = (s) => {
-            const [year, month, day] = s.split("-");
-            return new Date(Date.UTC(year, month - 1, day));
-        };
-
-        for (const { json: conference } of data) {
-            const hash = hashConference(conference)
-            console.dir(hash)
-            if (names.has(hash)) {
-                console.log(`Conference ${conference.title} already loaded. Skipping!`);
-                continue;
-            }
-            if (!room_mapping[conference.location]) {
-                const res = await conferencerooms.insertOne({
-                    name: conference.location,
-                });
-                room_mapping[conference.location] = res.insertedId;
-            }
-            const object = {
-                title: conference.title,
-                startDate: toUTCDate(conference.startDate),
-                endDate: conference.endDate ? toUTCDate(conference.endDate) : toUTCDate(conference.startDate),
-                url: conference.url,
-                conferenceRoom: new ObjectId(
-                    room_mapping[conference.location]
-                ),
-                grants: [],
-                description: conference.description,
-            };
-            if (!(await conferences.insertOne(object))) {
-                console.log("Error");
-                return false;
-            }
-        }
-        return true;
-    }
 }
 
 async function migrate(db, options) {

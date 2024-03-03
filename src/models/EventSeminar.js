@@ -23,7 +23,7 @@ export default class EventSeminar {
         this.indexDefaultFilter = {'_sort': '-startDatetime', '_limit': 10}
         this.columns = {
             'title': 'Titolo',
-            'speaker': 'Speaker',
+            'speakers': 'Speakers',
             'category': 'Categoria',
             'startDatetime': 'Inizio',
         }
@@ -54,16 +54,6 @@ export default class EventSeminar {
                 category: 'eventi',
             },
         ] : [];
-    }
-
-    homeElements(user) {
-        if (user.hasSomeRole(...this.schema.managerRoles)) {
-            return [<Link to={this.indexUrl()}>Gestire i Seminari</Link>]
-        } else if (user.hasSomeRole(...this.schema.supervisorRoles)) {
-            return [<Link to={this.indexUrl()}>Visualizzare i Seminari</Link>]
-        } else {
-            return []
-        }    
     }
 
     // brief description of given object

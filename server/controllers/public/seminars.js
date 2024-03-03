@@ -63,19 +63,23 @@ async function seminarsQuery(req) {
         ...sort_and_limit,
         { $lookup: {
             from: 'people',
-            localField: 'speaker',
+            localField: 'speakers',
             foreignField: '_id',
-            as: 'speaker',
-        }},
-        { $unwind: {
-            path: '$speaker',
-            preserveNullAndEmptyArrays: true
-        }},
-        {$lookup: {
-            from: 'institutions',
-            localField: 'speaker.affiliations',
-            foreignField: '_id',
-            as: 'speaker.affiliations',
+            as: 'speakers',
+            pipeline: [
+                {$lookup: {
+                    from: 'institutions',
+                    localField: 'affiliations',
+                    foreignField: '_id',
+                    as: 'affiliations'
+                }},
+                {$project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    affiliations: 1,
+                }}
+            ]
         }},
         {$lookup: {
             from: 'seminarcategories',
@@ -118,14 +122,15 @@ async function seminarsQuery(req) {
             conferenceRoom: 1,
             category: 1,
             duration: 1,
-            speaker: {
-                _id: 1,
-                firstName: 1,
-                lastName: 1,
-                affiliations: 1,
-            },
+            speakers: 1,
             abstract: 1,
             externalid: 1
+        }},
+        /*backward compatibility when only single speaker supported*/
+        { $addFields: {
+            speaker: {
+                $arrayElemAt: ["$speakers", 0]
+            }
         }}
     ]
 

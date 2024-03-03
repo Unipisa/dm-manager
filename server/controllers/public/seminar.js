@@ -9,20 +9,24 @@ async function seminarQuery(req) {
         }},
         { $lookup: {
             from: 'people',
-            localField: 'speaker',
+            localField: 'speakers',
             foreignField: '_id',
-            as: 'speaker',
+            as: 'speakers',
+            pipeline: [
+                {$lookup: {
+                    from: 'institutions',
+                    localField: 'affiliations',
+                    foreignField: '_id',
+                    as: 'affiliations'
+                }},
+                {$project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    affiliations: 1,
+                }}
+            ]
         }},
-        { $unwind: {
-            path: '$speaker',
-            preserveNullAndEmptyArrays: true
-        }},
-        {$lookup: {
-            from: 'institutions',
-            localField: 'speaker.affiliations',
-            foreignField: '_id',
-            as: 'speaker.affiliations'
-        }}, 
         {$lookup: {
             from: 'seminarcategories',
             localField: 'category',
@@ -63,12 +67,7 @@ async function seminarQuery(req) {
             category: 1,
             duration: 1,
             category: 1,
-            speaker: {
-                _id: 1,
-                firstName: 1,
-                lastName: 1,
-                affiliations: 1
-            },
+            speakers: 1,
             abstract: 1,
             externalid: 1
         }}

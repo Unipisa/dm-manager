@@ -8,7 +8,7 @@ class EventSeminarController extends Controller {
         this.managerRoles.push('event-seminar-manager')
         this.supervisorRoles.push('event-seminar-manager', 'event-seminar-supervisor')
 
-        this.searchFields = ['title', 'startDatetime', 'abstract', 'room.code', 'speaker.firstName', 'speaker.lastName']
+        this.searchFields = ['title', 'startDatetime', 'abstract', 'room.code', 'speakers.firstName', 'speakers.lastName']
     }
 }
 

@@ -83,7 +83,7 @@ router.delete('/:id', async (req, res) => {
     const seminarsPipeline = [
         { $match: { 
             createdBy: req.user._id,
-            speaker: visit.person,
+            speakers: visit.person,
             $expr: {
                 $and: [
                     { $or: [
