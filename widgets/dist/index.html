@@ -107,14 +107,20 @@
             dmwidgets.loadComponent(document.getElementById("conference"), "Conference", {
                 id: conference_id
             })
-            dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {})
+            dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {
+                //from: '2022-01-01',
+                //_sort: 'startDateTime',
+                _limit: 2
+            })
             dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
-                from: '2023-12-20', 
+                from: '2021-01-01', 
                 _sort: 'startDatetime',
+                //_limit: 10
                 // category: '653b5d8d10c0279ad486c807'
             })
             dmwidgets.loadComponent(document.getElementById("conferencelist"), "ConferenceList", { 
-                // from: '2023-11-30', 
+                from: '2021-01-01',
+                _limit: 50 
                 // category: '653b5d8d10c0279ad486c807'
             })
             dmwidgets.loadComponent(document.getElementById('homeeventlist'), "HomeEventList", {
