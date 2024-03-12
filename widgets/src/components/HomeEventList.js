@@ -25,7 +25,7 @@ export function HomeEventList({}) {
         var events = []
         const now = new Date()
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: "2022-01-01"} })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -34,7 +34,7 @@ export function HomeEventList({}) {
             events.push(...ec_label)
         }
 
-        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: now} })
+        const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: "2022-01-01"} })
         if (sem.data) {
             const es = sem.data.data
             const es_label = es.map(x => { 
@@ -76,10 +76,11 @@ export function HomeEventList({}) {
         )
       );
       
-      const showButton = numberOfEntries * 2 <= data.length + 6;
+      const showButton = numberOfEntries * 2 <= seminar_list.length + conference_list.length ;
 
       return (
         <div className="">
+          <div>{conference_list.length}</div>
           <Tab.Container id="left-tabs-example" defaultActiveKey="all">
             <Nav variant="pills" className="flex-row d-flex justify-content-center">
               <Nav.Item>
