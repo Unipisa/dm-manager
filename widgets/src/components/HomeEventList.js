@@ -76,7 +76,7 @@ export function HomeEventList({}) {
         )
       );
       
-      const showButton = numberOfEntries * 2 <= seminar_list.length + conference_list.length ;
+      const showButton = numberOfEntries <= seminar_list.length + conference_list.length ;
 
       return (
         <div className="">
