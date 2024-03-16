@@ -4,7 +4,7 @@ const {
     ObjectId, 
     startDate, 
     endDate,
-    multipleSSDs, 
+    SSD, 
     createdBy, 
     updatedBy,
 } = require('./Model')
@@ -26,7 +26,7 @@ const staffSchema = new Schema({
     isInternal: {type: Boolean, label: 'interno al dipartimento', default: true},
     startDate,
     endDate,
-    multipleSSDs,
+    SSD,
     photoUrl: {type: String, label: 'URL foto'},
     wordpressId: String,
     notes: {type: String, label: 'note', widget: 'text'},

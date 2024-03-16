@@ -6,6 +6,10 @@ import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
 import { useQuery } from 'react-query'
+import Markdown from 'react-markdown'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
+import 'katex/dist/katex.min.css'
 
 import SelectPersonBlock from './SelectPersonBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
@@ -174,7 +178,10 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                         <div className="d-flex align-items-start">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
                                 Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
-                                che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a></Tooltip>}>
+                                che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
+                                <br />
+                                L'anteprima dell'abstract verrà mostrata più sotto mentre scrivi.
+                                </Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
                             <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
@@ -196,11 +203,20 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
             </>}
             </Card.Body>
+
             {/* <Card.Footer>
                 {JSON.stringify({data})}
             </Card.Footer> */}
         </Card>
-    </PrefixProvider>
+            { data.abstract && 
+                <Card className="shadow" style={{maxWidth:"60em"}}>
+                    <Card.Header>Anteprima abstract</Card.Header>
+                    <Card.Body>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
+                    </Card.Body>
+                </Card>
+            }
+</PrefixProvider>
 }
 
 
