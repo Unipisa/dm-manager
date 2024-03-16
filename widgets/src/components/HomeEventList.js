@@ -175,6 +175,9 @@ function EventBox({ event }) {
                 {truncateTextByWords(title, 20)}
             </a>
         </h2>
+        { event.speakers && 
+          <div className="subtitle_style fas fa-user"> {event.speakers.map(speaker => `${speaker.firstName || ''} ${speaker.lastName || ''}`).join(', ')}</div> 
+        }
         <div className="subtitle_style far fa-calendar"> {date}</div>
         <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name}</div>
         <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>
