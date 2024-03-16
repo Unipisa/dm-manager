@@ -47,16 +47,20 @@ export function SeminarTitle({ seminar, href }) {
 
     const speakers = seminar.speakers.map(speaker => formatPersonName(speaker)).join(", ")
 
-    var title_block = <span>{seminar.title} &ndash; {speakers}</span>
+    var title_block = <>{seminar.title} &ndash; {speakers}</>
+
+    if (seminar?.category?.label === 'phd-thesis-defense') {
+        title_block = <>Ph.D. Thesis Defense: {title_block}</>
+    }
+
     if (href !== undefined) {
         title_block = <a href={href}>
             {title_block}
         </a>
     }
-    title_block = <h3 className="title entry-title">{title_block}</h3>
-
+    
     return <>
-    {title_block}
+    <h3 className="title entry-title">{title_block}</h3>
     <p>
         <small>
             <span className="far fa-calendar"></span> {formatDate(seminar.startDatetime)}

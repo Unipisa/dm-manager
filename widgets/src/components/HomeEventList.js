@@ -163,10 +163,16 @@ function EventBox({ event }) {
       tags = <a href={event.url}>{isEnglish() ? 'Website' : 'Sito web'}</a>
     }
 
+    var title = event.title
+
+    if (event.category?.label === 'phd-thesis-defense') {
+      title = `Ph.D. Thesis Defense: ${title}`
+    }
+
     return <div className="col-6 col-md-6 col-lg-4 event-box">
         <h2 className="title_style">
             <a href={link} className="title_style">
-                {truncateTextByWords(event.title, 20)}
+                {truncateTextByWords(title, 20)}
             </a>
         </h2>
         <div className="subtitle_style far fa-calendar"> {date}</div>
