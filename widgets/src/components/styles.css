@@ -84,7 +84,6 @@
 .excerpt_style {
     color: #000000;
     font-size: 1rem;
-    overflow: hidden;
 
     @media (max-width: 768px) {
         font-size: 0.875rem;
