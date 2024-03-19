@@ -78,6 +78,10 @@ export function HomeEventList({}) {
         
         events = events.slice(0, Math.max(numberOfEntries, Math.floor(events.length / 3) * 3))
 
+        if (events.length <= 3) {
+          setNumberOfEntries(numberOfEntries + 3)
+        }
+
         events.sort((a, b) => {
             const dateA = a.startDatetime ? a.startDatetime : a.startDate
             const dateB = b.startDatetime ? b.startDatetime : b.startDate

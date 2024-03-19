@@ -1,17 +1,17 @@
 .event-box {
     width: 300px;
-    height: 150px;
+    height: 160px;
     overflow: hidden;
     padding: 1rem;
     margin-bottom: 1rem;
 
     @media (min-width: 768px) {
         padding: 1.5rem;
-        height: 240px;
+        height: 250px;
     }
     @media (min-width: 1383px) {
         padding: 2rem;
-        height: 270px;
+        height: 280px;
     }
 }
 
