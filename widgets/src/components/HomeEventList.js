@@ -12,7 +12,6 @@ import {
   getDMURL,
   formatDate,
   formatTime,
-  truncateText,
   truncateTextByWords,
   isEnglish
 } from '../utils';
@@ -23,6 +22,12 @@ export function HomeEventList({}) {
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = []
+        var conferences = []
+        var seminars = []
+        var colloquia = []
+        var conferencesIndex = 0;
+        var seminarsIndex = 0;
+        var colloquiaIndex = 0;
         const now = new Date()
 
         const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
@@ -31,7 +36,7 @@ export function HomeEventList({}) {
             const ec_label =  ec.map(x => { 
                 return {...x, type: 'conference'}
             })
-            events.push(...ec_label)
+            conferences.push(...ec_label)
         }
 
         const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: now} })
@@ -40,7 +45,41 @@ export function HomeEventList({}) {
             const es_label = es.map(x => { 
                 return {...x, type: 'seminar'}
             })
-            events.push(...es_label)
+            seminars.push(...es_label)
+        }
+
+        //colloquium category develop: 65b385d88d78f383a820e974
+        //colloquim category production: 653b522f8f0af760bdc42723
+        const coll = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", category: "653b522f8f0af760bdc42723", from: now} })
+        if (coll.data) {
+            const ecl = coll.data.data
+            const ecl_label = ecl.map(x => { 
+                return {...x, type: 'seminar'}
+            })
+            colloquia.push(...ecl_label)
+        }
+
+        seminars = seminars.filter(seminar => !colloquia.some(colloquium => colloquium._id === seminar._id));
+
+        while (events.length < numberOfEntries && (conferencesIndex < conferences.length || seminarsIndex < seminars.length || colloquiaIndex < colloquia.length)) {
+          if (conferencesIndex < conferences.length) {
+              events.push(conferences[conferencesIndex]);
+              conferencesIndex++;
+          }
+          if (seminarsIndex < seminars.length && events.length < numberOfEntries) {
+              events.push(seminars[seminarsIndex]);
+              seminarsIndex++;
+          }
+          if (colloquiaIndex < colloquia.length && events.length < numberOfEntries) {
+              events.push(colloquia[colloquiaIndex]);
+              colloquiaIndex++;
+          }
+        }
+        
+        events = events.slice(0, Math.max(numberOfEntries, Math.floor(events.length / 3) * 3))
+
+        if (events.length <= 3) {
+          setNumberOfEntries(numberOfEntries + 3)
         }
 
         events.sort((a, b) => {
@@ -48,7 +87,7 @@ export function HomeEventList({}) {
             const dateB = b.startDatetime ? b.startDatetime : b.startDate
             return new Date(dateA) - new Date(dateB)
         })
-
+        
         return events
     }, {keepPreviousData: true})
 
@@ -76,7 +115,7 @@ export function HomeEventList({}) {
         )
       );
       
-      const showButton = numberOfEntries * 2 <= data.length + 6;
+      const showButton = numberOfEntries <= seminar_list.length + conference_list.length ;
 
       return (
         <div className="">
@@ -163,12 +202,21 @@ function EventBox({ event }) {
       tags = <a href={event.url}>{isEnglish() ? 'Website' : 'Sito web'}</a>
     }
 
+    var title = event.title
+
+    if (event.category?.label === 'phd-thesis-defense') {
+      title = `Ph.D. Thesis Defense: ${title}`
+    }
+
     return <div className="col-6 col-md-6 col-lg-4 event-box">
         <h2 className="title_style">
             <a href={link} className="title_style">
-                {truncateTextByWords(event.title, 20)}
+                {truncateTextByWords(title, 20)}
             </a>
         </h2>
+        { event.speakers && 
+          <div className="subtitle_style fas fa-user"> {event.speakers.map(speaker => `${speaker.firstName || ''} ${speaker.lastName || ''}`).join(', ')}</div> 
+        }
         <div className="subtitle_style far fa-calendar"> {date}</div>
         <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name}</div>
         <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>

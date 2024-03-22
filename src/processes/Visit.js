@@ -265,8 +265,14 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                 </div>
             </InputRow>
             <InputRow className="my-3" label="Seminario">
-                <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})}/>
-                {} È previsto un seminario
+                <div className="d-flex align-items-center">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Se volete aggiungere altri speaker al seminario, si prega di terminare l'inserimento e di inviare un'email a help@dm.unipi.it con i dati delle persone da aggiungere</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>  
+                    <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})} style={{marginRight: '5px'}}/>
+                    {} È previsto un seminario
+                </div>
             </InputRow>
             <InputRow className="my-3" label="Note">
                 <div className="d-flex align-items-start">

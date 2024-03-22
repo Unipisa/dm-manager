@@ -25,16 +25,17 @@ export function ConferenceList({ from, to, grant, SSD, _sort, _limit }) {
 
     var events_block = []
     for (var i = 0; i < data.length; i++) {
-        const e = data[i]
-        const link = getDMURL("en/conference?id=" + e._id)
-
-        events_block.push(
-            <div key={e._id}>
-                <ConferenceTitle conference={e} href={link}></ConferenceTitle>
-                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.description, 200)}</Markdown>
-                <hr className="my-4"></hr>
-            </div>
-        )
+        const e = data[i];
+        if (typeof(e) != 'undefined') {
+            const link = getDMURL("en/conference?id=" + e._id);
+            events_block.push(
+                <div key={e._id}>
+                    <ConferenceTitle conference={e} href={link}></ConferenceTitle>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.description, 200)}</Markdown>
+                    <hr className="my-4"></hr>
+                </div>
+            );
+        }
     }
 
     return <>

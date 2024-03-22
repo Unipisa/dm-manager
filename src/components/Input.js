@@ -47,13 +47,24 @@ export function StringInput({ value, setValue }) {
 
 export function EmailInput({ value, setValue }) {
     const id = useInputId()
+
     return <input 
         className="form-control col-sm-10"
         id={ id } 
         type="email"
         value={ value || "" } 
-        onChange={ (evt) => {setValue(evt.target.value)} }
+        onChange={ (evt) => {setValue(filterEmail(evt.target.value))} }
     />
+
+    function filterEmail(email) {
+        const match = email.match(/.*<(.*)>/)
+        if (match && match[1]) email = match[1]
+        
+        email = email.replace(/\s/g, '')
+
+        return email
+    }
+
 }   
 
 export function AttachmentInput({ value, setValue, image }) {
