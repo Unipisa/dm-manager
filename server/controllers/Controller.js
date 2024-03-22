@@ -111,7 +111,9 @@ class Controller {
                                 email: 1,
                                 phone: 1,
                                 affiliation: 1,
-                            }},
+                            }},{
+                                $sort: { 'lastName': 1 }
+                            },
                             {$lookup: {
                                 from: "institutions",
                                 localField: "affiliations",
