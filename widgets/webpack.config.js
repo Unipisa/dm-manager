@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
   entry: path.resolve(__dirname, './src/index.js'),
@@ -12,8 +13,8 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [ 'style-loader', 'css-loader' ],
-      }
+        use: ['style-loader', 'css-loader'],
+      },
     ],
   },
   resolve: {
@@ -23,13 +24,16 @@ module.exports = {
     path: path.resolve(__dirname, './dist'),
     filename: 'dmwidgets.js',
   },
-  plugins: [new webpack.HotModuleReplacementPlugin()],
+  plugins: [
+      new webpack.HotModuleReplacementPlugin(),
+      new HtmlWebpackPlugin({template: 'src/index.html'}),
+    ],
   devServer: {
     static: path.resolve(__dirname, './dist'),
     port: 8001,
     hot: true,
     proxy: {
-      '/api': 'http://localhost:8000'
-    }
+      '/api': 'http://localhost:8000',
+    },
   },
 };
