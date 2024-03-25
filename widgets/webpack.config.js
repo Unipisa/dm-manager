@@ -29,6 +29,7 @@ module.exports = {
       new CopyPlugin({
         patterns: [
           { from: 'src/index.html', to: 'index.html' },
+          { from: 'static/NoImage.png', to: 'static'}
         ],
       }),
     ],

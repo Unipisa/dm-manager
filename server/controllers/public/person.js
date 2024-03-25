@@ -41,6 +41,12 @@ async function personQuery(req, res) {
             ]
         }},
         {$lookup: {
+            from: 'roomAssignments',
+            localField: '_id',
+            foreignField: 'person',
+            as: 'roomAssignments',
+        }},
+        {$lookup: {
             from: 'groups',
             as: 'groups',
             let: { person_id: '$_id' },
@@ -66,7 +72,10 @@ async function personQuery(req, res) {
             $project: {
                 firstName: 1, 
                 lastName: 1,
-                affiliations: 1, 
+                affiliations: {
+                    _id: 1,
+                    name: 1,
+                }, 
                 gender: 1, 
                 email: 1, 
                 phone: 1, 
