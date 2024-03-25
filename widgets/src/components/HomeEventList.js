@@ -22,9 +22,6 @@ export function HomeEventList({}) {
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = {}
-        var conferences = []
-        var seminars = []
-        var colloquia = []
         const now = new Date()
 
         const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
