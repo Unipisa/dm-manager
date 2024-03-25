@@ -1,6 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   entry: path.resolve(__dirname, './src/index.js'),
@@ -26,7 +26,11 @@ module.exports = {
   },
   plugins: [
       new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({template: 'src/index.html'}),
+      new CopyPlugin({
+        patterns: [
+          { from: 'src/index.html', to: 'index.html' },
+        ],
+      }),
     ],
   devServer: {
     static: path.resolve(__dirname, './dist'),

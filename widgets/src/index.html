@@ -121,7 +121,7 @@
             dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
                 from: '2021-01-01', 
                 _sort: 'startDatetime',
-                //_limit: 10
+                _limit: 10
                 // category: '653b5d8d10c0279ad486c807'
             })
             dmwidgets.loadComponent(document.getElementById("conferencelist"), "ConferenceList", { 
@@ -130,7 +130,7 @@
                 // category: '653b5d8d10c0279ad486c807'
             })
             dmwidgets.loadComponent(document.getElementById('homeeventlist'), "HomeEventList", {
-              
+              _limit: 10,
             })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
                 id: '63860dd5f6c76fe5b717c7c8',

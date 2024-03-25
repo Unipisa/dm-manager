@@ -18,76 +18,49 @@ import {
 import './styles.css';
 
 export function HomeEventList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(3);
+    const [numberOfEntries, setNumberOfEntries] = useState(6);
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
-        var events = []
+        var events = {}
         var conferences = []
         var seminars = []
         var colloquia = []
-        var conferencesIndex = 0;
-        var seminarsIndex = 0;
-        var colloquiaIndex = 0;
         const now = new Date()
 
         const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
         if (conf.data) {
-            const ec = conf.data.data              
-            const ec_label =  ec.map(x => { 
-                return {...x, type: 'conference'}
-            })
-            conferences.push(...ec_label)
+            for (const e of conf.data.data) {
+              console.log(`Conference: ${e._id}`,e)
+              events[e._id] = {...e, type: 'conference'}
+            }
         }
 
         const sem = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", from: now} })
         if (sem.data) {
-            const es = sem.data.data
-            const es_label = es.map(x => { 
-                return {...x, type: 'seminar'}
-            })
-            seminars.push(...es_label)
+            for (const e of sem.data.data) {
+              events[e._id] = {...e, type: 'seminar'}
+            }
         }
 
         //colloquium category develop: 65b385d88d78f383a820e974
         //colloquim category production: 653b522f8f0af760bdc42723
         const coll = await axios.get(getManageURL("public/seminars"), { params: { _limit: numberOfEntries, _sort: "startDatetime", category: "653b522f8f0af760bdc42723", from: now} })
         if (coll.data) {
-            const ecl = coll.data.data
-            const ecl_label = ecl.map(x => { 
-                return {...x, type: 'seminar'}
-            })
-            colloquia.push(...ecl_label)
-        }
-
-        seminars = seminars.filter(seminar => !colloquia.some(colloquium => colloquium._id === seminar._id));
-
-        while (events.length < numberOfEntries && (conferencesIndex < conferences.length || seminarsIndex < seminars.length || colloquiaIndex < colloquia.length)) {
-          if (conferencesIndex < conferences.length) {
-              events.push(conferences[conferencesIndex]);
-              conferencesIndex++;
-          }
-          if (seminarsIndex < seminars.length && events.length < numberOfEntries) {
-              events.push(seminars[seminarsIndex]);
-              seminarsIndex++;
-          }
-          if (colloquiaIndex < colloquia.length && events.length < numberOfEntries) {
-              events.push(colloquia[colloquiaIndex]);
-              colloquiaIndex++;
-          }
+            for (const e of coll.data.data) {
+              events[e._id] = {...e, type: 'seminar'}
+            }
         }
         
-        events = events.slice(0, Math.max(numberOfEntries, Math.floor(events.length / 3) * 3))
-
-        if (events.length <= 3) {
-          setNumberOfEntries(numberOfEntries + 3)
-        }
+        events = Object.values(events)
 
         events.sort((a, b) => {
-            const dateA = a.startDatetime ? a.startDatetime : a.startDate
-            const dateB = b.startDatetime ? b.startDatetime : b.startDate
-            return new Date(dateA) - new Date(dateB)
+          const dateA = a.startDatetime ? a.startDatetime : a.startDate
+          const dateB = b.startDatetime ? b.startDatetime : b.startDate
+          return new Date(dateA) - new Date(dateB)
         })
         
+        // events = events.slice(0, Math.max(numberOfEntries, Math.floor(events.length / 3) * 3))
+
         return events
     }, {keepPreviousData: true})
 
@@ -95,21 +68,21 @@ export function HomeEventList({}) {
         return <Loading widget="Lista degli eventi" error={error}></Loading>
     }
 
-      const all_event_list = data.map((x) => (
+      const all_event_list = data.slice(0, numberOfEntries).map((x) => (
         <EventBox event={x} key={x._id}></EventBox>
       ));
     
-      const seminar_list = filterEventsByType(data, 'seminar').map((seminar) => (
+      const seminar_list = filterEventsByType(data, 'seminar').slice(0, numberOfEntries).map((seminar) => (
         <EventBox event={seminar} key={seminar._id}></EventBox>
       ));
     
-      const conference_list = filterEventsByType(data, 'conference').map(
+      const conference_list = filterEventsByType(data, 'conference').slice(0, numberOfEntries).map(
         (conference) => (
           <EventBox event={conference} key={conference._id}></EventBox>
         )
       );
     
-      const colloquia_list = filterEventsByCategory(data, 'Colloquium').map(
+      const colloquia_list = filterEventsByCategory(data, 'Colloquium').slice(0,numberOfEntries).map(
         (colloquium) => (
           <EventBox event={colloquium} key={colloquium._id}></EventBox>
         )
