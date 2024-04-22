@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import api from '../api'
 import { useState } from 'react'
 import { ModalDeleteDialog } from '../components/ModalDialog'
+import { formatDate } from '../components/DatetimeInput'
 
 export default function ManageSeminars() {
 
@@ -68,7 +69,7 @@ function SeminarList() {
                             <strong>Speaker</strong>: {speaker.firstName} { speaker.lastName } ({speaker.affiliations.map(x => x.name).join(", ")})<br></br>
                         </div>
                     )}
-                    <strong>Data</strong>: {seminar.startDatetime}<br></br>
+                    <strong>Data</strong>: {formatDate(seminar.startDatetime)}<br></br>
                     <div className="mt-2 d-flex flex-row justify-content-end">                        
                         <button className="ms-2 btn btn-danger" onClick={() => confirmDeleteSeminar(seminar._id)}>
                             Elimina
