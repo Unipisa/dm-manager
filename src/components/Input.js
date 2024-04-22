@@ -36,12 +36,15 @@ export function InputRow({ label, modified, help, children, className}) {
 }
 
 export function StringInput({ value, setValue }) {
+    // local copy of value, with possible leading/trailing spaces
+    // which are removed when setValue is called
+    const [myValue, setMyValue] = useState(value || "")
     const id = useInputId()
     return <input 
         className="form-control col-sm-10"
         id={ id } 
-        value={ value || "" } 
-        onChange={ (evt) => {setValue(evt.target.value)} }
+        value={ myValue } 
+        onChange={ (evt) => {setMyValue(evt.target.value);setValue(evt.target.value.trim())} }
     />
 }
 
@@ -253,7 +256,6 @@ export function ObjectInput({ placeholder, render, new_object, objCode, objName,
 
     const handleSearch = (query) => {
         setIsLoading(true)
-       
         api.get(`/api/v0/${api_prefix}/${objCode}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
