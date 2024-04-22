@@ -217,7 +217,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                 </InputRow>
             }
             <InputRow label="Data arrivo" className="my-3">
-                <DateInput value={data.startDate} setValue={setter(setData, "startDate")}/>
+                <DateInput value={data.startDate} setValue={startDateSetter}/>
             </InputRow>
             <InputRow label="Data partenza" className="my-3">
                 <DateInput value={data.endDate} setValue={setter(setData, "endDate")} defaultDate={data.startDate}/>
@@ -286,12 +286,21 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
-            <Button className="text-end" onClick={done} disabled={!check()}>Salva</Button>
-        </div>
+            <Button className="text-end" onClick={done} disabled={error()}>Salva</Button>       </div>
+        { error() && <div className="text-danger">{error()}</div>}
     </>
 
-    function check() {
-        return data.startDate && data.endDate && new Date(data.startDate) <= new Date(data.endDate)
+    function startDateSetter(value) {
+        setData(data => {
+            const endDate = data.endDate || value
+            return ({...data, startDate: value, endDate})
+        })
+    }
+
+    function error() {
+        if (!data.startDate) return "Data di arrivo non inserita"
+        if (!data.endDate) return "Data di partenza non inserita"
+        if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
     }
 
     function setReferencePeople(people) {
