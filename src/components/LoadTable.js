@@ -121,11 +121,9 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
             { query.data.limit < query.data.total
                 && <Button ref={scrollRef} onClick={ filter.extendLimit }>visualizza altre</Button>
             }
-            {/*
-            <pre>
+            {/* <pre>
                 {JSON.stringify({columns, filter, fieldsInfo}, null, 2)}                  
-            </pre>
-            */}
+            </pre> */}
         </div>
     </>
 }
@@ -143,6 +141,7 @@ function displayField(obj, key, fieldsInfo={}) {
         if (field.items['x-ref'] === 'Person') {
             return value.map(person => `${person.lastName}`).join(', ')
         } else if (field.items['x-ref'] === 'Institution') {
+            if (!value) return '???'
             return value.map(inst => `${inst.name}`).join(' and ')
         } else {
             return `array of ${field.items['x-ref']} not implemented`
@@ -166,7 +165,7 @@ function displayField(obj, key, fieldsInfo={}) {
 }
 
 export function Th({ filter, children, field }) {
-    const can_sort = field && field.can_sort
+    const can_sort = field?.can_sort || field?.items?.can_sort
     return <th scope="col" onClick={can_sort?filter.onClick:null} style={can_sort?{cursor: 'pointer'}:{}}>
         {children}{filter.sortIcon}
     </th>
