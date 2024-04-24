@@ -22,43 +22,39 @@ export default function SanityCheck() {
         <Card>
             <Card.Body>
             <Card.Title>Duplicated LastName+FirstName</Card.Title>
-            <Card.Text>
-                <table>
-                    <tbody>
-                        {data.duplicatedNames.map((item, i) => {
-                            return <tr key={i}>
-                                <td>{item._id.lastName} {item._id.firstName}</td>
-                                <td>
-                                    {item.ids.map((id, j) => {
-                                        return <a className="btn" key={j} href={`/person/${id}`}>{j+1}</a>
-                                    })}
-                                </td>
-                            </tr>
-                        })}
-                    </tbody>
-                </table>
-            </Card.Text>
+            <table>
+                <tbody>
+                    {data.duplicatedNames.map((item, i) => {
+                        return <tr key={i}>
+                            <td>{item._id.lastName} {item._id.firstName}</td>
+                            <td>
+                                {item.ids.map((id, j) => {
+                                    return <a className="btn" key={j} href={`/person/${id}`}>{j+1}</a>
+                                })}
+                            </td>
+                        </tr>
+                    })}
+                </tbody>
+            </table>
             </Card.Body>
         </Card>
         <Card className="mt-3">
             <Card.Body>
             <Card.Title>Duplicated Emails</Card.Title>
-            <Card.Text>
-                <table>
-                    <tbody>
-                        {data.duplicatedEmails.map((item, i) => {
-                            return <tr key={i}>
-                                <td>{item._id.email}</td>
-                                <td>
-                                    {item.ids.map((id, j) => {
-                                        return <a className="btn" key={j} href={`/person/${id}`}>{j+1}</a>
-                                    })}
-                                </td>
-                            </tr>
-                        })}
-                    </tbody>
-                </table>
-            </Card.Text>
+            <table>
+                <tbody>
+                    {data.duplicatedEmails.map((item, i) => {
+                        return <tr key={i}>
+                            <td>{item._id.email}</td>
+                            <td>
+                                {item.ids.map((id, j) => {
+                                    return <a className="btn" key={j} href={`/person/${id}`}>{j+1}</a>
+                                })}
+                            </td>
+                        </tr>
+                    })}
+                </tbody>
+            </table>
             </Card.Body>
         </Card>
     </>
