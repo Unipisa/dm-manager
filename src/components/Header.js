@@ -38,6 +38,35 @@ export default function Header() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
+            <NavDropdown className="mx-2 py-2" title="Database">
+              <NavDropdown.Header>personale</NavDropdown.Header>
+              <NavDropdown.Item as={NavLink} to="/person">Anagrafica</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/group">Gruppi</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/staff">Qualifiche</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Header>ricerca</NavDropdown.Header>
+              <NavDropdown.Item as={NavLink} to="/grant">Grants</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/thesis">Tesi Dottorato</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/visit">Visite</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/institution">Affiliazioni</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Header>eventi</NavDropdown.Header>
+              <NavDropdown.Item as={NavLink} to="/event-seminar">Seminari</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/event-conference">Conferenze</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/event-phd-course">Corsi di Dottorato</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/seminar-category">Cicli di seminari</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Header>stanze</NavDropdown.Header>
+              <NavDropdown.Item as={NavLink} to="/room">Stanze</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/conference-room">Aule</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/roomAssignment">Assegnazione</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/roomLabel">Cartellini</NavDropdown.Item>
+              <NavDropdown.Divider />
+              <NavDropdown.Header>amministrazione</NavDropdown.Header>
+              <NavDropdown.Item as={NavLink} to="/user">Utenti</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/token">Tokens</NavDropdown.Item>
+              <NavDropdown.Item as={NavLink} to="/log">Logs</NavDropdown.Item>
+            </NavDropdown>
             {Object.entries(objectCategories).map(([category,items]) => 
               <NavDropdown title={category.charAt(0).toUpperCase() + category.slice(1)} key={category} className="mx-2 py-2">
                 { items.map(item => 
