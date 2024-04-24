@@ -1,11 +1,10 @@
 import { Card } from 'react-bootstrap'
-import { useQuery, useQueryClient } from 'react-query'
+import { useQuery } from 'react-query'
 
 import { useEngine } from '../Engine'
 
 export default function SanityCheck() {
     const user = useEngine().user
-    const queryClient = useQueryClient()
     const { isLoading, error, data } = useQuery(['process', 'sanityCheck'])
 
     if (isLoading) {
