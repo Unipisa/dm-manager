@@ -95,5 +95,18 @@ function SeminarList() {
         <div className="row">
             {seminar_block}
         </div>
+        <hr />
+        <div>
+        <i>Chi può accedere a questa pagina?</i><br />
+        Questa pagina è accessibile a tutti gli utenti 
+        con permesso <i>/process/seminars</i>. Tale permesso è automatico 
+        per gli utenti che hanno una delle seguenti qualifiche interne al dipartimento:
+        'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+        'Assegnista', 'Dottorando', 
+        'Professore Emerito',
+        'Collaboratore',
+        'Personale in quiescenza',
+        'PTA'.
+        </div>
     </>
 }

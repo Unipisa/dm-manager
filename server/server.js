@@ -116,9 +116,25 @@ function setup_routes(app) {
       req.roles = [...user.roles]
       for (staff of req.staffs) {
         if (staff.isInternal) {
-          add_role('/process/seminars')
-          if (staff.qualification !== 'PTA') {
-            add_role('/process/my/visits')
+          // se modifchi queste qualifiche ricordati di modificare 
+          // anche la descrizione in fondo alle pagine dei relativi
+          // processi
+          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+            'Assegnista', 'Dottorando', 
+            'Professore Emerito',
+            'Collaboratore',
+            'Personale in quiescenza',
+            'PTA', 
+            ].includes(staff.qualification)) {
+              add_role('/process/seminars')
+          }
+          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+            'Assegnista', 'Dottorando', 
+            'Professore Emerito',
+            'Collaboratore',
+            'Personale in quiescenza',
+            ].includes(staff.qualification)) {
+              add_role('/process/my/visits')
           }
         }
       }

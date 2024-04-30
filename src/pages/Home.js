@@ -13,6 +13,8 @@ export default function Home() {
         Per problemi o informazioni scrivi a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>.
         {} {user?.roles?.length>0 && `I tuoi permessi: ${user.roles.join(', ')}. `}
         {} {user?.roles?.length===0 && `Non risultano permessi assegnati al tuo utente.`}
+        {} {user?.staffs?.length>0 && `Le tue qualifiche: ${user.staffs.map(staff => staff.qualification).join(', ')}. `}
+        {} {user?.staffs?.length===0 && `Non risultano qualifiche assegnate al tuo utente.`}
     </p>
   </>
   }

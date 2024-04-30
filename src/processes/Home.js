@@ -22,12 +22,13 @@ export default function Home() {
                             <li>Inserimento di nuovi seminari</li>
                             <li>Gestione dei seminari inseriti</li>
                         </ul>
-                        
                     </Card.Body>
                 </Card>
             </div>            
             }
             { user.hasProcessPermission('/process/my/visits') && user.person &&
+            // il ruolo '/process/my/visits' viene assegnato al volo
+            // vedi: server/server.js
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
