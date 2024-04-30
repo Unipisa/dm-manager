@@ -133,6 +133,7 @@ export default function Header() {
         <NavDropdown.Item as={NavLink} to="/user">Utenti</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/token">Tokens</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/log">Logs</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/process/sanityCheck">Controlli di consistenza</NavDropdown.Item>
       </NavDropdown>
       <NavLink to="/form" className="nav-link">
         Moduli
