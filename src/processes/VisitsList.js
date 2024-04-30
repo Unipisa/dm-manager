@@ -6,9 +6,18 @@ export default function ProcessVisitsList() {
         <h1 className="text-primary pb-0">Elenco visite</h1>
         <VisitsList/>
         **Vengono visualizzate le visite terminate da non più di 30 giorni.
-        <br />
-        Questa pagina è accessibile da parte di tutti gli utenti 
-        inseriti in anagrafica.
+        <div>
+        <i>Chi può accedere a questa pagina?</i><br />
+        Questa pagina è accessibile a tutti gli utenti 
+        con permesso <i>/process/visitsList</i>. Tale permesso è automatico 
+        per gli utenti che hanno una delle seguenti qualifiche interne al dipartimento:
+        'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+        'Assegnista', 'Dottorando', 
+        'Professore Emerito',
+        'Collaboratore',
+        'Personale in quiescenza',
+        'PTA'.
+        </div>
     </>
 }
 
