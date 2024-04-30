@@ -1,4 +1,6 @@
 import { Card } from 'react-bootstrap'
+import { NavDropdown } from "react-bootstrap"
+import { NavLink } from "react-router-dom"
 
 import { useEngine } from '../Engine'
 
@@ -98,3 +100,31 @@ export default function Home() {
         </div>
     </>
   }
+
+// this menu is inserted in the Header component
+
+export function ProcessDropdown() {
+    const user = useEngine().user
+    const items = []
+    if (user.hasProcessPermission('/process/seminars')) 
+        items.push(<NavDropdown.Item as={NavLink} to="/process/seminars">
+            Seminari
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/my/visits') && user.person)
+        items.push(<NavDropdown.Item as={NavLink} to="/process/my/visits">
+            Miei Visitatori
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/visits'))
+        items.push(<NavDropdown.Item as={NavLink} to="/process/visits">
+            Gestione Visitatori
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/roomLabels'))
+        items.push(<NavDropdown.Item as={NavLink} to="/process/roomLabels">
+            Cartellini stanze
+        </NavDropdown.Item>)
+    if (items.length === 0) return null
+
+    return <NavDropdown className="mx-2 py-2" title="Processi">
+        {items}
+    </NavDropdown>
+}
