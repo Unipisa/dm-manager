@@ -64,7 +64,24 @@ export default function Home() {
                     </Card.Body>
                 </Card>
             </div> }
-            { (user.hasProcessPermission('/process/roomLabels')) &&
+            { user.person &&  
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Elenco Visitatori</strong>
+                            <a href="/process/visitsList"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>visualizza le informazioni sugli ultimi visitatori</li>
+                        </ul>                    
+                    </Card.Body>
+                </Card>
+            </div>
+            }
+            { user.hasProcessPermission('/process/roomLabels') &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">
                 <Card.Header>                    
@@ -90,20 +107,24 @@ export default function Home() {
 export function ProcessDropdown() {
     const user = useEngine().user
     const items = []
-    if (user.hasProcessPermission('/process/seminars')) 
-        items.push(<NavDropdown.Item as={NavLink} to="/process/seminars">
+    if (user.hasProcessPermission('/process/seminars')) items.push(
+        <NavDropdown.Item as={NavLink} to="/process/seminars">
             Seminari
         </NavDropdown.Item>)
-    if (user.hasProcessPermission('/process/my/visits') && user.person)
-        items.push(<NavDropdown.Item as={NavLink} to="/process/my/visits">
+    if (user.hasProcessPermission('/process/my/visits') && user.person) items.push(
+        <NavDropdown.Item as={NavLink} to="/process/my/visits">
             Miei Visitatori
         </NavDropdown.Item>)
-    if (user.hasProcessPermission('/process/visits'))
-        items.push(<NavDropdown.Item as={NavLink} to="/process/visits">
+    if (user.hasProcessPermission('/process/visits')) items.push(
+        <NavDropdown.Item as={NavLink} to="/process/visits">
             Gestione Visitatori
         </NavDropdown.Item>)
-    if (user.hasProcessPermission('/process/roomLabels'))
-        items.push(<NavDropdown.Item as={NavLink} to="/process/roomLabels">
+    if (user.person) items.push(
+        <NavDropdown.Item as={NavLink} to="/process/visitsList">
+            Elenco Visitatori
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/roomLabels')) items.push(
+        <NavDropdown.Item as={NavLink} to="/process/roomLabels">
             Cartellini stanze
         </NavDropdown.Item>)
     if (items.length === 0) return null
