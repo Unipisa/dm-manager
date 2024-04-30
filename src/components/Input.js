@@ -151,16 +151,19 @@ export function DateInput({ value, setValue, defaultDate }) {
 }
 
 export function ListInput({ value, setValue, separator }) {
+    if (separator === undefined) separator = ','
     const id = useInputId()
+    const [myValue, setMyValue] = useState(value?value.join(separator):"")
 
-    if (separator === undefined) separator = ','    
     return <input 
         id={ id } 
-        value={ value ? (value.join(separator) || "") : "" } 
+        value={ myValue } 
         onChange={ (evt) => {
+                setMyValue(evt.target.value)
                 const val = evt.target.value
                     .split(separator)
                     .map( x => x.trim())
+                    .filter( x => x!=="")
                 setValue(val) 
             } 
         }
