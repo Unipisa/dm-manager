@@ -55,10 +55,10 @@ function VisitForm({visit, variant}) {
         <SelectPersonBlock 
             title="Selezione visitatore" 
             label="Visitatore" 
-            person={data.person} setPerson={setter(setData, 'person')} 
+            person={data.person} 
+            setPerson={setter(setData, 'person')} 
+            onFocus={() => setActiveSection('person')}
             done={nextStep}
-            change={() => {setData({...data, person: null});setActiveSection('person')}}
-            active={activeSection==='person'}
             prefix={`process/${variant}visits`}
         />
         { data.person && 

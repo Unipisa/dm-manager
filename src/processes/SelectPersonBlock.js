@@ -1,34 +1,45 @@
 import { useState } from 'react'
 import { Card, Form, Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
 
-import { InputRow, PersonInput, StringInput, EmailInput, InstitutionInput } from '../components/Input'
+import { InputRow, StringInput, EmailInput, InstitutionInput } from '../components/Input'
 import { useQuery } from 'react-query'
 import api from '../api'
 
-export default function SelectPersonBlock({ title, label, person, setPerson, active, done, change, prefix}) {
+export default function SelectPersonBlock({ title, label, person, setPerson, onFocus, done, prefix}) {
     // input dell'utente
     const [lastName, setLastName] = useState('')
     const [firstName, setFirstName] = useState('')
     const [email, setEmail] = useState('')
     const [affiliations, setAffiliations] = useState([])
+    const [mode, setMode] = useState(person ? 'display' : 'search')
 
-    // attiva la modalità di aggiornamento dei dati
-    const [edit, setEdit] = useState(true)
+    // mode:
+    // * display: mostra i dati della persona
+    // * search: cerca la persona
+    // * confirm: conferma la persona
+    // * update: modifica i dati della persona
 
-    if (!active) return <Card className="shadow mb-3">
+
+    if (mode === 'display') return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
-                <div>{label}: <strong>{person?.firstName} {person?.lastName}</strong> ({person.affiliations?.map(_ => _.name).join(', ') || '???'})</div>                    
-                <div className="btn btn-warning btn-sm" onClick={change}>Cambia persona</div>
+                <div>
+                    {label}: <strong>{person?.firstName} {person?.lastName}</strong> {}
+                    ({person.affiliations?.map(_ => _.name).join(', ') || '???'}) {}
+                    {person.email && <a href={`mailto:${person.email}`}>{person.email}</a>}
+                </div>
+                <div>
+                    <div className='btn btn-warning btn-sm mx-2' onClick={update}>Aggiorna dati</div>      
+                    <div className='btn btn-warning btn-sm' onClick={change}>Cambia persona</div>
+                </div>
             </div>
         </Card.Header>
+        <Footer />
     </Card>
 
-    return <Card className="shadow mb-3">
+    if (mode === 'search') return <Card className="shadow mb-3">
         <Card.Header className="">{title || "Selezione persona"}</Card.Header>
         <Card.Body>
-
-            {!person && <>
                 <p>Cerca la persona nel database:</p>
                 <Form className="mb-3">
                     <InputRow label="cognome">
@@ -58,10 +69,17 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 <Button className="mx-3" onClick={createNew} disabled={!lastName || !firstName || !email || !affiliations.length}>
                     Crea una nuova persona
                 </Button>
+                <Button className="mx-3" onClick={()=>setMode('display')} disabled={!person}>
+                    Annulla
+                </Button>
                 <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} prefix={prefix}/>
-            </>}
+            </Card.Body>
+        <Footer />
+    </Card>
 
-            {person && edit && <>
+    if (mode === 'update') return <Card className="shadow mb-3">
+        <Card.Header className="">{title || "Selezione persona"}</Card.Header>
+        <Card.Body> 
                 <Form className="mb-3">
                     <InputRow label="cognome">
                         <strong>{lastName}</strong>
@@ -82,10 +100,13 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                         Annulla
                     </Button>
                 </Form>
-            </>}
+                </Card.Body>
+        <Footer />
+    </Card>
 
-            {/* mostra i dati */}
-            {person && !edit && <>
+    if (mode === 'confirm') return <Card className="shadow mb-3">
+        <Card.Header className="">{title || "Selezione persona"}</Card.Header>
+        <Card.Body> 
                 <p>La persona è già presente nel database.
                     Controlla i dati...
                     {} { email 
@@ -101,7 +122,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                     <div>email: <strong>{email}</strong></div>
                     <div>affiliazione: <strong>{affiliations.map(affiliation => affiliation.name).join(', ')}</strong></div>
                 </div>
-                <Button className="m-3" onClick={() => setEdit(true)}>
+                <Button className="m-3" onClick={() => setMode('update')}>
                     Aggiorna i dati di questa persona
                 </Button>
                 <Button className="m-3" onClick={save}>
@@ -109,17 +130,23 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
                 </Button>
                 <Button className="m-3" onClick={() => {
                         setAffiliations([]);setLastName('');setFirstName('');setEmail('');
-                        setPerson(null);setEdit(true)}}>
+                        setMode('search')}}>
                     Cerca un'altra persona
                 </Button>
-            </>} 
         </Card.Body>
-        {/* <Card.Footer>
-            <pre>
-                {JSON.stringify({person, edit, active, lastName, firstName, email, affiliations}, null, 2)}
-            </pre>
-        </Card.Footer> */}
+        <Footer />
     </Card>
+
+    return <div>invalid mode: {mode}</div>
+
+    function Footer() {
+        return
+        return <Card.Footer>
+            <pre>
+                {JSON.stringify({person, mode, lastName, firstName, email, affiliations}, null, 2)}
+            </pre>
+        </Card.Footer>
+    }
 
     function clickPerson(person) {
         setLastName(person.lastName)
@@ -127,7 +154,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         setEmail(person.email)
         setAffiliations([...person.affiliations])
         setPerson(person)
-        setEdit(false)
+        setMode("confirm")
     }
 
     function diff() {
@@ -155,6 +182,7 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
             email,
             affiliations,
         })
+        setMode('display')
         done()
     }
 
@@ -163,8 +191,9 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         console.log(`patch: ${JSON.stringify(patch)}`)
         if (patch) {
             await api.patch(`/api/v0/${prefix}/person/${person._id}`, patch)
-            setPerson({...person, ...patch})
+            setPerson({...person, lastName, firstName, email, affiliations})
         }
+        setMode('display')
         done()
     }
 
@@ -173,7 +202,25 @@ export default function SelectPersonBlock({ title, label, person, setPerson, act
         setFirstName(person.firstName)
         setEmail(person.email)
         setAffiliations([...person.affiliations])
-        setEdit(false)
+        setMode('display')
+    }
+
+    function update() {
+        setLastName(person.lastName)
+        setFirstName(person.firstName)
+        setEmail(person.email)
+        setAffiliations([...person.affiliations])
+        setMode('update')
+        onFocus()
+    }
+
+    function change() {
+        setLastName('')
+        setFirstName('')
+        setEmail('')
+        setAffiliations([])
+        setMode('search')
+        onFocus()
     }
 }
 
@@ -199,36 +246,4 @@ function PersonSuggestions({query, onClick, prefix}) {
         </tbody>
     </Table>
 }
-
-export function OldSelectPersonBlock({ title, label, person, setPerson, active, done, cancel}) {
-    if (active || active===undefined) return <Card className="shadow mb-3">
-        <Card.Header className="">{title || "Selezione persona"}</Card.Header>
-        <Card.Body>
-        <p>
-        Digitare le prime lettere del cognome per attivare il completamento. 
-        Solo se la persona non esiste, crearne una nuova selezionando 
-        la voce che appare nel menù a tendina. 
-        In tal caso, inserire nome, cognome e istituzione nella lingua di appartenenza
-        (ad esempio, "Universität Zürich" piuttosto che "University of Zurich").
-        </p>
-        <Form className="mb-3">
-            <InputRow label={label || 'persona'}>
-                <PersonInput value={person} setValue={(x) => {
-                    setPerson(x)
-                    done && done()
-                }} />
-            </InputRow>
-        </Form>
-        </Card.Body>
-    </Card> 
-    return <Card className="shadow mb-3">
-        <Card.Header>
-            <div className="d-flex d-row justify-content-between">
-                <div>{label}: <strong>{person?.firstName} {person?.lastName}</strong> ({person.affiliations?.map(_ => _.name).join(', ') || '???'})</div>                    
-                <div className="btn btn-warning btn-sm" onClick={cancel}>Cambia persona</div>
-            </div>
-        </Card.Header>
-    </Card>
-}
-
 
