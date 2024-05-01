@@ -108,23 +108,23 @@ export function ProcessDropdown() {
     const user = useEngine().user
     const items = []
     if (user.hasProcessPermission('/process/seminars')) items.push(
-        <NavDropdown.Item as={NavLink} to="/process/seminars">
+        <NavDropdown.Item key="seminars" as={NavLink} to="/process/seminars">
             Seminari
         </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/my/visits') && user.person) items.push(
-        <NavDropdown.Item as={NavLink} to="/process/my/visits">
+        <NavDropdown.Item key="my/visits" as={NavLink} to="/process/my/visits">
             Miei Visitatori
         </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/visits')) items.push(
-        <NavDropdown.Item as={NavLink} to="/process/visits">
+        <NavDropdown.Item key="visits" as={NavLink} to="/process/visits">
             Gestione Visitatori
         </NavDropdown.Item>)
     if (user.person) items.push(
-        <NavDropdown.Item as={NavLink} to="/process/visitsList">
+        <NavDropdown.Item key="visitsList" as={NavLink} to="/process/visitsList">
             Elenco Visitatori
         </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/roomLabels')) items.push(
-        <NavDropdown.Item as={NavLink} to="/process/roomLabels">
+        <NavDropdown.Item key="roomLabels" as={NavLink} to="/process/roomLabels">
             Cartellini stanze
         </NavDropdown.Item>)
     if (items.length === 0) return null

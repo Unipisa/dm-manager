@@ -4,7 +4,7 @@ import Processes from '../processes/Home'
 export default function Home() {
   const user = useEngine().user
 
-  console.log('Home user', user)
+  // console.log('Home user', user)
 
   return <>
     <Processes />

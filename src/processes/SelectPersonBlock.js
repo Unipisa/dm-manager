@@ -141,11 +141,12 @@ export default function SelectPersonBlock({ title, label, person, setPerson, onF
 
     function Footer() {
         return
-        return <Card.Footer>
+/*        return <Card.Footer>
             <pre>
                 {JSON.stringify({person, mode, lastName, firstName, email, affiliations}, null, 2)}
             </pre>
         </Card.Footer>
+*/
     }
 
     function clickPerson(person) {
