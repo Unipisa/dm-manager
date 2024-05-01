@@ -14,7 +14,6 @@ export default class Institution extends Model {
             'un oggetto': "un'istituzione",
         }
         this.ModelName = 'Institution'
-        this.ModelCategory = 'ricerca'
         this.managerRoles = ['admin', 'institution-manager']
         this.indexDefaultFilter = {'_sort': 'name', '_limit': 10}
         this.columns = {

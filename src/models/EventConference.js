@@ -42,18 +42,6 @@ export default class EventConference {
 
     // absolute url of object with given id
     editUrl(id) {return `/${this.code}/${id}/edit`}
-
-    // info about elements to be added into the menu bar
-    menuElements(user) {
-        return user && this.schema && user.hasSomeRole(...this.schema.supervisorRoles) ? [
-            {
-                key: this.code,
-                url: this.indexUrl(), 
-                text: 'Conferenze',
-                category: 'eventi',
-            },
-        ] : [];
-    }
     
     // brief description of given object
     describe(obj) {

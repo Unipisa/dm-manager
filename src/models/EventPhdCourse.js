@@ -51,18 +51,6 @@ export default class EventPhdCourse {
     // absolute url of object with given id
     editUrl(id) {return `/${this.code}/${id}/edit`}
 
-    // info about elements to be added into the menu bar
-    menuElements(user) {
-        return user && this.schema && user.hasSomeRole(...this.schema.supervisorRoles) ? [
-            {
-                key: this.code,
-                url: this.indexUrl(), 
-                text: 'Corsi di Dottorato',
-                category: 'eventi',
-            },
-        ] : [];
-    }
-
     homeElements(user) {
         if (user.hasSomeRole(...this.schema.managerRoles)) {
             return [<Link to={this.indexUrl()}>Gestire i Corsi di Dottorato</Link>]

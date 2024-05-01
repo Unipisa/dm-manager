@@ -5,7 +5,6 @@ export default class User extends Model {
         super()
         this.code = 'user'
         this.ModelName = 'User'
-        this.ModelCategory = 'amministrazione'
         this.name = "utente"
         this.oa = "o"
         this.articulation = {
