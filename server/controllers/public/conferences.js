@@ -38,8 +38,8 @@ async function conferencesQuery(req) {
         match["startDate"] = { "$lte": to }
     }
 
-    if (req.query.grant) {
-        match["grant"] = ObjectId(req.query.grant)
+    if (req.query.grants) {
+        match["grants"] = ObjectId(req.query.grants)
     }
 
     if (req.query.SSD) {
@@ -63,8 +63,8 @@ async function conferencesQuery(req) {
         { $lookup: {
             from: 'grants',
             foreignField: '_id',
-            localField: 'grant',
-            as: 'grant'
+            localField: 'grants',
+            as: 'grants'
         }},
         ...sort_and_limit,
         { $project: {
@@ -73,6 +73,11 @@ async function conferencesQuery(req) {
             startDate: 1,
             endDate: 1,
             SSD: 1,
+            grants:  {
+                _id: 1,
+                name: 1, 
+                identifier: 1,
+            },
             url: 1,
             conferenceRoom: 1,
             description: 1,
