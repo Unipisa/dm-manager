@@ -30,9 +30,19 @@ async function seminarsQuery(req) {
             to = new Date(req.query.to)
     }
 
+    var startDatetime = {}
+    if (from !== undefined) {
+        startDatetime["$gte"] = from
+    }
+    if (to !== undefined) {
+        startDatetime["$lte"] = to
+    }
+
     var match = {}
-    if (from !== undefined) match.endDateTime={$gte: from}
-    if (to !== undefined) match.startDatetime={$lte: to}
+
+    if (Object.keys(startDatetime).length > 0) {
+        match.startDatetime = startDatetime
+    }
 
     if (req.query.category) {
         match["category"] = ObjectId(req.query.category)
