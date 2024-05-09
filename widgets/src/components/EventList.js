@@ -10,8 +10,8 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function EventList({ from, to, grant, _limit }) {
-    const filter = { from, to, grant, _limit }
+export function EventList({ from, to, grants, _limit }) {
+    const filter = { from, to, grants, _limit }
 
     const { isLoading, error, data } = useQuery([ 'events', filter ], async () => {
         var events = []
