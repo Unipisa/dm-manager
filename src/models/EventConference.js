@@ -9,14 +9,14 @@ export default class EventConference {
         this.ModelName = "EventConference"
         
         this.code = "event-conference"
-        this.name = "conferenza"
+        this.name = "evento"
         this.oa = "a"
         this.articulation = {
-            'oggetto': "conferenza", 
-            'oggetti': "conferenze",
-            'l\'oggetto': "la conferenza",
-            'gli oggetti': "le conferenze", 
-            'un oggetto': "una conferenza", 
+            'oggetto': "evento", 
+            'oggetti': "eventi",
+            'l\'oggetto': "l'evento",
+            'gli oggetti': "gli eventi", 
+            'un oggetto': "un evento", 
         }
         this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
         this.columns = {

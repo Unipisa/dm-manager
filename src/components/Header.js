@@ -70,7 +70,7 @@ export default function Header() {
       </NavDropdown>
       <NavDropdown title="Eventi" className="mx-2 py-2">
         <NavDropdown.Item as={NavLink} to="/event-seminar">Seminari</NavDropdown.Item>
-        <NavDropdown.Item as={NavLink} to="/event-conference">Conferenze</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/event-conference">Eventi</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/event-phd-course">Corsi di Dottorato</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/seminar-category">Cicli di seminari</NavDropdown.Item>
       </NavDropdown>
