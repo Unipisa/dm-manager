@@ -56,5 +56,19 @@ export default function SanityCheck() {
             </table>
             </Card.Body>
         </Card>
+        <Card className="mt-3">
+            <Card.Body>
+            <Card.Title>Missing Matricola</Card.Title>
+            <table>
+                <tbody>
+                    {data.missingMatricola.map((item, i) => {
+                        return <tr key={i}>
+                            <a className="btn" key={i} href={`/staff/${item._id}`}>{i+1}</a>
+                        </tr>
+                    })}
+                </tbody>
+            </table>
+            </Card.Body>
+        </Card>
     </>
   }
