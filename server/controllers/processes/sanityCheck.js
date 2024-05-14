@@ -5,6 +5,7 @@ const { ObjectId } = require('mongoose').Types
 const Person = require('../../models/Person')
 const {log} = require('../middleware')
 const { readSync } = require('fs-extra')
+const Staff = require('../../models/Staff')
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined || !req.user.roles.includes('admin')) {
@@ -53,7 +54,18 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, duplicatedEmails})
+    // find missing matricola
+    const missingMatricola = await Staff.aggregate([
+        {
+            $match: {
+                isInternal: true,
+                matricola: { $exists: false },
+                startDate: { $lt: new Date() }
+            }
+        }
+    ])
+
+    return res.json({duplicatedNames, duplicatedEmails, missingMatricola})
 })
 
 module.exports = router
