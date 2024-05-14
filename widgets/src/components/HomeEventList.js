@@ -23,6 +23,7 @@ export function HomeEventList({}) {
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = {}
         const now = new Date()
+        now.setHours(0, 0, 0, 0)
 
         const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
         if (conf.data) {
