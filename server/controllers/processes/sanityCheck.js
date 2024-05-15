@@ -7,6 +7,7 @@ const {log} = require('../middleware')
 const { readSync } = require('fs-extra')
 const Staff = require('../../models/Staff')
 const Institution = require('../../models/Institution')
+const Seminar = require('../../models/EventSeminar')
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined || !req.user.roles.includes('admin')) {
@@ -69,7 +70,7 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    //find institutions with missing country
+    // find institutions with missing country
     const missingInstitutionCountry = await Institution.aggregate([
         {
             $match: {
@@ -81,7 +82,29 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry})
+    // find duplicated institutions
+    const duplicatedInstitutions = await Institution.aggregate([
+        { $project: {
+            names: { $concatArrays: [ ["$name"], "$alternativeNames" ] },
+          }
+        },
+        { $unwind: "$names" },
+        { $match: { names: { $ne: "" } } },
+        { $match: { names: { $ne: null } } },
+        {
+            $group: {
+                _id: { name: { $toLower: "$names" } },
+                ids: { $push: "$_id" },
+                count: { $sum: 1 }
+            }
+        },
+        {   $match: { 
+                count: { $gt: 1 } 
+            } 
+        }
+    ]);
+
+    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry, duplicatedInstitutions})
 })
 
 module.exports = router
