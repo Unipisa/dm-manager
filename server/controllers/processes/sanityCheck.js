@@ -60,12 +60,16 @@ router.get('/', async (req, res) => {
         {
             $match: {
                 isInternal: true,
-                matricola: { $exists: false },
+                $or: [
+                    { matricola: { $exists: false } },
+                    { matricola: "" } 
+                ],
                 startDate: { $lt: new Date() }
             }
         }
     ])
 
+    //find institutions with missing country
     const missingInstitutionCountry = await Institution.aggregate([
         {
             $match: {
