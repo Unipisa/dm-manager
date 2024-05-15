@@ -46,6 +46,10 @@ async function conferencesQuery(req) {
         match["SSD"] = req.query.SSD
     }
 
+    if (req.query.isOutreach !== undefined) {
+        match["isOutreach"] = req.query.isOutreach === 'true'
+    }
+
     const sort_and_limit = createSortAndLimitFilters(req)
 
     const pipeline = [
@@ -73,6 +77,7 @@ async function conferencesQuery(req) {
             startDate: 1,
             endDate: 1,
             SSD: 1,
+            isOutreach: 1,
             grants:  {
                 _id: 1,
                 name: 1, 
