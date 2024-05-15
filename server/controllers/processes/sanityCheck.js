@@ -6,6 +6,7 @@ const Person = require('../../models/Person')
 const {log} = require('../middleware')
 const { readSync } = require('fs-extra')
 const Staff = require('../../models/Staff')
+const Institution = require('../../models/Institution')
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined || !req.user.roles.includes('admin')) {
@@ -65,7 +66,18 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, duplicatedEmails, missingMatricola})
+    const missingInstitutionCountry = await Institution.aggregate([
+        {
+            $match: {
+                $or: [
+                    { country: { $exists: false } }, 
+                    { country: "" }
+                ]
+            }
+        }
+    ])
+
+    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry})
 })
 
 module.exports = router

@@ -70,5 +70,19 @@ export default function SanityCheck() {
             </table>
             </Card.Body>
         </Card>
+        <Card className="mt-3">
+            <Card.Body>
+            <Card.Title>Missing Country in Institution</Card.Title>
+            <table>
+                <tbody>
+                    {data.missingInstitutionCountry.map((item, i) => {
+                        return <tr key={i}>
+                            <a className="btn" key={i} href={`/institution/${item._id}`}>{item.name}</a>
+                        </tr>
+                    })}
+                </tbody>
+            </table>
+            </Card.Body>
+        </Card>
     </>
   }
