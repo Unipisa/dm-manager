@@ -8,6 +8,7 @@ const { readSync } = require('fs-extra')
 const Staff = require('../../models/Staff')
 const Institution = require('../../models/Institution')
 const Seminar = require('../../models/EventSeminar')
+const Event = require('../../models/EventConference')
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined || !req.user.roles.includes('admin')) {
@@ -164,7 +165,67 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars})
+    const duplicatedEvents = await Event.aggregate([
+        {
+            $facet: {
+                byTitle: [
+                    {
+                        $group: {
+                            _id: { $toLower: "$title" },
+                            ids: { $push: "$_id" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $match: {
+                            count: { $gt: 1 }
+                        }
+                    }
+                ],
+                byDateAndRoom: [
+                    {
+                        $group: {
+                            _id: { startDate: "$startDate", conferenceRoom: "$conferenceRoom" },
+                            ids: { $push: "$_id" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $match: {
+                            count: { $gt: 1 }
+                        }
+                    }
+                ],
+                byDateAndInstitution: [
+                    {
+                        $group: {
+                            _id: { startDate: "$startDate", institution: "$institution" },
+                            ids: { $push: "$_id" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $match: {
+                            count: { $gt: 1 }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                duplicatedEvents: { $concatArrays: ["$byTitle", "$byDateAndRoom", "$byDateAndInstitution"] }
+            }
+        },
+        {
+            $unwind: "$duplicatedEvents"
+        },
+        {
+            $replaceRoot: { newRoot: "$duplicatedEvents" }
+        }
+    ])
+
+    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars, duplicatedEvents})
 })
 
 module.exports = router
