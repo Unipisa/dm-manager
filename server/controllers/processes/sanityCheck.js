@@ -104,7 +104,67 @@ router.get('/', async (req, res) => {
         }
     ]);
 
-    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry, duplicatedInstitutions})
+    const duplicatedSeminars = await Seminar.aggregate([
+        {
+            $facet: {
+                byTitle: [
+                    {
+                        $group: {
+                            _id: { $toLower: "$title" },
+                            ids: { $push: "$_id" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $match: {
+                            count: { $gt: 1 }
+                        }
+                    }
+                ],
+                bySpeakersAndDate: [
+                    {
+                        $group: {
+                            _id: { speakers: "$speakers", startDatetime: "$startDatetime" },
+                            ids: { $push: "$_id" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $match: {
+                            count: { $gt: 1 }
+                        }
+                    }
+                ],
+                byDateAndRoom: [
+                    {
+                        $group: {
+                            _id: { startDatetime: "$startDatetime", conferenceRoom: "$conferenceRoom" },
+                            ids: { $push: "$_id" },
+                            count: { $sum: 1 }
+                        }
+                    },
+                    {
+                        $match: {
+                            count: { $gt: 1 }
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $project: {
+                duplicatedSeminars: { $concatArrays: ["$byTitle", "$bySpeakersAndDate", "$byDateAndRoom"] }
+            }
+        },
+        {
+            $unwind: "$duplicatedSeminars"
+        },
+        {
+            $replaceRoot: { newRoot: "$duplicatedSeminars" }
+        }
+    ])
+
+    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars})
 })
 
 module.exports = router

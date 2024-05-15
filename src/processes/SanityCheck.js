@@ -77,15 +77,31 @@ export default function SanityCheck() {
         </Card>
         <Card className="mt-3">
             <Card.Body>
+            <Card.Title>Duplicated Seminars</Card.Title>
+            <table>
+                <tbody>
+                    {data.duplicatedSeminars.map((item, i) => {
+                        return <tr key={i}>
+                            <td>{item._id.title}</td>
+                            <td>
+                                {item.ids.map((id, j) => {
+                                    return <a className="btn" key={j} href={`/event-seminar/${id}`}>{j+1}</a>
+                                })}
+                            </td>
+                        </tr>
+                    })}
+                </tbody>
+            </table>
+            </Card.Body>
+        </Card>
+        <Card className="mt-3">
+            <Card.Body>
             <Card.Title>Missing Matricola</Card.Title>
             <table>
                 <tbody>
                     {data.missingMatricola.map((item, i) => {
                         return <tr key={i}>
-                            <td>{item.person.firstName}</td>
-                            <td>
-                                <a className="btn" key={i} href={`/staff/${item._id}`}>{i+1}</a>
-                            </td>
+                            <a className="btn" key={i} href={`/staff/${item._id}`}>{i+1}</a>
                         </tr>
                     })}
                 </tbody>
