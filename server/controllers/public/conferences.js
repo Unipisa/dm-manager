@@ -46,6 +46,10 @@ async function conferencesQuery(req) {
         match["SSD"] = req.query.SSD
     }
 
+    if (req.query.isOutreach !== undefined) {
+        match["isOutreach"] = req.query.isOutreach === 'true'
+    }
+
     const sort_and_limit = createSortAndLimitFilters(req)
 
     const pipeline = [
