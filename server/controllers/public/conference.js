@@ -30,6 +30,7 @@ async function conferenceQuery(req) {
             endDate: 1,
             SSD: 1,
             url: 1,
+            isOutreach: 1,
             grants: {
                 _id: 1,
                 name: 1, 
