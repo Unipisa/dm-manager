@@ -184,6 +184,11 @@ router.get('/', async (req, res) => {
                 ],
                 byDateAndRoom: [
                     {
+                        $match: {
+                            conferenceRoom: { $exists: true, $ne: "" }
+                        }
+                    },
+                    {
                         $group: {
                             _id: { startDate: "$startDate", conferenceRoom: "$conferenceRoom" },
                             ids: { $push: "$_id" },
@@ -197,6 +202,11 @@ router.get('/', async (req, res) => {
                     }
                 ],
                 byDateAndInstitution: [
+                    {
+                        $match: {
+                            institution: { $exists: true, $ne: "" }
+                        }
+                    },
                     {
                         $group: {
                             _id: { startDate: "$startDate", institution: "$institution" },
