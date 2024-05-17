@@ -105,6 +105,49 @@ async function personQuery(req, res) {
                 }
             ]
         }},
+        {$lookup: {
+            from: 'grants',
+            as: 'grants',
+            let: { person_id: '$_id' },
+            pipeline: [
+                { $match: { $expr: {
+                    $and: [
+                        { $or: [ 
+                            { $eq: [ "$$person_id", "$pi" ] },
+                            { $eq: [ "$$person_id", "$localCoordinator" ] },
+                            { $in: [ "$$person_id", "$members" ] }
+                        ]},
+                        { $or: [
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", "$$NOW"] } ]},
+                        { $or: [
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$NOW"] } ]}
+                    ]}}                 
+                },
+                { $lookup: {
+                    from: 'people',
+                    localField: 'pi',
+                    foreignField: '_id',
+                    as: 'piDetails'
+                }},
+                { $unwind: {
+                    path: "$piDetails",
+                    preserveNullAndEmptyArrays: true
+                }},
+                { $project: {
+                    name: 1,
+                    projectType: 1,
+                    pi: 1,
+                    startDate: 1,
+                    endDate: 1,
+                    piDetails: {
+                        firstName: 1,
+                        lastName: 1
+                    }
+                }}
+            ]
+        }},
         {
             $project: {
                 firstName: 1, 
@@ -142,6 +185,17 @@ async function personQuery(req, res) {
                     name: 1, 
                     chair: 1,
                     vice: 1
+                },
+                grants: {
+                    name: 1,
+                    projectType: 1,
+                    pi: 1,
+                    startDate: 1,
+                    endDate: 1,
+                    piDetails: {
+                        firstName: 1,
+                        lastName: 1
+                    }
                 }
             }
         }
