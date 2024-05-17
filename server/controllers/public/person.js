@@ -32,7 +32,7 @@ async function personQuery(req, res) {
                         $and: [
                             { $or: [
                                 { $eq: ["$endDate", null] },
-                            { $gte: ["$endDate", "$$NOW"] } ]},
+                                { $gte: ["$endDate", "$$NOW"] } ]},
                             { $or: [
                                 { $eq: ["$startDate", null] },
                                 { $lte: ["$startDate", "$$NOW"] } ]}
@@ -40,11 +40,48 @@ async function personQuery(req, res) {
                 }},
             ]
         }},
-        {$lookup: {
-            from: 'roomAssignments',
+        { $lookup: {
+            from: 'roomassignments',
             localField: '_id',
             foreignField: 'person',
             as: 'roomAssignments',
+            pipeline: [
+                { $match: {
+                    $expr: {
+                        $and: [
+                            { $or: [
+                                { $eq: ["$endDate", null] },
+                                { $gte: ["$endDate", "$$NOW"] } 
+                            ]},
+                            { $or: [
+                                { $eq: ["$startDate", null] },
+                                { $lte: ["$startDate", "$$NOW"] } 
+                            ]}
+                        ]
+                    }
+                }},
+                { $lookup: {
+                    from: 'rooms',
+                    localField: 'room',
+                    foreignField: '_id',
+                    as: 'roomDetails'
+                }},
+                { $unwind: {
+                    path: "$roomDetails",
+                    preserveNullAndEmptyArrays: true
+                }},
+                { $project: {
+                    room: 1,
+                    startDate: 1,
+                    endDate: 1,
+                    roomDetails: {
+                        building: 1,
+                        floor: 1,
+                        number: 1,
+                        code: 1
+                    }
+                }}
+            ]
         }},
         {$lookup: {
             from: 'groups',
@@ -60,7 +97,7 @@ async function personQuery(req, res) {
                         ]},
                         { $or: [
                             { $eq: ["$endDate", null] },
-                        { $gte: ["$endDate", "$$NOW"] } ]},
+                            { $gte: ["$endDate", "$$NOW"] } ]},
                         { $or: [
                             { $eq: ["$startDate", null] },
                             { $lte: ["$startDate", "$$NOW"] } ]}
@@ -89,6 +126,17 @@ async function personQuery(req, res) {
                     qualification: 1,
                     SSD: 1,
                     isInternal: 1
+                },
+                roomAssignments: {
+                    room: 1,
+                    startDate: 1,
+                    endDate: 1,
+                    roomDetails: {
+                        building: 1,
+                        floor: 1,
+                        number: 1,
+                        code: 1
+                    }
                 },
                 groups: {
                     name: 1, 
