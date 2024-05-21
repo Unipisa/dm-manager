@@ -1,5 +1,5 @@
 import React from 'react';
-import { getManageURL, getSSDLink } from '../utils';
+import { getManageURL, getSSDLink, getDMURL, formatDateInterval } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -7,7 +7,6 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 
-import { formatDateInterval } from '../utils'
 import { useQuery } from 'react-query'
 import { get } from 'mongoose';
 
@@ -41,12 +40,16 @@ export function PersonDetails({ id , en }) {
     const feminine = data.gender === 'Donna'
     const qualification = (data.staffs || []).map(q => get_role_label(q.qualification,en,feminine)).join(', ')
     const research_group_text = data.staffs.map(q=>q.SSD).filter(q=>q).map(ssd => get_research_group_label(ssd, en)).join(', ')
+    const room_details = (data.roomAssignments || []).map(r => {
+      const details = get_room_details(r.roomDetails, r.room, en);
+      return (
+          <div key={details.roomLink} dangerouslySetInnerHTML={{ __html: `${details.buildingName}, ${details.floorName}, ${details.roomLink}${details.roadName}` }} />
+      );
+    });
     const email = data.email
     const phone = data.phone
     const web = data.personalPage
     
-    
-
     return <div>
         <div class="entry-content box clearfix mb-0">
             <div class="d-flex flex-wrap align-middle">
@@ -56,13 +59,37 @@ export function PersonDetails({ id , en }) {
                 <div class="ml-4">
                     <div class="h2 mb-2">{data.firstName} {data.lastName}</div>
                     <div class="h5 mb-2">{qualification}</div>
-                    {research_group_text}
-                    { /* 
-                    {room_desc}
-                    {email_text}
-                    {phone_text}
-                    {web_text}
-                    */ }
+                    <p class="my-1">
+                      <i class="fas fa-users mr-2">
+                        {en ? ` ${research_group_text} Research Group` : ` Gruppo di Ricerca in ${research_group_text}`}
+                      </i>
+                    </p>
+                    <div class="d-flex justify-left">
+                      <div>
+                        <i class="fas fa-address-card mr-2"></i>
+                      </div>
+                      <div> {room_details}</div>
+                    </div>
+                    <p class="my-1">
+                      <i class="fas fa-at mr-2"> <a href={`mailto:${email}`}>{email}</a></i>
+                    </p>
+                    <p class="my-1">
+                      <i class="fas fa-phone mr-2"> <a href={`tel:${phone}`}>{phone}</a></i>
+                    </p>
+                    <p class="my-1">
+                      <i class="fas fa-link mr-2"> <a href={web}>{web}</a></i>
+                      <br>
+                      </br>
+                      {en ? (
+                        <span class="small text-muted">
+                          (The CV is available on this webpage)
+                        </span>
+                      ) : (
+                        <span class="small text-muted">
+                          (Il CV è disponibile a questa pagina web)
+                        </span>
+                      )}
+                    </p>
                 </div>
             </div>
         </div>
@@ -97,6 +124,58 @@ function get_role_label(role, english, feminine) {
     return role
 }
 
+function get_room_details(room, number, en) {
+  let buildingName;
+  let floorName;
+  let roadName;
+  let roomLink;
+
+  switch (room.building) {
+    case 'A':
+      buildingName = en ? 'Building A' : 'Edificio A';
+      roadName = 'Largo Bruno Pontecorvo, 5'
+      break;
+    case 'B':
+      buildingName = en ? 'Building B' : 'Edificio B';
+      roadName = 'Largo Bruno Pontecorvo, 5'
+      break;
+    case 'X':
+      buildingName = 'ex DMA';
+      roadName = 'Via Buonarroti, 1/c';
+      break;
+    default:
+      buildingName = room.building;
+  }
+  roadName += en ? ', 56127 Pisa (PI), Italy' : ', 56127 Pisa (PI), Italia'
+
+  switch (room.floor) {
+    case '0':
+      floorName = en ? 'Ground floor' : 'Piano terra';
+      break;
+    case '1':
+      floorName = en ? 'First floor' : 'Primo piano';
+      break;
+    case '2':
+      floorName = en ? 'Second floor' : 'Secondo piano';
+      break;
+    case '3':
+      floorName = en ? 'Third floor' : 'Terzo piano';
+      break;
+    default:
+      floorName = room.floor;
+  }
+
+  const link = en ? getDMURL(`/map?sel=${number}`) : getDMURL(`/mappa?sel=${number}`);
+  roomLink = `<a href="${link}">${en ? 'Room' : 'Stanza'} ${room.number}</a><br>`;
+
+  return {
+    buildingName,
+    floorName,
+    roadName,
+    roomLink,
+  };
+}
+
 function get_research_group_label(SSD, en) {
     switch (SSD) {
         case 'MAT/01':
@@ -118,4 +197,5 @@ function get_research_group_label(SSD, en) {
         default:
           return SSD
     }
+
 }
