@@ -70,6 +70,16 @@ async function conferencesQuery(req) {
             localField: 'grants',
             as: 'grants'
         }},
+        { $lookup: {
+            from: 'institutions',
+            foreignField: '_id',
+            localField: 'institution',
+            as: 'institution'
+        }},
+        { $unwind: {
+            path: '$institution',
+            preserveNullAndEmptyArrays: true
+        }},
         ...sort_and_limit,
         { $project: {
             _id: 1, 
@@ -85,6 +95,10 @@ async function conferencesQuery(req) {
             },
             url: 1,
             conferenceRoom: 1,
+            institution: {
+                _id: 1,
+                name: 1
+            },
             description: 1,
             url: 1
         }}
