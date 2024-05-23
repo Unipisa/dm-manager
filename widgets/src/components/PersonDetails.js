@@ -2,6 +2,7 @@ import React from 'react';
 import { getManageURL, getSSDLink, getDMURL, formatDateInterval } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
+import Accordion from './Accordion'
 
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -46,10 +47,7 @@ export function PersonDetails({ id , en }) {
           <div key={details.roomLink} dangerouslySetInnerHTML={{ __html: `${details.buildingName}, ${details.floorName}, ${details.roomLink}${details.roadName}` }} />
       );
     });
-    const email = data.email
-    const phone = data.phone
-    const web = data.personalPage
-    
+
     return <div>
         <div class="entry-content box clearfix mb-0">
             <div class="d-flex flex-wrap align-middle">
@@ -71,13 +69,13 @@ export function PersonDetails({ id , en }) {
                       <div> {room_details}</div>
                     </div>
                     <p class="my-1">
-                      <i class="fas fa-at mr-2"> <a href={`mailto:${email}`}>{email}</a></i>
+                      <i class="fas fa-at mr-2"> <a href={`mailto:${data.email}`}>{data.email}</a></i>
                     </p>
                     <p class="my-1">
-                      <i class="fas fa-phone mr-2"> <a href={`tel:${phone}`}>{phone}</a></i>
+                      <i class="fas fa-phone mr-2"> <a href={`tel:${data.phone}`}>{data.phone}</a></i>
                     </p>
                     <p class="my-1">
-                      <i class="fas fa-link mr-2"> <a href={web}>{web}</a></i>
+                      <i class="fas fa-link mr-2"> <a href={data.personalPage}>{data.personalPage}</a></i>
                       <br>
                       </br>
                       {en ? (
@@ -93,6 +91,8 @@ export function PersonDetails({ id , en }) {
                 </div>
             </div>
         </div>
+        <Accordion title="Accordion Title 1" content="Accordion Content 1" />
+
         { /*
         {about}
         {duties_accordion}
