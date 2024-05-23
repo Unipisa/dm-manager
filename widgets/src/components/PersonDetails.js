@@ -47,6 +47,38 @@ export function PersonDetails({ id , en }) {
           <div key={details.roomLink} dangerouslySetInnerHTML={{ __html: `${details.buildingName}, ${details.floorName}, ${details.roomLink}${details.roadName}` }} />
       );
     });
+    const groups = (
+      <div>
+          <ul>
+              {data.groups.filter(group => group.memberCount === 1).map(group => (
+                  <li key={group.name}>{group.name}</li>
+              ))}
+          </ul>
+          <div>
+              {en ? "Member of" : "Membro di"}
+              <ul>
+                  {data.groups.filter(group => group.memberCount > 1).sort((a, b) => {
+                      if (a.chair === data._id && b.chair !== data._id) return -1;
+                      if (a.chair !== data._id && b.chair === data._id) return 1;
+                      return 0;
+                  }).map(group => (
+                      <li key={group.name}>
+                          {group.name} {group.chair === data._id && (
+                                <span className="badge badge-primary mr-2">
+                                    {en ? "Chair" : group.chair_title}
+                                </span>
+                            )} 
+                            {group.vice === data._id && (
+                                <span className="badge badge-primary mr-2">
+                                    {en ? "Deputy Chair" : group.vice_title}
+                                </span>
+                            )}
+                      </li>
+                  ))}
+              </ul>
+          </div>
+      </div>
+    );
 
     return <div>
         <div class="entry-content box clearfix mb-0">
@@ -91,7 +123,10 @@ export function PersonDetails({ id , en }) {
                 </div>
             </div>
         </div>
-        <Accordion title="Accordion Title 1" content="Accordion Content 1" />
+        <p class="mb-4">
+          {en ? ` ${data.about_en}` : ` ${data.about_it}` }
+        </p>
+        <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
 
         { /*
         {about}

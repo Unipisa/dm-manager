@@ -102,6 +102,21 @@ async function personQuery(req, res) {
                             { $eq: ["$startDate", null] },
                             { $lte: ["$startDate", "$$NOW"] } ]}
                     ]}}                 
+                },
+                { 
+                    $addFields: {
+                        memberCount: { $size: "$members" }
+                    }
+                },
+                {
+                    $project: {
+                        memberCount: 1,
+                        name: 1,
+                        chair: 1,
+                        chair_title: 1,
+                        vice: 1,
+                        vice_title: 1
+                    }
                 }
             ]
         }},
@@ -165,6 +180,8 @@ async function personQuery(req, res) {
                 mathscinet: 1,
                 arxiv_orcid: 1,
                 photoUrl: 1,
+                about_it: 1,
+                about_en: 1,
                 staffs: {
                     qualification: 1,
                     SSD: 1,
@@ -184,7 +201,10 @@ async function personQuery(req, res) {
                 groups: {
                     name: 1, 
                     chair: 1,
-                    vice: 1
+                    chair_title: 1,
+                    vice: 1,
+                    vice_title: 1,
+                    memberCount: 1
                 },
                 grants: {
                     name: 1,
