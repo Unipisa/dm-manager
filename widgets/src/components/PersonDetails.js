@@ -3,11 +3,9 @@ import { getManageURL, getSSDLink, getDMURL, formatDateInterval } from '../utils
 import axios from 'axios'
 import { Loading } from './Loading'
 import Accordion from './Accordion'
-
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
-
 import { useQuery } from 'react-query'
 import { get } from 'mongoose';
 
@@ -79,6 +77,64 @@ export function PersonDetails({ id , en }) {
           </div>
       </div>
     );
+    const pubLinks = [];
+    if (data.google_scholar) {
+        pubLinks.push({
+            label: "Google Scholar",
+            url: `https://scholar.google.com/citations?user=${data.google_scholar}`,
+        });
+    }
+    if (data.orcid) {
+        pubLinks.push({
+            label: "ORCID",
+            url: `https://orcid.org/${data.orcid}`,
+        });
+    }
+    if (data.arxiv_orcid) {
+        pubLinks.push({
+            label: "ArXiV",
+            url: `https://arxiv.org/a/${data.orcid}`,
+        });
+    }
+    if (data.mathscinet) {
+        pubLinks.push({
+            label: "MathSciNet",
+            url: `https://mathscinet.ams.org/mathscinet/MRAuthorID/${data.mathscinet}`,
+        });
+    }
+    const pubLinksHtml = pubLinks.map(x => `<a href="${x.url}" target="_blank">${x.label}</a>`).join(", \n");
+    
+    const grantList = (data.grants || []).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
+    const grantText = grantList.map(g => {
+        const period = formatDateInterval(g.startDate, g.endDate);
+        const ppText = en ? "Project period" : "Periodo";
+        return (
+            `<li>
+                <a href="/research/grant-details/?grant_id=${g._id}">${g.name}</a>
+                <span class="text-muted small">(${g.projectType})</span><br>
+                Principal Investigator: <em>${g.piDetails.firstName} ${g.piDetails.lastName}</em><br>
+                ${ppText}: ${period}
+            </li>`
+        );
+    }).join("\n");
+
+    const finanziamentiDesc = en ? 'Grants' : 'Finanziamenti';
+
+    const grants = grantList.length > 0 ? (
+        `<h5 class="my-2">${finanziamentiDesc}</h5>
+        <ul>
+            ${grantText}
+        </ul>`
+    ) : '';
+
+    const research = (
+      <div>
+        {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
+        <span dangerouslySetInnerHTML={{ __html: pubLinksHtml }} />
+        <span dangerouslySetInnerHTML={{ __html: grants }} />
+      </div>
+    )
+
 
     return <div>
         <div class="entry-content box clearfix mb-0">
@@ -127,14 +183,13 @@ export function PersonDetails({ id , en }) {
           {en ? ` ${data.about_en}` : ` ${data.about_it}` }
         </p>
         <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
+        <Accordion title={en ? "Research" : "Ricerca"} content={research} />
 
         { /*
-        {about}
-        {duties_accordion}
         {research_accordion}
         {courses_data}
-        */ }
         Scheda personale {JSON.stringify(data)}
+        */ }
     </div>
 }
 
