@@ -25,7 +25,9 @@ import AddSeminar from './processes/Seminar'
 import ManageSeminars from './processes/Seminars'
 import ProcessVisits from './processes/Visits'
 import ProcessVisit from './processes/Visit'
+import ProcessVisitsList from './processes/VisitsList'
 import ManageRoomLabels from './processes/RoomLabels'
+import SanityCheck from './processes/SanityCheck'
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
 
@@ -92,8 +94,11 @@ function Internal() {
        <Route path="/process/my/visits/:id" element={<ProcessVisit variant="my/"/>}/>
        <Route path="/process/visits" element={<ProcessVisits variant=""/>}/>
        <Route path="/process/visits/:id" element={<ProcessVisit variant=""/>}/>
+       <Route path="/process/visitsList" element={<ProcessVisitsList variant=""/>}/>
        
        <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
+
+       <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
        
        {  Object.values(Models).map(x => x.routers()) }
        

@@ -8,7 +8,6 @@ export default class RoomLabel extends Model {
         super()
         this.code = 'roomLabel'
         this.ModelName = 'RoomLabel'
-        this.ModelCategory = 'stanze'
         this.name = "cartellino stanza"
         this.articulation = {
             'oggetto': "cartellino stanza", 
@@ -19,19 +18,4 @@ export default class RoomLabel extends Model {
         }
         this.IndexPage = RoomLabelsPage
     }
-
-    /*
-    menuElements(user) {
-        if (user) {
-            return [{
-                key: this.code,
-                url: this.indexUrl(),
-                text: 'Cartellini stanze',
-                category: this.ModelCategory,
-            }]
-        } else {
-            return []
-        }
-    }
-    }*/
 }

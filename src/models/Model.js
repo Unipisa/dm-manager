@@ -4,14 +4,6 @@ import ModelViewPage from '../pages/ModelViewPage'
 import ModelEditPage from '../pages/ModelEditPage'
 import ModelsPage from '../pages/ModelsPage'
 
-function capitalize(x) {
-    if (x) {
-        return x.charAt(0).toUpperCase() + x.slice(1);
-    } else {
-        return x
-    }
-}
-
 export default class Model {
     constructor() {
         // string identifier of model
@@ -52,23 +44,6 @@ export default class Model {
 
         // react element of object edit
         this.EditPage = ModelEditPage
-
-        // Category to be used in the navbar 
-        this.ModelCategory = null
-    }
-
-    // info about elements to be added into the menu bar
-    menuElements(user) {
-        if (user && this.schema && user.hasSomeRole(...this.schema.supervisorRoles)) {
-            return [{
-                key: this.code,
-                url: this.indexUrl(), 
-                text: capitalize(this.articulation['oggetti']),
-                category: this.ModelCategory,
-            }]
-        } else {
-            return []
-        }    
     }
 
     // brief description of given object

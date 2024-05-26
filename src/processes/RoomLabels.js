@@ -233,5 +233,9 @@ export default function ManageRoomLabels() {
         { engine.user.hasSomeRole('admin', 'supervisor', '/process/roomLabels') && query.isSuccess && 
             <RoomLabels data={query.data.data} onClick={onClick} onDone={onDone} onDelete={onDelete} urlId={urlId} setUrlId={setUrlId} />
         }
+        <hr />
+        <i>Chi può accedere a questa pagina?</i>
+        <br />
+        Solo chi ha uno dei permessi: <i>admin</i>, <i>supervisor</i>, <i>/process/roomLabels</i>.
     </>
 }

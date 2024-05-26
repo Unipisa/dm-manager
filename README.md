@@ -30,6 +30,8 @@ Finally, in another terminal, start the frontend:
 npm start
 ```
 
+The server should be available at [http://localhost:3000](http://localhost:3000).
+
 To test the notification service you should also start the background worker. In yet another terminal:
 ```
 npm run worker

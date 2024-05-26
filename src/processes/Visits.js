@@ -19,6 +19,22 @@ export default function ProcessVisits({variant}) {
             <VisitList variant={variant}/>
         </div>
         Vengono visualizzate le visite terminate da non più di 30 giorni.
+        <hr />
+        <div>
+        <i>Chi può accedere a questa pagina?</i>
+        <br />
+        {variant === 'my/' && <>
+            Tutte le persone inserite in anagrafica possono vedere le 
+            visite di cui sono responsabili.
+        </>}
+        {variant === '' && <>
+            Solo chi ha il permesso <i>/process/visists</i> {}
+            può gestire tutte le visite terminate da non più di 30 giorni.
+            Contattare gli amministratori
+            {} <a href="mailto:help@dm.unipi.it">[help@dm.unipi.it]</a> {}
+            se c'è la necessita di modificare le visite più vecchie.
+        </>}
+        </div>
     </>
 }
 

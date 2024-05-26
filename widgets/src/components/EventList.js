@@ -10,13 +10,13 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function EventList({ from, to, grant }) {
-    const filter = { from, to, grant }
+export function EventList({ from, to, grants, _limit }) {
+    const filter = { from, to, grants, _limit }
 
     const { isLoading, error, data } = useQuery([ 'events', filter ], async () => {
         var events = []
 
-        const conf = await axios.get(getManageURL("public/conferences"), { params: filter })
+        const conf = await axios.get(getManageURL("public/conferences"), { params: { ...filter, _sort: "startDate" } })
         if (conf.data) {
             const ec = conf.data.data              
             const ec_label =  ec.map(x => { 
@@ -25,7 +25,7 @@ export function EventList({ from, to, grant }) {
             events.push(...ec_label)
         }
 
-        const sem = await axios.get(getManageURL("public/seminars"), { params: filter })
+        const sem = await axios.get(getManageURL("public/seminars"), { params: { ...filter, _sort: "startDatetime" } })
         if (sem.data) {
             const es = sem.data.data
             const es_label = es.map(x => { 

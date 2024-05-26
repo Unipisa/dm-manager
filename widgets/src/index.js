@@ -7,6 +7,7 @@ import { Conference } from './components/Conference'
 import { ConferenceList } from './components/ConferenceList';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { HomeEventList } from './components/HomeEventList';
+import { PersonDetails } from './components/PersonDetails';
 import { getManageURL } from './utils'
 
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
@@ -44,6 +45,10 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
         case 'HomeEventList':
             element = <HomeEventList></HomeEventList>
             break;
+        case 'PersonDetails':
+            element = <PersonDetails {...props}></PersonDetails>
+            break;
+
         default:
             console.log("Unsupported element: " + name)
     }

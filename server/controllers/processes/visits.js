@@ -67,6 +67,75 @@ const INDEX_PIPELINE = [
 ]
 module.exports.INDEX_PIPELINE = INDEX_PIPELINE
 
+const ROOM_ASSIGNMENTS_LOOKUP = {$lookup: {
+    from: "roomassignments",
+    let: { start: "$startDate", end: "$endDate" },
+    localField: 'person._id',
+    foreignField: "person",
+    as: 'roomAssignments',
+    pipeline: [
+        // inserisce i dati della stanza
+        {$lookup: {
+            from: "rooms",
+            localField: "room",
+            foreignField: "_id",
+            as: "room",
+        }},
+        {$project: {
+            "startDate": 1,
+            "endDate": 1,
+            "room._id": 1,
+            "room.code": 1,
+            "room.building": 1,
+            "room.floor": 1,
+            "room.number": 1,
+            "createdBy": 1,
+            "createdAt": 1,
+        }},
+        // tiene solo le assegnazioni che intersecano il periodo [start, end] 
+        {$match: {
+            $expr: {
+                $and: [
+                    { $or: [
+                        { $eq: ["$$end", null] },
+                        { $eq: ["$startDate", null] },
+                        { $lte: ["$startDate", "$$end"] } ]},
+                    { $or: [
+                        { $eq: ["$$start", null] },
+                        { $eq: ["$endDate", null] },
+                        { $gte: ["$endDate", "$$start"] } ]}
+                ]},
+            },
+        },
+        {$unwind: {
+            path: "$room",
+            preserveNullAndEmptyArrays: true
+        }},
+        // ordina per data finale...
+        // l'ultima assegnazione dovrebbe essere quella attuale
+        {$sort: {"endDate": 1}},
+        // espande createdBy
+        {$lookup:{
+            from: "users",
+            localField: "createdBy",
+            foreignField: "_id",
+            as: "createdBy",
+            pipeline: [
+                {$project: {
+                    _id: 1,
+                    username: 1,
+                }},
+            ],
+        }},
+        {$unwind: {
+            path: "$createdBy",
+            preserveNullAndEmptyArrays: true
+        }},
+    ]
+}}
+
+module.exports.ROOM_ASSIGNMENTS_LOOKUP = ROOM_ASSIGNMENTS_LOOKUP
+
 const GET_PIPELINE = [
     { $lookup: {
         from: 'people',
@@ -156,72 +225,7 @@ const GET_PIPELINE = [
         ]
     
     }},
-    {$lookup: {
-        from: "roomassignments",
-        let: { start: "$startDate", end: "$endDate" },
-        localField: 'person._id',
-        foreignField: "person",
-        as: 'roomAssignments',
-        pipeline: [
-            // inserisce i dati della stanza
-            {$lookup: {
-                from: "rooms",
-                localField: "room",
-                foreignField: "_id",
-                as: "room",
-            }},
-            {$project: {
-                "startDate": 1,
-                "endDate": 1,
-                "room._id": 1,
-                "room.code": 1,
-                "room.building": 1,
-                "room.floor": 1,
-                "room.number": 1,
-                "createdBy": 1,
-                "createdAt": 1,
-            }},
-            // tiene solo le assegnazioni che intersecano il periodo [start, end] 
-            {$match: {
-                $expr: {
-                    $and: [
-                        { $or: [
-                            { $eq: ["$$end", null] },
-                            { $eq: ["$startDate", null] },
-                            { $lte: ["$startDate", "$$end"] } ]},
-                        { $or: [
-                            { $eq: ["$$start", null] },
-                            { $eq: ["$endDate", null] },
-                            { $gte: ["$endDate", "$$start"] } ]}
-                    ]},
-                },
-            },
-            {$unwind: {
-                path: "$room",
-                preserveNullAndEmptyArrays: true
-            }},
-            // ordina per data finale...
-            // l'ultima assegnazione dovrebbe essere quella attuale
-            {$sort: {"endDate": 1}},
-            // espande createdBy
-            {$lookup:{
-                from: "users",
-                localField: "createdBy",
-                foreignField: "_id",
-                as: "createdBy",
-                pipeline: [
-                    {$project: {
-                        _id: 1,
-                        username: 1,
-                    }},
-                ],
-            }},
-            {$unwind: {
-                path: "$createdBy",
-                preserveNullAndEmptyArrays: true
-            }},
-        ]
-    }},
+    ROOM_ASSIGNMENTS_LOOKUP,
     {$lookup: {
         from: "eventseminars",
         let: { start: "$startDate", end: "$endDate" },

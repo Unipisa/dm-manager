@@ -19,7 +19,6 @@ export default class Form extends Model {
             'un oggetto': "un modulo", 
         }
         this.ModelName = 'Form'
-        this.ModelCategory = null
         this.indexDefaultFilter = {'_sort': 'updatedAt', '_limit': 10}
         this.managerRoles = ['admin','form-manager']
         this.columns = {

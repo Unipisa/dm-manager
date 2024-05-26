@@ -12,8 +12,12 @@ router.use('/my/visits', require('./visitsMy'))
 
 router.use('/visits', require('./visits'))
 
+router.use('/visitsList', require('./visitsList'))
+
 router.use('/roomLabels', require('./roomLabels'))
 
 router.use('/planimetrie', require('./planimetrie'))
+
+router.use('/sanityCheck', require('./sanityCheck'))
 
 module.exports = router

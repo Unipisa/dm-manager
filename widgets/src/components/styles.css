@@ -1,6 +1,6 @@
 .event-box {
     width: 300px;
-    height: 150px;
+    height: 170px;
     overflow: hidden;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -84,6 +84,7 @@
 .excerpt_style {
     color: #000000;
     font-size: 1rem;
+    overflow: hidden;
 
     @media (max-width: 768px) {
         font-size: 0.875rem;

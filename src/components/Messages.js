@@ -30,7 +30,7 @@ export default function Messages({ messages, acknowledge }) {
                                     'warning': 'warning',
                                     'info': 'info',
                                 }[type]}>
-                            <p>{ msg }</p>
+                            <p>{ msg.length < 300 ? msg :  msg.slice(0,200)+"…" }</p>
                         </div>
                     )}
                     

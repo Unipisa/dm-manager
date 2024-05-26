@@ -102,9 +102,8 @@ export function SeminarBody({ seminar, forbidden }) {
         <SelectPersonBlock 
             label="Speaker" 
             person={data.speakers.length ? data.speakers[0] : null} setPerson={person => setData(data => ({...data,speakers: person?[person]:[]}))} 
-            active={!personDone}
             done={() => setPersonDone(true)}
-            change={() => {setPersonDone(false);setter(setData,'speaker')([])}}
+            onFocus={() => setPersonDone(false)}
             prefix="process/seminars"
             /> 
         {personDone && <SeminarDetailsBlock 

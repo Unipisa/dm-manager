@@ -62,9 +62,9 @@ export function ConferenceTitle({ conference, href }) {
             <span className="far fa-calendar"></span> {
                 formatDateInterval(conference.startDate, conference.endDate)}
             <span className="mx-1"></span>
-            <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom?.name}
+            <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom?.name || conference.institution?.name}
             <span className="mx-1"></span>
-            <span className="fas fa-university"></span> {conference.SSD.map(x => <span key={x} className="mr-1">{getSSDLink(x)}</span>)}
+            <span className="fas fa-university"></span> {(conference.SSD || [] ).map(x => <span key={x} className="mr-1">{getSSDLink(x)}</span>)}
             { conference.url && <><span className="mx-1"></span>
             <span className="fas fa-link"></span> <a href={conference.url}>Web</a></> }
         </small>

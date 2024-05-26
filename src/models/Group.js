@@ -14,7 +14,6 @@ export default class Group extends Model {
             'un oggetto': "un gruppo", 
         }
         this.ModelName = 'Group' 
-        this.ModelCategory = 'personale'
         this.columns = {
             'name': "nome",
             'startDate': "dal",

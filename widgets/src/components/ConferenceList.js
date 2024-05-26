@@ -9,8 +9,8 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function ConferenceList({ from, to, grant, SSD, _sort, _limit }) {
-    const filter = { from, to, grant, SSD, _sort, _limit }
+export function ConferenceList({ from, to, grants, SSD, isOutreach, _sort, _limit }) {
+    const filter = { from, to, grants, SSD, isOutreach, _sort, _limit }
 
     const { isLoading, error, data } = useQuery([ 'conferences', filter ], async () => {
         const res = await axios.get(getManageURL("public/conferences"), { params: filter })
@@ -25,16 +25,17 @@ export function ConferenceList({ from, to, grant, SSD, _sort, _limit }) {
 
     var events_block = []
     for (var i = 0; i < data.length; i++) {
-        const e = data[i]
-        const link = getDMURL("en/conference?id=" + e._id)
-
-        events_block.push(
-            <div key={e._id}>
-                <ConferenceTitle conference={e} href={link}></ConferenceTitle>
-                <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.description, 200)}</Markdown>
-                <hr className="my-4"></hr>
-            </div>
-        )
+        const e = data[i];
+        if (typeof(e) != 'undefined') {
+            const link = getDMURL("en/conference?id=" + e._id);
+            events_block.push(
+                <div key={e._id}>
+                    <ConferenceTitle conference={e} href={link}></ConferenceTitle>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.description, 200)}</Markdown>
+                    <hr className="my-4"></hr>
+                </div>
+            );
+        }
     }
 
     return <>

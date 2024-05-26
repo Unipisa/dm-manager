@@ -111,7 +111,9 @@ class Controller {
                                 email: 1,
                                 phone: 1,
                                 affiliation: 1,
-                            }},
+                            }},{
+                                $sort: { 'lastName': 1 }
+                            },
                             {$lookup: {
                                 from: "institutions",
                                 localField: "affiliations",
@@ -290,19 +292,21 @@ class Controller {
                         value = value.slice(1)
                     }
                 }
-                if (!(fields[value] && fields[value].can_sort)) {
+                const can_sort = fields[value].can_sort || fields[value]?.items?.can_sort
+                if (!can_sort) {
                     return sendBadRequest(res, `invalid _sort key ${value}. Fields: ${ JSON.stringify(fields) }`)
                 }
-                const can_sort = fields[value].can_sort
                 $sort={}
                 if (can_sort === true) {
                     $sort[value] = direction
-                } else {
+                } else if (Array.isArray(can_sort)) {
                     // e' l'ordinamento di un campo strutturato
                     // mi aspetto un array di campi
                     can_sort.forEach(field => {
                         $sort[`${value}.${field}`] = direction
                     })
+                } else {
+                    throw new Error(`invalid can_sort value ${can_sort} for field ${value}`)
                 }
             } else if (key == '_search') {
                 try {

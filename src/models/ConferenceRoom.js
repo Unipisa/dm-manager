@@ -14,7 +14,6 @@ export default class ConferenceRoom extends Model {
             'un oggetto': "una aula per conferenza", 
         }
         this.ModelName = 'ConferenceRoom'
-        this.ModelCategory = 'stanze'
         this.managerRoles = ['admin', 'conference-room-manager']
         this.columns = {
             'name': 'Nome',

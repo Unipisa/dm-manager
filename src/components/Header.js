@@ -4,30 +4,13 @@ import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 
 import { useEngine } from '../Engine'
-import Models from '../models/Models'
 import package_json from '../../package.json'
+import { ProcessDropdown } from '../processes/Home'
 
 export default function Header() {
   const engine = useEngine()
   const user = engine.user
   const navigate = useNavigate()
-
-  let objectCategories = {}
-  let otherObjects = []
-  
-  Object.values(Models)
-    .forEach(Model => {
-      Model.menuElements(user).forEach( x => {
-        if (x.category) {
-          if (!objectCategories[x.category]) {
-            objectCategories[x.category] = []
-          }
-          objectCategories[x.category].push(x)
-        } else {
-          otherObjects.push(x)
-        }
-      })
-    })
 
   return (
       <Navbar bg="light" expand="lg" className="mb-0 mr-4 shadow border-primary border-bottom border-3" variant="pills">
@@ -38,22 +21,8 @@ export default function Header() {
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
-            {Object.entries(objectCategories).map(([category,items]) => 
-              <NavDropdown title={category.charAt(0).toUpperCase() + category.slice(1)} key={category} className="mx-2 py-2">
-                { items.map(item => 
-                    <NavDropdown.Item as={NavLink} key={item.key} to={item.url}>
-                      {item.text}
-                    </NavDropdown.Item>)
-                }
-              </NavDropdown>)}
-            <Nav className="me-auto">
-              { otherObjects
-                .map((item, key) => 
-                <NavLink key={key} to={item.url} className="nav-link">
-                  {item.text}
-                </NavLink>)
-              }
-            </Nav>
+            <ProcessDropdown />
+            { user && user.roles.includes('admin') && <AdminDropdown /> }
           </Navbar.Collapse>
           <Nav className="right">
             <NavDropdown title={ user ? (<span className="me-2">{user.firstName} {user.lastName}<br />{user.username}</span>) : "user"}>
@@ -70,21 +39,6 @@ export default function Header() {
                   'notify/admin',
                   'supervisor', 
                   'visit-supervisor',
-/*                  'assignment-manager',
-                  'assignment-supervisor',
-                  'grant-manager',
-                  'grant-supervisor',
-                  'group-manager',
-                  'group-supervisor',
-                  'label-manager',
-                  'person-manager',
-                  'person-supervisor',
-                  'room-manager',
-                  'room-supervisor',
-                  'staff-manager',
-                  'staff-supervisor',
-                  'visit-manager',
-                  'visit-supervisor',*/
                   ].map(role => <NavDropdown.Item 
                     key={role} 
                     onClick={ async () => {
@@ -101,4 +55,39 @@ export default function Header() {
     );
   }
   
-  
+  function AdminDropdown() {
+    return <>
+      <NavDropdown title="Personale" className="mx-2 py-2">
+        <NavDropdown.Item as={NavLink} to="/person">Anagrafica</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/group">Gruppi</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/staff">Qualifiche</NavDropdown.Item>
+      </NavDropdown>
+      <NavDropdown title="Ricerca" className="mx-2 py-2">
+        <NavDropdown.Item as={NavLink} to="/grant">Grants</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/thesis">Tesi Dottorato</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/visit">Visite</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/institution">Affiliazioni</NavDropdown.Item>
+      </NavDropdown>
+      <NavDropdown title="Eventi" className="mx-2 py-2">
+        <NavDropdown.Item as={NavLink} to="/event-seminar">Seminari</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/event-conference">Eventi</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/event-phd-course">Corsi di Dottorato</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/seminar-category">Cicli di seminari</NavDropdown.Item>
+      </NavDropdown>
+      <NavDropdown title="Stanze" className="mx-2 py-2">
+        <NavDropdown.Item as={NavLink} to="/room">Stanze</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/conference-room">Aule</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/roomAssignment">Assegnazione</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/roomLabel">Cartellini</NavDropdown.Item>
+      </NavDropdown>
+      <NavDropdown title="Amministrazione" className="mx-2 py-2"> 
+        <NavDropdown.Item as={NavLink} to="/user">Utenti</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/token">Tokens</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/log">Logs</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/process/sanityCheck">Controlli di consistenza</NavDropdown.Item>
+      </NavDropdown>
+      <NavLink to="/form" className="nav-link">
+        Moduli
+      </NavLink>
+    </>
+  }

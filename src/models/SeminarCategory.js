@@ -14,7 +14,6 @@ export default class SeminarCategory extends Model {
             'un oggetto': "un ciclo di seminari", 
         }
         this.ModelName = 'SeminarCategory'
-        this.ModelCategory = 'eventi'
         this.managerRoles = ['admin', 'seminar-category-manager']
         this.columns = {
             'name': 'Nome',

@@ -67,6 +67,7 @@ async function seminarsQuery(req) {
             foreignField: '_id',
             as: 'speakers',
             pipeline: [
+                {$sort: { 'lastName': 1 }},
                 {$lookup: {
                     from: 'institutions',
                     localField: 'affiliations',

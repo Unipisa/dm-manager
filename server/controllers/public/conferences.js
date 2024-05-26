@@ -38,12 +38,16 @@ async function conferencesQuery(req) {
         match["startDate"] = { "$lte": to }
     }
 
-    if (req.query.grant) {
-        match["grant"] = ObjectId(req.query.grant)
+    if (req.query.grants) {
+        match["grants"] = ObjectId(req.query.grants)
     }
 
     if (req.query.SSD) {
         match["SSD"] = req.query.SSD
+    }
+
+    if (req.query.isOutreach !== undefined) {
+        match["isOutreach"] = req.query.isOutreach === 'true'
     }
 
     const sort_and_limit = createSortAndLimitFilters(req)
@@ -63,8 +67,18 @@ async function conferencesQuery(req) {
         { $lookup: {
             from: 'grants',
             foreignField: '_id',
-            localField: 'grant',
-            as: 'grant'
+            localField: 'grants',
+            as: 'grants'
+        }},
+        { $lookup: {
+            from: 'institutions',
+            foreignField: '_id',
+            localField: 'institution',
+            as: 'institution'
+        }},
+        { $unwind: {
+            path: '$institution',
+            preserveNullAndEmptyArrays: true
         }},
         ...sort_and_limit,
         { $project: {
@@ -73,8 +87,18 @@ async function conferencesQuery(req) {
             startDate: 1,
             endDate: 1,
             SSD: 1,
+            isOutreach: 1,
+            grants:  {
+                _id: 1,
+                name: 1, 
+                identifier: 1,
+            },
             url: 1,
             conferenceRoom: 1,
+            institution: {
+                _id: 1,
+                name: 1
+            },
             description: 1,
             url: 1
         }}

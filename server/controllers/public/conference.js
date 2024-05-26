@@ -20,8 +20,8 @@ async function conferenceQuery(req) {
         { $lookup: {
             from: 'grants',
             foreignField: '_id',
-            localField: 'grant',
-            as: 'grant'
+            localField: 'grants',
+            as: 'grants'
         }},
         { $project: {
             _id: 1, 
@@ -30,9 +30,11 @@ async function conferenceQuery(req) {
             endDate: 1,
             SSD: 1,
             url: 1,
+            isOutreach: 1,
             grants: {
                 _id: 1,
-                name: 1
+                name: 1, 
+                identifier: 1,
             }, 
             description: 1, 
             conferenceRoom: {
