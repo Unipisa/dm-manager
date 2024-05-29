@@ -1,16 +1,15 @@
 const Person = require("../../models/Person")
 const ObjectId = require('mongoose').Types.ObjectId
+const fetch = require('node-fetch')
+require('dotenv').config();
 
 /** @param {import('@types/express').Request} req */
 async function personQuery(req, res) {
-    let _id = undefined;
+    let _id;
     try {
-        _id = new ObjectId(req.params.id)
+        _id = new ObjectId(req.params.id);
     } catch {
-        res.status(404).json({ 
-            error: 'person not found'
-        })
-        return
+        return res.status(404).json({ error: 'person not found' });
     }
 
     const pipeline = [
@@ -185,6 +184,7 @@ async function personQuery(req, res) {
                 staffs: {
                     qualification: 1,
                     SSD: 1,
+                    matricola: 1,
                     isInternal: 1
                 },
                 roomAssignments: {
@@ -230,9 +230,86 @@ async function personQuery(req, res) {
         return
     }
 
+    const personData = response[0]
+
+    const staff = personData.staffs.find(staff => staff.matricola);
+    const id = staff ? staff.matricola.substring(1) : null;
+
+    if (!id) {
+        res.status(404).json({ 
+            error: 'matricola not found'
+        })
+        return
+    }
+
+    let anno = new Date().getFullYear();
+    if (new Date().getMonth() < 10) {
+        anno = anno - 1;
+    }
+
+    try {
+        const apiResponse = await fetch(`${process.env.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${process.env.UNIPI_TOKEN}`
+            }
+        });
+
+        if (apiResponse.ok) {
+            const registri = await apiResponse.json();
+            personData.registri = registri.results.registro || [];
+        } else {
+            personData.registri = [];
+        }
+    } catch (error) {
+        console.error('Error fetching registri data:', error);
+        personData.registri = [];
+    }
+
+    try {
+        const arpiLinkResponse = await fetch(`${process.env.UNIPI_API_URL}uniarpi/1.0/linkRicerca/${id}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${process.env.UNIPI_TOKENARPILINK}`
+            }
+        });
+
+        if (arpiLinkResponse.ok) {
+            const arpiData = await arpiLinkResponse.json();
+            personData.arpiLink = arpiData.linkToArpi || null;
+        } else {
+            personData.arpiLink = null;
+        }
+    } catch (error) {
+        console.error('Error fetching ARPI link:', error);
+        personData.arpiLink = null;
+    }
+
+    try {
+        const arpiResponse = await fetch(`${process.env.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': `Bearer ${process.env.UNIPI_TOKENARPI}`
+            }
+        });
+
+        if (arpiResponse.ok) {
+            const arpiPublications = await arpiResponse.json();
+            personData.arpiPublications = arpiPublications.entries.entry || [];
+        } else {
+            personData.arpiPublications = [];
+        }
+    } catch (error) {
+        console.error('Error fetching ARPI publications data:', error);
+        personData.arpiPublications = [];
+    }
+
     res.json({
-        data: response[0]
-    })
+        data: personData
+    });
 }
 
 module.exports = personQuery
