@@ -41,6 +41,11 @@ class Options {
             SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
             UPLOAD_DIRECTORY: __dirname + '/../uploads',
             WORKER_NOTIFICATION_INTERVAL: '300000', // 5 minutes
+            UNIPI_API_URL: '',
+            UNIPI_TOKEN: "",
+            UNIPI_TOKENARPI: "",
+            UNIPI_TOKENARPILINK: "",
+      
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
