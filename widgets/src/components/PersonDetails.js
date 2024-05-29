@@ -78,6 +78,12 @@ export function PersonDetails({ id , en }) {
       </div>
     );
     const pubLinks = [];
+    if (data.arpiLink) {
+        pubLinks.push({
+          label: "Arpi",
+          url: `${data.arpiLink}`,
+        });
+    }
     if (data.google_scholar) {
         pubLinks.push({
             label: "Google Scholar",
@@ -104,6 +110,24 @@ export function PersonDetails({ id , en }) {
     }
     const pubLinksHtml = pubLinks.map(x => `<a href="${x.url}" target="_blank">${x.label}</a>`).join(", \n");
     
+    const publicationsText = data.arpiPublications.slice(0,5).map(p => {
+        return (
+          `<li>
+              <a href="${p.link}" target="_blank">${p.title}</a> [${p.anno}] 
+          </li>`
+        );
+    }).join("\n") 
+
+    const publicationsDesc = en ? "Recent publications" : "Pubblicazioni recenti"
+
+    const publications = publicationsText.length > 0 ? (
+      `<h5 class="my-2">${publicationsDesc}</h5>
+        <ul>
+            ${publicationsText}
+        </ul>`
+    ) : '';
+
+
     const grantList = (data.grants || []).sort((a, b) => new Date(a.endDate) - new Date(b.endDate));
     const grantText = grantList.map(g => {
         const period = formatDateInterval(g.startDate, g.endDate);
@@ -129,12 +153,38 @@ export function PersonDetails({ id , en }) {
 
     const research = (
       <div>
+        <span dangerouslySetInnerHTML={{ __html: publications }} />
         {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
         <span dangerouslySetInnerHTML={{ __html: pubLinksHtml }} />
         <span dangerouslySetInnerHTML={{ __html: grants }} />
       </div>
     )
 
+    const coursesDesc = en ? "Courses for the current academic year:" : "Corsi insegnati nel corrente anno accademico:"
+
+    const coursesText = data.registri.map(c => {
+        return (
+          `<li>
+            ${c.modulo !== 'NESSUNO' 
+                ? `<strong>${c.modulo}</strong> (Modulo dell'insegnamento ${c.descrizione} - Cod. ${c.codiceInsegnamento}) CdS ${c.codiceCorso} ${c.denominazione}`
+                : `<strong>${c.descrizione}</strong> (Cod. ${c.codiceInsegnamento}) CdS ${c.codiceCorso} ${c.denominazione}`}
+            (<a href="https://unimap.unipi.it/registri/dettregistriNEW.php?re=${c.id}::::&ri=${c.matricola}" target="_blank">Registro</a>)
+        </li>`
+        )
+    }).join("\n");
+
+    const coursesAll = coursesText.length > 0 ? (
+      `<p>${coursesDesc}</p>
+      <ul>
+          ${coursesText}
+      </ul>`
+  ) : '';
+
+    const courses = (
+      <div>
+        <span dangerouslySetInnerHTML={{ __html: coursesAll }} />
+      </div>
+    )
 
     return <div>
         <div class="entry-content box clearfix mb-0">
@@ -180,11 +230,11 @@ export function PersonDetails({ id , en }) {
             </div>
         </div>
         <p class="mb-4">
-          {en ? ` ${data.about_en}` : ` ${data.about_it}` }
+          {data.about_en || data.about_it ? (en ? ` ${data.about_en}` : ` ${data.about_it}`) : null}
         </p>
         <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
         <Accordion title={en ? "Research" : "Ricerca"} content={research} />
-
+        <Accordion title={en ? "Teaching" : "Didattica"} content={courses} />
         { /*
         {research_accordion}
         {courses_data}
