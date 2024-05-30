@@ -3,9 +3,22 @@ const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
 
 async function visitsQuery(req) {
     const pipeline = [
-        { $match: {
-            startDate: {$lte: new Date()},
-            endDate: {$gte: new Date()}
+        {$match: {
+            $expr: {
+                $and: [
+                    { $or: [
+                        { $eq: ["$endDate", null] },
+                        { $gte: ["$endDate", {
+                            $dateAdd: {
+                                startDate: "$$NOW", 
+                                unit: "day",
+                                amount: -1
+                            }}] } ]},
+                    { $or: [
+                        { $eq: ["$startDate", null] },
+                        { $lte: ["$startDate", "$$NOW"]}
+                    ]}
+                ]},
         }},
         { $lookup: {
             from: 'people',
