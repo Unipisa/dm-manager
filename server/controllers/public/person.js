@@ -95,13 +95,13 @@ async function personQuery(req, res) {
         })
     ];
 
-    const response = await Person.aggregate(personPipeline);
-    
-    if (response.length === 0) {
-        return res.status(404).json({ error: 'person not found' });
+    const basicPersonData = await Person.aggregate(personPipeline);
+
+    if (basicPersonData.length === 0) {
+        return res.status(404).json({ error: 'Person not found' });
     }
 
-    const personData = response[0];
+    const personData = basicPersonData[0];
 
     const staff = personData.staffs.find(staff => staff.matricola);
     const id = staff ? staff.matricola.substring(1) : null;
@@ -137,27 +137,37 @@ async function personQuery(req, res) {
         }
     };
 
-    personData.registri = await fetchFromAPI(
-        `${process.env.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`,
-        process.env.UNIPI_TOKEN,
-        'results',
-        (results) => results?.registro ?? []
-    );
+    const fetchPromises = [
+        fetchFromAPI(
+            `${process.env.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`,
+            process.env.UNIPI_TOKEN,
+            'results',
+            (results) => results?.registro ?? []
+        ),
+        fetchFromAPI(
+            `${process.env.UNIPI_API_URL}uniarpi/1.0/linkRicerca/${id}`,
+            process.env.UNIPI_TOKENARPILINK,
+            'linkToArpi',
+            (link) => link ?? null
+        ),
+        fetchFromAPI(
+            `${process.env.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
+            process.env.UNIPI_TOKENARPI,
+            'entries',
+            (entries) => entries?.entry ?? []
+        )
+    ];
 
-    personData.arpiLink = await fetchFromAPI(
-        `${process.env.UNIPI_API_URL}uniarpi/1.0/linkRicerca/${id}`,
-        process.env.UNIPI_TOKENARPILINK,
-        'linkToArpi',
-        (link) => link ?? null
-    );
+    try {
+        const [registri, arpiLink, arpiPublications] = await Promise.all(fetchPromises);
 
-    personData.arpiPublications = await fetchFromAPI(
-        `${process.env.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
-        process.env.UNIPI_TOKENARPI,
-        'entries',
-        (entries) => entries?.entry ?? []
-    );
-    
+        personData.registri = registri;
+        personData.arpiLink = arpiLink;
+        personData.arpiPublications = arpiPublications;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+    }
+
     res.json({ data: personData });
 }
 
