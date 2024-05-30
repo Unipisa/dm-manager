@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './styles.css';
 
-
 const createUniqueId = () => 'id-' + Math.random().toString(36).substr(2, 9);
 
 const Accordion = ({ title, content, markdown = true }) => {

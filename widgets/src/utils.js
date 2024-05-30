@@ -167,3 +167,102 @@ export function getSSDLink(SSD) {
 
     return ""
 }
+
+export function getRoleLabel(role, english, feminine) {
+    const ROLES = {
+        'PO': ['Professore Ordinario', 'Professoressa Ordinaria', 'Full Professor', 'Full Professor'],
+        'PA': ['Professore Associato', 'Professoressa Associata', 'Associate Professor', 'Associate Professor'],
+        'RTDb': ['Ricercatore a tempo determinato senior', 'Ricercatrice a tempo determinato senior', 'Tenure-track Assistant Professor', 'Tenure-track Assistant Professor'],
+        'RTDa': ['Ricercatore a tempo determinato junior', 'Ricercatrice a tempo determinato junior', 'Non-Tenure-Track Assistant Professor', 'Non-Tenure-Track Assistant Professor'],
+        'RIC': ['Ricercatore a tempo indeterminato', 'Ricercatrice a tempo indeterminato', 'Tenured Assistant Professor', 'Tenured Assistant Professor'],
+        'Assegnista': ['Assegnista', 'Assegnista', 'Postdoctoral Fellow', 'Postdoctoral Fellow'],
+        'Dottorando': ['Dottorando', 'Dottoranda', 'Ph.D. Student', 'Ph.D. Student'],
+        'PTA': ['Personale Tecnico Amministrativo', 'Personale Tecnico Amministrativo', 'Administrative Staff', 'Administrative Staff'],
+        'Professore Emerito': ['Professore Emerito', 'Professore Emerito', 'Emeritus Professor', 'Emeritus Professor'],
+        'Collaboratore': ['Collaboratore', 'Collaboratrice', 'Affiliate Member', 'Affiliate Member'], 
+        'Docente Esterno': ['Docente con contratto esterno', 'Docente con contratto esterno', 'Adjunct Professor', 'Adjunct Professor'],
+        'Studente': ['Studente', 'Studentessa', 'Student', 'Student'],
+    }
+
+    const i = (feminine ? 1 : 0) + (english ? 2 : 0)
+    if (ROLES[role]) return ROLES[role][i]
+    return role
+}
+
+export function getResearchGroupLabel(SSD, en) {
+    switch (SSD) {
+        case 'MAT/01':
+          return en ? 'Mathematical Logic' : 'Logica Matematica'
+        case 'MAT/02':
+          return 'Algebra'
+        case 'MAT/03':
+          return en ? 'Geometry' : 'Geometria'
+        case 'MAT/04':
+          return en ? 'Mathematics Education and History of Mathematics' : 'Didattica della Matematica e Storia della Matematica'
+        case 'MAT/05':
+          return en ? 'Mathematical Analysis' : 'Analisi Matematica'
+        case 'MAT/06':
+          return en ? 'Probability and Mathematical Statistics' : 'Probabilità e Statistica Matematica'
+        case 'MAT/07':
+          return en ? 'Mathematical Physics' : 'Fisica Matematica'
+        case 'MAT/08':
+          return en ? 'Numerical Analysis' : 'Analisi Numerica'
+        default:
+          return SSD
+    }
+}
+
+export function getRoomDetails(room, id, en) {
+    let buildingName;
+    let floorName;
+    let roadName;
+    let roomLink;
+  
+    switch (room.building) {
+      case 'A':
+        buildingName = en ? 'Building A' : 'Edificio A';
+        roadName = 'Largo Bruno Pontecorvo, 5';
+        break;
+      case 'B':
+        buildingName = en ? 'Building B' : 'Edificio B';
+        roadName = 'Largo Bruno Pontecorvo, 5';
+        break;
+      case 'X':
+        buildingName = 'ex DMA';
+        roadName = 'Via Buonarroti, 1/c';
+        break;
+      default:
+        buildingName = room.building;
+    }
+    roadName += en ? ', 56127 Pisa (PI), Italy' : ', 56127 Pisa (PI), Italia';
+  
+    switch (room.floor) {
+      case '0':
+        floorName = en ? 'Ground floor' : 'Piano terra';
+        break;
+      case '1':
+        floorName = en ? 'First floor' : 'Primo piano';
+        break;
+      case '2':
+        floorName = en ? 'Second floor' : 'Secondo piano';
+        break;
+      case '3':
+        floorName = en ? 'Third floor' : 'Terzo piano';
+        break;
+      default:
+        floorName = room.floor;
+    }
+  
+    const link = en ? getDMURL(`/map?sel=${id}`) : getDMURL(`/mappa?sel=${id}`);
+    roomLink = {
+      url: link,
+      text: `${en ? 'Room' : 'Stanza'} ${room.number}`
+    };
+  
+    return {
+      buildingName,
+      floorName,
+      roadName,
+      roomLink,
+    };
+  }
