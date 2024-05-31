@@ -34,7 +34,7 @@ export function PersonDetails({ id , en }) {
     const photoUrl = data.photoUrl || "/static/NoImage.png"
     const feminine = data.gender === 'Donna'
     const qualification = (data.staffs || []).map(q => getRoleLabel(q.qualification, en, feminine)).join(', ')
-    const researchGroup = data.staffs.map(q => q.SSD).filter(q => q).map(ssd => getResearchGroupLabel(ssd, en)).join(', ')
+    const researchGroup = [...new Set(data.staffs.map(q => q.SSD).filter(q => q).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ')
     const roomDetails = (data.roomAssignments || []).map(r => getRoomDetails(r.roomDetails, r.room, en));
     
     const personBlock = (
@@ -141,7 +141,7 @@ export function PersonDetails({ id , en }) {
     ) : null;
 
     const pubLinks = [
-      { label: data.arpiLink ? "Arpi" : "", url: data.arpiLink },
+      { label: data.arpiLink === "https://arpi.unipi.it" ? "" : (data.arpiLink ? "Arpi" : ""), url: data.arpiLink },
       { label: "Google Scholar", url: data.google_scholar ? `https://scholar.google.com/citations?user=${data.google_scholar}` : null },
       { label: "ORCID", url: data.orcid ? `https://orcid.org/${data.orcid}` : null },
       { label: "ArXiV", url: data.arxiv_orcid ? `https://arxiv.org/a/${data.orcid}` : null },
