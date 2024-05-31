@@ -1,7 +1,7 @@
 const Person = require("../../models/Person")
 const ObjectId = require('mongoose').Types.ObjectId
 const fetch = require('node-fetch')
-require('dotenv').config();
+const config = require('../../config');
 
 /** @param {import('@types/express').Request} req */
 async function personQuery(req, res) {
@@ -124,7 +124,7 @@ async function personQuery(req, res) {
                     'Authorization': `Bearer ${token}`
                 }
             });
-
+            
             if (apiResponse.ok) {
                 const data = await apiResponse.json();
                 return processFn(data[key]);
@@ -139,20 +139,20 @@ async function personQuery(req, res) {
     
     const fetchPromises = [
         fetchFromAPI(
-            `${process.env.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`,
-            process.env.UNIPI_TOKEN,
+            `${config.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`,
+            config.UNIPI_TOKEN,
             'results',
             (results) => results?.registro ?? []
         ),
         fetchFromAPI(
-            `${process.env.UNIPI_API_URL}uniarpi/1.0/linkRicerca/${id}`,
-            process.env.UNIPI_TOKENARPILINK,
+            `${config.UNIPI_API_URL}uniarpi/1.0/linkRicerca/${id}`,
+            config.UNIPI_TOKENARPILINK,
             'linkToArpi',
             (link) => link ?? null
         ),
         fetchFromAPI(
-            `${process.env.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
-            process.env.UNIPI_TOKENARPI,
+            `${config.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
+            config.UNIPI_TOKENARPI,
             'entries',
             (entries) => entries?.entry ?? []
         )
