@@ -50,9 +50,8 @@ export function PersonDetails({ id , en }) {
             )}
             {researchGroup && (
               <p class="my-1">
-                <i class="fas fa-users mr-2">
-                  {en ? ` ${researchGroup} Research Group` : ` Gruppo di Ricerca in ${researchGroup}`}
-                </i>
+                <i class="fas fa-users mr-2"></i>
+                {en ? `${researchGroup} Research Group` : `Gruppo di Ricerca in ${researchGroup}`}
               </p>
             )}
             {roomDetails && roomDetails.length > 0 && (
@@ -101,8 +100,8 @@ export function PersonDetails({ id , en }) {
       </div>
     )
 
-    const memberOfOne = data.groups.filter(group => group.memberCount === 1);
-    const memberOfMultiple = data.groups.filter(group => group.memberCount > 1).sort((a, b) => {
+    const memberOfOne = data.groups.filter(group => group.memberCount === 1 && !group.name.startsWith("MAT/"));
+    const memberOfMultiple = data.groups.filter(group => group.memberCount > 1 && !group.name.startsWith("MAT/")).sort((a, b) => {
       if (a.chair === data._id && b.chair !== data._id) return -1;
       if (a.chair !== data._id && b.chair === data._id) return 1;
       return 0;
@@ -142,12 +141,12 @@ export function PersonDetails({ id , en }) {
     ) : null;
 
     const pubLinks = [
-      { label: "Arpi", url: data.arpiLink },
+      { label: data.arpiLink ? "Arpi" : "", url: data.arpiLink },
       { label: "Google Scholar", url: data.google_scholar ? `https://scholar.google.com/citations?user=${data.google_scholar}` : null },
       { label: "ORCID", url: data.orcid ? `https://orcid.org/${data.orcid}` : null },
       { label: "ArXiV", url: data.arxiv_orcid ? `https://arxiv.org/a/${data.orcid}` : null },
       { label: "MathSciNet", url: data.mathscinet ? `https://mathscinet.ams.org/mathscinet/MRAuthorID/${data.mathscinet}` : null }
-    ].filter(link => link.url !== null);
+    ].filter(link => link.url !== null && link.label !== "");
 
     const PublicationLinks = () => {
       if (pubLinks.length === 0) {
@@ -179,7 +178,7 @@ export function PersonDetails({ id , en }) {
           return (
             <li key={g._id}>
               <a href={`/research/grant-details/?grant_id=${g._id}`}>{g.name}</a>
-              <span className="text-muted small">({g.projectType})</span><br />
+              <span className="text-muted small"> ({g.projectType})</span><br />
               Principal Investigator: <em>{g.piDetails.firstName} {g.piDetails.lastName}</em><br />
               {en ? "Project period" : "Periodo"}: {formatDateInterval(g.startDate, g.endDate)}
             </li>
@@ -189,32 +188,38 @@ export function PersonDetails({ id , en }) {
     );
 
     const research = (
-      <div>
-        {data.arpiPublications.length > 0 && (
-          <>
-            <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
-            <PublicationList publications={data.arpiPublications} />
-          </>
-        )}
-        {pubLinks.length > 0 && (
+      <>
+        {(data.arpiPublications && data.arpiPublications.length > 0) ||
+        (pubLinks.length > 0) ||
+        (data.grants && data.grants.length > 0) ? (
           <div>
-            {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
-            <PublicationLinks />
+            {data.arpiPublications && data.arpiPublications.length > 0 && (
+              <>
+                <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
+                <PublicationList publications={data.arpiPublications} />
+              </>
+            )}
+            {pubLinks.length > 0 && (
+              <div>
+                {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
+                <PublicationLinks />
+              </div>
+            )}
+            {data.grants && data.grants.length > 0 && (
+              <>
+                <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
+                <GrantList grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
+              </>
+            )}
           </div>
-        )}
-        {data.grants.length > 0 && (
-          <>
-            <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
-            <GrantList grants={data.grants.sort((a, b) => new Date(a.endDate) - new Date(b.endDate))} />
-          </>
-        )}
-      </div>
+        ) : null}
+      </>
     );
 
     const CourseList = ({ en }) => {
       const coursesDesc = en ? "Courses for the current academic year:" : "Corsi insegnati nel corrente anno accademico:";
     
-      const courses = data.registri.map(c => (
+      const courses = (data.registri || []).map(c => (
         <li key={c.id}>
           {c.modulo !== 'NESSUNO' ? (
             <strong>{c.modulo}</strong>
@@ -246,17 +251,23 @@ export function PersonDetails({ id , en }) {
       );
     };
 
-    return <div>
-      {personBlock}
-      <p class="mb-4">{data.about_en || data.about_it ? (en ? ` ${data.about_en}` : ` ${data.about_it}`) : null}</p>
-      {groups && (
-        <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
-      )}
-      {research && (
-        <Accordion title={en ? "Research" : "Ricerca"} content={research} />
-      )}
-      {data.registri.length > 0 && (
-        <Accordion title={en ? "Teaching" : "Didattica"} content={CourseList({ en })} />
-      )}
-    </div>
+    return (
+      <div>
+        {personBlock}
+        {(data.about_en || data.about_it) && (
+          <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
+        )}
+        {groups && (
+          <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
+        )}
+        {(data.arpiPublications && data.arpiPublications.length > 0) ||
+        (pubLinks.length > 0) ||
+        (data.grants && data.grants.length > 0) ? (
+          <Accordion title={en ? "Research" : "Ricerca"} content={research} />
+        ) : null}
+        {data.registri && data.registri.length > 0 && (
+          <Accordion title={en ? "Teaching" : "Didattica"} content={CourseList({ en })} />
+        )}
+      </div>
+    );
 }
