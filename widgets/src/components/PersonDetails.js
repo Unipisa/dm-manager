@@ -50,9 +50,8 @@ export function PersonDetails({ id , en }) {
             )}
             {researchGroup && (
               <p class="my-1">
-                <i class="fas fa-users mr-2">
-                  {en ? ` ${researchGroup} Research Group` : ` Gruppo di Ricerca in ${researchGroup}`}
-                </i>
+                <i class="fas fa-users mr-2"></i>
+                {en ? ` ${researchGroup} Research Group` : ` Gruppo di Ricerca in ${researchGroup}`}
               </p>
             )}
             {roomDetails && roomDetails.length > 0 && (
@@ -101,8 +100,8 @@ export function PersonDetails({ id , en }) {
       </div>
     )
 
-    const memberOfOne = data.groups.filter(group => group.memberCount === 1);
-    const memberOfMultiple = data.groups.filter(group => group.memberCount > 1).sort((a, b) => {
+    const memberOfOne = data.groups.filter(group => group.memberCount === 1 && !group.name.startsWith("MAT/"));
+    const memberOfMultiple = data.groups.filter(group => group.memberCount > 1 && !group.name.startsWith("MAT/")).sort((a, b) => {
       if (a.chair === data._id && b.chair !== data._id) return -1;
       if (a.chair !== data._id && b.chair === data._id) return 1;
       return 0;
@@ -179,7 +178,7 @@ export function PersonDetails({ id , en }) {
           return (
             <li key={g._id}>
               <a href={`/research/grant-details/?grant_id=${g._id}`}>{g.name}</a>
-              <span className="text-muted small">({g.projectType})</span><br />
+              <span className="text-muted small"> ({g.projectType})</span><br />
               Principal Investigator: <em>{g.piDetails.firstName} {g.piDetails.lastName}</em><br />
               {en ? "Project period" : "Periodo"}: {formatDateInterval(g.startDate, g.endDate)}
             </li>
@@ -205,7 +204,7 @@ export function PersonDetails({ id , en }) {
         {data.grants.length > 0 && (
           <>
             <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
-            <GrantList grants={data.grants.sort((a, b) => new Date(a.endDate) - new Date(b.endDate))} />
+            <GrantList grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
           </>
         )}
       </div>
@@ -248,7 +247,9 @@ export function PersonDetails({ id , en }) {
 
     return <div>
       {personBlock}
-      <p class="mb-4">{data.about_en || data.about_it ? (en ? ` ${data.about_en}` : ` ${data.about_it}`) : null}</p>
+      {(data.about_en || data.about_it) && (
+        <p class="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
+      )}
       {groups && (
         <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
       )}
