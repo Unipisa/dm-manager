@@ -107,7 +107,7 @@ async function personQuery(req, res) {
     const id = staff ? staff.matricola.substring(1) : null;
 
     if (!id) {
-        return res.status(404).json({ error: 'matricola not found' });
+        return res.json({ data: personData });
     }
 
     let anno = new Date().getFullYear();
@@ -136,7 +136,7 @@ async function personQuery(req, res) {
             return [];
         }
     };
-
+    
     const fetchPromises = [
         fetchFromAPI(
             `${process.env.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`,
