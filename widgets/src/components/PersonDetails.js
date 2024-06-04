@@ -1,14 +1,14 @@
 import React from 'react';
 import axios from 'axios'
 import Accordion from './Accordion'
-import { getManageURL, formatDateInterval, getRoleLabel, getResearchGroupLabel, getRoomDetails } from '../utils';
+import { getManageURL, formatDateInterval, getRoleLabel, getResearchGroupLabel, getRoomDetails, isEnglish } from '../utils';
 import { Loading } from './Loading'
 import { useQuery } from 'react-query'
 
-export function PersonDetails({ id , en }) {
-    const { isLoading, error, data } = useQuery([ 'person', id ], async () => {
-        if (id !== null) {
-            const res = await axios.get(getManageURL('public/person/' + id))
+export function PersonDetails({ person_id }) {
+    const { isLoading, error, data } = useQuery([ 'person', person_id ], async () => {
+        if (person_id !== null) {
+            const res = await axios.get(getManageURL('public/person/' + person_id))
             const person = res.data.data
             if (! person) {
                 throw new Error("Impossibile trovare la persona richiesta")
@@ -31,7 +31,8 @@ export function PersonDetails({ id , en }) {
         </div>
     }
 
-    const photoUrl = data.photoUrl || "/static/NoImage.png"
+    const en = isEnglish()
+    const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png"
     const feminine = data.gender === 'Donna'
     const qualification = (data.staffs || []).map(q => getRoleLabel(q.qualification, en, feminine)).join(', ')
     const researchGroup = [...new Set(data.staffs.map(q => q.SSD).filter(q => q).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ')
@@ -100,11 +101,16 @@ export function PersonDetails({ id , en }) {
       </div>
     )
 
-    const memberOfOne = data.groups.filter(group => group.memberCount === 1 && !group.name.startsWith("MAT/"));
-    const memberOfMultiple = data.groups.filter(group => group.memberCount > 1 && !group.name.startsWith("MAT/")).sort((a, b) => {
-      if (a.chair === data._id && b.chair !== data._id) return -1;
-      if (a.chair !== data._id && b.chair === data._id) return 1;
-      return 0;
+    const memberOfOne = data.groups
+      .filter(group => group.memberCount === 1 && !group.name.startsWith("MAT/"))
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    const memberOfMultiple = data.groups
+      .filter(group => group.memberCount > 1 && !group.name.startsWith("MAT/"))
+      .sort((a, b) => {
+        if (a.chair === data._id && b.chair !== data._id) return -1;
+        if (a.chair !== data._id && b.chair === data._id) return 1;
+        return a.name.localeCompare(b.name);
     });
     
     const groups = (memberOfOne.length > 0 || memberOfMultiple.length > 0) ? (
@@ -118,7 +124,7 @@ export function PersonDetails({ id , en }) {
         )}
         {memberOfMultiple.length > 0 && (
           <div>
-            {en ? "Member of" : "Membro di"}
+            <h5>{en ? "Member of" : "Membro di"}</h5>
             <ul>
               {memberOfMultiple.map(group => (
                 <li key={group.name}>
