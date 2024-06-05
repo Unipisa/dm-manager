@@ -165,7 +165,7 @@ export function PersonDetails({ person_id }) {
     ) : null;
 
     const pubLinks = [
-        { label: unimapData && unimapData.arpiLink === "https://arpi.unipi.it" ? "" : (unimapData && unimapData.arpiLink ? "Arpi" : ""), url: unimapData ? unimapData.arpiLink : null },
+        //{ label: unimapData && unimapData.arpiLink === "https://arpi.unipi.it" ? "" : (unimapData && unimapData.arpiLink ? "Arpi" : ""), url: unimapData ? unimapData.arpiLink : null },
         { label: "Google Scholar", url: data.google_scholar ? `https://scholar.google.com/citations?user=${data.google_scholar}` : null },
         { label: "ORCID", url: data.orcid ? `https://orcid.org/${data.orcid}` : null },
         { label: "ArXiV", url: data.arxiv_orcid ? `https://arxiv.org/a/${data.orcid}` : null },
@@ -220,7 +220,7 @@ export function PersonDetails({ person_id }) {
             ) : (
                 <div key={0}>
                     {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
-                        (pubLinks.length > 0) || (data.grants && data.grants.length > 0) && (
+                        (pubLinks.length > 0) || (data.grants && data.grants.length > 0) ? (
                         <div>
                             {unimapData?.arpiPublications && unimapData.arpiPublications.length > 0 && (
                                 <>
@@ -241,7 +241,7 @@ export function PersonDetails({ person_id }) {
                                 </>
                             )}
                         </div>
-                    )}
+                    ) : null}
                 </div>
             )}
         </div>
