@@ -218,9 +218,9 @@ export function PersonDetails({ person_id }) {
             ) : unimapError ? (
                 <div>{unimapError.message}</div>
             ) : (
-                <>
+                <div key={0}>
                     {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
-                        (pubLinks.length > 0) ? (
+                        (pubLinks.length > 0) || (data.grants && data.grants.length > 0) && (
                         <div>
                             {unimapData?.arpiPublications && unimapData.arpiPublications.length > 0 && (
                                 <>
@@ -241,8 +241,8 @@ export function PersonDetails({ person_id }) {
                                 </>
                             )}
                         </div>
-                    ) : null}
-                </>
+                    )}
+                </div>
             )}
         </div>
     );
