@@ -14,6 +14,7 @@ const conferencesQuery = require('./controllers/public/conferences')
 const processes = require('./controllers/processes/router.js')
 const roomsQuery = require('./controllers/public/rooms.js')
 const personQuery = require('./controllers/public/person.js')
+const unimapQuery = require('./controllers/public/unimap.js')
 
 const router = express.Router()
 
@@ -110,6 +111,8 @@ router.get('/public/rooms', async (req, res) => {
 })
 
 router.get('/public/person/:id', personQuery)
+
+router.get('/public/unimap/:matricola', unimapQuery)
 
 // async (req, res) => {
 //     res.json(await personQuery(req))

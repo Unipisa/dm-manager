@@ -1,7 +1,5 @@
 const Person = require("../../models/Person")
 const ObjectId = require('mongoose').Types.ObjectId
-const fetch = require('node-fetch')
-const config = require('../../config');
 
 /** @param {import('@types/express').Request} req */
 async function personQuery(req, res) {
@@ -95,80 +93,13 @@ async function personQuery(req, res) {
         })
     ];
 
-    const basicPersonData = await Person.aggregate(personPipeline);
+    const personData = await Person.aggregate(personPipeline);
 
-    if (basicPersonData.length === 0) {
+    if (personData.length === 0) {
         return res.status(404).json({ error: 'Person not found' });
     }
 
-    const personData = basicPersonData[0];
-
-    const staff = personData.staffs.find(staff => staff.matricola);
-    const id = staff ? staff.matricola.substring(1) : null;
-
-    if (!id) {
-        return res.json({ data: personData });
-    }
-
-    let anno = new Date().getFullYear();
-    if (new Date().getMonth() < 10) {
-        anno = anno - 1;
-    }
-
-    const fetchFromAPI = async (url, token, key, processFn = (data) => data) => {
-        try {
-            const apiResponse = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-            
-            if (apiResponse.ok) {
-                const data = await apiResponse.json();
-                return processFn(data[key]);
-            } else {
-                return [];
-            }
-        } catch (error) {
-            console.error(`Error fetching data from ${url}:`, error);
-            return [];
-        }
-    };
-    
-    const fetchPromises = [
-        fetchFromAPI(
-            `${config.UNIPI_API_URL}registri/1.0/elenco/${id}?anno=${anno}`,
-            config.UNIPI_TOKEN,
-            'results',
-            (results) => results?.registro ?? []
-        ),
-        fetchFromAPI(
-            `${config.UNIPI_API_URL}uniarpi/1.0/linkRicerca/${id}`,
-            config.UNIPI_TOKENARPILINK,
-            'linkToArpi',
-            (link) => link ?? null
-        ),
-        fetchFromAPI(
-            `${config.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
-            config.UNIPI_TOKENARPI,
-            'entries',
-            (entries) => entries?.entry ?? []
-        )
-    ];
-
-    try {
-        const [registri, arpiLink, arpiPublications] = await Promise.all(fetchPromises);
-
-        personData.registri = registri;
-        personData.arpiLink = arpiLink;
-        personData.arpiPublications = arpiPublications;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-    }
-
-    res.json({ data: personData });
+    res.json({ data: personData[0] });
 }
 
 module.exports = personQuery

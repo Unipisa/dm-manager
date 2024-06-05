@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios'
 import Accordion from './Accordion'
 import { getManageURL, formatDateInterval, getRoleLabel, getResearchGroupLabel, getRoomDetails, isEnglish } from '../utils';
@@ -19,16 +19,36 @@ export function PersonDetails({ person_id }) {
         else {
             throw new Error('Impossibile trovare la persona richiesta')
         }
-    })
+    });
+
+    const [unimapData, setUnimapData] = useState(null);
+    const [loadingUnimap, setLoadingUnimap] = useState(false);
+    const [unimapError, setUnimapError] = useState(null);
+
+    const loadUnimapData = async (matricola) => {
+      setLoadingUnimap(true);
+      try {
+          const res = await axios.get(getManageURL('public/unimap/' + matricola));
+          setUnimapData(res.data);
+      } catch (error) {
+          setUnimapError(error);
+      } finally {
+          setLoadingUnimap(false);
+      }
+    };
+
+    useEffect(() => {
+      if (data && data.staffs && data.staffs[0].matricola) {
+          loadUnimapData(data.staffs[0].matricola);
+      }
+    }, [data]);
 
     if (isLoading || error ) {
         return <Loading widget="Scheda personale" error={error}></Loading>
     }
 
     if (! data) {
-        return <div>
-            404 Not Found.
-        </div>
+        return <div>404 Not Found.</div>
     }
 
     const en = isEnglish()
@@ -147,7 +167,7 @@ export function PersonDetails({ person_id }) {
     ) : null;
 
     const pubLinks = [
-      { label: data.arpiLink === "https://arpi.unipi.it" ? "" : (data.arpiLink ? "Arpi" : ""), url: data.arpiLink },
+      { label: unimapData && unimapData.arpiLink === "https://arpi.unipi.it" ? "" : (unimapData && unimapData.arpiLink ? "Arpi" : ""), url: unimapData ? unimapData.arpiLink : null },
       { label: "Google Scholar", url: data.google_scholar ? `https://scholar.google.com/citations?user=${data.google_scholar}` : null },
       { label: "ORCID", url: data.orcid ? `https://orcid.org/${data.orcid}` : null },
       { label: "ArXiV", url: data.arxiv_orcid ? `https://arxiv.org/a/${data.orcid}` : null },
@@ -195,37 +215,44 @@ export function PersonDetails({ person_id }) {
 
     const research = (
       <>
-        {(data.arpiPublications && data.arpiPublications.length > 0) ||
-        (pubLinks.length > 0) ||
-        (data.grants && data.grants.length > 0) ? (
-          <div>
-            {data.arpiPublications && data.arpiPublications.length > 0 && (
+          {loadingUnimap ? (
+              <Loading widget="Research" />
+          ) : unimapError ? (
+              <div>{unimapError.message}</div>
+          ) : (
               <>
-                <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
-                <PublicationList publications={data.arpiPublications} />
+                  {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                  (pubLinks.length > 0) ? (
+                      <div>
+                          {unimapData?.arpiPublications && unimapData.arpiPublications.length > 0 && (
+                              <>
+                                  <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
+                                  <PublicationList publications={unimapData.arpiPublications} />
+                              </>
+                          )}
+                          {pubLinks.length > 0 && (
+                              <div>
+                                  {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
+                                  <PublicationLinks />
+                              </div>
+                          )}
+                          {data.grants && data.grants.length > 0 && (
+                            <>
+                              <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
+                              <GrantList grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
+                            </>
+                          )}
+                      </div>
+                  ) : null}
               </>
-            )}
-            {pubLinks.length > 0 && (
-              <div>
-                {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
-                <PublicationLinks />
-              </div>
-            )}
-            {data.grants && data.grants.length > 0 && (
-              <>
-                <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
-                <GrantList grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
-              </>
-            )}
-          </div>
-        ) : null}
+          )}
       </>
     );
 
     const CourseList = ({ en }) => {
       const coursesDesc = en ? "Courses for the current academic year:" : "Corsi insegnati nel corrente anno accademico:";
     
-      const courses = (data.registri || []).map(c => (
+      const courses = (unimapData.registri || []).map(c => (
         <li key={c.id}>
           {c.modulo !== 'NESSUNO' ? (
             <strong>{c.modulo}</strong>
@@ -244,36 +271,44 @@ export function PersonDetails({ person_id }) {
       ));
     
       return (
-        <div>
-          {courses.length > 0 && (
-            <>
-              <p>{coursesDesc}</p>
-              <ul>
-                {courses}
-              </ul>
-            </>
+        <>
+          {loadingUnimap ? (
+              <Loading widget="Teaching" />
+          ) : unimapError ? (
+              <div>{unimapError.message}</div>
+          ) : (
+              <div>
+                {courses.length > 0 && (
+                  <>
+                    <p>{coursesDesc}</p>
+                    <ul>
+                      {courses}
+                    </ul>
+                  </>
+                )}
+              </div>
           )}
-        </div>
+        </>
       );
     };
 
     return (
       <div>
-        {personBlock}
-        {(data.about_en || data.about_it) && (
-          <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
-        )}
-        {groups && (
-          <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
-        )}
-        {(data.arpiPublications && data.arpiPublications.length > 0) ||
-        (pubLinks.length > 0) ||
-        (data.grants && data.grants.length > 0) ? (
-          <Accordion title={en ? "Research" : "Ricerca"} content={research} />
-        ) : null}
-        {data.registri && data.registri.length > 0 && (
-          <Accordion title={en ? "Teaching" : "Didattica"} content={CourseList({ en })} />
-        )}
+          {personBlock}
+          {(data.about_en || data.about_it) && (
+              <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
+          )}
+          {groups && (
+              <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
+          )}
+          {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
+          (pubLinks.length > 0) ||
+          (data.grants && data.grants.length > 0) ? (
+              <Accordion title={en ? "Research" : "Ricerca"} content={research}/>
+          ) : null}
+          {(unimapData?.registri && unimapData.registri.length > 0) && (
+              <Accordion title={en ? "Teaching" : "Didattica"} content={<CourseList en={en} />}/>
+          )}
       </div>
     );
 }
