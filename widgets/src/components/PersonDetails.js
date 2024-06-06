@@ -212,13 +212,13 @@ export function PersonDetails({ person_id }) {
     );
 
     const research = (
-        <div key={0}>
+        <div>
             {loadingUnimap ? (
                 <Loading widget="Research" />
             ) : unimapError ? (
                 <div>{unimapError.message}</div>
             ) : (
-                <div key={0}>
+                <div>
                     {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                         (pubLinks.length > 0) || (data.grants && data.grants.length > 0) ? (
                         <div>
@@ -269,7 +269,7 @@ export function PersonDetails({ person_id }) {
         ));
 
         return (
-            <div key={0}>
+            <div>
                 {loadingUnimap ? (
                     <Loading widget="Teaching" />
                 ) : unimapError ? (
@@ -299,6 +299,13 @@ export function PersonDetails({ person_id }) {
             {groups && (
                 <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
             )}
+            <div>
+                <h5>Debug Info:</h5>
+                <p>unimapData: {JSON.stringify(unimapData)}</p>
+                <p>loadingUnimap: {loadingUnimap.toString()}</p>
+                <p>unimapError: {unimapError ? unimapError.message : 'null'}</p>
+                <p>pubLinks: {JSON.stringify(pubLinks)}</p>
+            </div>
             {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                 (pubLinks.length > 0) ||
                 (data.grants && data.grants.length > 0) ? (
