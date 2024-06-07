@@ -20,20 +20,16 @@ export function PersonDetails({ person_id }) {
     });
 
     const [unimapData, setUnimapData] = useState(null);
-    const [loadingUnimap, setLoadingUnimap] = useState(false);
-    const [unimapError, setUnimapError] = useState(null);
 
     const loadUnimapData = async (matricola) => {
-        setLoadingUnimap(true);
         try {
             const res = await axios.get(getManageURL('public/unimap/' + matricola));
-            setUnimapData(res.data);
-        } catch (error) {
-            setUnimapError(error);
-        } finally {
-            setLoadingUnimap(false);
+            setUnimapData(res.data)
         }
-    };
+        catch {
+            setUnimapData({ 'error': 'Impossibile scaricare i dati di unimap' })
+        }
+    }
 
     useEffect(() => {
         if (data && data.staffs && data.staffs[0].matricola) {
@@ -165,7 +161,7 @@ export function PersonDetails({ person_id }) {
     ) : null;
 
     const pubLinks = [
-        //{ label: unimapData && unimapData.arpiLink === "https://arpi.unipi.it" ? "" : (unimapData && unimapData.arpiLink ? "Arpi" : ""), url: unimapData ? unimapData.arpiLink : null },
+        { label: unimapData && unimapData.arpiLink === "https://arpi.unipi.it" ? "" : (unimapData && unimapData.arpiLink ? "Arpi" : ""), url: unimapData ? unimapData.arpiLink : null },
         { label: "Google Scholar", url: data.google_scholar ? `https://scholar.google.com/citations?user=${data.google_scholar}` : null },
         { label: "ORCID", url: data.orcid ? `https://orcid.org/${data.orcid}` : null },
         { label: "ArXiV", url: data.arxiv_orcid ? `https://arxiv.org/a/${data.orcid}` : null },
@@ -213,10 +209,10 @@ export function PersonDetails({ person_id }) {
 
     const research = (
         <div>
-            {loadingUnimap ? (
+            {unimapData === null ? (
                 <Loading widget="Research" />
-            ) : unimapError ? (
-                <div>{unimapError.message}</div>
+            ) : unimapData?.error !== undefined ? (
+                <div>{unimapData?.error}</div>
             ) : (
                 <div>
                     {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
@@ -270,10 +266,10 @@ export function PersonDetails({ person_id }) {
 
         return (
             <div>
-                {loadingUnimap ? (
+                {unimapData === null ? (
                     <Loading widget="Teaching" />
-                ) : unimapError ? (
-                    <div>{unimapError.message}</div>
+                ) : unimapData?.error !== undefined ? (
+                    <div>{unimapData?.error}</div>
                 ) : (
                     <div>
                         {courses.length > 0 && (
@@ -299,13 +295,6 @@ export function PersonDetails({ person_id }) {
             {groups && (
                 <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
             )}
-            <div>
-                <h5>Debug Info:</h5>
-                <p>unimapData: {JSON.stringify(unimapData)}</p>
-                <p>loadingUnimap: {loadingUnimap.toString()}</p>
-                <p>unimapError: {unimapError ? unimapError.message : 'null'}</p>
-                <p>pubLinks: {JSON.stringify(pubLinks)}</p>
-            </div>
             {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                 (pubLinks.length > 0) ||
                 (data.grants && data.grants.length > 0) ? (
