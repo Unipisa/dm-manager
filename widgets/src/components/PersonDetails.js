@@ -149,7 +149,9 @@ export function PersonDetails({ person_id }) {
                 <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
             )}
             {groups && (
-                <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
+                <Accordion title={en ? "Administrative duties" : "Incarichi"}>
+                {groups}
+                </Accordion>
             )}
             <UnimapData data={data} en={en}/>
         </div>
@@ -181,50 +183,49 @@ function UnimapData({data, en}) {
         { label: "MathSciNet", url: data.mathscinet ? `https://mathscinet.ams.org/mathscinet/MRAuthorID/${data.mathscinet}` : null }
     ].filter(link => link.url !== null && link.label !== "");
 
-    const research = (
-        <div>
-            {unimapData === null ? (
-                <Loading widget="Research" />
-            ) : unimapData?.error !== undefined ? (
-                <div>{unimapData?.error}</div>
-            ) : (
-                <div>
-                    {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
-                        (pubLinks.length > 0) || (data.grants && data.grants.length > 0) ? (
-                        <div>
-                            {unimapData?.arpiPublications && unimapData.arpiPublications.length > 0 && (
-                                <>
-                                    <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
-                                    <PublicationList publications={unimapData.arpiPublications} />
-                                </>
-                            )}
-                            {pubLinks.length > 0 && (
-                                <div>
-                                    {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
-                                    <PublicationLinks pubLinks={pubLinks}/>
-                                </div>
-                            )}
-                            {data.grants && data.grants.length > 0 && (
-                                <>
-                                    <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
-                                    <GrantList en={en} grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
-                                </>
-                            )}
-                        </div>
-                    ) : null}
-                </div>
-            )}
-        </div>
-    );
-
     return <>
             {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                 (pubLinks.length > 0) ||
-                (data.grants && data.grants.length > 0) ? (
-                <Accordion title={en ? "Research" : "Ricerca"} content={research} />
-            ) : null}
+                (data.grants && data.grants.length > 0) ?
+                <Accordion title={en ? "Research" : "Ricerca"}>
+                    <div>
+                    {unimapData === null ? (
+                        <Loading widget="Research" />
+                    ) : unimapData?.error !== undefined ? (
+                        <div>{unimapData?.error}</div>
+                    ) : (
+                        <div>
+                            {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                                (pubLinks.length > 0) || (data.grants && data.grants.length > 0) ? (
+                                <div>
+                                    {unimapData?.arpiPublications && unimapData.arpiPublications.length > 0 && (
+                                        <>
+                                            <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
+                                            <PublicationList publications={unimapData.arpiPublications} />
+                                        </>
+                                    )}
+                                    {pubLinks.length > 0 && (
+                                        <div>
+                                            {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
+                                            <PublicationLinks pubLinks={pubLinks}/>
+                                        </div>
+                                    )}
+                                    {data.grants && data.grants.length > 0 && (
+                                        <>
+                                            <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
+                                            <GrantList en={en} grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
+                                        </>
+                                    )}
+                                </div>
+                            ) : null}
+                        </div>
+                    )}
+                </div>
+            </Accordion> : null}
             {(unimapData?.registri && unimapData.registri.length > 0) && (
-                <Accordion title={en ? "Teaching" : "Didattica"} content={<CourseList unimapData={unimapData} en={en} />} />
+                <Accordion title={en ? "Teaching" : "Didattica"}>
+                    <CourseList unimapData={unimapData} en={en} />
+                </Accordion>
             )}
     </>
 }

@@ -3,7 +3,7 @@ import './styles.css';
 
 const createUniqueId = () => 'id-' + Math.random().toString(36).substr(2, 9);
 
-const Accordion = ({ title, content, markdown = true }) => {
+const Accordion = ({ title, content, markdown = true, children }) => {
   const id = createUniqueId();
   const acId = 'ac-' + id;
   const atId = 'at-' + id;
@@ -34,6 +34,7 @@ const Accordion = ({ title, content, markdown = true }) => {
         style={{ display: isOpen ? 'block' : 'none' }}
       >
         {content}
+        {children}
       </div>
     </div>
   );
