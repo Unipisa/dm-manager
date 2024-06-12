@@ -181,45 +181,6 @@ function UnimapData({data, en}) {
         { label: "MathSciNet", url: data.mathscinet ? `https://mathscinet.ams.org/mathscinet/MRAuthorID/${data.mathscinet}` : null }
     ].filter(link => link.url !== null && link.label !== "");
 
-    const PublicationLinks = () => {
-        if (pubLinks.length === 0) {
-            return null;
-        }
-
-        return pubLinks
-            .map(link => (
-                <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer">
-                    {link.label}
-                </a>
-            ))
-            .reduce((prev, curr) => [prev, ', ', curr]);
-    };
-
-    const PublicationList = ({ publications }) => (
-        <ul>
-            {publications.slice(0, 5).map((p, i) => (
-                <li key={i}>
-                    <a href={p.link} target="_blank" rel="noopener noreferrer">{p.title}</a> [{p.anno}]
-                </li>
-            ))}
-        </ul>
-    );
-
-    const GrantList = ({ grants }) => (
-        <ul>
-            {grants.map((g, i) => {
-                return (
-                    <li key={i}>
-                        <a href={`/research/grant-details/?grant_id=${g._id}`}>{g.name}</a>
-                        <span className="text-muted small"> ({g.projectType})</span><br />
-                        Principal Investigator: <em>{g.piDetails.firstName} {g.piDetails.lastName}</em><br />
-                        {en ? "Project period" : "Periodo"}: {formatDateInterval(g.startDate, g.endDate)}
-                    </li>
-                );
-            })}
-        </ul>
-    );
-
     const research = (
         <div>
             {unimapData === null ? (
@@ -240,13 +201,13 @@ function UnimapData({data, en}) {
                             {pubLinks.length > 0 && (
                                 <div>
                                     {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
-                                    <PublicationLinks />
+                                    <PublicationLinks pubLinks={pubLinks}/>
                                 </div>
                             )}
                             {data.grants && data.grants.length > 0 && (
                                 <>
                                     <h5 className="my-2">{en ? 'Grants' : 'Finanziamenti'}</h5>
-                                    <GrantList grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
+                                    <GrantList en={en} grants={data.grants.sort((a, b) => new Date(b.endDate) - new Date(a.endDate))} />
                                 </>
                             )}
                         </div>
@@ -256,49 +217,6 @@ function UnimapData({data, en}) {
         </div>
     );
 
-    const CourseList = ({ en }) => {
-        const coursesDesc = en ? "Courses for the current academic year:" : "Corsi insegnati nel corrente anno accademico:";
-
-        const courses = (unimapData.registri || []).map(c => (
-            <li key={c.id}>
-                {c.modulo !== 'NESSUNO' ? (
-                    <strong>{c.modulo}</strong>
-                ) : (
-                    <strong>{c.descrizione}</strong>
-                )}
-                {' '}
-                {c.modulo !== 'NESSUNO' ? (
-                    `(Modulo dell'insegnamento ${c.descrizione} - Cod. ${c.codiceInsegnamento}) CdS ${c.codiceCorso} ${c.denominazione}`
-                ) : (
-                    `(Cod. ${c.codiceInsegnamento}) CdS ${c.codiceCorso} ${c.denominazione}`
-                )}
-                {' '}
-                (<a href={`https://unimap.unipi.it/registri/dettregistriNEW.php?re=${c.id}::::&ri=${c.matricola}`} target="_blank" rel="noopener noreferrer">Registro</a>)
-            </li>
-        ));
-
-        return (
-            <div>
-                {unimapData === null ? (
-                    <Loading widget="Teaching" />
-                ) : unimapData?.error !== undefined ? (
-                    <div>{unimapData?.error}</div>
-                ) : (
-                    <div>
-                        {courses.length > 0 && (
-                            <>
-                                <p>{coursesDesc}</p>
-                                <ul>
-                                    {courses}
-                                </ul>
-                            </>
-                        )}
-                    </div>
-                )}
-            </div>
-        );
-    };
-
     return <>
             {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                 (pubLinks.length > 0) ||
@@ -306,7 +224,89 @@ function UnimapData({data, en}) {
                 <Accordion title={en ? "Research" : "Ricerca"} content={research} />
             ) : null}
             {(unimapData?.registri && unimapData.registri.length > 0) && (
-                <Accordion title={en ? "Teaching" : "Didattica"} content={<CourseList en={en} />} />
+                <Accordion title={en ? "Teaching" : "Didattica"} content={<CourseList unimapData={unimapData} en={en} />} />
             )}
     </>
 }
+
+function PublicationLinks({pubLinks}) {
+    if (pubLinks.length === 0) {
+        return null;
+    }
+
+    return pubLinks
+        .map(link => (
+            <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer">
+                {link.label}
+            </a>
+        ))
+        .reduce((prev, curr) => [prev, ', ', curr]);
+};
+
+function PublicationList({ publications }) {
+    return <ul>
+        {publications.slice(0, 5).map((p, i) => (
+            <li key={p.link}>
+                <a href={p.link} target="_blank" rel="noopener noreferrer">{p.title}</a> [{p.anno}]
+            </li>
+        ))}
+    </ul>
+}
+
+function GrantList ({ grants, en }) {
+    return <ul>
+        {grants.map((g, i) => {
+            return (
+                <li key={g._id}>
+                    <a href={`/research/grant-details/?grant_id=${g._id}`}>{g.name}</a>
+                    <span className="text-muted small"> ({g.projectType})</span><br />
+                    Principal Investigator: <em>{g.piDetails.firstName} {g.piDetails.lastName}</em><br />
+                    {en ? "Project period" : "Periodo"}: {formatDateInterval(g.startDate, g.endDate)}
+                </li>
+            );
+        })}
+    </ul>
+}
+
+function CourseList ({ unimapData, en }) {
+    const coursesDesc = en ? "Courses for the current academic year:" : "Corsi insegnati nel corrente anno accademico:";
+
+    const courses = (unimapData.registri || []).map(c => (
+        <li key={c.id}>
+            {c.modulo !== 'NESSUNO' ? (
+                <strong>{c.modulo}</strong>
+            ) : (
+                <strong>{c.descrizione}</strong>
+            )}
+            {' '}
+            {c.modulo !== 'NESSUNO' ? (
+                `(Modulo dell'insegnamento ${c.descrizione} - Cod. ${c.codiceInsegnamento}) CdS ${c.codiceCorso} ${c.denominazione}`
+            ) : (
+                `(Cod. ${c.codiceInsegnamento}) CdS ${c.codiceCorso} ${c.denominazione}`
+            )}
+            {' '}
+            (<a href={`https://unimap.unipi.it/registri/dettregistriNEW.php?re=${c.id}::::&ri=${c.matricola}`} target="_blank" rel="noopener noreferrer">Registro</a>)
+        </li>
+    ));
+    return (
+        <div>
+            {unimapData === null ? (
+                <Loading widget="Teaching" />
+            ) : unimapData?.error !== undefined ? (
+                <div>{unimapData?.error}</div>
+            ) : (
+                <div>
+                    {courses.length > 0 && (
+                        <>
+                            <p>{coursesDesc}</p>
+                            <ul>
+                                {courses}
+                            </ul>
+                        </>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+};
+
