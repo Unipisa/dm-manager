@@ -19,24 +19,6 @@ export function PersonDetails({ person_id }) {
         }
     });
 
-    const [unimapData, setUnimapData] = useState(null);
-
-    const loadUnimapData = async (matricola) => {
-        try {
-            const res = await axios.get(getManageURL('public/unimap/' + matricola));
-            setUnimapData(res.data)
-        }
-        catch {
-            setUnimapData({ 'error': 'Impossibile scaricare i dati di unimap' })
-        }
-    }
-
-    useEffect(() => {
-        if (data && data.staffs && data.staffs[0].matricola) {
-            loadUnimapData(data.staffs[0].matricola);
-        }
-    }, [data]);
-
     if (isLoading) {
         return <Loading widget="Scheda personale" />;
     }
@@ -159,6 +141,37 @@ export function PersonDetails({ person_id }) {
             )}
         </div>
     ) : null;
+1
+    return (
+        <div>
+            {personBlock}
+            {(data.about_en || data.about_it) && (
+                <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
+            )}
+            {groups && (
+                <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
+            )}
+            <UnimapData data={data} en={en}/>
+        </div>
+    );
+}
+
+function UnimapData({data, en}) {
+    const matricola = data?.staffs?.length > 0 ? data.staffs[0].matricola : null;
+    const { isLoading, error, data: unimapData } = useQuery([ 'unimap', matricola ], async () => {
+        if (!matricola) return null
+        try {
+            const res = await axios.get(getManageURL('public/unimap/' + matricola));
+            return res.data;
+        }
+        catch {
+            return { 'error': 'Impossibile scaricare i dati di unimap' };
+        }
+    })
+
+    if (!matricola) {
+        return <div>impossibile determinare la matricola</div>
+    }
 
     const pubLinks = [
         { label: unimapData && unimapData.arpiLink === "https://arpi.unipi.it" ? "" : (unimapData && unimapData.arpiLink ? "Arpi" : ""), url: unimapData ? unimapData.arpiLink : null },
@@ -286,15 +299,7 @@ export function PersonDetails({ person_id }) {
         );
     };
 
-    return (
-        <div>
-            {personBlock}
-            {(data.about_en || data.about_it) && (
-                <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
-            )}
-            {groups && (
-                <Accordion title={en ? "Administrative duties" : "Incarichi"} content={groups} />
-            )}
+    return <>
             {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                 (pubLinks.length > 0) ||
                 (data.grants && data.grants.length > 0) ? (
@@ -303,6 +308,5 @@ export function PersonDetails({ person_id }) {
             {(unimapData?.registri && unimapData.registri.length > 0) && (
                 <Accordion title={en ? "Teaching" : "Didattica"} content={<CourseList en={en} />} />
             )}
-        </div>
-    );
+    </>
 }
