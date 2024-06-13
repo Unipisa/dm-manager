@@ -1,12 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useId } from 'react';
 import './styles.css';
 
-const createUniqueId = () => 'id-' + Math.random().toString(36).substr(2, 9);
-
 const Accordion = ({ title, content, markdown = true, children }) => {
-  const id = createUniqueId();
-  const acId = 'ac-' + id;
-  const atId = 'at-' + id;
+  const acId = useId();
+  const atId = useId();
   const markdownClass = markdown ? 'markdown-compile' : '';
 
   const [isOpen, setIsOpen] = useState(false);

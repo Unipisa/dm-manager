@@ -187,8 +187,7 @@ function UnimapData({data, en}) {
             {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
                 (pubLinks.length > 0) ||
                 (data.grants && data.grants.length > 0) ?
-                /*<Accordion title={en ? "Research" : "Ricerca"}>*/
-                    <div>
+                <Accordion title={en ? "Research" : "Ricerca"}>
                     {unimapData === null ? (
                         <Loading widget="Research" />
                     ) : unimapData?.error !== undefined ? (
@@ -220,8 +219,7 @@ function UnimapData({data, en}) {
                             ) : null}
                         </div>
                     )}
-                </div>
-/*            </Accordion>*/ : null}
+            </Accordion> : null}
             {(unimapData?.registri && unimapData.registri.length > 0) && (
                 <Accordion title={en ? "Teaching" : "Didattica"}>
                     <CourseList unimapData={unimapData} en={en} />
