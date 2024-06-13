@@ -12,6 +12,8 @@ const Accordion = ({ title, content, markdown = true, children }) => {
     setIsOpen(!isOpen);
   };
 
+  console.log('Accordion', JSON.stringify({ title }));
+
   return (
     <div className="wp-block-pb-accordion-item c-accordion__item js-accordion-item">
       <h4

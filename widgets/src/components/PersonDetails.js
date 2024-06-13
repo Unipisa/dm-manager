@@ -19,6 +19,8 @@ export function PersonDetails({ person_id }) {
         }
     });
 
+    console.log('PersonDetails', JSON.stringify({person_id, isLoading, error, data }, null, 2)) 
+
     if (isLoading) {
         return <Loading widget="Scheda personale" />;
     }
@@ -171,6 +173,8 @@ function UnimapData({data, en}) {
         }
     })
 
+    console.log('UnimapData', JSON.stringify({matricola, isLoading, error, unimapData}, null, 2))
+
     if (!matricola) {
         return <div>impossibile determinare la matricola</div>
     }
@@ -243,6 +247,7 @@ function PublicationLinks({pubLinks}) {
 };
 
 function PublicationList({ publications }) {
+    console.log('PublicationList', JSON.stringify(publications, null, 2))
     return <ul>
         {publications.slice(0, 5).map((p, i) => (
             <li key={p.link}>
