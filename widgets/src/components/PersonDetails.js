@@ -45,7 +45,7 @@ export function PersonDetails({ person_id }) {
 }
 
 function PersonBlock({data, en}) {
-    const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png";
+    const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png?resize=280%2C280&ssl=1";
     const feminine = data.gender === 'Donna';
     const qualification = (data.staffs || []).map(q => getRoleLabel(q.qualification, en, feminine)).join(', ');
     const researchGroup = [...new Set(data.staffs.map(q => q.SSD).filter(q => q).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ');
@@ -175,7 +175,7 @@ function UnimapData({data, en}) {
     }
 
     if (!matricola) {
-        return <div>impossibile determinare la matricola</div>;
+        return <div>Impossibile determinare la matricola</div>;
     }
 
     const pubLinks = [
