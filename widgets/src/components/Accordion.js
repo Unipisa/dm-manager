@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useId } from 'react';
 import './styles.css';
 
 const Accordion = ({ title, content, markdown = true, children }) => {
-  const acId = useRef(`ac-${Math.random().toString(36).substr(2, 9)}`);
-  const atId = useRef(`at-${Math.random().toString(36).substr(2, 9)}`);
+  const acId = useId();
+  const atId = useId();
   const markdownClass = markdown ? 'markdown-compile' : '';
 
   const [isOpen, setIsOpen] = useState(false);
@@ -11,11 +11,6 @@ const Accordion = ({ title, content, markdown = true, children }) => {
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
   };
-
-  useEffect(() => {
-  }, [content, children]);
-
-  console.log('Accordion', JSON.stringify({ title }));
 
   return (
     <div className="wp-block-pb-accordion-item c-accordion__item js-accordion-item">

@@ -1,25 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useQuery } from 'react-query';
 import axios from 'axios';
 import Accordion from './Accordion';
-import { getManageURL, formatDateInterval, getRoleLabel, getResearchGroupLabel, getRoomDetails, isEnglish } from '../utils';
 import { Loading } from './Loading';
-import { useQuery } from 'react-query';
+import { formatDateInterval, getManageURL, getResearchGroupLabel, getRoleLabel, getRoomDetails, isEnglish } from '../utils';
 
 export function PersonDetails({ person_id }) {
-    const { isLoading, error, data } = useQuery([ 'person', person_id ], async () => {
-        if (person_id !== null) {
-            const res = await axios.get(getManageURL('public/person/' + person_id));
-            const person = res.data.data;
-            if (!person) {
-                throw new Error("Impossibile trovare la persona richiesta");
-            }
-            return person;
-        } else {
-            throw new Error('Impossibile trovare la persona richiesta');
+    const { isLoading, error, data } = useQuery(['person', person_id], async () => {
+        if (!person_id) {
+            throw new Error('Id non può essere vuota');
         }
+        const res = await axios.get(getManageURL(`public/person/${person_id}`));
+        const person = res.data.data;
+        if (!person) {
+            throw new Error("Impossibile trovare la persona richiesta");
+        }
+        return person;
     });
-
-    console.log('PersonDetails', JSON.stringify({person_id, isLoading, error, data }, null, 2)) 
 
     if (isLoading) {
         return <Loading widget="Scheda personale" />;
@@ -30,17 +27,31 @@ export function PersonDetails({ person_id }) {
     }
 
     if (!data) {
-        return <div>404 Not Found.</div>;
+        return <div>Nessun dato</div>;
     }
 
     const en = isEnglish();
+    
+    return (
+        <div>
+            <PersonBlock data={data} en={en}/>
+            {(data.about_en || data.about_it) && (
+                <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
+            )}
+            <Duties data={data} en={en}/>
+            <UnimapData data={data} en={en}/>
+        </div>
+    );
+}
+
+function PersonBlock({data, en}) {
     const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2022/07/No-Image-Placeholder.svg_.png";
     const feminine = data.gender === 'Donna';
     const qualification = (data.staffs || []).map(q => getRoleLabel(q.qualification, en, feminine)).join(', ');
     const researchGroup = [...new Set(data.staffs.map(q => q.SSD).filter(q => q).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ');
     const roomDetails = (data.roomAssignments || []).map(r => getRoomDetails(r.roomDetails, r.room, en));
 
-    const personBlock = (
+    return (
         <div className="entry-content box clearfix mb-0">
             <div className="d-flex flex-wrap align-middle">
                 <div className="mr-4 mb-4">
@@ -87,18 +98,18 @@ export function PersonDetails({ person_id }) {
                             <i className="fas fa-link mr-2"></i>
                             <a href={data.personalPage}>{data.personalPage}</a>
                             <br />
-                            {en ? (
-                                <span className="small text-muted">(The CV is available on this webpage)</span>
-                            ) : (
-                                <span className="small text-muted">(Il CV è disponibile a questa pagina web)</span>
-                            )}
+                            <span className="small text-muted">
+                                {en ? "(The CV is available on this webpage)" : "(Il CV è disponibile a questa pagina web)"}
+                            </span>
                         </p>
                     )}
                 </div>
             </div>
         </div>
     );
+}
 
+function Duties({data, en}) {
     const memberOfOne = data.groups
         .filter(group => group.memberCount === 1 && !group.name.startsWith("MAT/"))
         .sort((a, b) => a.name.localeCompare(b.name));
@@ -111,8 +122,12 @@ export function PersonDetails({ person_id }) {
             return a.name.localeCompare(b.name);
         });
 
-    const groups = (memberOfOne.length > 0 || memberOfMultiple.length > 0) ? (
-        <div>
+    if (memberOfOne.length === 0 && memberOfMultiple.length === 0) {
+        return null;
+    }
+
+    return (
+        <Accordion title={en ? "Administrative duties" : "Incarichi"}>
             {memberOfOne.length > 0 && (
                 <ul>
                     {memberOfOne.map(group => (
@@ -126,37 +141,15 @@ export function PersonDetails({ person_id }) {
                     <ul>
                         {memberOfMultiple.map(group => (
                             <li key={group.name}>
-                                {group.name} {group.chair === data._id && (
-                                    <span className="badge badge-primary mr-2">
-                                        {en ? "Chair" : group.chair_title}
-                                    </span>
-                                )}
-                                {group.vice === data._id && (
-                                    <span className="badge badge-primary mr-2">
-                                        {en ? "Deputy Chair" : group.vice_title}
-                                    </span>
-                                )}
+                                {group.name} 
+                                {group.chair === data._id && <span className="badge badge-primary mr-2">{en ? "Chair" : group.chair_title}</span>}
+                                {group.vice === data._id && <span className="badge badge-primary mr-2">{en ? "Deputy Chair" : group.vice_title}</span>}
                             </li>
                         ))}
                     </ul>
                 </div>
             )}
-        </div>
-    ) : null;
-1
-    return (
-        <div>
-            {personBlock}
-            {(data.about_en || data.about_it) && (
-                <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
-            )}
-            {groups && (
-                <Accordion title={en ? "Administrative duties" : "Incarichi"}>
-                {groups}
-                </Accordion>
-            )}
-            <UnimapData data={data} en={en}/>
-        </div>
+        </Accordion>
     );
 }
 
@@ -173,10 +166,16 @@ function UnimapData({data, en}) {
         }
     })
 
-    console.log('UnimapData', JSON.stringify({matricola, isLoading, error, unimapData}, null, 2))
+    if (isLoading) {
+        return <Loading widget="Dati Unimap" />;
+    }
+
+    if (error) {
+        return <Loading widget="Dati Unimap" error={error} />;
+    }
 
     if (!matricola) {
-        return <div>impossibile determinare la matricola</div>
+        return <div>impossibile determinare la matricola</div>;
     }
 
     const pubLinks = [
@@ -187,21 +186,20 @@ function UnimapData({data, en}) {
         { label: "MathSciNet", url: data.mathscinet ? `https://mathscinet.ams.org/mathscinet/MRAuthorID/${data.mathscinet}` : null }
     ].filter(link => link.url !== null && link.label !== "");
 
-    return <>
-            {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
-                (pubLinks.length > 0) ||
-                (data.grants && data.grants.length > 0) ?
-                <Accordion title={en ? "Research" : "Ricerca"}>
-                    {unimapData === null ? (
-                        <Loading widget="Research" />
-                    ) : unimapData?.error !== undefined ? (
-                        <div>{unimapData?.error}</div>
-                    ) : (
-                        <div>
-                            {(unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
-                                (pubLinks.length > 0) || (data.grants && data.grants.length > 0) ? (
+    return (
+        <>
+            {((unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                pubLinks.length > 0 ||
+                (data.grants && data.grants.length > 0) ||
+                (unimapData?.registri && unimapData.registri.length > 0)) &&
+                (unimapData && !unimapData.error) && (
+                    <>
+                        {(unimapData.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                            pubLinks.length > 0 ||
+                            (data.grants && data.grants.length > 0) ? (
+                            <Accordion title={en ? "Research" : "Ricerca"}>
                                 <div>
-                                    {unimapData?.arpiPublications && unimapData.arpiPublications.length > 0 && (
+                                    {unimapData.arpiPublications && unimapData.arpiPublications.length > 0 && (
                                         <>
                                             <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
                                             <PublicationList publications={unimapData.arpiPublications} />
@@ -210,7 +208,7 @@ function UnimapData({data, en}) {
                                     {pubLinks.length > 0 && (
                                         <div>
                                             {en ? "See all publications on: " : "Vedi tutte le pubblicazioni su: "}
-                                            <PublicationLinks pubLinks={pubLinks}/>
+                                            <PublicationLinks pubLinks={pubLinks} />
                                         </div>
                                     )}
                                     {data.grants && data.grants.length > 0 && (
@@ -220,16 +218,18 @@ function UnimapData({data, en}) {
                                         </>
                                     )}
                                 </div>
-                            ) : null}
-                        </div>
-                    )}
-            </Accordion> : null}
-            {(unimapData?.registri && unimapData.registri.length > 0) && (
-                <Accordion title={en ? "Teaching" : "Didattica"}>
-                    <CourseList unimapData={unimapData} en={en} />
-                </Accordion>
-            )}
-    </>
+                            </Accordion>
+                        ) : null}
+    
+                        {unimapData.registri && unimapData.registri.length > 0 && (
+                            <Accordion title={en ? "Teaching" : "Didattica"}>
+                                <CourseList unimapData={unimapData} en={en} />
+                            </Accordion>
+                        )}
+                    </>
+                )}
+        </>
+    );
 }
 
 function PublicationLinks({pubLinks}) {
@@ -247,9 +247,8 @@ function PublicationLinks({pubLinks}) {
 };
 
 function PublicationList({ publications }) {
-    console.log('PublicationList', JSON.stringify(publications, null, 2))
     return <ul>
-        {publications.slice(0, 5).map((p, i) => (
+        {publications.slice(0, 5).map((p) => (
             <li key={p.link}>
                 <a href={p.link} target="_blank" rel="noopener noreferrer">{p.title}</a> [{p.anno}]
             </li>
@@ -259,7 +258,7 @@ function PublicationList({ publications }) {
 
 function GrantList ({ grants, en }) {
     return <ul>
-        {grants.map((g, i) => {
+        {grants.map((g) => {
             return (
                 <li key={g._id}>
                     <a href={`/research/grant-details/?grant_id=${g._id}`}>{g.name}</a>
@@ -292,25 +291,15 @@ function CourseList ({ unimapData, en }) {
             (<a href={`https://unimap.unipi.it/registri/dettregistriNEW.php?re=${c.id}::::&ri=${c.matricola}`} target="_blank" rel="noopener noreferrer">Registro</a>)
         </li>
     ));
+
     return (
         <div>
-            {unimapData === null ? (
-                <Loading widget="Teaching" />
-            ) : unimapData?.error !== undefined ? (
-                <div>{unimapData?.error}</div>
-            ) : (
-                <div>
-                    {courses.length > 0 && (
-                        <>
-                            <p>{coursesDesc}</p>
-                            <ul>
-                                {courses}
-                            </ul>
-                        </>
-                    )}
-                </div>
+            {courses.length > 0 && (
+                <>
+                    <p>{coursesDesc}</p>
+                    <ul>{courses}</ul>
+                </>
             )}
         </div>
     );
 };
-
