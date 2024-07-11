@@ -8,6 +8,7 @@ import { ConferenceList } from './components/ConferenceList';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { HomeEventList } from './components/HomeEventList';
 import { PersonDetails } from './components/PersonDetails';
+import { CourseList } from './components/CourseList';
 import { getManageURL } from './utils'
 
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
@@ -47,6 +48,9 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
             break;
         case 'PersonDetails':
             element = <PersonDetails {...props}></PersonDetails>
+            break;
+        case 'CourseList':
+            element = <CourseList {...props}></CourseList>
             break;
 
         default:

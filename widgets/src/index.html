@@ -76,6 +76,11 @@
                  data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails" 
                  aria-selected="false">PersonDetails</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#courselist" id="courselist-label" data-toggle="tab" 
+               data-target="#courselist-tab" type="button" role="tab" aria-controls="courselist" 
+               aria-selected="false">CourseList</a>
+        </li>
         </ul>
     </nav>
 
@@ -94,6 +99,7 @@
           <div class="tab-pane fade p-3" id="conference-tab"><div id="conference"></div></div>
           <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
+          <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
         </div>
       </article>
     </main>
@@ -134,6 +140,9 @@
             })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
                 person_id: '66471d4ef38d44852c3310e9',
+            })
+            dmwidgets.loadComponent(document.getElementById("courselist"), "CourseList", { 
+                from: '2021-01-01'
             })
         }
         loader();
