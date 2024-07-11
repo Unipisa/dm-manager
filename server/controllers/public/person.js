@@ -79,7 +79,7 @@ async function personQuery(req, res) {
                     ] } } },
                     lookupPipeline('people', 'pi', '_id', 'piDetails'),
                     { $unwind: { path: "$piDetails", preserveNullAndEmptyArrays: true } },
-                    projectFields({ name: 1, projectType: 1, pi: 1, startDate: 1, endDate: 1, piDetails: { firstName: 1, lastName: 1 } })
+                    projectFields({ _id: 1, name: 1, projectType: 1, pi: 1, startDate: 1, endDate: 1, piDetails: { firstName: 1, lastName: 1 } })
                 ]
             }
         },
@@ -89,7 +89,7 @@ async function personQuery(req, res) {
             staffs: { qualification: 1, SSD: 1, matricola: 1, isInternal: 1 },
             roomAssignments: { room: 1, startDate: 1, endDate: 1, roomDetails: { building: 1, floor: 1, number: 1, code: 1 } },
             groups: { name: 1, chair: 1, chair_title: 1, vice: 1, vice_title: 1, memberCount: 1 },
-            grants: { name: 1, projectType: 1, pi: 1, startDate: 1, endDate: 1, piDetails: { firstName: 1, lastName: 1 } }
+            grants: { _id: 1, name: 1, projectType: 1, pi: 1, startDate: 1, endDate: 1, piDetails: { firstName: 1, lastName: 1 } }
         })
     ];
 
