@@ -175,7 +175,8 @@ function UnimapData({data, en}) {
     }
 
     if (!matricola) {
-        return <div>Impossibile determinare la matricola</div>;
+        console.log("Impossibile determinare la matricola");
+        return null;
     }
 
     const pubLinks = [
