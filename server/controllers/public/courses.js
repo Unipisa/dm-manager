@@ -34,14 +34,31 @@ async function coursesQuery(req) {
         match["startDate"] = { "$lte": to }
     }
 
+    const lookupPipeline = (from, localField, foreignField, as, additionalPipeline = []) => ({
+        $lookup: {
+            from,
+            localField,
+            foreignField,
+            as,
+            pipeline: additionalPipeline
+        }
+    });
+
+    const projectFields = (fields) => ({ $project: fields });
+    
     const pipeline = [
         { $match: match },
-        { $lookup: {
-            from: 'people',
-            localField: 'lecturers',
-            foreignField: '_id',
-            as: 'lecturers',
-        }},
+        lookupPipeline('people', 'lecturers', '_id', 'lecturers', [
+            lookupPipeline('institutions', 'affiliations', '_id', 'affiliations'),
+            { $unwind: { path: "$affiliations", preserveNullAndEmptyArrays: true } },
+            projectFields({
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+                affiliations: { _id: 1, name: 1 }
+            })
+        ]),
         { $unwind: {
             path: '$person',
             preserveNullAndEmptyArrays: true
@@ -55,7 +72,12 @@ async function coursesQuery(req) {
             lecturers: {
                 _id: 1,
                 firstName: 1,
-                lastName: 1   
+                lastName: 1,
+                email: 1,
+                affiliations: {
+                    _id: 1,
+                    name: 1
+                }
             }
         }}
     ];
