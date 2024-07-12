@@ -51,13 +51,13 @@ async function unimapQuery(req, res) {
             (link) => link ?? null
         ),
         fetchFromAPI(
-            `${config.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/9999`,
+            `${config.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
             config.UNIPI_TOKENARPI,
             'entries',
             (entries) => entries?.entry ?? []
         ),
         fetchFromAPI(
-            `${config.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/${new Date().getFullYear()}`,
+            `${config.UNIPI_API_URL}arpicineca/1.0/getElencoPeriodo/${id}/9999`,
             config.UNIPI_TOKENARPI,
             'entries',
             (entries) => entries?.entry ?? []
@@ -65,12 +65,12 @@ async function unimapQuery(req, res) {
     ];
 
     try {
-        const [registri, arpiLink, arpiPublications, arpiAcceptedPapers] = await Promise.all(fetchPromises);
+        const [registri, arpiLink, arpiPublishedPapers, arpiAcceptedPapers] = await Promise.all(fetchPromises);
 
         res.json({
             registri,
             arpiLink,
-            arpiPublications,
+            arpiPublishedPapers,
             arpiAcceptedPapers
         });
     } catch (error) {

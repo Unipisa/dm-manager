@@ -189,14 +189,14 @@ function UnimapData({data, en}) {
 
     return (
         <>
-            {((unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
+            {((unimapData?.arpiPublishedPapers && unimapData.arpiPublishedPapers.length > 0) ||
                 (unimapData?.arpiAcceptedPapers && unimapData.arpiAcceptedPapers.length > 0) ||
                 pubLinks.length > 0 ||
                 (data.grants && data.grants.length > 0) ||
                 (unimapData?.registri && unimapData.registri.length > 0)) &&
                 (unimapData && !unimapData.error) && (
                     <>
-                        {(unimapData.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                        {(unimapData.arpiPublishedPapers && unimapData.arpiPublishedPapers.length > 0) ||
                             (unimapData.arpiAcceptedPapers && unimapData.arpiAcceptedPapers.length > 0) ||
                             pubLinks.length > 0 ||
                             (data.grants && data.grants.length > 0) ? (
@@ -208,10 +208,10 @@ function UnimapData({data, en}) {
                                             <PublicationList publications={unimapData.arpiAcceptedPapers} />
                                         </>
                                     )}
-                                    {unimapData.arpiPublications && unimapData.arpiPublications.length > 0 && (
+                                    {unimapData.arpiPublishedPapers && unimapData.arpiPublishedPapers.length > 0 && (
                                         <>
-                                            <h5 className="my-2">{en ? "Publications" : "Pubblicazioni"}</h5>
-                                            <PublicationList publications={unimapData.arpiPublications} />
+                                            <h5 className="my-2">{en ? "Published papers" : "Pubblicazioni"}</h5>
+                                            <PublicationList publications={unimapData.arpiPublishedPapers} />
                                         </>
                                     )}
                                     {pubLinks.length > 0 && (
