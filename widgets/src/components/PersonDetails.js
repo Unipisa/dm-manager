@@ -190,19 +190,27 @@ function UnimapData({data, en}) {
     return (
         <>
             {((unimapData?.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                (unimapData?.arpiAcceptedPapers && unimapData.arpiAcceptedPapers.length > 0) ||
                 pubLinks.length > 0 ||
                 (data.grants && data.grants.length > 0) ||
                 (unimapData?.registri && unimapData.registri.length > 0)) &&
                 (unimapData && !unimapData.error) && (
                     <>
                         {(unimapData.arpiPublications && unimapData.arpiPublications.length > 0) ||
+                            (unimapData.arpiAcceptedPapers && unimapData.arpiAcceptedPapers.length > 0) ||
                             pubLinks.length > 0 ||
                             (data.grants && data.grants.length > 0) ? (
                             <Accordion title={en ? "Research" : "Ricerca"}>
                                 <div>
+                                    {unimapData.arpiAcceptedPapers && unimapData.arpiAcceptedPapers.length > 0 && (
+                                        <>
+                                            <h5 className="my-2">{en ? "Accepted papers" : "Articoli accettati"}</h5>
+                                            <PublicationList publications={unimapData.arpiAcceptedPapers} />
+                                        </>
+                                    )}
                                     {unimapData.arpiPublications && unimapData.arpiPublications.length > 0 && (
                                         <>
-                                            <h5 className="my-2">{en ? "Recent publications" : "Pubblicazioni recenti"}</h5>
+                                            <h5 className="my-2">{en ? "Publications" : "Pubblicazioni"}</h5>
                                             <PublicationList publications={unimapData.arpiPublications} />
                                         </>
                                     )}
@@ -251,7 +259,8 @@ function PublicationList({ publications }) {
     return <ul>
         {publications.slice(0, 5).map((p) => (
             <li key={p.link}>
-                <a href={p.link} target="_blank" rel="noopener noreferrer">{p.title}</a> [{p.anno}]
+                <a href={p.link} target="_blank" rel="noopener noreferrer">{p.title}</a> 
+                {p.anno !== "9999" && ` [${p.anno}]`}
             </li>
         ))}
     </ul>
