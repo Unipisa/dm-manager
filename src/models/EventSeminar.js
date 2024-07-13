@@ -1,4 +1,5 @@
 import { Route } from 'react-router-dom'
+import { useState } from 'react'
 
 import ModelEditPage from '../pages/ModelEditPage'
 import ModelsPage from '../pages/ModelsPage'
@@ -32,6 +33,7 @@ export default class EventSeminar {
         this.IndexPage = ModelsPage
         this.ViewPage = ModelViewPage
         this.EditPage = ModelEditPage
+        this.Filters = SeminarsFilters
     }
 
     // absolute url of objects index
@@ -72,4 +74,35 @@ export default class EventSeminar {
 
         return [indexRouter, viewRouter, editRouter].filter(Boolean)
     }    
+}
+
+function SeminarsFilters({filter}) {
+    const setFilterFields = filter.setFilter
+    const [year, setYear] = useState(0)
+    const currentYear = new Date().getFullYear()
+    const years = Array.from({length: 10} , (_, i) => currentYear + 1 - i)
+    return <>
+        <select 
+            placeholder='seleziona anno' 
+            value={year || ""} 
+            onChange={evt => {
+                const year = parseInt(evt.target.value)
+                setYear(year)
+                if (year) {
+                    setFilterFields(prev => ({
+                        ...prev,
+                        startDatetime__gte: `${year}-01-01`,
+                        startDatetime__lt: `${year+1}-01-01`,
+                    }))
+                } else {
+                    setFilterFields(prev => {
+                        const {startDatetime__gte, startDatetime__lt, ...rest} = prev
+                        return rest
+                    })
+                }
+            }}>
+            <option value="">Tutti gli anni</option>
+            {years.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+    </>
 }

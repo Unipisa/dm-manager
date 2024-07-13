@@ -6,7 +6,7 @@ import { CSVLink } from "react-csv"
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import Loading from './Loading'
 
-export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders}) {    
+export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders, Filters}) {    
     const engine = useEngine()
     const filter = useQueryFilter(defaultFilter || {})
     const query = engine.useIndex(path, filter.filter)
@@ -90,6 +90,11 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                 <CSVLink className="btn btn-primary mx-1" data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
                 { addButton }
             </div>            
+            { Filters && 
+                <div className="d-flex mb-4">
+                    <Filters filter={filter}/>
+                </div>
+            }
             <div className="d-flex mb-4">
                 { selectedIds.length>0 
                     ? <>

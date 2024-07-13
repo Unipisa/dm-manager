@@ -19,6 +19,7 @@ export default function ModelsPage({ Model, columns }) {
             fieldsInfo={Model.schema.fields}
             addButton={addButton}
             columns={columns || Model.columns}
+            Filters={Model.Filters}
             />
     </>
 }
