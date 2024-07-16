@@ -12,14 +12,14 @@ export function formatAffiliations(affiliations) {
     return "(" + affiliations.map(x => x.name).join(", ") + ")"
 }
 
-export function formatDate(datetime) {
+export function formatDate(datetime, locale) {
     const date = new Date(datetime)
 
-    // Consider passing en-us or it-it in place of undefined, if 
-    // you want to force the locale.
-    return date.toLocaleDateString(isEnglish() ? 'en' : 'it', {
+    const resolvedLocale = locale || (isEnglish() ? 'en-US' : 'it-IT');
+
+    return date.toLocaleDateString(resolvedLocale, {
         weekday: "long", year: "numeric", month: "short", day: "numeric"
-    })
+    });
 }
 
 export function formatDateInterval(start, end) {

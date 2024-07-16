@@ -50,7 +50,7 @@ export function CourseList({ from, to }) {
         return courses.map(course => {
             const lecturerCards = course.lecturers.map(lecturer => {
                 const showAffiliations = lecturer.affiliations && lecturer.affiliations.length > 0 && 
-                    !lecturer.affiliations.some(affiliation => affiliation._id === '6644ab27871112d444fbbc2f');
+                    !lecturer.affiliations.some(affiliation => affiliation._id === '641b8b0b840928dc5b8da2e3');
                 const formattedAffiliations = showAffiliations ? formatAffiliations(lecturer.affiliations) : '';
             
                 return (
@@ -83,7 +83,7 @@ export function CourseList({ from, to }) {
                     <h5 className="wp-block-heading"><strong>{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</strong></h5>
                     {lecturerCards}
                     <h5 className="wp-block-heading"><strong>Period:</strong></h5>
-                    <p>From {formatDate(course.startDate)} to {formatDate(course.endDate)}</p>
+                    <p>From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
                     <h5 className="wp-block-heading"><strong>Description:</strong></h5>
                     <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
                 </Accordion>
