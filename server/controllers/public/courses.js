@@ -50,19 +50,14 @@ async function coursesQuery(req) {
         { $match: match },
         lookupPipeline('people', 'lecturers', '_id', 'lecturers', [
             lookupPipeline('institutions', 'affiliations', '_id', 'affiliations'),
-            { $unwind: { path: "$affiliations", preserveNullAndEmptyArrays: true } },
             projectFields({
                 _id: 1,
                 firstName: 1,
                 lastName: 1,
                 email: 1,
-                affiliations: { _id: 1, name: 1 }
+                affiliations: {_id:1, name: 1}
             })
         ]),
-        { $unwind: {
-            path: '$person',
-            preserveNullAndEmptyArrays: true
-        }},
         { $project: {
             _id: 1,
             startDate: 1,
@@ -81,7 +76,7 @@ async function coursesQuery(req) {
             }
         }}
     ];
-
+    
     const courses = await EventPhdCourse.aggregate(pipeline);
 
     return {
