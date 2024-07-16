@@ -6,56 +6,100 @@ import remarkMath from 'remark-math'
 import axios from 'axios'
 import Accordion from './Accordion';
 import { Loading } from './Loading'
-import { getManageURL } from '../utils'
+import { formatAffiliations, formatDate, getManageURL, getDMURL } from '../utils'
 
-export function CourseList({ from, to}) {
-    const filter = { from, to }
+export function CourseList({ from, to }) {
+    if (from === undefined || to === undefined) {
+        return <div>Please specify both 'from' and 'to' in order to show the list of courses</div>;
+    }
+    
+    const filter = { from, to };
 
-    const { isLoading, error, data } = useQuery([ 'conferences', filter ], async () => {
-        const res = await axios.get(getManageURL("public/courses"), { params: filter })
+    const { isLoading, error, data } = useQuery(['conferences', filter], async () => {
+        const res = await axios.get(getManageURL('public/courses'), { params: filter });
         const courses = res.data.data;
         if (!courses) {
-            throw new Error("Impossibile trovare i corsi di dottorato richiesti");
+            throw new Error('Impossibile trovare i corsi di dottorato richiesti');
         }
         return courses;
-    })
+    });
 
     if (isLoading || error) {
-        return <Loading widget="Lista dei corsi" error={error}></Loading>
+        return <Loading widget="Lista dei corsi" error={error}></Loading>;
     }
 
-    var courses_block = []
-    for (var i = 0; i < data.length; i++) {
-        const course = data[i];
-        if (typeof(course) != 'undefined') {
-            const lecturerCards = course.lecturers.map(lecturer => (
-                <div class="col-lg-6 col-12 py-2" key={lecturer._id}>
-                    <div class="card h-100 m-2 shadow-sm">
-                        <div class="card-body">
-                            <i class="fas fa-id-card fa-fw"></i>
-                            <span class="card-title ml-2 h5">{lecturer.firstName} {lecturer.lastName}</span>
-                            <br></br>
-                            <i class="fas fa-at mr-3"></i>
-                            <a href={`mailto:${lecturer.email}`}>{lecturer.email}</a>
-                        </div>
-                    </div>
-                </div>
-            ));
+    const fallCourses = [];
+    const springCourses = [];
 
-            courses_block.push(
-                <Accordion title={course.title}>
-                    <h5 class="wp-block-heading"><strong>Lecturer:</strong></h5>
-                        {lecturerCards}
-                    <h5 class="wp-block-heading"><strong>Period:</strong></h5>
-                        <p>Dal Al</p>
-                    <h5 class="wp-block-heading"><strong>Description:</strong></h5>
-                        <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
-                </Accordion>
-            );
+    const fromYear = new Date(from).getFullYear();
+    const toYear = new Date(to).getFullYear();
+    const springDate = new Date(`${fromYear + 1}-03-01`);
+
+    for (const course of data) {
+        if (course && course.endDate) {
+            const courseEndDate = new Date(course.endDate);
+            if (courseEndDate < springDate) {
+                fallCourses.push(course);
+            } else {
+                springCourses.push(course);
+            }
         }
     }
 
-    return <>
-        {courses_block}
-    </>
+    const renderCourses = (courses) => {
+        return courses.map(course => {
+            const lecturerCards = course.lecturers.map(lecturer => {
+                const showAffiliations = lecturer.affiliations && lecturer.affiliations.length > 0 && 
+                    !lecturer.affiliations.some(affiliation => affiliation._id === '6644ab27871112d444fbbc2f');
+                const formattedAffiliations = showAffiliations ? formatAffiliations(lecturer.affiliations) : '';
+            
+                return (
+                    <div className="col-lg-6 col-12 py-2" key={lecturer._id}>
+                        <div className="card h-100 m-2 shadow-sm">
+                            <div className="card-body">
+                                {showAffiliations ? (
+                                    <i className="fas fa-id-card fa-fw"></i>
+                                ) : (
+                                    <a href={getDMURL(`en/person/${lecturer._id}`)}><i className="fas fa-id-card fa-fw"></i></a>
+                                )}
+                                <span className="card-title ml-2 h5">
+                                    {lecturer.firstName} {lecturer.lastName} {formattedAffiliations}
+                                </span>
+                                <br />
+                                {lecturer.email && (
+                                <>
+                                    <i className="fas fa-at mr-3"></i>
+                                    <a href={`mailto:${lecturer.email}`}>{lecturer.email}</a>
+                                </>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            });
+
+            return (
+                <Accordion title={course.title} key={course._id}>
+                    <h5 className="wp-block-heading"><strong>{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</strong></h5>
+                    {lecturerCards}
+                    <h5 className="wp-block-heading"><strong>Period:</strong></h5>
+                    <p>From {formatDate(course.startDate)} to {formatDate(course.endDate)}</p>
+                    <h5 className="wp-block-heading"><strong>Description:</strong></h5>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
+                </Accordion>
+            );
+        });
+    };
+
+    return (
+        <>
+            <p>The list of Ph.D. courses that will be taught during the academic year {fromYear}-{toYear} is below:</p>
+            <div style={{ height: '5px' }} aria-hidden="true" className="wp-block-spacer"></div>
+            <h4 class="wp-block-heading">Fall/Winter Term</h4>
+            {renderCourses(fallCourses)}
+            <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
+            <h4 class="wp-block-heading">Winter/Spring Term</h4>
+            {renderCourses(springCourses)}
+        </>
+    );
 }
