@@ -60,7 +60,7 @@ export function CourseList({ from, to }) {
                                 {showAffiliations ? (
                                     <i className="fas fa-id-card fa-fw"></i>
                                 ) : (
-                                    <a href={getDMURL(`en/person/${lecturer._id}`)}><i className="fas fa-id-card fa-fw"></i></a>
+                                    <a href={getDMURL(`en/person-details/?person_id=${lecturer._id}`)}><i className="fas fa-id-card fa-fw"></i></a>
                                 )}
                                 <span className="card-title ml-2 h5">
                                     {lecturer.firstName} {lecturer.lastName} {formattedAffiliations}
