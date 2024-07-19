@@ -27,9 +27,7 @@ export default class EventSeminar {
             'category': 'Categoria',
             'startDatetime': 'Inizio',
         }
-
         this.schema = null
-
         this.IndexPage = ModelsPage
         this.ViewPage = ModelViewPage
         this.EditPage = ModelEditPage
@@ -80,9 +78,13 @@ function SeminarsFilters({filter}) {
     const setFilterFields = filter.setFilter
     const [year, setYear] = useState(0)
     const currentYear = new Date().getFullYear()
-    const years = Array.from({length: 10} , (_, i) => currentYear + 1 - i)
+    const startYear = 2013
+    const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i)
+
     return <>
-        <select 
+        <select
+            className="mx-1 form-control"
+            style={{ width: '10%' }}
             placeholder='seleziona anno' 
             value={year || ""} 
             onChange={evt => {
@@ -91,12 +93,12 @@ function SeminarsFilters({filter}) {
                 if (year) {
                     setFilterFields(prev => ({
                         ...prev,
-                        startDatetime__gte: `${year}-01-01`,
-                        startDatetime__lt: `${year+1}-01-01`,
+                        startDatetime__gte_or_null: `${year}-01-01`,
+                        startDatetime__lt_or_null: `${year+1}-01-01`,
                     }))
                 } else {
                     setFilterFields(prev => {
-                        const {startDatetime__gte, startDatetime__lt, ...rest} = prev
+                        const {startDatetime__gte_or_null, startDatetime__lt_or_null, ...rest} = prev
                         return rest
                     })
                 }
