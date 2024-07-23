@@ -41,7 +41,7 @@ function VisitsFilters({filter}) {
     const setFilterFields = filter.setFilter
     const [year, setYear] = useState(0)
     const currentYear = new Date().getFullYear()
-    const startYear = 2013
+    const startYear = 2021
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i)
 
     return <>
