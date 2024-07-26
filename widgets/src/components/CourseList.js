@@ -45,6 +45,9 @@ export function CourseList({ from, to }) {
             }
         }
     }
+    
+    fallCourses.sort((a, b) => a.title.localeCompare(b.title));
+    springCourses.sort((a, b) => a.title.localeCompare(b.title));
 
     const renderCourses = (courses) => {
         return courses.map(course => {
