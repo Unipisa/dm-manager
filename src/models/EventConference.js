@@ -11,7 +11,7 @@ export default class EventConference {
         
         this.code = "event-conference"
         this.name = "evento"
-        this.oa = "a"
+        this.oa = "o"
         this.articulation = {
             'oggetto': "evento", 
             'oggetti': "eventi",
