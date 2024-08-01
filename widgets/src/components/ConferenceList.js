@@ -9,8 +9,8 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import { useQuery } from 'react-query'
 
-export function ConferenceList({ from, to, grants, SSD, isOutreach, _sort, _limit }) {
-    const filter = { from, to, grants, SSD, isOutreach, _sort, _limit }
+export function ConferenceList({ from, to, grants, ssd, is_outreach, _sort, _limit }) {
+    const filter = { from, to, grants, ssd, is_outreach, _sort, _limit }
 
     const { isLoading, error, data } = useQuery([ 'conferences', filter ], async () => {
         const res = await axios.get(getManageURL("public/conferences"), { params: filter })

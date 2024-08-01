@@ -42,12 +42,12 @@ async function conferencesQuery(req) {
         match["grants"] = ObjectId(req.query.grants)
     }
 
-    if (req.query.SSD) {
-        match["SSD"] = req.query.SSD
+    if (req.query.ssd) {
+        match["SSD"] = req.query.ssd
     }
 
-    if (req.query.isOutreach !== undefined) {
-        match["isOutreach"] = req.query.isOutreach === 'true'
+    if (req.query.is_outreach !== undefined) {
+        match["isOutreach"] = req.query.is_outreach === 'true'
     }
 
     const sort_and_limit = createSortAndLimitFilters(req)
