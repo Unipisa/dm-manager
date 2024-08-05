@@ -11,72 +11,70 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import 'katex/dist/katex.min.css'
 
-import SelectPersonBlock from './SelectPersonBlock'
-import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
-import { DatetimeInput } from '../components/DatetimeInput'
+import { ConferenceRoomInput, GrantInput, InputRow, DateInput, MultipleSelectInput, InstitutionInput, BooleanInput, StringInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
-import { myDatetimeFormat, setter } from '../Engine'
+import { setter } from '../Engine'
 
-export default function Seminar() {
+export default function Conference() {
     const { id } = useParams()
 
     const search = new URLSearchParams(window.location.search)
     const preFill = search.get("prefill")
 
-    const { isLoading, error, data } = useQuery([ 'process', 'seminar', id, preFill ], async function () {
-        var seminar = {
-            speakers: [], 
+    const { isLoading, error, data } = useQuery([ 'process', 'conference', id, preFill ], async function () {
+        var conference = { 
             title: "", 
-            stateDatetime: null,
-            duration: 60,
+            startDate: null,
+            endDate: null,
+            SSD: null,
+            url: "",
             conferenceRoom: null,
-            category: null,
-            abstract: "",
+            institution: null,
+            isOutreach: null,
             grants: null, 
-            externalid: "",
+            description: "",
         }
 
         if (id) {
-            const res = await api.get(`/api/v0/process/seminars/get/${id}`)
-            seminar = res.data[0]
+            const res = await api.get(`/api/v0/process/conferences/get/${id}`)
+            conference = res.data[0]
 
-            // If the seminar could not be loaded, then either it does not exist, or it 
+            // If the conference could not be loaded, then either it does not exist, or it 
             // was created by another user. Either way, we need to give an understandable
             // error to the end user. 
-            if (! seminar) {
+            if (! conference) {
                 return;
             }
 
-            seminar._id = id
+            conference._id = id
         }
 
         if (preFill !== null) {
-            seminar = await loadExternalData(preFill, seminar)
+            conference = await loadExternalData(preFill, conference)
         }
 
         return {
-            seminar, 
-            forbidden: !seminar
+            conference, 
+            forbidden: !conference
         }            
     })
 
     if (isLoading) return <Loading error={error}></Loading>
     if (error) return <div>{`${error}`}</div>
 
-    return <SeminarBody seminar={data.seminar} forbidden={data.forbidden }/>
+    return <ConferenceBody conference={data.conference} forbidden={data.forbidden }/>
 }
 
-export function SeminarBody({ seminar, forbidden }) {
-    const [personDone, setPersonDone] = useState(seminar.speakers.length>0)
-    const [data, setData] = useState(seminar)
+export function ConferenceBody({ conference, forbidden }) {
+    const [data, setData] = useState(conference)
     const navigate = useNavigate()
 
     if (forbidden) {
         return <div>
             <h4>Accesso negato</h4>
             <p>
-                Il seminario selezionato non esiste, oppure è stato creato da un altro utente.
+                L'evento selezionato non esiste, oppure è stato creato da un altro utente.
                 Nel secondo caso, solo l'utente che l'ha originariamente creato (o un amministratore)  
                 può modificarne il contenuto. 
             </p>
@@ -88,41 +86,34 @@ export function SeminarBody({ seminar, forbidden }) {
     }
 
     const onCompleted = async () => {
-        // Insert the seminar in the database
-        await api.put('/api/v0/process/seminars/save', data)
-        navigate('/process/seminars')
+        // Insert the conference in the database
+        await api.put('/api/v0/process/conferences/save', data)
+        navigate('/process/conferences')
     }
 
-    return <PrefixProvider value="process/seminars">
+    return <PrefixProvider value="process/conferences">
         <h1 className="text-primary pb-4">
-            { seminar._id 
-                ? "Modifica seminario" 
-                : "Inserimento nuovo seminario" }
+            { conference._id 
+                ? "Modifica evento" 
+                : "Inserimento nuovo evento" }
         </h1>
-        <SelectPersonBlock 
-            label="Speaker" 
-            person={data.speakers.length ? data.speakers[0] : null} setPerson={person => setData(data => ({...data,speakers: person?[person]:[]}))} 
-            done={() => setPersonDone(true)}
-            onFocus={() => setPersonDone(false)}
-            prefix="process/seminars"
-            /> 
-        {personDone && <SeminarDetailsBlock 
+        <ConferenceDetailsBlock 
             data={data} setData={setData}
             onCompleted={onCompleted}
             active={true}
-        />}
+        />
     </PrefixProvider>
 }
 
-export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
-    const confirm_enabled = (data.title !== "") && (data.startDatetime !== null) && (data.duration > 0) && data.conferenceRoom
+export function ConferenceDetailsBlock({ onCompleted, data, setData, change, active, error }) {
+    const confirm_enabled = (data.title !== "") && (data.startDate !== null) && (data.endDate !== null)
 
-    return <PrefixProvider value="process/seminars">
+    return <PrefixProvider value="process/conferences">
         <Card className="shadow">
             <Card.Header>
             <div className="d-flex d-row justify-content-between">
                     <div>
-                        Dettagli del seminario
+                        Dettagli dell'evento
                     </div>
                     <div>{ change && !active &&  
                         <Button className="text-end btn-warning btn-sm" onClick={change}>
@@ -135,23 +126,31 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
             { active ? <>
                 <Form>
                     <InputRow label="Titolo" className="my-3">
-                        <StringInput value={data.title} setValue={setter(setData,'title')} />
+                        <StringInput value={data.title} setValue={setter(setData,'title')}/>
                     </InputRow>
-                    <InputRow label="Ciclo di seminari" className="my-3">
+                    <InputRow label="Data di inizio" className="my-3">
+                        <DateInput value={data.startDate} setValue={setter(setData,'startDate')}/>
+                    </InputRow>
+                    <InputRow label="Data di fine" className="my-3">
+                        <DateInput value={data.endDate} setValue={setter(setData, 'endDate')}/>
+                    </InputRow>
+                    <InputRow label="SSD" className="my-3">
+                        <MultipleSelectInput 
+                            value={data.SSD} 
+                            setValue={setter(setData, "SSD")} 
+                            options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09"]}
+                        />
+                    </InputRow>
+                    <InputRow className="my-3" label="Sito web">
                         <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Si prega di selezionare tra uno dei cicli di seminari presenti nella lista. 
-                                Se il ciclo di seminari che cerchi è assente, si prega di contattare <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></Tooltip>}>
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="url-tooltip">
+                                Se l'evento ha un sito web dedicato, inserirlo qui
+                                e indirizzare gli utenti a esso nella descrizione.
+                                Per inserire un link il formato è [descrizione](url)</Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>                
-                            <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
+                            </OverlayTrigger>   
+                            <StringInput value={data.url} setValue={setter(setData,'url')} disableCreation={true}/>
                         </div>
-                    </InputRow>
-                    <InputRow label="Data e ora" className="my-3">
-                        <DatetimeInput value={data.startDatetime} setValue={setter(setData,'startDatetime')}/>
-                    </InputRow>
-                    <InputRow className="my-3" label="Durata (in minuti)">
-                        <NumberInput value={data.duration} setValue={setter(setData,'duration')}/>
                     </InputRow>
                     <InputRow className="my-3" label="Aula">
                         <div className="d-flex align-items-center">
@@ -161,6 +160,26 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
                             <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
+                        </div>
+                    </InputRow>
+                    <InputRow className="my-3" label="Istituzione (solo se diversa da unipi)">
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="institutions-tooltip">
+                                Se l'evento non si svolge al Dipartimento, selezionare un'istituzione
+                                e lasciare vuota l'aula</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>   
+                            <InstitutionInput value={data.institution} setValue={setter(setData,'institution')}/>
+                        </div>
+                    </InputRow>
+                    <InputRow className="my-3" label="Terza missione">
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="third-mission-tooltip">
+                                Se l'evento fa parte di un'iniziativa di Terza missione
+                                selezionare la casella</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>   
+                            <BooleanInput value={data.isOutreach} setValue={setter(setData,'isOutreach')}/>
                         </div>
                     </InputRow>
                     <InputRow className="my-3" label="Grant">
@@ -173,17 +192,17 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                             <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
                         </div>
                     </InputRow>
-                    <InputRow className="my-3" label="Abstract">
+                    <InputRow className="my-3" label="Descrizione">
                         <div className="d-flex align-items-start">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
                                 Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
                                 che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
                                 <br />
-                                L'anteprima dell'abstract verrà mostrata più sotto mentre scrivi.
+                                L'anteprima della descrizione verrà mostrata più sotto mentre scrivi.
                                 </Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
-                            <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
+                            <TextInput value={data.description} setValue={setter(setData,'description')}/>
                         </div>
                     </InputRow>
                 </Form>
@@ -193,12 +212,15 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 </div>
             </> : <>
                 titolo: <b>{data.title}</b><br/>
-                ciclo: <b>{data.category?.label || data.category?.name || '---'}</b><br/>
-                data: <b>{myDatetimeFormat(data.startDatetime)}</b><br/>
-                durata: <b>{data.duration}</b><br/>
+                data inizio: <b>{data.startDate}</b><br/>
+                data fine: <b>{data.endDate}</b><br/>
+                SSD: <b>{data.SSD}</b><br/>
+                sito web: <b>{data.url}</b><br/>
                 aula: <b>{data.conferenceRoom && data.conferenceRoom.name}</b><br/>
+                istituzione: <b>{data.institution}</b><br/>
+                terza missione: <b>{data.isOutreach}</b><br/>
                 grant: <b>{(data.grants && data.grants.map(g => g.name).join(', ')) || '---'}</b><br/>
-                abstract: <b>{data.abstract}</b><br/>
+                descrizione: <b>{data.description}</b><br/>
                 creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
             </>}
             </Card.Body>
@@ -207,11 +229,11 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 {JSON.stringify({data})}
             </Card.Footer> */}
         </Card>
-            { data.abstract && 
+            { data.description && 
                 <Card className="shadow" style={{maxWidth:"60em"}}>
-                    <Card.Header>Anteprima abstract</Card.Header>
+                    <Card.Header>Anteprima descrizione</Card.Header>
                     <Card.Body>
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.description}</Markdown>
                     </Card.Body>
                 </Card>
             }
@@ -219,7 +241,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
 }
 
 
-async function loadExternalData(source, seminar) {
+async function loadExternalData(source, conference) {
     if (! source || ! source.includes(':')) {
         return
     }
@@ -231,17 +253,17 @@ async function loadExternalData(source, seminar) {
     switch (externalSource[0]) {
         case 'indico':
             if (externalSource.length !== 2) {
-                console.log("Unsupported formato for Indico import: " + source)
+                console.log("Unsupported format for Indico import: " + source)
             }
             else {
-                return await loadIndicoData(externalSource[1], seminar)
+                return await loadIndicoData(externalSource[1], conference)
             }
             break;
         default:
             console.log("Unsupported source specified, aborting")
     }
 
-    return seminar
+    return conference
 }
 
 async function loadIndicoData(indico_id, seminar) {

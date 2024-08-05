@@ -127,6 +127,7 @@ function setup_routes(app) {
             'PTA', 
             ].includes(staff.qualification)) {
               add_role('/process/seminars')
+              add_role('/process/conferences')
               add_role('/process/visitsList')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 

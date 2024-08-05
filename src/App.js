@@ -22,7 +22,9 @@ import FormFillPage from './pages/FormFillPage'
 
 // Processes
 import AddSeminar from './processes/Seminar'
+import AddConference from './processes/Conference'
 import ManageSeminars from './processes/Seminars'
+import ManageConferences from './processes/Conferences'
 import ProcessVisits from './processes/Visits'
 import ProcessVisit from './processes/Visit'
 import ProcessVisitsList from './processes/VisitsList'
@@ -89,6 +91,10 @@ function Internal() {
        <Route path="/process/seminars" element={<ManageSeminars/>}/>
        <Route path="/process/seminars/add" element={<AddSeminar/>}/>
        <Route path="/process/seminars/add/:id" element={<AddSeminar/>}/>
+
+       <Route path="/process/conferences" element={<ManageConferences/>}/>
+       <Route path="/process/conferences/add" element={<AddConference/>}/>
+       <Route path="/process/conferences/add/:id" element={<AddConference/>}/>
 
        <Route path="/process/my/visits" element={<ProcessVisits variant="my/"/>}/>
        <Route path="/process/my/visits/:id" element={<ProcessVisit variant="my/"/>}/>
