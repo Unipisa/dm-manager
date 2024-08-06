@@ -31,14 +31,14 @@ export default function Home() {
                 <Card className="shadow">
                     <Card.Header>                    
                         <div className="d-flex flex-row justify-content-between">
-                            <strong>Eventi</strong>
+                            <strong>Convegni</strong>
                             <a href="/process/conferences"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                         </div>
                     </Card.Header>
                     <Card.Body>
                         <ul>
-                            <li>Inserimento di nuovi eventi</li>
-                            <li>Gestione degli eventi inseriti</li>
+                            <li>Inserimento di nuovi convegni</li>
+                            <li>Gestione dei convegni inseriti</li>
                         </ul>
                     </Card.Body>
                 </Card>
@@ -131,7 +131,7 @@ export function ProcessDropdown() {
         </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/conferences')) items.push(
         <NavDropdown.Item key="conferences" as={NavLink} to="/process/conferences">
-            Eventi
+            Convegni
         </NavDropdown.Item>)        
     if (user.hasProcessPermission('/process/my/visits') && user.person) items.push(
         <NavDropdown.Item key="my/visits" as={NavLink} to="/process/my/visits">

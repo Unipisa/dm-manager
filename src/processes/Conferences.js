@@ -60,7 +60,7 @@ function ConferenceList() {
         conference_block.push(
             <div className="p-3 col-lg-6 p-0" key={"conference-" + conference._id}>
             <Card className="shadow">
-                <Card.Header className="h6">Evento</Card.Header>
+                <Card.Header className="h6">Convegno</Card.Header>
                 <Card.Body>
                     <strong>Titolo</strong>: {conference.title} <br></br>
                     <strong>Data inizio</strong>: {formatDate(conference.startDate, false)}<br></br>
@@ -82,10 +82,10 @@ function ConferenceList() {
     }
 
     return <>
-        <h1 className="text-primary pb-0">Gestione eventi</h1>
+        <h1 className="text-primary pb-0">Gestione convegni</h1>
         <ModalDeleteDialog show={showDeleteDialog} objectName={deleteObjectName} handleClose={deleteConference}></ModalDeleteDialog>
         <a href="/process/conferences/add">
-            <button className="btn btn-primary my-3">Nuovo evento</button>
+            <button className="btn btn-primary my-3">Nuovo convegno</button>
         </a>
         <div className="row">
             {conference_block}

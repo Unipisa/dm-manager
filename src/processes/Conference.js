@@ -2,9 +2,6 @@ import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
-import axios from 'axios'
-import { DateTime, Interval } from 'luxon'
-import { Converter } from 'showdown'
 import { useQuery } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -19,10 +16,7 @@ import { setter } from '../Engine'
 export default function Conference() {
     const { id } = useParams()
 
-    const search = new URLSearchParams(window.location.search)
-    const preFill = search.get("prefill")
-
-    const { isLoading, error, data } = useQuery([ 'process', 'conference', id, preFill ], async function () {
+    const { isLoading, error, data } = useQuery([ 'process', 'conference', id ], async function () {
         var conference = { 
             title: "", 
             startDate: null,
@@ -50,10 +44,6 @@ export default function Conference() {
             conference._id = id
         }
 
-        if (preFill !== null) {
-            conference = await loadExternalData(preFill, conference)
-        }
-
         return {
             conference, 
             forbidden: !conference
@@ -74,7 +64,7 @@ export function ConferenceBody({ conference, forbidden }) {
         return <div>
             <h4>Accesso negato</h4>
             <p>
-                L'evento selezionato non esiste, oppure è stato creato da un altro utente.
+                Il convegno selezionato non esiste, oppure è stato creato da un altro utente.
                 Nel secondo caso, solo l'utente che l'ha originariamente creato (o un amministratore)  
                 può modificarne il contenuto. 
             </p>
@@ -94,8 +84,8 @@ export function ConferenceBody({ conference, forbidden }) {
     return <PrefixProvider value="process/conferences">
         <h1 className="text-primary pb-4">
             { conference._id 
-                ? "Modifica evento" 
-                : "Inserimento nuovo evento" }
+                ? "Modifica convegno" 
+                : "Inserimento nuovo convegno" }
         </h1>
         <ConferenceDetailsBlock 
             data={data} setData={setData}
@@ -113,7 +103,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
             <Card.Header>
             <div className="d-flex d-row justify-content-between">
                     <div>
-                        Dettagli dell'evento
+                        Dettagli del convegno
                     </div>
                     <div>{ change && !active &&  
                         <Button className="text-end btn-warning btn-sm" onClick={change}>
@@ -144,7 +134,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     <InputRow className="my-3" label="Sito web">
                         <div className="d-flex align-items-center">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="url-tooltip">
-                                Se l'evento ha un sito web dedicato, inserirlo qui
+                                Se il convegno ha un sito web dedicato, inserirlo qui
                                 e indirizzare gli utenti a esso nella descrizione.
                                 Per inserire un link il formato è [descrizione](url)</Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
@@ -155,8 +145,9 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     <InputRow className="my-3" label="Aula">
                         <div className="d-flex align-items-center">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Si ricorda che la prenotazione su <a href="https://rooms.dm.unipi.it/">Rooms</a> non è automatica
-                                e va effettuata indipendentemente</Tooltip>}>
+                                Per la prenotazione di un'aula in Dipartimento si può procedere autonomamente
+                                usando <a href="https://rooms.dm.unipi.it/">Rooms</a>,
+                                oppure ci si può rivolgere alla segreteria</Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
                             <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
@@ -165,7 +156,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     <InputRow className="my-3" label="Istituzione (solo se diversa da unipi)">
                         <div className="d-flex align-items-center">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="institutions-tooltip">
-                                Se l'evento non si svolge al Dipartimento, selezionare un'istituzione
+                                Se il convegno non si svolge al Dipartimento, selezionare un'istituzione
                                 e lasciare vuota l'aula</Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
@@ -175,7 +166,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     <InputRow className="my-3" label="Terza missione">
                         <div className="d-flex align-items-center">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="third-mission-tooltip">
-                                Se l'evento fa parte di un'iniziativa di Terza missione
+                                Se il convegno fa parte di un'iniziativa di Terza missione
                                 selezionare la casella</Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
@@ -238,70 +229,4 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                 </Card>
             }
 </PrefixProvider>
-}
-
-
-async function loadExternalData(source, conference) {
-    if (! source || ! source.includes(':')) {
-        return
-    }
-
-    console.log("Loading external data from source: " + source)
-
-    const externalSource = source.split(":")
-
-    switch (externalSource[0]) {
-        case 'indico':
-            if (externalSource.length !== 2) {
-                console.log("Unsupported format for Indico import: " + source)
-            }
-            else {
-                return await loadIndicoData(externalSource[1], conference)
-            }
-            break;
-        default:
-            console.log("Unsupported source specified, aborting")
-    }
-
-    return conference
-}
-
-async function loadIndicoData(indico_id, seminar) {
-    const res = await axios.get(`https://events.dm.unipi.it/export/event/${indico_id}.json`)
-    const indico_seminar = res.data.results[0]
-    
-    seminar.title = indico_seminar.title
-
-    if (! seminar.abstract) {
-        const converter = new Converter()
-        seminar.abstract = converter.makeMarkdown(indico_seminar.description)
-    }
-
-    const startDatetime = DateTime.fromFormat(
-        indico_seminar.startDate.date + " " + indico_seminar.startDate.time,
-        'yyyy-MM-dd HH:mm:ss', 
-        { zone: indico_seminar.startDate.tz })
-    const endDatetime = DateTime.fromFormat(
-        indico_seminar.endDate.date + " " + indico_seminar.endDate.time,
-        'yyyy-MM-dd HH:mm:ss', 
-        { zone: indico_seminar.endDate.tz })
-
-    seminar.startDatetime = startDatetime.toJSDate()
-    seminar.duration = (Interval.fromDateTimes(startDatetime, endDatetime)).length('minutes')
-
-    // Try to match the category, if possible
-    const res_cat = (await axios.get('/api/v0/public/seminar-categories', {
-        params: { name: indico_seminar.category }
-    })).data
-    if (res_cat && res_cat.data && res_cat.data.length > 0) {
-        seminar.category = res_cat.data[0]
-        console.log(seminar.category)
-    }
-
-    // Try to match the speaker by email? Right now Indico does not export this information, 
-    // so we cannot really do it. 
-
-    seminar.externalid = `indico:${indico_id}`
-
-    return seminar
 }
