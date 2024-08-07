@@ -3,141 +3,101 @@ import { useQuery } from 'react-query'
 
 import { useEngine } from '../Engine'
 
+function CheckCard({ title, data, renderRow }) {
+    return (
+        <Card className="mt-3">
+            <Card.Body>
+                <Card.Title>{title}</Card.Title>
+                <table>
+                    <tbody>
+                        {data.map((item, i) => (
+                            <tr key={i}>
+                                {renderRow(item, i)}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </Card.Body>
+        </Card>
+    );
+}
+
+function RenderCheckMultipleItems(item, keyField, pathPrefix) {
+    return (
+        <>
+            <td>{item._id[keyField]}</td>
+            <td>
+                {item.ids.map((id, j) => (
+                    <a className="btn" key={j} href={`${pathPrefix}/${id}`}>{j + 1}</a>
+                ))}
+            </td>
+        </>
+    );
+}
+
+function RenderCheckSingleItem(item, i, pathPrefix) {
+    return (
+        <td>
+            <a className="btn" href={`${pathPrefix}/${item._id}`}>{i + 1}</a>
+        </td>
+    );
+}
+
 export default function SanityCheck() {
-    const user = useEngine().user
-    const { isLoading, error, data } = useQuery(['process', 'sanityCheck'])
+    const user = useEngine().user;
+    const { isLoading, error, data } = useQuery(['process', 'sanityCheck']);
 
     if (isLoading) {
-        return "Loading"
+        return "Loading";
     }
 
     if (!data) {
-        return "Error: " + error.message
+        return "Error: " + error.message;
     }
 
-    if (!user.roles.includes('admin')) return <>Not authorized</>
+    if (!user.roles.includes('admin')) return <>Not authorized</>;
 
-    return <>
-        <Card>
-            <Card.Body>
-            <Card.Title>Duplicated LastName+FirstName</Card.Title>
-            <table>
-                <tbody>
-                    {data.duplicatedNames.map((item, i) => {
-                        return <tr key={i}>
-                            <td>{item._id.lastName} {item._id.firstName}</td>
-                            <td>
-                                {item.ids.map((id, j) => {
-                                    return <a className="btn" key={j} href={`/person/${id}`}>{j+1}</a>
-                                })}
-                            </td>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-        <Card className="mt-3">
-            <Card.Body>
-            <Card.Title>Duplicated Emails</Card.Title>
-            <table>
-                <tbody>
-                    {data.duplicatedEmails.map((item, i) => {
-                        return <tr key={i}>
-                            <td>{item._id.email}</td>
-                            <td>
-                                {item.ids.map((id, j) => {
-                                    return <a className="btn" key={j} href={`/person/${id}`}>{j+1}</a>
-                                })}
-                            </td>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-        <Card className="mt-3">
-            <Card.Body>
-            <Card.Title>Duplicated Institutions</Card.Title>
-            <table>
-                <tbody>
-                    {data.duplicatedInstitutions.map((item, i) => {
-                        return <tr key={i}>
-                            <td>{item._id.name}</td>
-                            <td>
-                                {item.ids.map((id, j) => {
-                                    return <a className="btn" key={j} href={`/institution/${id}`}>{j+1}</a>
-                                })}
-                            </td>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-        <Card className="mt-3">
-            <Card.Body>
-            <Card.Title>Duplicated Seminars</Card.Title>
-            <table>
-                <tbody>
-                    {data.duplicatedSeminars.map((item, i) => {
-                        return <tr key={i}>
-                            <td>
-                                {item.ids.map((id, j) => {
-                                    return <a className="btn" key={j} href={`/event-seminar/${id}`}>{j+1}</a>
-                                })}
-                            </td>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-        <Card className="mt-3">
-            <Card.Body>
-            <Card.Title>Duplicated Events</Card.Title>
-            <table>
-                <tbody>
-                    {data.duplicatedEvents.map((item, i) => {
-                        return <tr key={i}>
-                            <td>
-                                {item.ids.map((id, j) => {
-                                    return <a className="btn" key={j} href={`/event-conference/${id}`}>{j+1}</a>
-                                })}
-                            </td>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-        <Card className="mt-3">
-            <Card.Body>
-            <Card.Title>Missing Matricola</Card.Title>
-            <table>
-                <tbody>
-                    {data.missingMatricola.map((item, i) => {
-                        return <tr key={i}>
-                            <a className="btn" key={i} href={`/staff/${item._id}`}>{i+1}</a>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-        <Card className="mt-3">
-            <Card.Body>
-            <Card.Title>Missing Country in Institution</Card.Title>
-            <table>
-                <tbody>
-                    {data.missingInstitutionCountry.map((item, i) => {
-                        return <tr key={i}>
-                            <a className="btn" key={i} href={`/institution/${item._id}`}>{item.name}</a>
-                        </tr>
-                    })}
-                </tbody>
-            </table>
-            </Card.Body>
-        </Card>
-    </>
-  }
+    return (
+        <>
+            <CheckCard
+                title="Duplicated LastName+FirstName"
+                data={data.duplicatedNames}
+                renderRow={(item) => RenderCheckMultipleItems(item, 'lastName', '/person')}
+            />
+            <CheckCard
+                title="Duplicated Emails"
+                data={data.duplicatedEmails}
+                renderRow={(item) => RenderCheckMultipleItems(item, 'email', '/person')}
+            />
+            <CheckCard
+                title="Duplicated Institutions"
+                data={data.duplicatedInstitutions}
+                renderRow={(item) => RenderCheckMultipleItems(item, 'name', '/institution')}
+            />
+            <CheckCard
+                title="Duplicated Seminars"
+                data={data.duplicatedSeminars}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/event-seminar')}
+            />
+            <CheckCard
+                title="Duplicated Events"
+                data={data.duplicatedEvents}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/event-conference')}
+            />
+            <CheckCard
+                title="Missing Matricola"
+                data={data.missingMatricola}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/staff')}
+            />
+            <CheckCard
+                title="Missing Country in Institution"
+                data={data.missingInstitutionCountry}
+                renderRow={(item) => (
+                    <td>
+                        <a className="btn" href={`/institution/${item._id}`}>{item.name}</a>
+                    </td>
+                )}
+            />
+        </>
+    );
+}

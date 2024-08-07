@@ -8,6 +8,8 @@ router.use(requirePathPermissions)
 
 router.use('/seminars', require('./seminars'))
 
+router.use('/conferences', require('./conferences'))
+
 router.use('/my/visits', require('./visitsMy'))
 
 router.use('/visits', require('./visits'))

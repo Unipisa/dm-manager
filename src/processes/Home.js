@@ -26,6 +26,24 @@ export default function Home() {
                 </Card>
             </div>            
             }
+            { (user.hasProcessPermission('/process/conferences')) &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Convegni</strong>
+                            <a href="/process/conferences"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Inserimento di nuovi convegni</li>
+                            <li>Gestione dei convegni inseriti</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+            </div>            
+            }
             { user.hasProcessPermission('/process/my/visits') && user.person &&
             // il ruolo '/process/my/visits' viene assegnato al volo
             // vedi: server/server.js
@@ -111,6 +129,10 @@ export function ProcessDropdown() {
         <NavDropdown.Item key="seminars" as={NavLink} to="/process/seminars">
             Seminari
         </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/conferences')) items.push(
+        <NavDropdown.Item key="conferences" as={NavLink} to="/process/conferences">
+            Convegni
+        </NavDropdown.Item>)        
     if (user.hasProcessPermission('/process/my/visits') && user.person) items.push(
         <NavDropdown.Item key="my/visits" as={NavLink} to="/process/my/visits">
             Miei Visitatori

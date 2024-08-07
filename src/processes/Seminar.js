@@ -42,7 +42,7 @@ export default function Seminar() {
             seminar = res.data[0]
 
             // If the seminar could not be loaded, then either it does not exist, or it 
-            // was created by another use. Either way, we need to give an understandable
+            // was created by another user. Either way, we need to give an understandable
             // error to the end user. 
             if (! seminar) {
                 return;
