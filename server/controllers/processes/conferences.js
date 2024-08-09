@@ -16,9 +16,9 @@ require('./conferenceRoomSearch')(router)
 
 async function notifyConference(conference) {
     const text = `
-    È stato creato o modificato un evento.
+    È stato creato o modificato un convegno.
     
-    Il titolo dell'evento è ${conference.title}; la descrizione è disponibile al link https://www.dm.unipi.it/en/conference/?id=${conference._id}. 
+    Il titolo del convegno è ${conference.title}; la descrizione è disponibile al link https://www.dm.unipi.it/en/conference/?id=${conference._id}. 
     `;
     await notify('process/conferences', `${conference._id}`, text);
 }
