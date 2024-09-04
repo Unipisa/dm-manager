@@ -71,6 +71,21 @@ router.get('/', async (req, res) => {
         }
     ])
 
+    // find missing SSD
+    const missingSSD = await Staff.aggregate([
+        {
+            $match: {
+                isInternal: true,
+                $or: [
+                    { SSD: { $exists: false } },
+                    { SSD: "" } 
+                ],
+                startDate: { $lt: new Date() },
+                qualification: { $ne: 'PTA' }
+            }
+        }
+    ])
+
     // find institutions with missing country
     const missingInstitutionCountry = await Institution.aggregate([
         {
@@ -235,7 +250,7 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars, duplicatedEvents})
+    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingSSD, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars, duplicatedEvents})
 })
 
 module.exports = router

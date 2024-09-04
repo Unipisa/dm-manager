@@ -90,6 +90,11 @@ export default function SanityCheck() {
                 renderRow={(item, i) => RenderCheckSingleItem(item, i, '/staff')}
             />
             <CheckCard
+                title="Missing SSD"
+                data={data.missingSSD}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/staff')}
+            />
+            <CheckCard
                 title="Missing Country in Institution"
                 data={data.missingInstitutionCountry}
                 renderRow={(item) => (
