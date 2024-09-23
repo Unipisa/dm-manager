@@ -65,14 +65,25 @@ Il titolo del seminario è ${seminar.title}; l'abstract è disponibile al link h
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined) {
-        res.status(401).json({
+        return res.status(401).json({
             result: "Unauthorized"
         })
     }
-    else {
-        controller.performQuery({ createdBy: req.user._id }, res)
-    }
+    const pipeline = [
+        {$match: {
+            $or: [
+                { createdBy: req.user._id },
+                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
+            ]
+        }},
+        ...controller.queryPipeline,
+    ]
+    const data = await EventSeminar.aggregate(pipeline)
 
+    return res.send({
+        data,
+    })
+    // era: controller.performQuery({ createdBy: req.user._id }, res)
 })
 
 router.delete('/:id', async (req, res) => {

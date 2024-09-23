@@ -25,14 +25,29 @@ async function notifyConference(conference) {
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined) {
-        res.status(401).json({
+        return res.status(401).json({
             result: "Unauthorized"
         })
     }
-    else {
-        controller.performQuery({ createdBy: req.user._id }, res)
-    }
+    const pipeline = [
+        {$match: {
+            $or: [
+                //{_id: new ObjectId("65c5208d6b4add65aa974fef")},
+                { createdBy: req.user._id },
+                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
+            ]
+        }},
+        ...controller.queryPipeline,
+    ]
+    const data = await EventConference.aggregate(pipeline)
+
+    return res.send({
+        data,
+        // person: req.person,
+    })
+    // era: controller.performQuery({ createdBy: req.user._id }, res)
 })
+
 
 router.delete('/:id', async (req, res) => {
     try {
