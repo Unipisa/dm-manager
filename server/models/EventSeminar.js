@@ -10,6 +10,7 @@ const Grant = require('./Grant')
 
 const eventSeminarSchema = new Schema({
     speakers: [{ type: ObjectId, label: 'Speakers', ref: 'Person', required: true }],
+    organizers: [{type: ObjectId, label: 'Organizzatori', ref: 'Person'}],
     title: { type: String, label: 'Titolo' },
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
     startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },

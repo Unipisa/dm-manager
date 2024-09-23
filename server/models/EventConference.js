@@ -12,6 +12,7 @@ const {
 
 const eventConferenceSchema = new Schema({
     title:  {type: String, label: 'Titolo'},
+    organizers: [{type: ObjectId, label: 'Organizzatori', ref: 'Person'}],
     startDate,
     endDate,
     SSD: multipleSSDs,
