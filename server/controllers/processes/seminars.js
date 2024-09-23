@@ -70,18 +70,19 @@ router.get('/', async (req, res) => {
         })
     }
     const pipeline = [
+        ...controller.queryPipeline,
         {$match: {
             $or: [
                 { createdBy: req.user._id },
-                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
+                { organizers: { $elemMatch: { _id: req?.person._id }}},
             ]
         }},
-        ...controller.queryPipeline,
     ]
     const data = await EventSeminar.aggregate(pipeline)
 
     return res.send({
         data,
+        person: req.person,
     })
     // era: controller.performQuery({ createdBy: req.user._id }, res)
 })
@@ -89,8 +90,12 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const seminar = await EventSeminar.findById(new ObjectId(req.params.id))
+        const organizers = await Person.find({ _id: { $in: seminar.organizers }})
 
-        if (req.user.equals(seminar.createdBy)) {
+        const user_is_creator = req.user.equals(seminar.createdBy)
+        const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+
+        if (user_is_creator || user_is_organizer) {
             await seminar.delete()
             await log(req, seminar, {})
             res.json({})
@@ -109,11 +114,33 @@ router.delete('/:id', async (req, res) => {
 
 
 router.get('/get/:id', async (req, res) => {
-    const controller = new EventSeminarController()
+//    const controller = new EventSeminarController()
+
+/*
+era:
     controller.performQuery({
         _id: req.params.id, 
         createdBy: req.user._id
     }, res)
+*/
+
+    const pipeline = [
+        ...controller.queryPipeline,
+        {$match: {
+            _id: new ObjectId(req.params.id),
+            $or: [
+                { createdBy: req.user._id },
+                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
+            ]
+        }},
+    ]
+    
+    const data = await EventSeminar.aggregate(pipeline)
+
+    return res.send({
+        data,
+    })
+
 })
 
 router.post('/', async (req, res) => {
@@ -153,9 +180,13 @@ router.patch('/:id', async (req, res) => {
 
     try {
         const seminar = await EventSeminar.findById(_id)
-        if (!seminar.createdBy.equals(req.user._id)) {
-            res.status(403).json({ error: "Forbidden" })
-            return
+        const organizers = await Person.find({ _id: { $in: seminar.organizers }})
+
+        const user_is_creator = req.user.equals(seminar.createdBy)
+        const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+
+        if (!user_is_creator && !user_is_organizer) {
+            return res.status(403).json({ error: "Forbidden" })
         }
         
         const was = {...seminar}
@@ -180,13 +211,19 @@ router.put('/save', async (req, res) => {
     try {
         if (! payload._id) {
             const seminar = EventSeminar(payload)
+
             await seminar.save()
             await notifySeminar(seminar)
             await log(req, {}, payload)
         }
         else {
             const seminar = await EventSeminar.findById(payload._id)
-            if (!seminar.createdBy.equals(req.user._id)) {
+            const organizers = await Person.find({ _id: { $in: seminar.organizers }})
+
+            const user_is_creator = req.user.equals(seminar.createdBy)
+            const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+
+            if (!user_is_creator && !user_is_organizer) {
                 res.status(403).json({ error: "Forbidden" })
                 return
             }

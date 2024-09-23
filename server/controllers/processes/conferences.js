@@ -23,13 +23,14 @@ async function notifyConference(conference) {
     await notify('process/conferences', `${conference._id}`, text);
 }
 
-router.get('/', async (req, res) => {    
+router.get('/', async (req, res) => {
     if (req.user === undefined) {
         return res.status(401).json({
             result: "Unauthorized"
         })
     }
     const pipeline = [
+        ...controller.queryPipeline,
         {$match: {
             $or: [
                 //{_id: new ObjectId("65c5208d6b4add65aa974fef")},
@@ -37,7 +38,6 @@ router.get('/', async (req, res) => {
                 { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
             ]
         }},
-        ...controller.queryPipeline,
     ]
     const data = await EventConference.aggregate(pipeline)
 
@@ -52,15 +52,19 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const conference = await EventConference.findById(new ObjectId(req.params.id))
+        const organizers = await Person.find({ _id: { $in: conference.organizers }})
 
-        if (req.user.equals(conference.createdBy)) {
+        const user_is_creator = req.user.equals(seminar.createdBy)
+        const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+
+        if (user_is_creator || user_is_organizer) {
             await conference.delete()
             await log(req, conference, {})
             res.json({})
         }
         else {
             res.status(401).json({
-                error: "Cannot delete conferences created by other users"
+                error: "Cannot delete conferences created by other users or not in the organizers list"
             })
         }
     } catch(error) {
@@ -71,11 +75,29 @@ router.delete('/:id', async (req, res) => {
 })
 
 router.get('/get/:id', async (req, res) => {
-    const controller = new EventConferenceController()
+//    const controller = new EventConferenceController()
+    const pipeline = [
+        ...controller.queryPipeline,
+        {$match: {
+            _id: new ObjectId(req.params.id),
+            $or: [
+                { createdBy: req.user._id },
+                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
+            ]
+        }},
+    ]
+
+    const data = await EventConference.aggregate(pipeline)
+
+    return res.send({
+        data,
+        // person: req.person,
+    })
+/*
     controller.performQuery({
         _id: req.params.id, 
         createdBy: req.user._id
-    }, res)
+    }, res)*/
 })
 
 router.post('/', async (req, res) => {
@@ -115,7 +137,12 @@ router.patch('/:id', async (req, res) => {
 
     try {
         const conference = await EventConference.findById(_id)
-        if (!conference.createdBy.equals(req.user._id)) {
+        const organizers = await Person.find({ _id: { $in: conference.organizers }})
+
+        const user_is_creator = req.user.equals(seminar.createdBy)
+        const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+
+        if (!user_is_creator && !user_is_organizer) {
             res.status(403).json({ error: "Forbidden" })
             return
         }
@@ -148,7 +175,12 @@ router.put('/save', async (req, res) => {
         }
         else {
             const conference = await EventConference.findById(payload._id)
-            if (!conference.createdBy.equals(req.user._id)) {
+            const organizers = await Person.find({ _id: { $in: conference.organizers }})
+
+            const user_is_creator = req.user.equals(seminar.createdBy)
+            const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+    
+            if (!user_is_creator && !user_is_organizer) {
                 res.status(403).json({ error: "Forbidden" })
                 return
             }
