@@ -11,7 +11,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import 'katex/dist/katex.min.css'
 
-import SelectPeopleBlock from './SelectPeopleBlock'
+import {SelectPeopleBlock} from './SelectPeopleBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
@@ -108,7 +108,7 @@ export function SeminarBody({ seminar, forbidden }) {
 
 export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
     const requirement = (() => {
-        if (data.speakers.length === 0) return "Inserire almeno uno speaker"
+        if (!data.speakers || data.speakers.length === 0) return "Inserire almeno uno speaker"
         if (data.title === "") return "Inserire il titolo del seminario"
         if (data.startDatetime === null) return "Inserire la data di inizio del seminario"
         if (data.duration <= 0) return "Inserire la durata del seminario"
@@ -135,9 +135,15 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 <Form>
                     <InputRow label="Speakers" className="my-3">
                         <SelectPeopleBlock 
-                            people={data.speakers || []} setPeople={persons => setData(data => ({...data,speakers: persons}))} 
+                            people={data.speakers || []} setPeople={people => setData(data => ({...data,speakers: people}))} 
                             prefix="process/seminars"
                         /> 
+                    </InputRow>
+                    <InputRow label="Organizzaori" className="my-3">
+                        <SelectPeopleBlock
+                            people={data.organizers || []} setPeople={people => setData(data => ({...data,organizers: people}))}
+                            prefix="process/seminars"
+                        />
                     </InputRow>
                     <InputRow label="Titolo" className="my-3">
                         <StringInput value={data.title} setValue={setter(setData,'title')} />

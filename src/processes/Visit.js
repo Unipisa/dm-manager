@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
-import SelectPersonBlock from './SelectPersonBlock'
+import { SelectPersonBlock } from './SelectPeopleBlock'
 import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
@@ -40,7 +40,7 @@ function VisitForm({visit, variant}) {
     const [data, setData] = useState(visit)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const [activeSection, setActiveSection] = useState(data.person ? '' : 'person')
+    const [activeSection, setActiveSection] = useState(visit?'':'data')
     const [seminar, setSeminar] = useState(null)
     const user = useEngine().user
     const seminars = visit.seminars
@@ -52,24 +52,14 @@ function VisitForm({visit, variant}) {
         <h1 className="text-primary pb-4">{visit._id 
             ? "Modifica visita inserita"
             : "Inserimento nuova visita"}</h1>
-        <SelectPersonBlock 
-            title="Selezione visitatore" 
-            label="Visitatore" 
-            person={data.person} 
-            setPerson={setter(setData, 'person')} 
-            onFocus={() => setActiveSection('person')}
-            done={nextStep}
-            prefix={`process/${variant}visits`}
+        <VisitDetailsBlock
+            data={data} 
+            setData={setData} 
+            active={activeSection==='data'} 
+            done={() => {save();nextStep()}} 
+            edit={() => setActiveSection('data')}
+            variant={variant}
         />
-        { data.person && 
-            <VisitDetailsBlock
-                data={data} 
-                setData={setData} 
-                active={activeSection==='data'} 
-                done={() => {save();nextStep()}} 
-                edit={() => setActiveSection('data')}
-                variant={variant}
-            />}
         { (data.requireRoom || roomAssignments?.length>0)  &&
             <RoomAssignments 
                 visit={visit}
@@ -187,6 +177,7 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
         { active 
         ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} variant={variant}/>
         : <>
+            visitatore: <b>{data.person.firstName} {data.person.lastName} ({data.person.affiliations.map(a=>a.name).join(', ')}) {data.person.email}</b>
             {data.referencePeople.map(person => <div key={person._id}>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></div>)}
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
             <br />
@@ -211,6 +202,14 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
 function ActiveVisitDetailsBlock({data, setData, done, variant}) {
     return <>
         <Form autoComplete="off">
+            <InputRow label="Visitatore" className="my-3">
+                <SelectPersonBlock 
+                    label="Visitatore" 
+                    person={data.person} 
+                    setPerson={setter(setData, 'person')} 
+                    prefix={`process/${variant}visits`}
+                />
+            </InputRow>
             { variant === '' &&
                 <InputRow label="Referenti" className="my-3">
                     <PersonInput multiple={true} value={data.referencePeople} setValue={setReferencePeople} />

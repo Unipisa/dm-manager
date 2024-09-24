@@ -6,7 +6,7 @@ import { InputRow, StringInput, EmailInput, InstitutionInput } from '../componen
 import { useQuery } from 'react-query'
 import api from '../api'
 
-export default function SelectPeopleBlock({ label, people, setPeople, prefix}) {
+export function SelectPeopleBlock({ label, people, setPeople, prefix}) {
     const editPerson = people.findIndex(person => person === null)
 
     return <div>
@@ -20,11 +20,11 @@ export default function SelectPeopleBlock({ label, people, setPeople, prefix}) {
                 /> 
             )}
             {editPerson === -1 &&
-                <Button className="m-3" onClick={() => {
+                <div className='btn btn-primary btn-sm m-1' onClick={() => {
                     setPeople([...people, null])}}
                 >
                     Aggiungi { people.length > 0 && "un'altra" } persona
-                </Button>
+                </div>
             }
         </div>
 }
