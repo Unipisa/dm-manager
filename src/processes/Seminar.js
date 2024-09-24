@@ -11,7 +11,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import 'katex/dist/katex.min.css'
 
-import SelectPersonBlock from './SelectPersonBlock'
+import SelectPeopleBlock from './SelectPeopleBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
@@ -68,7 +68,6 @@ export default function Seminar() {
 }
 
 export function SeminarBody({ seminar, forbidden }) {
-    const [personDone, setPersonDone] = useState(seminar.speakers.length>0)
     const [data, setData] = useState(seminar)
     const navigate = useNavigate()
 
@@ -99,23 +98,23 @@ export function SeminarBody({ seminar, forbidden }) {
                 ? "Modifica seminario" 
                 : "Inserimento nuovo seminario" }
         </h1>
-        <SelectPersonBlock 
-            label="Speaker" 
-            person={data.speakers.length ? data.speakers[0] : null} setPerson={person => setData(data => ({...data,speakers: person?[person]:[]}))} 
-            done={() => setPersonDone(true)}
-            onFocus={() => setPersonDone(false)}
-            prefix="process/seminars"
-            /> 
-        {personDone && <SeminarDetailsBlock 
+        <SeminarDetailsBlock 
             data={data} setData={setData}
             onCompleted={onCompleted}
             active={true}
-        />}
+        />
     </PrefixProvider>
 }
 
 export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
-    const confirm_enabled = (data.title !== "") && (data.startDatetime !== null) && (data.duration > 0) && data.conferenceRoom
+    const requirement = (() => {
+        if (data.speakers.length === 0) return "Inserire almeno uno speaker"
+        if (data.title === "") return "Inserire il titolo del seminario"
+        if (data.startDatetime === null) return "Inserire la data di inizio del seminario"
+        if (data.duration <= 0) return "Inserire la durata del seminario"
+        if (!data.conferenceRoom) return "Inserire l'aula in cui si svolge il seminario"
+        return ""
+    })()
 
     return <PrefixProvider value="process/seminars">
         <Card className="shadow">
@@ -134,6 +133,12 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
             <Card.Body>
             { active ? <>
                 <Form>
+                    <InputRow label="Speakers" className="my-3">
+                        <SelectPeopleBlock 
+                            people={data.speakers || []} setPeople={persons => setData(data => ({...data,speakers: persons}))} 
+                            prefix="process/seminars"
+                        /> 
+                    </InputRow>
                     <InputRow label="Titolo" className="my-3">
                         <StringInput value={data.title} setValue={setter(setData,'title')} />
                     </InputRow>
@@ -188,10 +193,12 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     </InputRow>
                 </Form>
                 {error && <div className="alert alert-danger">{error}</div>}
+                {requirement && <div className="alert alert-warning">{requirement}</div>}
                 <div className="d-flex flex-row justify-content-end">
-                    <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
+                    <Button className="text-end" onClick={onCompleted} disabled={requirement != ''}>Salva</Button>
                 </div>
             </> : <>
+                speakers: <b>{data.speakers && data.speakers.map(p => <>{p.firstName} {p.lastName} ({p.affiliations.map(x => x.name).join(', ')})</>).join(', ')}</b><br/>
                 titolo: <b>{data.title}</b><br/>
                 ciclo: <b>{data.category?.label || data.category?.name || '---'}</b><br/>
                 data: <b>{myDatetimeFormat(data.startDatetime)}</b><br/>
