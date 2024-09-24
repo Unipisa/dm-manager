@@ -73,7 +73,7 @@ router.get('/', async (req, res) => {
         {$match: {
             $or: [
                 { createdBy: req.user._id },
-                { organizers: { $elemMatch: { _id: req?.person._id }}},
+                //{ organizers: { $elemMatch: { _id: req?.person._id }}},
             ]
         }},
         ...controller.queryPipeline,
