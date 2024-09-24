@@ -78,7 +78,6 @@ router.delete('/:id', async (req, res) => {
 router.get('/get/:id', async (req, res) => {
 //    const controller = new EventConferenceController()
     const pipeline = [
-        ...controller.queryPipeline,
         {$match: {
             _id: new ObjectId(req.params.id),
             $or: [
@@ -86,6 +85,7 @@ router.get('/get/:id', async (req, res) => {
                 { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
             ]
         }},
+        ...controller.queryPipeline,
     ]
 
     const data = await EventConference.aggregate(pipeline)
