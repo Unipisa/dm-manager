@@ -6,9 +6,7 @@ import { InputRow, StringInput, EmailInput, InstitutionInput } from '../componen
 import { useQuery } from 'react-query'
 import api from '../api'
 
-export function SelectPeopleBlock({ label, people, setPeople, prefix}) {
-    const editPerson = people.findIndex(person => person === null)
-
+export function SelectPeopleBlock({ people, setPeople, prefix}) {
     return <div>
             {people.map((person, i) =>
                 <SelectPersonBlock 
@@ -19,17 +17,15 @@ export function SelectPeopleBlock({ label, people, setPeople, prefix}) {
                     onRemove={() => setPeople(people.filter((_,j) => i !== j))}
                 /> 
             )}
-            {editPerson === -1 &&
-                <div className='btn btn-primary btn-sm m-1' onClick={() => {
-                    setPeople([...people, null])}}
-                >
-                    Aggiungi { people.length > 0 && "un'altra" } persona
-                </div>
-            }
+            <div className='btn btn-primary btn-sm m-1' onClick={() => {
+                setPeople([...people, null])}}
+            >
+                Aggiungi { people.length > 0 && "un'altra" } persona
+            </div>
         </div>
 }
 
-export function SelectPersonBlock({ title, label, person, setPerson, onFocus, done, prefix, canEdit, canChange, onRemove}) {
+export function SelectPersonBlock({ title, person, setPerson, onFocus, done, prefix, canEdit, canChange, onRemove}) {
     // input dell'utente
     const [lastName, setLastName] = useState('')
     const [firstName, setFirstName] = useState('')
@@ -58,47 +54,46 @@ export function SelectPersonBlock({ title, label, person, setPerson, onFocus, do
             </div>
         </div>
 
-    if (mode === 'search') return <Card className="shadow mb-3">
-        <Card.Header className="">{title || "Selezione persona"}</Card.Header>
-        <Card.Body>
-                <p>Cerca la persona nel database:</p>
-                <Form className="mb-3">
-                    <InputRow label="cognome">
-                        <StringInput value={lastName} setValue={setLastName} />
-                    </InputRow>
-                    <InputRow label="nome">
-                        <StringInput value={firstName} setValue={setFirstName} />
-                    </InputRow>
-                    <InputRow label="email">
-                        <EmailInput value={email} setValue={setEmail} />
-                    </InputRow>
-                    <InputRow label="affiliazione">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                È possibile scegliere più di un'affiliazione selezionandone una alla volta, 
-                                oppure selezionare "N/A" per nessuna affiliazione</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>
-                            <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
-                        </div>
-                    </InputRow>
-                </Form>
-                <p>Se la persona esiste ma vuoi aggiornare i dati, selezionala e poi clicca su "Aggiorna i dati"</p>
-                <p>Se il nome o il cognome sono sbagliati, scrivi un'email a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></p>
-                <p>Se vuoi aggiungere altri speaker, termina l'inserimento del seminario e poi scrivi un'email a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a> con i dati delle persone che vuoi aggiungere</p>
-                <u>Se sei sicuro che la persona non esiste</u>, inserisci tutti i dati e poi
-                <Button className="mx-3" onClick={createNew} disabled={!lastName || !firstName || !email || !affiliations.length}>
-                    Crea una nuova persona
-                </Button>
-                <Button className="mx-3" onClick={()=>setMode('display')} disabled={!person}>
-                    Annulla
-                </Button>
-                <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} prefix={prefix}/>
-            </Card.Body>
-        <Footer />
-    </Card>
-
-    if (mode === 'confirm' || mode ==='update') return <Modal show={true}>
+    if (mode !=='display') return <Modal show={true}>
+        {mode === 'search' && <Card className="shadow mb-3">
+            <Card.Header className="">{title || "Selezione persona"}</Card.Header>
+            <Card.Body>
+                    <p>Cerca la persona nel database:</p>
+                    <Form className="mb-3">
+                        <InputRow label="cognome">
+                            <StringInput value={lastName} setValue={setLastName} />
+                        </InputRow>
+                        <InputRow label="nome">
+                            <StringInput value={firstName} setValue={setFirstName} />
+                        </InputRow>
+                        <InputRow label="email">
+                            <EmailInput value={email} setValue={setEmail} />
+                        </InputRow>
+                        <InputRow label="affiliazione">
+                            <div className="d-flex align-items-center">
+                                <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                    È possibile scegliere più di un'affiliazione selezionandone una alla volta, 
+                                    oppure selezionare "N/A" per nessuna affiliazione</Tooltip>}>
+                                    <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                                </OverlayTrigger>
+                                <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
+                            </div>
+                        </InputRow>
+                    </Form>
+                    <p>Se la persona esiste ma vuoi aggiornare i dati, selezionala e poi clicca su "Aggiorna i dati"</p>
+                    <p>Se il nome o il cognome sono sbagliati, scrivi un'email a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></p>
+                    <p>Se vuoi aggiungere altri speaker, termina l'inserimento del seminario e poi scrivi un'email a <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a> con i dati delle persone che vuoi aggiungere</p>
+                    <u>Se sei sicuro che la persona non esiste</u>, inserisci tutti i dati e poi
+                    <Button className="mx-3" onClick={createNew} disabled={!lastName || !firstName || !email || !affiliations.length}>
+                        Crea una nuova persona
+                    </Button>
+                    <Button className="mx-3" onClick={()=>setMode('display')} disabled={!person}>
+                        Annulla
+                    </Button>
+                    <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} prefix={prefix}/>
+                </Card.Body>
+            <Footer />
+        </Card>}
         { mode === 'confirm' && <Card className="shadow mb-3">
         <Card.Header className="">{title || "Selezione persona"}</Card.Header>
         <Card.Body> 
