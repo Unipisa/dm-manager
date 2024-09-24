@@ -249,6 +249,64 @@ const GET_PIPELINE = [
                 },
             },
             {$lookup: {
+                from: 'people',
+                localField: 'speakers',
+                foreignField: '_id',
+                as: 'speakers',
+                pipeline: [
+                    {$project: {
+                        _id: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        affiliations: 1,
+                        email: 1,
+                    }},
+                    {
+                        $lookup: {
+                            from: 'institutions',
+                            localField: 'affiliations',
+                            foreignField: '_id',
+                            as: 'affiliations',
+                            pipeline: [
+                                {$project: {
+                                    _id: 1,
+                                    name: 1,
+                                }},
+                            ]
+                        }
+                    }
+                ]
+            }},
+            {$lookup: {
+                from: 'people',
+                localField: 'organizers',
+                foreignField: '_id',
+                as: 'organizers',
+                pipeline: [
+                    {$project: {
+                        _id: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        affiliations: 1,
+                        email: 1,
+                    }},
+                    {
+                        $lookup: {
+                            from: 'institutions',
+                            localField: 'affiliations',
+                            foreignField: '_id',
+                            as: 'affiliations',
+                            pipeline: [
+                                {$project: {
+                                    _id: 1,
+                                    name: 1,
+                                }},
+                            ]
+                        }
+                    }
+                ]
+            }},
+            {$lookup: {
                 from: 'seminarcategories',
                 localField: 'category',
                 foreignField: '_id',
@@ -286,6 +344,8 @@ const GET_PIPELINE = [
                 preserveNullAndEmptyArrays: true
             }},
             {$project: {
+                "speakers": 1,
+                "organizers": 1,
                 "startDatetime": 1,
                 "title": 1,
                 "category._id": 1,

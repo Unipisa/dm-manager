@@ -40,7 +40,7 @@ export default function Seminar() {
 
         if (id) {
             const res = await api.get(`/api/v0/process/seminars/get/${id}`)
-            seminar = res.data[0]
+            seminar = res.data.length>0 ? res.data[0] : null
 
             // If the seminar could not be loaded, then either it does not exist, or it 
             // was created by another user. Either way, we need to give an understandable
@@ -64,6 +64,10 @@ export default function Seminar() {
 
     if (isLoading) return <Loading error={error}></Loading>
     if (error) return <div>{`${error}`}</div>
+
+    if (!data) {
+        return "Errore: seminario non trovato"
+    }
 
     return <SeminarBody seminar={data.seminar} forbidden={data.forbidden }/>
 }
@@ -210,7 +214,8 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     <Button className="text-end" onClick={onCompleted} disabled={requirement !== ''}>Salva</Button>
                 </div>
             </> : <>
-                speakers: <b>{data.speakers && data.speakers.map(p => <>{p.firstName} {p.lastName} ({p.affiliations.map(x => x.name).join(', ')})</>).join(', ')}</b><br/>
+                speakers: <b>{data.speakers && data.speakers.map((p,i) => <>{i>0 && ', '}{p.firstName} {p.lastName} ({p.affiliations.map(x => x.name).join(', ')})</>)}</b><br/>
+                organizers: <b>{data.organizers && data.organizers.map((p,i)=><>{i>0 && ', '}{p.firstName} {p.lastName}</>)}</b><br />
                 titolo: <b>{data.title}</b><br/>
                 ciclo: <b>{data.category?.label || data.category?.name || '---'}</b><br/>
                 data: <b>{myDatetimeFormat(data.startDatetime)}</b><br/>
