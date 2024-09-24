@@ -17,6 +17,7 @@ import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
 import { myDatetimeFormat, setter } from '../Engine'
+import { useEngine } from '../Engine'
 
 export default function Seminar() {
     const { id } = useParams()
@@ -107,6 +108,9 @@ export function SeminarBody({ seminar, forbidden }) {
 }
 
 export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
+    const user = useEngine().user
+    const isAdmin = user.roles && user.roles.includes('admin')
+
     const requirement = (() => {
         if (!data.speakers || data.speakers.length === 0) return "Inserire almeno uno speaker"
         if (data.title === "") return "Inserire il titolo del seminario"
@@ -123,8 +127,10 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     <div>
                         Dettagli del seminario
                     </div>
-                    <div>{ change && !active &&  
-                        <Button className="text-end btn-warning btn-sm" onClick={change}>
+                    <div>
+                        { isAdmin && data._id && <a href={`/event-seminar/${data._id}`}>{data._id}</a>}
+                        { change && !active &&  
+                        <Button className="text-end btn-warning btn-sm mx-1" onClick={change}>
                             Modifica
                         </Button>
                     }</div>

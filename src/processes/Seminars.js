@@ -3,8 +3,10 @@ import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import { useState } from 'react'
+
 import { ModalDeleteDialog } from '../components/ModalDialog'
 import { formatDate } from '../components/DatetimeInput'
+import { useEngine } from '../Engine'
 
 export default function ManageSeminars() {
 
@@ -14,6 +16,8 @@ export default function ManageSeminars() {
 }
 
 function SeminarList() {
+    const user = useEngine().user
+    const isAdmin = user.roles && user.roles.includes('admin')
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
     const [deleteObjectName, setDeleteObjectName] = useState(null)
     const [deleteSeminarId, setDeleteSeminarId] = useState(null)
@@ -61,7 +65,12 @@ function SeminarList() {
         seminar_block.push(
             <div className="p-3 col-lg-6 p-0" key={"seminar-" + seminar._id}>
             <Card className="shadow">
-                <Card.Header className="h6">Seminario</Card.Header>
+                <Card.Header className="h6">
+                    <div className="d-flex d-row justify-content-between">
+                        <div>Seminario</div>
+                        { isAdmin && <a href={`/event-seminar/${seminar._id}`}>{seminar._id}</a> }
+                    </div>
+                </Card.Header>
                 <Card.Body>
                     <strong>Titolo</strong>: {seminar.title} <br></br>
                     {speakers.map(speaker =>

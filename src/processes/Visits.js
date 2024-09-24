@@ -5,6 +5,7 @@ import Loading from '../components/Loading'
 import { myDateFormat } from '../Engine'
 import { ConfirmDeleteButton } from '../components/ModalDialog'
 import api from '../api'
+import { useEngine } from '../Engine'
 
 export default function ProcessVisits({variant}) {
     // variant è '' per /process/visits
@@ -66,6 +67,8 @@ function Rooms({variant, id}) {
 }
 
 function VisitList({variant}) {
+    const user = useEngine().user
+    const isAdmin = user.roles && user.roles.includes('admin')
     const queryClient = useQueryClient()
     const { isLoading, error, data } = useQuery(`process/${variant}visits`.split('/'))
 
@@ -82,7 +85,12 @@ function VisitList({variant}) {
             visit => {
             return <div className="p-3 col-lg-6 p-0" key={visit._id}>
                 <Card className="shadow">
-                    <Card.Header className="h6">Visita</Card.Header>
+                    <Card.Header className="h6">
+                        <div className="d-flex d-row justify-content-between">
+                            <div>Visita</div>
+                            {isAdmin && <a href={`/visit/${visit._id}`}>{visit._id}</a>}
+                        </div>
+                    </Card.Header>
                     <Card.Body>
                         {/*JSON.stringify(visit)*/}
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />

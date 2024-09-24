@@ -11,7 +11,8 @@ import 'katex/dist/katex.min.css'
 import { ConferenceRoomInput, GrantInput, InputRow, DateInput, MultipleSelectInput, InstitutionInput, BooleanInput, StringInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
-import { setter } from '../Engine'
+import { setter, useEngine } from '../Engine'
+import { SelectPeopleBlock } from './SelectPeopleBlock'
 
 export default function Conference() {
     const { id } = useParams()
@@ -96,7 +97,15 @@ export function ConferenceBody({ conference, forbidden }) {
 }
 
 export function ConferenceDetailsBlock({ onCompleted, data, setData, change, active, error }) {
-    const confirm_enabled = (data.title !== "") && (data.startDate !== null) && (data.endDate !== null)
+    const user = useEngine().user
+    const isAdmin = user.roles && user.roles.includes('admin')
+
+    const requirement = (()=>{
+        if (data.title === "") return "inserisci il titolo"
+        if (data.startDate === null) return "inserisci la data di inizio"
+        if (data.endDate === null) return "inserisci la data di fine"
+        return ""
+    })()
 
     return <PrefixProvider value="process/conferences">
         <Card className="shadow">
@@ -105,7 +114,9 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     <div>
                         Dettagli del convegno
                     </div>
-                    <div>{ change && !active &&  
+                    <div>
+                    { isAdmin && data._id && <a href={`/event-congress/${data._id}`}>{data._id}</a>}    
+                    { change && !active &&  
                         <Button className="text-end btn-warning btn-sm" onClick={change}>
                             Modifica
                         </Button>
@@ -117,6 +128,9 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                 <Form>
                     <InputRow label="Titolo" className="my-3">
                         <StringInput value={data.title} setValue={setter(setData,'title')}/>
+                    </InputRow>
+                    <InputRow label="Organizzatori" className="my-3">
+                        <SelectPeopleBlock people={data.organizers || []} setPeople={people => setData(data => ({...data, organizers: people}))} prefix="process/conferences"/>
                     </InputRow>
                     <InputRow label="Data di inizio" className="my-3">
                         <DateInput value={data.startDate} setValue={setter(setData,'startDate')}/>
@@ -198,8 +212,9 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     </InputRow>
                 </Form>
                 {error && <div className="alert alert-danger">{error}</div>}
+                {requirement && <div className="alert alert-warning">{requirement}</div>}
                 <div className="d-flex flex-row justify-content-end">
-                    <Button className="text-end" onClick={onCompleted} disabled={! confirm_enabled}>Salva</Button>
+                    <Button className="text-end" onClick={onCompleted} disabled={requirement!==''}>Salva</Button>
                 </div>
             </> : <>
                 titolo: <b>{data.title}</b><br/>

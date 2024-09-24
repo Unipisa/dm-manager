@@ -5,6 +5,7 @@ import api from '../api'
 import { useState } from 'react'
 import { ModalDeleteDialog } from '../components/ModalDialog'
 import { formatDate } from '../components/DatetimeInput'
+import { useEngine } from '../Engine'
 
 export default function ManageConferences() {
 
@@ -53,34 +54,6 @@ function ConferenceList() {
         setShowDeleteDialog(true)
     }
 
-    var conference_block = []
-
-    for (var i = 0; i < data.data.length; i++) {
-        const conference = data.data[i]
-        conference_block.push(
-            <div className="p-3 col-lg-6 p-0" key={"conference-" + conference._id}>
-            <Card className="shadow">
-                <Card.Header className="h6">Convegno</Card.Header>
-                <Card.Body>
-                    <strong>Titolo</strong>: {conference.title} <br></br>
-                    <strong>Data inizio</strong>: {formatDate(conference.startDate, false)}<br></br>
-                    <strong>Data fine</strong>: {formatDate(conference.endDate, false)}<br></br>
-                    <div className="mt-2 d-flex flex-row justify-content-end">                        
-                        <button className="ms-2 btn btn-danger" onClick={() => confirmDeleteConference(conference._id)}>
-                            Elimina
-                        </button>
-                        <Link className="ms-2" to={"/process/conferences/add/" + conference._id}>
-                            <button className="btn btn-primary">
-                                Modifica
-                            </button>
-                        </Link>
-                    </div>
-                </Card.Body>                
-            </Card>
-            </div>
-        )
-    }
-
     return <>
         <h1 className="text-primary pb-0">Gestione convegni</h1>
         <ModalDeleteDialog show={showDeleteDialog} objectName={deleteObjectName} handleClose={deleteConference}></ModalDeleteDialog>
@@ -88,7 +61,11 @@ function ConferenceList() {
             <button className="btn btn-primary my-3">Nuovo convegno</button>
         </a>
         <div className="row">
-            {conference_block}
+            {data.data.map(conference => 
+                <div className="p-3 col-lg-6 p-0" key={"conference-" + conference._id}>
+                    <Conference conference={conference} onDelete={() => confirmDeleteConference(conference._id)} />
+                </div>
+            )}
         </div>
         <hr />
         <div>
@@ -104,4 +81,33 @@ function ConferenceList() {
         'PTA'.
         </div>
     </>
+}
+
+function Conference({conference, onDelete}) {
+    const user = useEngine().user
+    const isAdmin = user.roles && user.roles.includes('admin')
+
+    return <Card className="shadow">
+        <Card.Header className="h6">
+            <div className="d-flex d-row justify-content-between">
+                <div>Convegno</div>
+                {isAdmin && <a href={`/event-conference/${conference._id}`}>{conference._id}</a>}
+            </div>
+        </Card.Header>
+        <Card.Body>
+            <strong>Titolo</strong>: {conference.title} <br></br>
+            <strong>Data inizio</strong>: {formatDate(conference.startDate, false)}<br></br>
+            <strong>Data fine</strong>: {formatDate(conference.endDate, false)}<br></br>
+            <div className="mt-2 d-flex flex-row justify-content-end">                        
+                {onDelete && <button className="ms-2 btn btn-danger" onClick={onDelete}>
+                    Elimina
+                </button>}
+                <Link className="ms-2" to={"/process/conferences/add/" + conference._id}>
+                    <button className="btn btn-primary">
+                        Modifica
+                    </button>
+                </Link>
+            </div>
+        </Card.Body>                
+    </Card>
 }

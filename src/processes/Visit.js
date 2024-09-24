@@ -163,13 +163,17 @@ function VisitForm({visit, variant}) {
 }
 
 function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
+    const user = useEngine().user
+    const isAdmin = user.roles && user.roles.includes('admin')
+
     return <Card className="shadow mb-3">
         <Card.Header>
             <div className="d-flex d-row justify-content-between">
                 <div>Dettagli della visita</div>
             {!active && 
                 <div>
-                    <Button className="text-end btn-warning btn-sm" onClick={edit}>Modifica</Button>
+                    {isAdmin && <a href={`/visit/${data._id}`}>{data._id}</a>}
+                    <Button className="text-end btn-warning btn-sm mx-1" onClick={edit}>Modifica</Button>
                 </div>}
             </div>
         </Card.Header>

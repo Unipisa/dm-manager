@@ -12,6 +12,7 @@ const {log} = require('../middleware')
 const { notify } = require('../../models/Notification')
 
 /* inject functionality for widgets */
+require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
 
 async function notifyConference(conference) {
