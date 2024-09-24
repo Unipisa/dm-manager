@@ -73,11 +73,12 @@ router.get('/', async (req, res) => {
         {$match: {
             $or: [
                 { createdBy: req.user._id },
-                //{ organizers: { $elemMatch: { _id: req?.person._id }}},
+                { organizers: { $elemMatch: { _id: req?.person._id }}},
             ]
         }},
         ...controller.queryPipeline,
     ]
+    console.log(JSON.stringify({seminar_pipeline: pipeline}, null, 2))
     const data = await EventSeminar.aggregate(pipeline)
 
     return res.send({
