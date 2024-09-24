@@ -76,14 +76,15 @@ router.delete('/:id', async (req, res) => {
 })
 
 router.get('/get/:id', async (req, res) => {
-//    const controller = new EventConferenceController()
+    let authorization_alternatives = [
+        { createdBy: req.user._id },
+    ]
+    if (req?.person?._id) authorization_alternatives.push({ organizers: { $elemMatch: { _id: new ObjectId(req.person._id) }}})
+
     const pipeline = [
         {$match: {
             _id: new ObjectId(req.params.id),
-            $or: [
-                { createdBy: req.user._id },
-                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
-            ]
+            $or: authorization_alternatives
         }},
         ...controller.queryPipeline,
     ]

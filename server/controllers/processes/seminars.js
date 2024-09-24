@@ -69,12 +69,14 @@ router.get('/', async (req, res) => {
             result: "Unauthorized"
         })
     }
+    let authorization_alternatives = [
+        { createdBy: req.user._id },
+    ]
+    if (req?.person?._id) authorization_alternatives.push({ organizers: { $elemMatch: { _id: new ObjectId(req.person._id) }}})
+
     const pipeline = [
         {$match: {
-            $or: [
-                { createdBy: req.user._id },
-                { organizers: { $elemMatch: { _id: req?.person._id }}},
-            ]
+            $or: authorization_alternatives
         }},
         ...controller.queryPipeline,
     ]
