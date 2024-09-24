@@ -207,7 +207,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 {error && <div className="alert alert-danger">{error}</div>}
                 {requirement && <div className="alert alert-warning">{requirement}</div>}
                 <div className="d-flex flex-row justify-content-end">
-                    <Button className="text-end" onClick={onCompleted} disabled={requirement != ''}>Salva</Button>
+                    <Button className="text-end" onClick={onCompleted} disabled={requirement !== ''}>Salva</Button>
                 </div>
             </> : <>
                 speakers: <b>{data.speakers && data.speakers.map(p => <>{p.firstName} {p.lastName} ({p.affiliations.map(x => x.name).join(', ')})</>).join(', ')}</b><br/>
