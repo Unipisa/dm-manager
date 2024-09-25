@@ -27,9 +27,10 @@ export default function Seminar() {
 
     const { isLoading, error, data } = useQuery([ 'process', 'seminar', id, preFill ], async function () {
         var seminar = {
-            speakers: [], 
+            speakers: [],
+            organizers: [],
             title: "", 
-            stateDatetime: null,
+            startDatetime: null,
             duration: 60,
             conferenceRoom: null,
             category: null,
@@ -149,7 +150,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                             prefix="process/seminars"
                         /> 
                     </InputRow>
-                    <InputRow label="Organizzaori" className="my-3">
+                    <InputRow label="Organizzatori" className="my-3">
                         <SelectPeopleBlock
                             people={data.organizers || []} setPeople={people => setData(data => ({...data,organizers: people}))}
                             prefix="process/seminars"
