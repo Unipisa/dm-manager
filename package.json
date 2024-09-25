@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "1.8.5b",
+  "version": "1.8.6",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",

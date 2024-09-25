@@ -40,7 +40,7 @@ function VisitForm({visit, variant}) {
     const [data, setData] = useState(visit)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const [activeSection, setActiveSection] = useState(visit?'':'data')
+    const [activeSection, setActiveSection] = useState(visit ? 'data' : '')
     const [seminar, setSeminar] = useState(null)
     const user = useEngine().user
     const seminars = visit.seminars
@@ -208,8 +208,10 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
         <Form autoComplete="off">
             <InputRow label="Visitatore" className="my-3">
                 <SelectPersonBlock 
-                    label="Visitatore" 
+                    title="Selezione visitatore" 
                     person={data.person} 
+                    canEdit={true}
+                    canChange={true}
                     setPerson={setter(setData, 'person')} 
                     prefix={`process/${variant}visits`}
                 />

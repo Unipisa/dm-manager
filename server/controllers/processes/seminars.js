@@ -123,11 +123,11 @@ router.get('/get/:id', async (req, res) => {
     if (req?.person?._id) authorization_alternatives.push({ organizers: { $elemMatch: { _id: new ObjectId(req.person._id) }}})
 
     const pipeline = [
-        ...controller.queryPipeline,
         {$match: {
             _id: new ObjectId(req.params.id),
             $or: authorization_alternatives
         }},
+        ...controller.queryPipeline,
     ]
     
     const data = await EventSeminar.aggregate(pipeline)
@@ -180,7 +180,7 @@ router.patch('/:id', async (req, res) => {
         const user_is_creator = req.user.equals(seminar.createdBy)
         const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
 
-        if (!user_is_creator && !user_is_organizer) {
+        if (!req.roles.includes('admin') && !user_is_creator && !user_is_organizer) {
             return res.status(403).json({ error: "Forbidden" })
         }
         
