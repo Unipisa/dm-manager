@@ -118,7 +118,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
 
     const requirement = (() => {
         if (!data.speakers || data.speakers.length === 0) return "Inserire almeno uno speaker"
-        if (data.title === "") return "Inserire il titolo del seminario"
+        if (!data.title) return "Inserire il titolo del seminario"
         if (data.startDatetime === null) return "Inserire la data di inizio del seminario"
         if (data.duration <= 0) return "Inserire la durata del seminario"
         if (!data.conferenceRoom) return "Inserire l'aula in cui si svolge il seminario"
