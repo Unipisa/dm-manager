@@ -31,14 +31,14 @@ router.get('/', async (req, res) => {
         })
     }
     const pipeline = [
-        ...controller.queryPipeline,
         {$match: {
             $or: [
                 //{_id: new ObjectId("65c5208d6b4add65aa974fef")},
                 { createdBy: req.user._id },
-                { organizers: { $elemMatch: { _id: new ObjectId(req?.person._id) } } },
+                { organizers: new ObjectId(req?.person._id)},
             ]
         }},
+        ...controller.queryPipeline,
     ]
     const data = await EventConference.aggregate(pipeline)
 
@@ -79,7 +79,7 @@ router.get('/get/:id', async (req, res) => {
     let authorization_alternatives = [
         { createdBy: req.user._id },
     ]
-    if (req?.person?._id) authorization_alternatives.push({ organizers: { $elemMatch: { _id: new ObjectId(req.person._id) }}})
+    if (req?.person?._id) authorization_alternatives.push({ organizers: new ObjectId(req.person._id) })
 
     const pipeline = [
         {$match: {
