@@ -116,7 +116,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                         Dettagli del convegno
                     </div>
                     <div>
-                    { isAdmin && data._id && <a href={`/event-congress/${data._id}`}>{data._id}</a>}    
+                    { isAdmin && data._id && <a href={`/event-conference/${data._id}`}>{data._id}</a>}    
                     { change && !active &&  
                         <Button className="text-end btn-warning btn-sm" onClick={change}>
                             Modifica

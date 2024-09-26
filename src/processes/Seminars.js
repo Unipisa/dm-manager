@@ -62,6 +62,7 @@ function SeminarList() {
     for (var i = 0; i < data.data.length; i++) {
         const seminar = data.data[i]
         const speakers = seminar.speakers
+        const organizers = seminar.organizers
         seminar_block.push(
             <div className="p-3 col-lg-6 p-0" key={"seminar-" + seminar._id}>
             <Card className="shadow">
@@ -73,10 +74,21 @@ function SeminarList() {
                 </Card.Header>
                 <Card.Body>
                     <strong>Titolo</strong>: {seminar.title} <br></br>
-                    {speakers.map(speaker =>
-                        <div id={speaker._id}>
-                            <strong>Speaker</strong>: {speaker.firstName} { speaker.lastName } ({speaker.affiliations.map(x => x.name).join(", ")})<br></br>
-                        </div>
+                    <strong>Speaker</strong>: {
+                        speakers.map(speaker => (
+                            `${speaker.firstName} ${speaker.lastName} (${speaker.affiliations.map(x => x.name).join(", ")})`
+                        )).join(", ")}
+                    <br />
+                    {Array.isArray(organizers) && organizers.length > 0 && organizers.length > 0 && (
+                        <>
+                             <strong>
+                                {organizers.length > 1 ? "Organizzatori" : "Organizzatore"}
+                            </strong>: {
+                                organizers.map(organizer => (
+                                    `${organizer.firstName} ${organizer.lastName} (${organizer.affiliations.map(x => x.name).join(", ")})`
+                                )).join(", ")}
+                            <br />
+                        </>
                     )}
                     <strong>Data</strong>: {formatDate(seminar.startDatetime)}<br></br>
                     <div className="mt-2 d-flex flex-row justify-content-end">                        

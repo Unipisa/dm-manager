@@ -86,6 +86,7 @@ function ConferenceList() {
 function Conference({conference, onDelete}) {
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
+    const organizers = conference.organizers
 
     return <Card className="shadow">
         <Card.Header className="h6">
@@ -96,6 +97,17 @@ function Conference({conference, onDelete}) {
         </Card.Header>
         <Card.Body>
             <strong>Titolo</strong>: {conference.title} <br></br>
+            {Array.isArray(organizers) && organizers.length > 0 && organizers.length > 0 && (
+                <>
+                    <strong>
+                        {organizers.length > 1 ? "Organizzatori" : "Organizzatore"}
+                    </strong>: {
+                        organizers.map(organizer => (
+                            `${organizer.firstName} ${organizer.lastName} (${organizer.affiliations.map(x => x.name).join(", ")})`
+                        )).join(", ")}
+                    <br />
+                </>
+            )}
             <strong>Data inizio</strong>: {formatDate(conference.startDate, false)}<br></br>
             <strong>Data fine</strong>: {formatDate(conference.endDate, false)}<br></br>
             <div className="mt-2 d-flex flex-row justify-content-end">                        
