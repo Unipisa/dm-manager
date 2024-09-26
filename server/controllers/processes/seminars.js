@@ -20,6 +20,24 @@ require('./conferenceRoomSearch')(router)
 require('./seminarCategorySearch')(router)
 
 async function notifySeminar(seminar) {
+    
+    // notify all organizers
+    if (seminar.organizers && seminar.organizers.length > 0) {
+        const organizers = await Person.find({ _id: { $in: seminar.organizers }})
+        for (const organizer of organizers) {
+            if (!organizer.email) continue
+            const text = `
+È stato creato o modificato un seminario per il quale sei organizzatore. 
+
+Il titolo del seminario è ${seminar.title}; 
+l'abstract è disponibile al link https://www.dm.unipi.it/en/seminar/?id=${seminar._id}. 
+        `
+            await notify(organizer.email, `${seminar._id}`, text)
+        }
+    }
+
+    // notification for related visitor
+
     // For matching visitors, we only care about the days, and ignore the actual time 
     // at which the seminar is scheduled.
     const startDate = new Date(seminar.startDatetime); startDate.setHours(0)
