@@ -3,6 +3,7 @@ const router = express.Router()
 const { ObjectId } = require('mongoose').Types
 
 const EventConference = require('../../models/EventConference')
+const Person = require('../../models/Person')
 
 const InstitutionController = require('../InstitutionController')
 const EventConferenceController = require('../EventConferenceController')
@@ -54,17 +55,19 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const conference = await EventConference.findById(new ObjectId(req.params.id))
-        const organizers = await Person.find({ _id: { $in: conference.organizers }})
+        let user_is_organizer = false
+        if (conference.organizers && conference.organizers.length > 0) {
+            const organizers = await Person.find({ _id: { $in: conference.organizers }})
+            user_is_organizer = req.person && organizers.some(o => o._id.equals(req.person._id))
+        }
 
-        const user_is_creator = req.user.equals(seminar.createdBy)
-        const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+        const user_is_creator = req.user.equals(conference.createdBy)
 
         if (user_is_creator || user_is_organizer) {
             await conference.delete()
             await log(req, conference, {})
             res.json({})
-        }
-        else {
+        } else {
             res.status(401).json({
                 error: "Cannot delete conferences created by other users or not in the organizers list"
             })
@@ -140,14 +143,22 @@ router.patch('/:id', async (req, res) => {
 
     try {
         const conference = await EventConference.findById(_id)
-        const organizers = await Person.find({ _id: { $in: conference.organizers }})
+        if (conference.organizers && conference.organizers.length > 0) {
+            const organizers = await Person.find({ _id: { $in: conference.organizers } })
 
-        const user_is_creator = req.user.equals(seminar.createdBy)
-        const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
-
-        if (!user_is_creator && !user_is_organizer) {
-            res.status(403).json({ error: "Forbidden" })
-            return
+            const user_is_creator = req.user.equals(conference.createdBy)
+            const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+    
+            if (!user_is_creator && !user_is_organizer) {
+                res.status(403).json({ error: "Forbidden" })
+                return
+            }
+        } else {
+            const user_is_creator = req.user.equals(conference.createdBy)
+            if (!user_is_creator) {
+                res.status(403).json({ error: "Forbidden" })
+                return
+            }
         }
         
         const was = {...conference}
@@ -168,7 +179,6 @@ router.put('/save', async (req, res) => {
         createdBy: req.user._id,
         updatedBy: req.user._id,
     }
-
     try {
         if (! payload._id) {
             const conference = EventConference(payload)
@@ -178,14 +188,22 @@ router.put('/save', async (req, res) => {
         }
         else {
             const conference = await EventConference.findById(payload._id)
-            const organizers = await Person.find({ _id: { $in: conference.organizers }})
-
-            const user_is_creator = req.user.equals(seminar.createdBy)
-            const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
-    
-            if (!user_is_creator && !user_is_organizer) {
-                res.status(403).json({ error: "Forbidden" })
-                return
+            if (conference.organizers && conference.organizers.length > 0) {
+                const organizers = await Person.find({ _id: { $in: conference.organizers } })
+                
+                const user_is_creator = req.user.equals(conference.createdBy)
+                const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
+        
+                if (!user_is_creator && !user_is_organizer) {
+                    res.status(403).json({ error: "Forbidden" })
+                    return
+                }
+            } else {
+                const user_is_creator = req.user.equals(conference.createdBy)
+                if (!user_is_creator) {
+                    res.status(403).json({ error: "Forbidden" })
+                    return
+                }
             }
             delete payload.createdBy
             
@@ -194,7 +212,6 @@ router.put('/save', async (req, res) => {
             await conference.save()
             await notifyConference(conference)
             await log(req, was, payload)
-
         }
         res.send({})
     }

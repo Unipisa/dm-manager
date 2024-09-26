@@ -120,8 +120,8 @@ router.get('/get/:id', async (req, res) => {
     let authorization_alternatives = [
         { createdBy: req.user._id },
     ]
-    if (req?.person?._id) authorization_alternatives.push({ organizers: { $elemMatch: { _id: new ObjectId(req.person._id) }}})
-
+    if (req?.person?._id) authorization_alternatives.push({ organizers: new ObjectId(req.person._id) })
+    
     const pipeline = [
         {$match: {
             _id: new ObjectId(req.params.id),

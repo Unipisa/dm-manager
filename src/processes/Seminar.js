@@ -24,7 +24,7 @@ export default function Seminar() {
 
     const search = new URLSearchParams(window.location.search)
     const preFill = search.get("prefill")
-
+    
     const { isLoading, error, data } = useQuery([ 'process', 'seminar', id, preFill ], async function () {
         var seminar = {
             speakers: [],
@@ -38,7 +38,7 @@ export default function Seminar() {
             grants: null, 
             externalid: "",
         }
-
+        
         if (id) {
             const res = await api.get(`/api/v0/process/seminars/get/${id}`)
             seminar = res.data.length>0 ? res.data[0] : null
@@ -118,9 +118,9 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
 
     const requirement = (() => {
         if (!data.speakers || data.speakers.length === 0) return "Inserire almeno uno speaker"
-        if (!data.title) return "Inserire il titolo del seminario"
-        if (data.startDatetime === null) return "Inserire la data di inizio del seminario"
-        if (data.duration <= 0) return "Inserire la durata del seminario"
+        if (!data.title || typeof data.title !== 'string' || data.title.trim() === "") return "Inserire il titolo del seminario"
+        if (!data.startDatetime) return "Inserire la data di inizio del seminario"
+        if (!data.duration || data.duration <= 0) return "Inserire la durata del seminario"
         if (!data.conferenceRoom) return "Inserire l'aula in cui si svolge il seminario"
         return ""
     })()

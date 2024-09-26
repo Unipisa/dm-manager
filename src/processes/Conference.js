@@ -101,9 +101,10 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
     const isAdmin = user.roles && user.roles.includes('admin')
 
     const requirement = (()=>{
-        if (data.title === "") return "inserisci il titolo"
-        if (data.startDate === null) return "inserisci la data di inizio"
-        if (data.endDate === null) return "inserisci la data di fine"
+        if (!data.title || typeof data.title !== 'string' || data.title.trim() === "") return "inserisci il titolo"
+        if (!data.startDate) return "inserisci la data di inizio"
+        if (!data.endDate) return "inserisci la data di fine"
+        if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
         return ""
     })()
 

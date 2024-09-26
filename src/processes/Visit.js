@@ -89,18 +89,19 @@ function VisitForm({visit, variant}) {
             (!seminars || seminars.length === 0) && data.requireSeminar && !seminar && canCreateSeminar &&
             <Card className="shadow">
                 <Card.Header>
-                <div className="d-flex d-row justify-content-between">
+                <div className="d-flex d-row justify-content-between align-items-center">
                         <div>
                             Seminario
                         </div>
                         <div> 
-                            <Button className="text-end btn-warning btn-sm" onClick={newSeminar}>
+                            <Button className="text-end btn-warning btn-sm" onClick={newSeminar} disabled={errorVisit()}>
                                 Inserisci seminario
                             </Button>
                         </div>
                     </div>  
                 </Card.Header>
                 <Card.Body>
+                    { errorVisit() && <div className="text-danger">{errorVisit()}</div>}
                     <i>nessun seminario inserito nel periodo della visita</i>
                 </Card.Body>
             </Card>
@@ -127,6 +128,12 @@ function VisitForm({visit, variant}) {
         setActiveSection('seminar')
     }
 
+    function errorVisit() {
+        if (!data.startDate || !data.endDate || new Date(data.startDate) > new Date(data.endDate)) {
+            return "Prima di poter inserire un seminario terminare di inserire i dati necessari della visita"
+        }
+    }
+
     function nextStep() {
         let section = activeSection
         section = {
@@ -136,7 +143,7 @@ function VisitForm({visit, variant}) {
         setActiveSection(section)
         console.log(`nextStep: ${section}`)
     }
-
+    
     async function save() {
         if (data.person.affiliations && !data.affiliations?.length) {
             data.affiliations = data.person.affiliations
@@ -183,6 +190,7 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
         : <>
             visitatore: <b>{data.person.firstName} {data.person.lastName} ({data.person.affiliations.map(a=>a.name).join(', ')}) {data.person.email}</b>
             {data.referencePeople.map(person => <div key={person._id}>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></div>)}
+            <br />
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
             <br />
             SSD: <b>{data.SSD}</b>
@@ -272,7 +280,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             <InputRow className="my-3" label="Seminario">
                 <div className="d-flex align-items-center">
                     <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se volete aggiungere altri speaker al seminario, si prega di terminare l'inserimento e di inviare un'email a help@dm.unipi.it con i dati delle persone da aggiungere</Tooltip>}>
+                        Se un seminario per lo speaker è stato già inserito apparirà solo dopo aver salvato la visita</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>  
                     <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})} style={{marginRight: '5px'}}/>

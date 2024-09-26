@@ -9,6 +9,7 @@ export function SelectPeopleBlock({ people, setPeople, prefix}) {
     return <div>
             {people.map((person, i) =>
                 <SelectPersonBlock 
+                    key={prefix + i}
                     prefix={prefix} 
                     person={person} 
                     setPerson={person => setPeople(people.map((p,j) => i === j ? person : p))}
@@ -209,7 +210,6 @@ export function SelectPersonBlock({ title, person, setPerson, onFocus, done, pre
             affiliations,
         })
         setMode('display')
-        done()
     }
 
     async function save() {
@@ -220,7 +220,6 @@ export function SelectPersonBlock({ title, person, setPerson, onFocus, done, pre
             setPerson({...person, lastName, firstName, email, affiliations})
         }
         setMode('display')
-        done()
     }
 
     function cancel() {
