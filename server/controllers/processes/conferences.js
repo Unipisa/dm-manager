@@ -17,12 +17,28 @@ require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
 
 async function notifyConference(conference) {
-    const text = `
-    È stato creato o modificato un convegno.
-    
-    Il titolo del convegno è ${conference.title}; la descrizione è disponibile al link https://www.dm.unipi.it/en/conference/?id=${conference._id}. 
+    const notificationText = (conference) => `
+    È stato creato o modificato un convegno${conference.organizers ? ' per il quale sei organizzatore' : ''}. 
+
+    Il titolo del convegno è: ${conference.title}.
+
+    Il link per visualizzare il convegno sul sito del Dipartimento è: https://www.dm.unipi.it/en/conference/?id=${conference._id}
+
+    Il convegno su Manage si trova al seguente link: https://manage.dm.unipi.it/event-conference/${conference._id}
     `;
-    await notify('process/conferences', `${conference._id}`, text);
+
+    // notify all organizers
+    if (conference.organizers && conference.organizers.length > 0) {
+        const organizers = await Person.find({ _id: { $in: conference.organizers } });
+        for (const organizer of organizers) {
+            if (!organizer.email) continue;
+            const text = notificationText(conference);
+            await notify(organizer.email, `${conference._id}`, text);
+        }
+    }
+
+    const generalText = notificationText(conference);
+    await notify('process/conferences', `${conference._id}`, generalText);
 }
 
 router.get('/', async (req, res) => {

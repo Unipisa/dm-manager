@@ -1,4 +1,4 @@
-const express = require('express')
+ const express = require('express')
 const router = express.Router()
 const { ObjectId } = require('mongoose').Types
 
@@ -29,8 +29,11 @@ async function notifySeminar(seminar) {
             const text = `
 È stato creato o modificato un seminario per il quale sei organizzatore. 
 
-Il titolo del seminario è ${seminar.title}; 
-l'abstract è disponibile al link https://www.dm.unipi.it/en/seminar/?id=${seminar._id}. 
+Il titolo del seminario è: ${seminar.title}.
+
+Il link per visualizzare il seminario sul sito del Dipartimento è: https://www.dm.unipi.it/en/seminar/?id=${seminar._id}.
+
+Il seminario su Manage si trova al seguente link: https://manage.dm.unipi.it/event-seminar/${seminar._id}.
         `
             await notify(organizer.email, `${seminar._id}`, text)
         }
@@ -74,7 +77,11 @@ l'abstract è disponibile al link https://www.dm.unipi.it/en/seminar/?id=${semin
 È stato creato o modificato un seminario per l'ospite ${v.person.firstName} ${v.person.lastName}, 
 in visita da ${startDate} a ${endDate}.
 
-Il titolo del seminario è ${seminar.title}; l'abstract è disponibile al link https://www.dm.unipi.it/en/seminar/?id=${seminar._id}. 
+Il titolo del seminario è ${seminar.title}.
+
+Il link per visualizzare il seminario sul sito del Dipartimento è: https://www.dm.unipi.it/en/seminar/?id=${seminar._id}.
+
+Il seminario su Manage si trova al seguente link: https://manage.dm.unipi.it/event-seminar/${seminar._id}.
         `;
         await notify('process/visits', `${v._id}`, text)
     })
