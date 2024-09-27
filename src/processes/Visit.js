@@ -261,10 +261,11 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             <InputRow className="my-3" label="Prenotazione albergo">
                 <div className="d-flex align-items-center">
                     <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se volete che l'Unità Ricerca si occupi della prenotazione dell'albergo, si prega di selezionare uno degli alberghi presenti nel menù</Tooltip>}>
+                        Le prenotazioni di alberghi per visitatori singoli devono essere fatte indipendentemente dal visitatore. 
+                        Si ricorda che le spese di pernottamento verranno rimborsate per un massimo di €180 a notte</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>
-                    <SelectInput value={data.requireHotel || "non richiesto"} setValue={setter(setData, "requireHotel")} options={["non richiesto", "un albergo qualsiasi", "Residence Le Benedettine", "Hotel Duomo", "Hotel Bologna", "Royal Victoria Hotel", "Hotel Bonanno"]}/>
+                    <SelectInput value={data.requireHotel || "non richiesto"} setValue={setter(setData, "requireHotel")} options={["non richiesto", "prenotazione indipendente"]}/>
                 </div>
             </InputRow>
             <InputRow className="my-3" label="Ufficio in Dipartimento">
