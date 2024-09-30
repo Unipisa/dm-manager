@@ -77,12 +77,12 @@ export default function SanityCheck() {
             <CheckCard
                 title="Duplicated Seminars"
                 data={data.duplicatedSeminars}
-                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/event-seminar')}
+                renderRow={(item, i) => RenderCheckMultipleItems(item, i, '/event-seminar')}
             />
             <CheckCard
                 title="Duplicated Events"
                 data={data.duplicatedEvents}
-                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/event-conference')}
+                renderRow={(item, i) => RenderCheckMultipleItems(item, i, '/event-conference')}
             />
             <CheckCard
                 title="Missing Matricola"
