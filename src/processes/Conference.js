@@ -2,7 +2,7 @@ import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
@@ -60,6 +60,7 @@ export default function Conference() {
 export function ConferenceBody({ conference, forbidden }) {
     const [data, setData] = useState(conference)
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     if (forbidden) {
         return <div>
@@ -79,6 +80,7 @@ export function ConferenceBody({ conference, forbidden }) {
     const onCompleted = async () => {
         // Insert the conference in the database
         await api.put('/api/v0/process/conferences/save', data)
+        queryClient.invalidateQueries([ 'process', 'conference', data._id ])
         navigate('/process/conferences')
     }
 
