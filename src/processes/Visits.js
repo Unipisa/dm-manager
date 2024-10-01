@@ -94,7 +94,15 @@ function VisitList({variant}) {
                     <Card.Body>
                         {/*JSON.stringify(visit)*/}
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />
-                        { variant==='' && visit.referencePeople.map(p => <span key={p._id}><strong>Referente</strong>: {p.firstName} {p.lastName}<br /></span>)}
+                        {variant === '' && visit.referencePeople.length > 0 && (
+                                <>
+                                    <strong>{visit.referencePeople.length > 1 ? "Referenti" : "Referente"}</strong>: { 
+                                    visit.referencePeople.map(p => (
+                                        `${p.firstName} ${p.lastName}`
+                                    )).join(", ")}
+                                    <br />
+                                </>
+                            )}
                         <strong>Periodo</strong>: {myDateFormat(visit.startDate)} – {myDateFormat(visit.endDate)}<br />
                         <Rooms variant={variant} id={visit._id} />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        

@@ -124,7 +124,7 @@ function VisitForm({visit, variant}) {
     </PrefixProvider>
 
     function newSeminar() {
-        setSeminar({speakers: [data.person], grants: [...data.grants]})
+        setSeminar({speakers: [data.person], organizers: [...data.referencePeople], grants: [...data.grants]})
         setActiveSection('seminar')
     }
 
