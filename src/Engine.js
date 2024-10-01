@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useState, createContext, useContext, useEffect } from 'react'
+import { useState, createContext, useContext } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
 
 import api from './api'
