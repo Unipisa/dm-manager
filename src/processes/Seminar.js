@@ -5,7 +5,7 @@ import api from '../api'
 import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
-import { useQuery } from 'react-query'
+import { useQuery, useQueryClient } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
@@ -76,6 +76,7 @@ export default function Seminar() {
 export function SeminarBody({ seminar, forbidden }) {
     const [data, setData] = useState(seminar)
     const navigate = useNavigate()
+    const queryClient = useQueryClient()
 
     if (forbidden) {
         return <div>
@@ -95,6 +96,7 @@ export function SeminarBody({ seminar, forbidden }) {
     const onCompleted = async () => {
         // Insert the seminar in the database
         await api.put('/api/v0/process/seminars/save', data)
+        queryClient.invalidateQueries([ 'process', 'seminar', data._id ])
         navigate('/process/seminars')
     }
 
