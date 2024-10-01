@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
     const duplicatedNames = await Person.aggregate([
         {
             $group: {
-                _id: { lastName: "$lastName", firstName: "$firstName" },
+                _id: { lastName: { $toLower: "$lastName" }, firstName: { $toLower: "$firstName" } },
                 ids: { $push: "$_id" },
                 count: { $sum: 1 }
             }
@@ -45,7 +45,7 @@ router.get('/', async (req, res) => {
         { $match: {emails: { $ne: null }}},
         {
             $group: {
-                _id: { email: "$emails" },
+                _id: { email: { $toLower: "$emails" } },
                 ids: { $push: "$_id" },
                 count: { $sum: 1 }
             }
@@ -125,8 +125,15 @@ router.get('/', async (req, res) => {
             $facet: {
                 byTitle: [
                     {
+                        $match: {
+                            $expr: { 
+                                $ne: [{ $toLower: "$title" }, "tba"]
+                            }
+                        }
+                    },
+                    {
                         $group: {
-                            _id: { $toLower: "$title" },
+                            _id: { title: { $toLower: "$title" } },
                             ids: { $push: "$_id" },
                             count: { $sum: 1 }
                         }
@@ -153,8 +160,13 @@ router.get('/', async (req, res) => {
                 ],
                 byDateAndRoom: [
                     {
+                        $match: {
+                            conferenceRoom: { $exists: true, $ne: "" }
+                        }
+                    },
+                    {
                         $group: {
-                            _id: { startDatetime: "$startDatetime", conferenceRoom: "$conferenceRoom" },
+                            _id: { startDate: "$startDatetime", conferenceRoom: "$conferenceRoom" },
                             ids: { $push: "$_id" },
                             count: { $sum: 1 }
                         }
@@ -185,8 +197,15 @@ router.get('/', async (req, res) => {
             $facet: {
                 byTitle: [
                     {
+                        $match: {
+                            $expr: { 
+                                $ne: [{ $toLower: "$title" }, "tba"]
+                            }
+                        }
+                    },
+                    {
                         $group: {
-                            _id: { $toLower: "$title" },
+                            _id: { title: { $toLower: "$title" } },
                             ids: { $push: "$_id" },
                             count: { $sum: 1 }
                         }

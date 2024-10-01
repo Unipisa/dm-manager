@@ -23,9 +23,11 @@ function CheckCard({ title, data, renderRow }) {
 }
 
 function RenderCheckMultipleItems(item, keyField, pathPrefix) {
+    const effectiveKeyField = item._id[keyField] ? keyField : (item._id.title ? 'title' : 'startDate');
+
     return (
         <>
-            <td>{item._id[keyField]}</td>
+            <td>{item._id[effectiveKeyField]}</td>
             <td>
                 {item.ids.map((id, j) => (
                     <a className="btn" key={j} href={`${pathPrefix}/${id}`}>{j + 1}</a>
@@ -77,12 +79,12 @@ export default function SanityCheck() {
             <CheckCard
                 title="Duplicated Seminars"
                 data={data.duplicatedSeminars}
-                renderRow={(item, i) => RenderCheckMultipleItems(item, i, '/event-seminar')}
+                renderRow={(item) => RenderCheckMultipleItems(item, 'title', '/event-seminar')}
             />
             <CheckCard
                 title="Duplicated Events"
                 data={data.duplicatedEvents}
-                renderRow={(item, i) => RenderCheckMultipleItems(item, i, '/event-conference')}
+                renderRow={(item) => RenderCheckMultipleItems(item, 'title', '/event-conference')}
             />
             <CheckCard
                 title="Missing Matricola"
