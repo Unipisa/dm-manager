@@ -1,16 +1,20 @@
 import { Card } from 'react-bootstrap'
 import { myDateFormat, useEngine } from '../Engine'
 import { useObject } from './ObjectProvider'
+import Loading from './Loading'
 
 export default function RelatedDetails({ Model, related, title }) {
     const obj = useObject()
     const engine = useEngine()
     related = related || engine.useGetRelated(Model.ModelName, obj._id)
 
+    if (related.isLoading) return <Loading />
+    if (related.isError) return <div>{related.error}</div>
+
     return <Card className="my-2">
         <Card.Header><h4>{ title || `elementi collegati` }</h4></Card.Header>
         <Card.Body>
-        {related.filter(info => info.data !== null && info.data.length > 0).map((info, i) => 
+        {related.data.filter(info => info.data !== null && info.data.length > 0).map((info, i) => 
             <div key={i}>
                 <b>{info.modelName} {info.field}:</b>
                 <ul>

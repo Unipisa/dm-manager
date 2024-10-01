@@ -245,24 +245,23 @@ export function useCreateEngine() {
 
         useGetRelated: (modelName, _id) => {
             const related = state.Models[modelName].schema.related
-            const [data, setData] = useState(related.map(
-                info => ({...info, data: null})))
-            useEffect(() => {
-                related.forEach((info, i) => {
-                    api.get(`/api/v0/${info.url}`, {[info.field]: _id}).then(result => {
-                        setData(data => data.map(
-                            (old, i_) => {
-                                if (i !== i_) return old
-                                return {
-                                    ...info, 
-                                    data: result.data
-                                }
-                            }
-                        ))
+            const path = 'getRelated/' + modelName + '/' + _id
+            console.log(path)
+            console.log(state.Models[modelName].schema)
+            console.log(related)
+            return useQuery(path, async () => {
+                const data = []
+                for (const info of related) {
+                    const url = `/api/v0/${info.url}`
+                    const result = await api.get(url, {[info.field]: _id})
+                    data.push({
+                        ...info,
+                        data: result.data 
                     })
-                })
-            }, [_id, related])
-            return data
+                }
+
+                return data
+            })
         }
     }
 }
