@@ -146,17 +146,24 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
             <Card.Body>
             { active ? <>
                 <Form>
-                    <InputRow label="Speakers" className="my-3">
+                    <InputRow label="Speaker" className="my-3">
                         <SelectPeopleBlock 
                             people={data.speakers || []} setPeople={people => setData(data => ({...data,speakers: people}))} 
                             prefix="process/seminars"
                         /> 
                     </InputRow>
                     <InputRow label="Organizzatori" className="my-3">
-                        <SelectPeopleBlock
+                        <div className="d-flex align-items-center">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="organizers-tooltip">
+                                Se il seminario è gestito da più persone, inserisci tutti gli organizzatori
+                                così che tutti possano vedere i dati e fare modifiche</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>  
+                            <SelectPeopleBlock
                             people={data.organizers || []} setPeople={people => setData(data => ({...data,organizers: people}))}
                             prefix="process/seminars"
-                        />
+                            />
+                        </div>
                     </InputRow>
                     <InputRow label="Titolo" className="my-3">
                         <StringInput value={data.title} setValue={setter(setData,'title')} />
