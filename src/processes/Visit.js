@@ -224,18 +224,16 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                     prefix={`process/${variant}visits`}
                 />
             </InputRow>
-            { variant === '' &&
-                <InputRow label="Referenti" className="my-3">
-                    <div className="d-flex align-items-center">
-                        <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                            Se la visita è gestita da più persone, inserisci tutti i referenti
-                            così che tutti possano vedere i dati e fare modifiche</Tooltip>}>
-                            <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                        </OverlayTrigger>
-                        <PersonInput multiple={true} value={data.referencePeople} setValue={setReferencePeople} />
-                    </div>
-                </InputRow>
-            }
+            <InputRow label="Referenti" className="my-3">
+                <div className="d-flex align-items-center">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Se la visita è gestita da più persone, inserisci tutti i referenti
+                        così che tutti possano vedere i dati e fare modifiche</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>
+                    <PersonInput multiple={true} value={data.referencePeople} setValue={setReferencePeople} />
+                </div>
+            </InputRow>
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={startDateSetter}/>
             </InputRow>
