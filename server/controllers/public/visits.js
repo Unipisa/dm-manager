@@ -2,6 +2,15 @@ const Visit = require('../../models/Visit')
 const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
 
 async function visitsQuery(req) {
+    // restituisce le visite correnti
+    // si può filtrare sull'email
+
+    const matches = []
+    if (req.query.email) {
+        matches.push({ 'person.email': req.query.email },
+            { 'person.alternativeEmails': req.query.email })
+    }
+
     const pipeline = [
         {$match: {
             $expr: {
@@ -17,7 +26,7 @@ async function visitsQuery(req) {
                     { $or: [
                         { $eq: ["$startDate", null] },
                         { $lte: ["$startDate", "$$NOW"]}
-                    ]}
+                    ]},
                 ]},
         }},
         { $lookup: {
@@ -26,6 +35,11 @@ async function visitsQuery(req) {
             foreignField: '_id',
             as: 'person',
         }},
+        ...(matches.length > 0 ? [{
+            $match: {
+                $or: matches,
+            }
+        }] : []),
         { $unwind: {
             path: '$person',
             preserveNullAndEmptyArrays: true
