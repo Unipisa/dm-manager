@@ -81,12 +81,26 @@ export function CourseList({ from, to }) {
                 );
             });
 
+            const lessons = course.lessons && course.lessons.filter(lesson => Object.keys(lesson).length > 0).length > 0 ? (
+                <div>
+                    <h5 className="wp-block-heading"><strong>Scheduled lessons:</strong></h5>
+                    <ul>
+                        {course.lessons.map((lesson, index) => (
+                            <li key={index}>
+                                {formatDate(lesson.date, 'en-US')} ({lesson.duration} minutes), {lesson.conferenceRoom}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            ) : null;
+
             return (
                 <Accordion title={course.title} key={course._id}>
                     <h5 className="wp-block-heading"><strong>{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</strong></h5>
                     {lecturerCards}
                     <h5 className="wp-block-heading"><strong>Period:</strong></h5>
                     <p>From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
+                    {lessons}
                     <h5 className="wp-block-heading"><strong>Description:</strong></h5>
                     <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
                 </Accordion>
