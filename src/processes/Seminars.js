@@ -79,7 +79,7 @@ function SeminarList() {
                             `${speaker.firstName} ${speaker.lastName} (${speaker.affiliations.map(x => x.name).join(", ")})`
                         )).join(", ")}
                     <br />
-                    {Array.isArray(organizers) && organizers.length > 0 && organizers.length > 0 && (
+                    {Array.isArray(organizers) && organizers.length > 0 && (
                         <>
                              <strong>
                                 {organizers.length > 1 ? "Organizzatori" : "Organizzatore"}

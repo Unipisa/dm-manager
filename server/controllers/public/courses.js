@@ -1,3 +1,4 @@
+const { duration } = require('moment');
 const EventPhdCourse = require('../../models/EventPhdCourse')
 
 async function coursesQuery(req) {
@@ -58,22 +59,33 @@ async function coursesQuery(req) {
                 affiliations: {_id:1, name: 1}
             })
         ]),
+        { $unwind: { path: '$lessons', preserveNullAndEmptyArrays: true } },
+        lookupPipeline('conferencerooms', 'lessons.conferenceRoom', '_id', 'conferenceRoom', [
+            projectFields({ name: 1 })
+        ]),
+        { $unwind: { path: '$conferenceRoom', preserveNullAndEmptyArrays: true } },
+        { $group: {
+            _id: '$_id',
+            startDate: { $first: '$startDate' },
+            endDate: { $first: '$endDate' },
+            title: { $first: '$title' },
+            description: { $first: '$description' },
+            lecturers: { $first: '$lecturers' },
+            lessons: { $push: {
+                _id: '$lessons._id',
+                date: '$lessons.date',
+                duration: '$lessons.duration',
+                conferenceRoom: '$conferenceRoom.name'
+            }}
+        }},
         { $project: {
             _id: 1,
             startDate: 1,
             endDate: 1,
             title: 1,
             description: 1,
-            lecturers: {
-                _id: 1,
-                firstName: 1,
-                lastName: 1,
-                email: 1,
-                affiliations: {
-                    _id: 1,
-                    name: 1
-                }
-            }
+            lecturers: 1,
+            lessons: 1
         }}
     ];
     
