@@ -18,15 +18,17 @@ export function ModelFieldOutput({ field, schema, value }) {
     }
     if (schema.type === 'array') {
         if (schema.enum) return value.join(', ')
-        let lst = []
-        value.forEach((v, i) => {
-            if (i>0) lst.push(', ')
-            lst.push(render(v, schema.items['x-ref']))
-        })
-        return <>
-            {lst} {}
-            {lst.length > 4 ? `(${lst.length})` : ''}
-        </>
+        return (
+            <>
+                {value.map((v, i) => (
+                    <>
+                        {i > 0 && ', '}
+                        {render(v, schema.items['x-ref'])}
+                    </>
+                ))}
+                {value.length > 4 ? ` (${value.length})` : ''}
+            </>
+        );
     } else {
         if (schema['x-ref']) return render(value, schema['x-ref'])
         if (schema.format === 'date-time') {
