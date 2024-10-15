@@ -1,6 +1,5 @@
 import Model from './Model'
 import UrlViewPage from '../pages/UrlViewPage'
-import { useState } from 'react'
 
 export default class Url extends Model {
     constructor() {
