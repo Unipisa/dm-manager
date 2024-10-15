@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
                 count: { $gt: 1 }
             }
         }
-    ])
+    ])  
 
     // find duplicated emails and alternativeEmails
     const duplicatedEmails = await Person.aggregate([
@@ -98,6 +98,34 @@ router.get('/', async (req, res) => {
         }
     ])
 
+    // find persons with trailing spaces
+    const personsWithTrailingSpaces = await Person.aggregate([
+        {
+            $match: {
+                $or: [
+                    { firstName: { $regex: /\s+$/, $options: "s" } },
+                    { lastName: { $regex: /\s+$/, $options: "s" } },
+                    { email: { $regex: /\s+$/, $options: "s" } },
+                    { alternativeEmails: { $regex: /\s+$/, $options: "s" } }
+                ]
+            }
+        }
+    ]);
+
+    // find institutions with trailing spaces
+    const institutionsWithTrailingSpaces = await Institution.aggregate([
+        {
+            $match: {
+                $or: [
+                    { name: { $regex: /\s+$/, $options: "s" } },
+                    { country: { $regex: /\s+$/, $options: "s" } },
+                    { city: { $regex: /\s+$/, $options: "s" } },
+                    { code: { $regex: /\s+$/, $options: "s" } }
+                ]
+            }
+        }
+    ]);
+
     // find duplicated institutions
     const duplicatedInstitutions = await Institution.aggregate([
         { $project: {
@@ -120,6 +148,7 @@ router.get('/', async (req, res) => {
         }
     ]);
 
+    // find duplicated seminars
     const duplicatedSeminars = await Seminar.aggregate([
         {
             $facet: {
@@ -192,6 +221,7 @@ router.get('/', async (req, res) => {
         }
     ])
 
+    // find duplicated events
     const duplicatedEvents = await Event.aggregate([
         {
             $facet: {
@@ -269,7 +299,7 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, duplicatedEmails, missingMatricola, missingSSD, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars, duplicatedEvents})
+    return res.json({duplicatedNames, personsWithTrailingSpaces, institutionsWithTrailingSpaces, duplicatedEmails, missingMatricola, missingSSD, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars, duplicatedEvents})
 })
 
 module.exports = router

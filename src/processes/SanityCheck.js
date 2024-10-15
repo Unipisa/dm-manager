@@ -105,6 +105,16 @@ export default function SanityCheck() {
                     </td>
                 )}
             />
+            <CheckCard
+                title="Person with trailing spaces"
+                data={data.personsWithTrailingSpaces}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/person')}
+            />
+            <CheckCard
+                title="Institution with trailing spaces"
+                data={data.institutionsWithTrailingSpaces}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/institution')}
+            />
         </>
     );
 }
