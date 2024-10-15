@@ -23,7 +23,10 @@ export function ModelFieldOutput({ field, schema, value }) {
             if (i>0) lst.push(', ')
             lst.push(render(v, schema.items['x-ref']))
         })
-        return lst
+        return <>
+            {lst} {}
+            {lst.length > 4 ? `(${lst.length})` : ''}
+        </>
     } else {
         if (schema['x-ref']) return render(value, schema['x-ref'])
         if (schema.format === 'date-time') {
