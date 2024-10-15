@@ -1,18 +1,14 @@
 const { 
     model, 
     Schema, 
-    ObjectId, 
-    startDate, 
-    endDate,
-    SSD, 
     createdBy, 
     updatedBy,
 } = require('./Model')
 
 const urlSchema = new Schema({
-    url: { type: String, label: 'url', required: true }, // web.dm.unipi.it/walker
-    ref: { type: String, label: 'ref', required: true }, // a0123456@login:public_html
-    disabled: { type: Boolean, label: 'disabled', default: false },
+    alias: { type: String, label: 'alias', required: true },
+    destination: { type: String, label: 'destination', required: true, default: "public_html" },
+    owner: { type: String, label: 'owner', required: true},
     notes: {type: String, label: 'note', widget: 'text', default: ""},
     createdBy,
     updatedBy,

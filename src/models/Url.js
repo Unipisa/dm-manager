@@ -7,7 +7,7 @@ export default class Url extends Model {
         super()
         this.code = 'url'
         this.name = "url"
-        this.oa = "x"
+        this.oa = "o"
         this.articulation = {
             'oggetto': "url", 
             'oggetti': "url",
@@ -17,13 +17,14 @@ export default class Url extends Model {
         }
         this.ModelName = 'Url' 
         this.columns = {
-            'url': "url",
-            'ref': "ref",
+            'alias': "alias",
+            'destination': "destination",
+            'username': "username",
             'updatedAt': "modificato",
         }
         this.ViewPage = UrlViewPage
         this.indexDefaultFilter = {'_sort': 'updatedAt', '_limit': 10}
     }
-    describe(obj) { return `${obj?.url}` }
+    describe(obj) { return `${obj?.alias}` }
 }
 
