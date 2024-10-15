@@ -82,6 +82,7 @@ export default function Header() {
       </NavDropdown>
       <NavDropdown title="Amministrazione" className="mx-2 py-2"> 
         <NavDropdown.Item as={NavLink} to="/user">Utenti</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/url">Urls</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/token">Tokens</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/log">Logs</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/process/sanityCheck">Controlli di consistenza</NavDropdown.Item>

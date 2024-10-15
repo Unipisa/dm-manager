@@ -292,7 +292,7 @@ class Controller {
                         value = value.slice(1)
                     }
                 }
-                const can_sort = fields[value].can_sort || fields[value]?.items?.can_sort
+                const can_sort = fields[value] && (fields[value].can_sort || fields[value]?.items?.can_sort)
                 if (!can_sort) {
                     return sendBadRequest(res, `invalid _sort key ${value}. Fields: ${ JSON.stringify(fields) }`)
                 }
