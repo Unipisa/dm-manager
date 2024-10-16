@@ -14,7 +14,10 @@ async function roomsQuery(req, res) {
             number: 1,
             polygon: 1,
         }},
-        ...RoomAssignment.roomRoomAssignmentPipeline('$$NOW', '$$NOW'),
+        ...RoomAssignment.roomRoomAssignmentPipeline(
+            { $dateTrunc: { date: "$$NOW", unit: "day" } },
+            { $dateTrunc: { date: "$$NOW", unit: "day" } }
+        ),
     ])
 
     return { 
