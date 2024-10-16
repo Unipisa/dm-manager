@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import { SelectPersonBlock, SelectPeopleBlock } from './SelectPeopleBlock'
-import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, TextInput, SelectInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
