@@ -340,7 +340,7 @@ class Controller {
                 } else if (field.match_boolean) {
                     $matches.push({ [key0]: ['1','yes','true'].includes(value) })
                 } else if (field.match_date) {
-                    let date_value = null
+                    let date_value = null; date_value.setHours(0, 0, 0, 0);
                     if (value === 'today') {
                         date_value = new Date()
                     } else {

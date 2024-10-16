@@ -27,7 +27,7 @@ function RoomAssignments() {
 
     if (!assignmentsQuery.isSuccess) return <Loading />
     const assignments = assignmentsQuery.data.data
-    const today = new Date()
+    const today = new Date(); today.setHours(0, 0, 0, 0);
 
     const filteredAssignments = assignments.filter(assignment => {
         const start = notNullStartDate(assignment.startDate)
