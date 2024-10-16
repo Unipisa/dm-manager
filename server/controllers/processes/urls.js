@@ -32,6 +32,7 @@ async function sync_web_server() {
     // make a GET request to http://web.cdc:8000/alias/reload
     // and check for error code
     const url = config.WEB_PAGES_SERVER_UPDATE_URL
+    if (!url) return true
     try {
         const response = await axios.get(url)
         console.log(`sync_web_server: ${response.status} ${response.statusText}`)

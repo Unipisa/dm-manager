@@ -45,7 +45,7 @@ class Options {
             UNIPI_TOKEN: "",
             UNIPI_TOKENARPI: "",
             UNIPI_TOKENARPILINK: "",
-            WEB_PAGES_SERVER_UPDATE_URL: "http://web.cdc:8000/alias/reload",
+            WEB_PAGES_SERVER_UPDATE_URL: "", // "http://web.cdc:8000/alias/reload",
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
