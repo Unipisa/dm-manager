@@ -13,7 +13,6 @@ import {SeminarDetailsBlock} from './Seminar'
 import { useEngine } from '../Engine'
 
 export default function Url() {
-
     const { id } = useParams()
     const path = `process/my/urls/${id || '__new__'}`
     const query = useQuery(path.split('/'))
@@ -28,6 +27,7 @@ export default function Url() {
 
 function UrlForm({url}) {
     const [data, setData] = useState(url)
+    const modified = url.alias!=data.alias || url.destination!=data.destination
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const user = useEngine().user
@@ -41,7 +41,10 @@ function UrlForm({url}) {
             data={data} 
             setData={setData} 
         />
-        <Button className="mt-3" onClick={completed}>
+        <Button className="mt-3 mx-2" onClick={save} disabled={!modified}>
+            salva
+        </Button>
+        <Button className="mt-3 mx-2" onClick={completed}>
             Indietro
         </Button>
     </PrefixProvider>
