@@ -8,7 +8,7 @@ import { ConfirmDeleteButton } from '../components/ModalDialog'
 export default function ProcessUrls() {
     return  <>
         <h1 className="text-primary pb-0">Gestione alias pagine web</h1>
-        <a href={`__new__`}>
+        <a href={`/process/my/urls/__new__`}>
             <button className="btn btn-primary my-3">Nuovo alias</button>
         </a>
         <UrlList/>
@@ -39,7 +39,6 @@ function UrlList() {
                         </div>
                     </Card.Header>
                     <Card.Body>
-                        {/*JSON.stringify(visit)*/}
                         <strong>alias</strong>: {url.alias}<br />
                         <strong>destination</strong>: {url.destination}<br />
                         <strong>owner</strong>: {url.owner}<br />

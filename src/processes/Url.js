@@ -7,16 +7,13 @@ import { InputRow, StringInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
-import {myDateFormat,setter} from '../Engine'
-import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
-import {SeminarDetailsBlock} from './Seminar'
+import {setter} from '../Engine'
 import { useEngine } from '../Engine'
 
 export default function Url() {
     const { id } = useParams()
     const path = `process/my/urls/${id || '__new__'}`
     const query = useQuery(path.split('/'))
-    const user = useEngine().user
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento: {query.error.response.data?.error || `${query.error}`}</div>
 
@@ -49,25 +46,25 @@ function UrlForm({url}) {
         </Button>
     </PrefixProvider>
 
+    async function completed() {
+        navigate(`/process/my/urls`)     
+    }
+    
     async function save() {
-        if (url._id) {
-            try {
+        try {
+            if (url._id) {
                 await api.patch(`/api/v0/process/my/urls/${url._id}`, data)
-            } catch (e) {
-                addMessage(`${e}`)
+            } else {
+                const res = await api.put(`/api/v0/process/my/urls`, data)
+                const _id = res._id
             }
-        } else {
-            const res = await api.put(`/api/v0/process/my/urls`, data)
-            const _id = res._id
-            console.log(`save response: ${JSON.stringify(res)}`)
-            navigate(`/process/my/urls/${_id}`, {replace: true})
+            navigate(`/process/my/urls/`, {replace: true})
+        } catch (e) {
+            addMessage(`${e}`)
         }
         queryClient.invalidateQueries(`process/my/urls`.split('/'))
     }
 
-    async function completed() {
-        navigate(`/process/my/urls`)     
-    }
 }
 
 function UrlDetailsBlock({data, setData, active, done, edit}) {
