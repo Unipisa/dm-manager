@@ -20,6 +20,7 @@ function UrlList() {
     const isAdmin = user.roles && user.roles.includes('admin')
     const { isLoading, error, data } = useQuery([ 'process', 'my', 'urls' ])
     const queryClient = useQueryClient()
+    const addMessage = useEngine().addMessage
 
     if (isLoading) {
         return "Loading"
@@ -59,7 +60,12 @@ function UrlList() {
     </>
 
     async function removeUrl(id) {
-        await api.del(`${id}`)
-        queryClient.invalidateQueries(`process/my/urls`.split('/'))
+        try {
+            await api.del(`/api/v0/process/my/urls/${id}`)
+            queryClient.invalidateQueries(`process/my/urls`.split('/'))
+        } catch(e) {
+            console.error(e)
+            addMessage(`${e}`)
+        }
     }
 }

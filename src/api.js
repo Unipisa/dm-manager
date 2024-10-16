@@ -58,7 +58,7 @@ async function get(url, data) {
 
 // delete is a reserved word
 async function del(url) {
-    return api_fetch(url, {method: 'DELETE'})
+    return await api_fetch(url, {method: 'DELETE'})
 }
 
 const api = {

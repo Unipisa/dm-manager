@@ -4,13 +4,9 @@ const { ObjectId } = require('mongoose').Types
 
 const Url = require('../../models/Url')
 const { log } = require('../middleware')
-const { notify } = require('../../models/Notification')
-const config = require('../../config')
-const { createdBy } = require('../../models/Model')
 
 const router = express.Router()
 module.exports = router
-
 
 router.get('/', async (req, res) => {    
     if (!req.user) {
@@ -25,6 +21,30 @@ router.get('/', async (req, res) => {
     ])
 
     res.json({ data })
+})
+
+router.delete('/:id', async (req, res) => {
+    console.log(`my DELETE ${req.params.id}`)
+    try {
+        const url = await Url.findById(new ObjectId(req.params.id))
+
+        const user_is_creator = req.user.equals(url.createdBy)
+
+        if (user_is_creator) {
+            await url.delete()
+            await log(req, url, {})
+            res.json({})
+        }
+        else {
+            res.status(401).json({
+                error: "Cannot delete urls created by other users"
+            })
+        }
+    } catch(error) {
+        res.status(400).json({
+            error: error.message
+        })
+    }
 })
 
 router.get('/:id', async (req,res) => {
@@ -172,3 +192,4 @@ router.put('/', async (req, res) => {
         res.status(400).send({ error: error.message })
     }
 })
+

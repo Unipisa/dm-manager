@@ -1,4 +1,4 @@
-import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
@@ -27,7 +27,6 @@ function UrlForm({url}) {
     const modified = url.alias!=data.alias || url.destination!=data.destination
     const navigate = useNavigate()
     const queryClient = useQueryClient()
-    const user = useEngine().user
     const addMessage = useEngine().addMessage
 
     return <PrefixProvider value={`process/my/visits`}>
