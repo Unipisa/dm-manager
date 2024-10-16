@@ -8,6 +8,7 @@ const Grant = require('../models/Grant')
 const Thesis = require('../models/Thesis')
 
 const { log } = require('./middleware')
+const { ObjectId } = require('../models/Model')
 
 module.exports = function profile(router, path) {
     
@@ -23,9 +24,9 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
         
-        const data = (user.email 
+        const data = user.person
             ? await Person.aggregate([
-                { $match: {$or: [{email: user.email }, {alternativeEmails: user.email}] } },
+                { $match: { _id: user.person } },
                 { $project: { notes: 0 }},
                 { $lookup: {
                     from: "staffs",
@@ -36,7 +37,7 @@ module.exports = function profile(router, path) {
                         { $project: { notes: 0 }},
                     ],
                 }}]) 
-            : [])
+            : []
 
         res.send({
             data,
@@ -48,13 +49,11 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
         
-        const people = user.email ? await Person.find({ email: user.email }) : []
-
-        const data = await Staff.aggregate([
+        const data = user.person ? await Staff.aggregate([
             // match person in people
-            { $match: { person: { $in: people.map(p => p._id) } } },
+            { $match: { person: user.person } },
             { $project: { notes: 0 }},
-        ])
+        ]) : []
 
         res.send({
             data,
@@ -66,11 +65,9 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = user.email ? await Person.find({ email: user.email }) : []
-
-        const data = await RoomAssignment.aggregate([
+        const data = user.person ? await RoomAssignment.aggregate([
             // match person in people
-            { $match: { person: { $in: people.map(p => p._id) } } },
+            { $match: { person: user.person }},
             { $project: { notes: 0 }},
             { $lookup: {
                 from: "rooms",
@@ -79,7 +76,7 @@ module.exports = function profile(router, path) {
                 as: "room",
             }},
             { $unwind: { path: "$room", preserveNullAndEmptyArrays: true } },
-        ])
+        ]) : []
 
         res.send({
             data,
@@ -92,18 +89,15 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = user.email ? await Person.find({ email: user.email }) : []
-        const people_ids = people.map(p => p._id)
-
-        const data = await Group.aggregate([
+        const data = user.person ? await Group.aggregate([
             // match person in people or person in chair 
             { $match: { $or: [
-                { members: { $in: people_ids } },
-                { chair: { $in: people_ids } },
-                { vice: { $in: people_ids } },
+                { members: user.person },
+                { chair: user.person },
+                { vice: user.person },
             ]}},
             { $project: { notes: 0 }},
-        ])
+        ]) : []
 
         res.send({
             data,
@@ -115,14 +109,11 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = user.email ? await Person.find({ email: user.email }) : []
-        const people_ids = people.map(p => p._id)
-
-        const data = await Visit.aggregate([
+        const data = user.person ? await Visit.aggregate([
             // match person in person or in referencePeople
             { $match: { $or: [
-                { person: { $in: people_ids } },
-                { referencePeople: { $in: people_ids } },
+                { person: user.person },
+                { referencePeople: user.person },
             ]}},
             // lookup person
             { $lookup: {
@@ -133,7 +124,7 @@ module.exports = function profile(router, path) {
             }},
             { $unwind: { path: "$person", preserveNullAndEmptyArrays: true } },
             { $project: { notes: 0 }},
-        ])
+        ]) : []
 
         res.send({
             data,
@@ -145,18 +136,15 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
 
-        const people = user.email ? await Person.find({ email: user.email }) : []
-        const people_ids = people.map(p => p._id)
-
-        const data = await Grant.aggregate([
+        const data = user.person ? await Grant.aggregate([
             // match people in pi, localCoordinator, members:
             { $match: { $or: [
-                { pi: { $in: people_ids } },
-                { localCoordinator: { $in: people_ids } },
-                { members: { $in: people_ids } },
+                { pi: user.person },
+                { localCoordinator: user.person },
+                { members: user.person },
             ]}},
             { $project: { notes: 0 }},
-        ])
+        ]) : []
 
         res.send({
             data,
@@ -168,14 +156,11 @@ module.exports = function profile(router, path) {
         const user = req.user || null
         if (!user) return res.status(401).send({error: "Not authenticated"})
         
-        const people = user.email ? await Person.find({ email: user.email }) : []
-        const people_ids = people.map(p => p._id)
-        
-        const data = await Thesis.aggregate([
+        const data = user.person ? await Thesis.aggregate([
             // match people in person, advisors
             { $match: { $or: [
-                { person: { $in: people_ids } },
-                { advisors: { $in: people_ids } },
+                { person: user.person },
+                { advisors: user.person },
             ]}},
             { $project: { notes: 0 }},
             { $lookup: {
@@ -189,7 +174,7 @@ module.exports = function profile(router, path) {
                 ],
             }},
             { $unwind: { path: "$person", preserveNullAndEmptyArrays: true } },
-        ])
+        ]) : []
 
         res.send({
             data,
@@ -202,13 +187,11 @@ module.exports = function profile(router, path) {
         const id = req.params.id
         const modifiable_fields = Person._profile_editable_fields
         const payload = req.body
+
+        if (!user.person.equals(id)) return res.status(401).send({error: "Not authorized"})
+
         try {
             const person = await Person.findById(id)
-            if (!user.email || (person.email != user.email && !person.alternativeEmails.includes(user.email))) {
-                // not authorized
-                res.status(401).send({error: "Not authorized"})
-                return
-            }
             req.log_who = user.username
             await log(req, person, payload)
             for(field of modifiable_fields) {

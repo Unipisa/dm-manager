@@ -129,6 +129,7 @@ function setup_routes(app) {
               add_role('/process/seminars')
               add_role('/process/conferences')
               add_role('/process/visitsList')
+              add_role('/process/my/urls')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
             'Assegnista', 'Dottorando', 

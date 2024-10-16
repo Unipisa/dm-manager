@@ -93,7 +93,7 @@ export default function Home() {
                     </Card.Header>
                     <Card.Body>
                         <ul>
-                            <li>visualizza le informazioni sugli ultimi visitatori</li>
+                            <li>Visualizza le informazioni sugli ultimi visitatori</li>
                         </ul>                    
                     </Card.Body>
                 </Card>
@@ -104,17 +104,35 @@ export default function Home() {
             <Card className="shadow">
                 <Card.Header>                    
                     <div className="d-flex flex-row justify-content-between">
-                        <strong>Cartellini stanze</strong>
+                        <strong>Cartellini Stanze</strong>
                         <a href="/process/roomLabels"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
                     </div>
                 </Card.Header>
                 <Card.Body>
                     <ul>
-                        <li>gestisci richieste cartellini</li>
+                        <li>Gestisci richieste cartellini</li>
                     </ul>                    
                 </Card.Body>
             </Card>
             </div>
+            }
+            {
+                user.hasProcessPermission('/process/my/urls') && 
+                <div className='col-lg-6 p-3'>
+                    <Card className="shadow">
+                        <Card.Header>
+                            <div className="d-flex flex-row justify-content-between">
+                                <strong>Alias Pagine Web</strong>
+                                <a href="/process/my/urls"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                            </div>
+                        </Card.Header>
+                        <Card.Body>
+                            <ul>
+                                <li>Gestisci gli alias delle pagine web personali</li>
+                            </ul>
+                        </Card.Body>
+                    </Card>
+                </div>
             }
         </div>
     </>
@@ -147,7 +165,11 @@ export function ProcessDropdown() {
         </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/roomLabels')) items.push(
         <NavDropdown.Item key="roomLabels" as={NavLink} to="/process/roomLabels">
-            Cartellini stanze
+            Cartellini Stanze
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/my/urls')) items.push(
+        <NavDropdown.Item key="urls" as={NavLink} to="/process/my/urls">
+            Alias Pagine Web
         </NavDropdown.Item>)
     if (items.length === 0) return null
 

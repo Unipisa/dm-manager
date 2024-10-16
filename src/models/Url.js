@@ -18,7 +18,7 @@ export default class Url extends Model {
         this.columns = {
             'alias': "alias",
             'destination': "destination",
-            'username': "username",
+            'owner': "owner",
             'updatedAt': "modificato",
         }
         this.ViewPage = UrlViewPage
