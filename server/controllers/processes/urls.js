@@ -1,12 +1,17 @@
 const express = require('express')
 const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
+const axios = require('axios')
 
 const Url = require('../../models/Url')
 const { log } = require('../middleware')
 
 const router = express.Router()
 module.exports = router
+
+const config = require('../../config')
+const { sync } = require('resolve')
+
 
 router.get('/', async (req, res) => {    
     if (!req.user) {
@@ -22,6 +27,20 @@ router.get('/', async (req, res) => {
 
     res.json({ data })
 })
+
+async function sync_web_server() {
+    // make a GET request to http://web.cdc:8000/alias/reload
+    // and check for error code
+    const url = config.WEB_PAGES_SERVER_UPDATE_URL
+    try {
+        const response = await axios.get(url)
+        console.log(`sync_web_server: ${response.status} ${response.statusText}`)
+        return true
+    } catch(error) {
+        console.error(`sync_web_server: ${error}`)
+        return false
+    }
+}
 
 router.delete('/:id', async (req, res) => {
     console.log(`my DELETE ${req.params.id}`)
@@ -40,6 +59,9 @@ router.delete('/:id', async (req, res) => {
                 error: "Cannot delete urls created by other users"
             })
         }
+
+        if (!await sync_web_server()) return res.status(500).json({error: "web server sync failed"})
+
     } catch(error) {
         res.status(400).json({
             error: error.message
@@ -157,6 +179,9 @@ router.patch('/:id', async (req, res) => {
         await url.save()
 //        await notifySeminar(seminar)
         await log(req, was, payload)
+
+        if (!await sync_web_server()) return res.status(500).json({error: "web server sync failed"})
+
         res.send({})
     }
     catch (error) {
@@ -186,6 +211,9 @@ router.put('/', async (req, res) => {
         await url.save()
 //        await notifySeminar(seminar)
         await log(req, {}, payload)
+
+        if (!await sync_web_server()) return res.status(500).json({error: "web server sync failed"})
+
         res.send({})
     }
     catch (error) {
