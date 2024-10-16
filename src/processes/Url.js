@@ -24,7 +24,7 @@ export default function Url() {
 
 function UrlForm({url}) {
     const [data, setData] = useState(url)
-    const modified = url.alias!=data.alias || url.destination!=data.destination
+    const modified = url.alias!==data.alias || url.destination!==data.destination
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const addMessage = useEngine().addMessage
@@ -54,8 +54,7 @@ function UrlForm({url}) {
             if (url._id) {
                 await api.patch(`/api/v0/process/my/urls/${url._id}`, data)
             } else {
-                const res = await api.put(`/api/v0/process/my/urls`, data)
-                const _id = res._id
+                await api.put(`/api/v0/process/my/urls`, data)
             }
             navigate(`/process/my/urls/`, {replace: true})
         } catch (e) {
