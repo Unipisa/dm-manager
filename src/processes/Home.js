@@ -116,6 +116,24 @@ export default function Home() {
             </Card>
             </div>
             }
+            {
+                user.hasProcessPermission('/process/urls') && 
+                <div className='col-lg-6 p-3'>
+                    <Card class name="shadow">
+                        <Card.Header>
+                            <div className="d-flex flex-row justify-content-between">
+                                <strong>alias pagine web</strong>
+                                <a href="/process/my/urls"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                            </div>
+                        </Card.Header>
+                        <Card.Body>
+                            <ul>
+                                <li>gestisci gli alias delle pagine web personali</li>
+                            </ul>
+                        </Card.Body>
+                    </Card>
+                </div>
+            }
         </div>
     </>
   }
@@ -148,6 +166,10 @@ export function ProcessDropdown() {
     if (user.hasProcessPermission('/process/roomLabels')) items.push(
         <NavDropdown.Item key="roomLabels" as={NavLink} to="/process/roomLabels">
             Cartellini stanze
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/my/urls')) items.push(
+        <NavDropdown.Item key="urls" as={NavLink} to="/process/my/urls">
+            Alias pagine web
         </NavDropdown.Item>)
     if (items.length === 0) return null
 

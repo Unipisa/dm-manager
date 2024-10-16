@@ -22,4 +22,6 @@ router.use('/planimetrie', require('./planimetrie'))
 
 router.use('/sanityCheck', require('./sanityCheck'))
 
+router.use('/my/urls', require('./urls'))
+
 module.exports = router
