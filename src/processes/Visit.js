@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
-import { SelectPersonBlock } from './SelectPeopleBlock'
+import { SelectPersonBlock, SelectPeopleBlock } from './SelectPeopleBlock'
 import { GrantInput, InputRow, DateInput, TextInput, SelectInput, PersonInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
@@ -231,7 +231,10 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                         così che tutti possano vedere i dati e fare modifiche</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>
-                    <PersonInput multiple={true} value={data.referencePeople} setValue={setReferencePeople} />
+                    <SelectPeopleBlock
+                        people={data.referencePeople || []} setPeople={setReferencePeople}
+                        prefix="process/visits"
+                    />
                 </div>
             </InputRow>
             <InputRow label="Data arrivo" className="my-3">
