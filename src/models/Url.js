@@ -19,6 +19,7 @@ export default class Url extends Model {
             'alias': "alias",
             'destination': "destination",
             'owner': "owner",
+            'index': "indicizza",
             'updatedAt': "modificato",
         }
         this.ViewPage = UrlViewPage

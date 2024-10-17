@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
-import { InputRow, StringInput } from '../components/Input'
+import { InputRow, StringInput, BooleanInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -24,7 +24,7 @@ export default function Url() {
 
 function UrlForm({url}) {
     const [data, setData] = useState(url)
-    const modified = url.alias!==data.alias || url.destination!==data.destination
+    const modified = url.alias!==data.alias || url.destination!==data.destination || url.index!==data.index
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const addMessage = useEngine().addMessage
@@ -87,6 +87,9 @@ function UrlDetailsBlock({data, setData, active, done, edit}) {
         </InputRow>
         <InputRow label="destination" className="my-3">
             <StringInput value={data.destination} setValue={setter(setData,"destination")} />
+        </InputRow>
+        <InputRow label="indicizza" className="my-3">
+            <BooleanInput value={data.index} setValue={setter(setData,"index")} />
         </InputRow>
         </Card.Body>
     </Card>

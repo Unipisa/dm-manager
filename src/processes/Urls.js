@@ -43,6 +43,7 @@ function UrlList() {
                         <strong>alias</strong>: {url.alias}<br />
                         <strong>destination</strong>: {url.destination}<br />
                         <strong>owner</strong>: {url.owner}<br />
+                        <strong>indicizza</strong>: {url.index?"sì":"no"}<br />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        
                             {
                             <ConfirmDeleteButton className="ms-2 btn btn-danger" objectName={`l'alias ${url.alias}`} onConfirm={() => removeUrl(url._id)}>
