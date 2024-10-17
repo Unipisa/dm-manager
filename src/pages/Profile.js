@@ -79,8 +79,11 @@ export default function Profile() {
                     lastName: "Cognome",
                     username: "Username",
                     email: "Email",
-                    roles: "Ruoli"
+                    roles: "Permessi particolari",
                 }).map(([field, label]) => <FieldOutput key={field} label={label} field={field} Model={User} obj={user} editable={getUsers.data.editable_fields.includes(field)} />)}
+                <p>
+                    <strong>Permessi effettivi:</strong> { engine.user.roles.join(', ') }
+                </p>
             </Card.Body>
             <Card.Footer>
                 <p>

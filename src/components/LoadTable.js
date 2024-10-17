@@ -165,6 +165,8 @@ function displayField(obj, key, fieldsInfo={}) {
     } else if (xref) {
         return `${xref} not implemented`
     }
+    if (value === true) return '✓'
+    if (value === false) return '✗'
     if (typeof value === 'object') return JSON.stringify(value)
     return value
 }
