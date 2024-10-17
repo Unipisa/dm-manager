@@ -12,6 +12,19 @@ export default function ProcessUrls() {
             <button className="btn btn-primary my-3">Nuovo alias</button>
         </a>
         <UrlList/>
+        <hr />
+        <div>
+        <i>Chi può accedere a questa pagina?</i><br />
+        Questa pagina è accessibile a tutti gli utenti 
+        con permesso <i>/process/my/urls</i>. Tale permesso è automatico 
+        per gli utenti che hanno una delle seguenti qualifiche interne al dipartimento:
+        'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+        'Assegnista', 'Dottorando', 
+        'Professore Emerito',
+        'Collaboratore',
+        'Personale in quiescenza',
+        'PTA'.
+        </div>
     </>
 }
 
