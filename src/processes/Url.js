@@ -85,13 +85,13 @@ function UrlDetailsBlock({data, setData}) {
         <InputRow label="alias" className="my-3">
             <StringInput value={data.alias} setValue={setter(setData,'alias')} />
         </InputRow>
-        <InputRow label="destination" className="my-3">
+        <InputRow label="destinazione" className="my-3">
             <StringInput value={data.destination} setValue={setter(setData,"destination")} />
         </InputRow>
         <InputRow label="indicizza" className="my-3">
             <BooleanInput value={data.index} setValue={setter(setData,"index")} />
         </InputRow>
-        <InputRow label="title" className="my-3">
+        <InputRow label="titolo" className="my-3">
             <StringInput value={data.title} setValue={setter(setData,"title")} />
         </InputRow>
         </Card.Body>
