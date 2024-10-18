@@ -10,6 +10,7 @@ const urlSchema = new Schema({
     destination: { type: String, label: 'destination', required: true, default: "public_html"},
     index: { type: Boolean, label: 'indicizza', required: true, default: false}, 
     owner: { type: String, label: 'owner', required: true},
+    title: { type: String, label: 'title', required: true, default: ""},
     notes: {type: String, label: 'note', widget: 'text', default: ""},
     createdBy,
     updatedBy,

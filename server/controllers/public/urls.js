@@ -10,6 +10,7 @@ async function urlsQuery(req, res) {
             _id: 1, 
             alias: 1,
             destination: 1,
+            title: 1,
         }},
     ])
 

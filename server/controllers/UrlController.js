@@ -5,7 +5,7 @@ class UrlController extends Controller {
     constructor() {
         super(Url)
         this.path = 'url'
-        this.searchFields = [ 'url', 'ref' ]
+        this.searchFields = [ 'destination', 'alias', 'title', 'notes', 'owner' ]
         this.managerRoles.push('url-manager')
         this.supervisorRoles.push('url-manager', 'url-supervisor')
     }

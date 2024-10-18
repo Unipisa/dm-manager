@@ -24,7 +24,7 @@ export default function Url() {
 
 function UrlForm({url}) {
     const [data, setData] = useState(url)
-    const modified = url.alias!==data.alias || url.destination!==data.destination || url.index!==data.index
+    const modified = ["alias", "destination", "title", "index"].reduce((res, field) => res || url[field]!==data[field], false)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
     const addMessage = useEngine().addMessage
@@ -65,7 +65,7 @@ function UrlForm({url}) {
 
 }
 
-function UrlDetailsBlock({data, setData, active, done, edit}) {
+function UrlDetailsBlock({data, setData}) {
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
 
@@ -90,6 +90,9 @@ function UrlDetailsBlock({data, setData, active, done, edit}) {
         </InputRow>
         <InputRow label="indicizza" className="my-3">
             <BooleanInput value={data.index} setValue={setter(setData,"index")} />
+        </InputRow>
+        <InputRow label="title" className="my-3">
+            <StringInput value={data.title} setValue={setter(setData,"title")} />
         </InputRow>
         </Card.Body>
     </Card>
