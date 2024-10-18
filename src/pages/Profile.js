@@ -122,7 +122,6 @@ export default function Profile() {
                 </Card.Body>
                 <Card.Footer>
                     <p>
-                        Questi dati sono collegati al tuo utente tramite l'indirizzo email.
                         Se ci fossero errori nei dati che non puoi modificare autonomamente
                         puoi scrivere a <AdminEmail />.
                     </p>
