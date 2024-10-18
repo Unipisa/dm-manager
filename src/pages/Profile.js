@@ -1,4 +1,4 @@
-import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card } from 'react-bootstrap'
 import { useState } from "react"
 
 import { myDateFormat, useEngine } from "../Engine"
@@ -117,16 +117,7 @@ export default function Profile() {
                         about_it: "informazioni opzionali (in italiano) da pubblicare nella propria scheda personale",
                         about_en: "informazioni opzionali (in inglese) da pubblicare nella propria scheda personale",
                     }).map(([field, label]) => 
-                        field === "arxiv_orcid" 
-                        ? <div key={field} className="d-flex align-items-center">
-                            <FieldOutput label={label} field={field} Model={Person} obj={person} editable={getPeople.data.editable_fields.includes(field)} />
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="arxiv-tooltip">
-                                selezionare sì se il proprio profilo arXiv è stato associato al proprio profilo ORCID
-                            </Tooltip>}>
-                                <Button size="sm" style={{ marginLeft: '10px' }}>?</Button>
-                            </OverlayTrigger>
-                        </div>
-                        : <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={getPeople.data.editable_fields.includes(field)} />
+                        <FieldOutput key={field} label={label} field={field} Model={Person} obj={person} editable={getPeople.data.editable_fields.includes(field)} />
                 )}
                 </Card.Body>
                 <Card.Footer>
