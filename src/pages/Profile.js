@@ -39,10 +39,10 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
         </>
     }
 
-    return <p key={field}>
+    return <div key={field} className='mb-1 pt-1'>
         <strong>{label}: </strong>
         { Field() }
-    </p>
+    </div>
 }
 
 const adminEmail = 'help@dm.unipi.it'
