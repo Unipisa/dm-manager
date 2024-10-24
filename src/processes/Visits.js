@@ -39,31 +39,52 @@ export default function ProcessVisits({variant}) {
     </>
 }
 
-function Rooms({variant, id}) {
+function RoomsAndSeminars({variant, id}) {
     const path = `process/${variant||''}visits/${id}`
     const query = useQuery(path.split('/'))
+
     if (query.isLoading) return <Loading />
     if (query.isError) return <div>Errore caricamento: {query.error.response.data?.error || `${query.error}`}</div>
     if (!query.data) return <div>No data available</div>;
 
     let visit = {...query.data}
 
-    if (! visit.requireRoom) return <div>
-        <strong>Ufficio</strong>: non richiesto
-    </div>
-    else if (visit.roomAssignments?.length > 0) return visit.roomAssignments.map(r => 
-        <div key={r._id}>
-            <strong>Ufficio</strong>: 
-            edificio {r.room.building}, {r.room.floor === '0' ? 'piano terra' : 
-            r.room.floor === '1' ? 'primo piano' : 
-            r.room.floor === '2' ? 'secondo piano' : 
-            'piano ' + r.room.floor}, 
-            ufficio {r.room.number},
-            dal {myDateFormat(r.startDate)} al {myDateFormat(r.endDate)}
-        </div>)
-    else return <div>
-        <strong>Ufficio</strong>: da assegnare
-    </div>
+    let roomAssignments;
+    if (visit.requireRoom) {
+        if (visit.roomAssignments?.length > 0) {
+            roomAssignments = visit.roomAssignments.map(r => (
+                <div key={r._id}>
+                    <strong>Ufficio</strong>: 
+                    edificio {r.room.building}, {r.room.floor === '0' ? 'piano terra' : 
+                    r.room.floor === '1' ? 'primo piano' : 
+                    r.room.floor === '2' ? 'secondo piano' : 
+                    'piano ' + r.room.floor}, 
+                    ufficio {r.room.number},
+                    dal {myDateFormat(r.startDate)} al {myDateFormat(r.endDate)}
+                </div>
+            ));
+        } else {
+            roomAssignments = <div><strong>Ufficio</strong>: da assegnare</div>;
+        }
+    } else {
+        roomAssignments = <div><strong>Ufficio</strong>: non richiesto</div>;
+    }
+
+    let seminars;
+    if (visit.requireSeminar && visit.seminars && visit.seminars.length > 0 ) {
+        seminars = (
+        <div>
+            <strong>{visit.seminars.length > 1 ? "Seminari" : "Seminario"}</strong>: {visit.seminars.map(seminar => seminar.title).join(", ")}
+        </div>
+        )
+    }
+
+    return (
+        <div>
+            {roomAssignments}
+            {seminars}
+        </div>
+    )
 }
 
 function VisitList({variant}) {
@@ -95,16 +116,16 @@ function VisitList({variant}) {
                         {/*JSON.stringify(visit)*/}
                         <strong>Visitatore</strong>: {visit.person.firstName} { visit.person.lastName } ({visit.affiliations.map(x => x.name).join(", ")})<br />
                         {variant === '' && visit.referencePeople.length > 0 && (
-                                <>
-                                    <strong>{visit.referencePeople.length > 1 ? "Referenti" : "Referente"}</strong>: { 
-                                    visit.referencePeople.map(p => (
-                                        `${p.firstName} ${p.lastName}`
-                                    )).join(", ")}
-                                    <br />
-                                </>
-                            )}
+                            <>
+                                <strong>{visit.referencePeople.length > 1 ? "Referenti" : "Referente"}</strong>: { 
+                                visit.referencePeople.map(p => (
+                                    `${p.firstName} ${p.lastName}`
+                                )).join(", ")}
+                                <br />
+                            </>
+                        )}
                         <strong>Periodo</strong>: {myDateFormat(visit.startDate)} – {myDateFormat(visit.endDate)}<br />
-                        <Rooms variant={variant} id={visit._id} />
+                        <RoomsAndSeminars variant={variant} id={visit._id} />
                         <div className="mt-2 d-flex flex-row justify-content-end">                        
                             {
                             <ConfirmDeleteButton className="ms-2 btn btn-danger" objectName={`la visita di ${visit.person.firstName} ${visit.person.lastName}`} onConfirm={() => removeVisit(visit._id)}>

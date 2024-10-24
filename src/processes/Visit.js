@@ -42,8 +42,8 @@ function VisitForm({visit, variant}) {
     const queryClient = useQueryClient()
     const [activeSection, setActiveSection] = useState(visit ? 'data' : '')
     const [seminar, setSeminar] = useState(null)
+    const [existingSeminars, setExistingSeminars] = useState(() => data.seminars || []);
     const user = useEngine().user
-    const seminars = visit.seminars
     const roomAssignments = visit.roomAssignments
     const canCreateSeminar = user.hasProcessPermission('/process/seminars')
     const addMessage = useEngine().addMessage
@@ -53,12 +53,13 @@ function VisitForm({visit, variant}) {
             ? "Modifica visita inserita"
             : "Inserimento nuova visita"}</h1>
         <VisitDetailsBlock
-            data={data} 
+            data={data}
             setData={setData} 
             active={activeSection==='data'} 
             done={() => {save();nextStep()}} 
             edit={() => setActiveSection('data')}
             variant={variant}
+            fetchSeminars={fetchSeminars}
         />
         { (data.requireRoom || roomAssignments?.length>0)  &&
             <RoomAssignments 
@@ -72,22 +73,9 @@ function VisitForm({visit, variant}) {
                 onChange={save /* save visit to force notification */} 
             />
         }
-        {   // mostra i seminari già inseriti
-            seminars &&
-            seminars.map(seminar => <div key={seminar._id}>
-            <Seminar seminar={seminar} 
-                active={activeSection===seminar._id} 
-                change={() => setActiveSection(seminar._id)}
-                done={() => {
-                    setActiveSection('')
-                    save() // save visit to force notification
-                }}
-                variant={variant}
-                />
-        </div>)}
         {   // mostra il pulsante per inserire un nuovo seminario
-            (!seminars || seminars.length === 0) && data.requireSeminar && !seminar && canCreateSeminar &&
-            <Card className="shadow">
+            data.requireSeminar && !seminar && canCreateSeminar &&
+            <Card className="shadow mb-3">
                 <Card.Header>
                 <div className="d-flex d-row justify-content-between align-items-center">
                         <div>
@@ -101,8 +89,22 @@ function VisitForm({visit, variant}) {
                     </div>  
                 </Card.Header>
                 <Card.Body>
-                    { errorVisit() && <div className="text-danger">{errorVisit()}</div>}
-                    <i>nessun seminario inserito nel periodo della visita</i>
+                    { errorVisit() ? (
+                        <div className="text-danger">{errorVisit()}</div>
+                    ) : (
+                        <>
+                            { existingSeminars.length > 0 ? (
+                                <div className="text-warning">
+                                    { existingSeminars.length === 1 
+                                        ? "C'è già un seminario inserito nel periodo della visita. Per inserire comunque un nuovo seminario premere il pulsante 'Inserisci seminario'"
+                                        : "Ci sono già seminari inseriti nel periodo della visita. Per inserire comunque un nuovo seminario premere il pulsante 'Inserisci seminario'"
+                                    }
+                                </div>
+                            ) : (
+                                <i>Per inserire un seminario per il visitatore premere il pulsante 'Inserisci seminario'</i>
+                            )}
+                        </>
+                    )}
                 </Card.Body>
             </Card>
         }
@@ -113,10 +115,43 @@ function VisitForm({visit, variant}) {
                 done={() => {
                     setActiveSection('');
                     setSeminar(null);
-                    save() // save visit to force notification
+                    save(); // save visit to force notification
+                    fetchSeminars(data);
                 }}
                 variant={variant}
                 />
+        }
+        {   // mostra i seminari già inseriti
+            data.requireSeminar && data.startDate && data.endDate && data.person?._id && 
+            <Card className="shadow mb-3">
+                <Card.Header>Seminari già inseriti</Card.Header>
+                <Card.Body>
+                    {(() => {
+                        return existingSeminars.length ? (
+                            <>
+                                <div className="mb-2">
+                                    <i>I seguenti seminari sono stati già inseriti per il visitatore nel periodo selezionato:</i>
+                                </div>
+                                {existingSeminars.map(seminar => (
+                                    <div key={seminar._id} className="mb-2">
+                                        <Seminar seminar={seminar} 
+                                        active={activeSection===seminar._id} 
+                                        change={() => setActiveSection(seminar._id)}
+                                        done={() => {
+                                            setActiveSection('')
+                                            save() // save visit to force notification
+                                        }}
+                                        variant={variant}
+                                        />
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <i>Nessun seminario trovato nel periodo selezionato</i>
+                        )
+                    })()}
+                </Card.Body>
+            </Card>
         }
         <Button className="mt-3" onClick={completed}>
             Indietro
@@ -142,6 +177,19 @@ function VisitForm({visit, variant}) {
         }[section]
         setActiveSection(section)
         console.log(`nextStep: ${section}`)
+    }
+
+    function fetchSeminars(newData) {
+        const queryParams = {
+            startDate: new Date(newData.startDate).toISOString().split('T')[0],
+            endDate: new Date(newData.endDate).toISOString().split('T')[0]
+        }
+        
+        api.get(`/api/v0/process/visits/seminars/${data.person._id}`, queryParams).then(res => {
+            setExistingSeminars(res.data || [])
+        }).catch(err => {
+            addMessage(`Error fetching seminars: ${err}`)
+        })
     }
     
     async function save() {
@@ -169,7 +217,7 @@ function VisitForm({visit, variant}) {
     }
 }
 
-function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
+function VisitDetailsBlock({data, setData, active, done, edit, variant, fetchSeminars}) {
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
 
@@ -186,7 +234,7 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
         </Card.Header>
         <Card.Body>
         { active 
-        ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} variant={variant}/>
+        ? <ActiveVisitDetailsBlock data={data} setData={setData} done={done} variant={variant} fetchSeminars={fetchSeminars}/>
         : <>
             visitatore: <b>{data.person.firstName} {data.person.lastName} ({data.person.affiliations.map(a=>a.name).join(', ')}) {data.person.email}</b>
             {data.referencePeople.map(person => <div key={person._id}>referente: <b>{person.firstName} {person.lastName}</b> &lt;<a href={`mailto:${person.email}`}>{person.email}</a>&gt;<br/></div>)}
@@ -211,7 +259,7 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant}) {
     </Card>
 }
 
-function ActiveVisitDetailsBlock({data, setData, done, variant}) {
+function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) {
     return <>
         <Form autoComplete="off">
             <InputRow label="Visitatore" className="my-3">
@@ -241,7 +289,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
                 <DateInput value={data.startDate} setValue={startDateSetter}/>
             </InputRow>
             <InputRow label="Data partenza" className="my-3">
-                <DateInput value={data.endDate} setValue={setter(setData, "endDate")} defaultDate={data.startDate}/>
+            <DateInput value={data.endDate} setValue={endDateSetter} defaultDate={data.startDate}/>
             </InputRow>    
             <InputRow label="SSD" className="my-3">
                 <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
@@ -289,10 +337,21 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             <InputRow className="my-3" label="Seminario">
                 <div className="d-flex align-items-center">
                     <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se un seminario per lo speaker è stato già inserito apparirà solo dopo aver salvato la visita</Tooltip>}>
+                        Se un seminario per lo speaker nel periodo della visita è stato già inserito apparirà sotto</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>  
-                    <input type="checkbox" checked={data.requireSeminar} onChange={e => setData({...data, requireSeminar: e.target.checked})} style={{marginRight: '5px'}}/>
+                    <input 
+                        type="checkbox" 
+                        checked={data.requireSeminar} 
+                        onChange={e => {
+                            const newData = {...data, requireSeminar: e.target.checked}
+                            setData(newData)
+                            if (e.target.checked && newData.startDate && newData.endDate && newData.person?._id) {
+                                fetchSeminars(newData)
+                            }
+                        }} 
+                        style={{marginRight: '5px'}}
+                    />
                     {} È previsto un seminario
                 </div>
             </InputRow>
@@ -308,14 +367,31 @@ function ActiveVisitDetailsBlock({data, setData, done, variant}) {
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
-            <Button className="text-end" onClick={done} disabled={error()}>Salva</Button>       </div>
+            <Button className="text-end" onClick={done} disabled={error()}>Salva</Button>       
+        </div>
         { error() && <div className="text-danger">{error()}</div>}
     </>
 
+    function handleDataChange(newData) {
+        setData(newData)
+        if (newData.startDate && newData.endDate && newData.person?._id && newData.requireSeminar) {            
+            fetchSeminars(newData)
+        }
+    }
+
     function startDateSetter(value) {
-        setData(data => {
-            const endDate = data.endDate || value
-            return ({...data, startDate: value, endDate})
+        const endDate = data.endDate || value
+        handleDataChange({
+            ...data,
+            startDate: value,
+            endDate
+        })
+    }
+
+    function endDateSetter(value) {
+        handleDataChange({
+            ...data,
+            endDate: value
         })
     }
 

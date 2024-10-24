@@ -543,6 +543,75 @@ router.get('/:id', async (req, res) => {
     res.json(data[0])
 })
 
+router.get('/seminars/:personId', async (req, res) => {
+    if (!req.user) {
+        return res.status(401).json({ result: "Unauthorized" });
+    }
+
+    const { startDate, endDate } = req.query;
+    if (!startDate || !endDate) {
+        return res.status(400).json({ error: "startDate and endDate are required" });
+    }
+
+    const seminars = await EventSeminar.aggregate([
+        {
+            $match: {
+                speakers: new ObjectId(req.params.personId),
+                $expr: {
+                    $and: [
+                        {
+                            $or: [
+                                { $eq: [new Date(endDate), null] },
+                                { $eq: ["$startDatetime", null] },
+                                { $lte: ["$startDatetime", new Date(endDate)] }
+                            ]
+                        },
+                        {
+                            $or: [
+                                { $eq: [new Date(startDate), null] },
+                                { $eq: ["$startDatetime", null] },
+                                { $gte: ["$startDatetime", new Date(startDate)] }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {$lookup: {
+            from: 'people',
+            localField: 'speakers',
+            foreignField: '_id',
+            as: 'speakers',
+            pipeline: [
+                {$project: {
+                    _id: 1,
+                    firstName: 1,
+                    lastName: 1,
+                    affiliations: 1,
+                    email: 1,
+                }},
+                {
+                    $lookup: {
+                        from: 'institutions',
+                        localField: 'affiliations',
+                        foreignField: '_id',
+                        as: 'affiliations',
+                        pipeline: [
+                            {$project: {
+                                _id: 1,
+                                name: 1,
+                            }}
+                        ]
+                    }
+                }
+            ]
+        }},
+        {$sort: {"startDatetime": 1}}
+    ]);
+
+    res.json({ data: seminars });
+});
+
 // TODO: should be "post" instead of "put"
 router.put('/', async (req, res) => {
     const payload = {...req.body}

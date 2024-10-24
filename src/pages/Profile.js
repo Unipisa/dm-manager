@@ -118,7 +118,7 @@ export default function Profile() {
                         about_en: "informazioni opzionali (in inglese) da pubblicare nella propria scheda personale",
                     }).map(([field, label]) => 
                         field === "arxiv_orcid" 
-                        ? <div key={field} className="d-flex align-items-center">
+                        ? <div key={field} className="d-flex align-items-top">
                             <FieldOutput label={label} field={field} Model={Person} obj={person} editable={getPeople.data.editable_fields.includes(field)} />
                             <OverlayTrigger placement="left" overlay={<Tooltip id="arxiv-tooltip">
                                 selezionare sì se il proprio profilo arXiv è stato associato al proprio profilo ORCID
