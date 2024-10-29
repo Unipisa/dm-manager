@@ -9,6 +9,7 @@ const Staff = require('../../models/Staff')
 const Institution = require('../../models/Institution')
 const Seminar = require('../../models/EventSeminar')
 const Event = require('../../models/EventConference')
+const Visit = require('../../models/Visit')
 
 router.get('/', async (req, res) => {    
     if (req.user === undefined || !req.user.roles.includes('admin')) {
@@ -121,6 +122,25 @@ router.get('/', async (req, res) => {
                     { country: { $regex: /\s+$/, $options: "s" } },
                     { city: { $regex: /\s+$/, $options: "s" } },
                     { code: { $regex: /\s+$/, $options: "s" } }
+                ]
+            }
+        }
+    ]);
+
+    const seminarsTBA = await Seminar.aggregate([
+        {
+            $match: {
+                $expr: { $lt: [{ $strLenCP: { $ifNull: ["$title", ""] } }, 5] } 
+            }
+        }
+    ]);
+
+    const visitsTBD = await Visit.aggregate([
+        {
+            $match: {
+                $and: [
+                    { $expr: { $lt: [{ $strLenCP: { $ifNull: ["$collaborationTheme", ""] } }, 5] } },
+                    { collaborationTheme: { $exists: true } }
                 ]
             }
         }
@@ -299,7 +319,19 @@ router.get('/', async (req, res) => {
         }
     ])
 
-    return res.json({duplicatedNames, personsWithTrailingSpaces, institutionsWithTrailingSpaces, duplicatedEmails, missingMatricola, missingSSD, missingInstitutionCountry, duplicatedInstitutions, duplicatedSeminars, duplicatedEvents})
+    return res.json({
+        duplicatedNames, 
+        personsWithTrailingSpaces, 
+        institutionsWithTrailingSpaces, 
+        duplicatedEmails, 
+        missingMatricola, 
+        missingSSD, 
+        missingInstitutionCountry,
+        duplicatedInstitutions, 
+        duplicatedSeminars, 
+        duplicatedEvents, 
+        seminarsTBA,
+        visitsTBD})
 })
 
 module.exports = router

@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import { SelectPersonBlock, SelectPeopleBlock } from './SelectPeopleBlock'
-import { GrantInput, InputRow, DateInput, TextInput, SelectInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, StringInput, TextInput, SelectInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -241,6 +241,8 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant, fetchSem
             <br />
             periodo: <b>{myDateFormat(data.startDate)} – {myDateFormat(data.endDate)}</b>
             <br />
+            tema: <b>{data.collaborationTheme}</b>
+            <br />
             SSD: <b>{data.SSD}</b>
             <br />
             grants: {data?.grants?.length ? data.grants.map(grant => <span key={grant._id}><b>{grant.identifier}</b>&nbsp;</span>) : <i>nessun grant utilizzato</i>}
@@ -291,6 +293,16 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
             <InputRow label="Data partenza" className="my-3">
             <DateInput value={data.endDate} setValue={endDateSetter} defaultDate={data.startDate}/>
             </InputRow>    
+            <InputRow label="Tema collaborazione" className="my-3" l>
+                <div className="d-flex align-items-start">
+                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                        Indicare il tema della collaborazione da inserire nella lettera di incarico che Francesca dovrà scrivere. 
+                        Se il tema non è ancora definito inserire 'TBD' e aggiungere successivamente.</Tooltip>}>
+                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                    </OverlayTrigger>
+                    <StringInput value={data.collaborationTheme} setValue={setter(setData, "collaborationTheme")}/>
+                </div>
+            </InputRow>
             <InputRow label="SSD" className="my-3">
                 <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
             </InputRow>
@@ -358,8 +370,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
             <InputRow className="my-3" label="Note">
                 <div className="d-flex align-items-start">
                     <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                    Si consiglia di utilizzare le note per scrivere tutte le info rilevanti per Francesca, in particolare si suggerisce di utilizzare le note 
-                    per indicare il "tema della collaborazione" da inserire nella lettera di incarico che Francesca dovrà scrivere</Tooltip>}>
+                    Si consiglia di utilizzare le note per scrivere tutte le info rilevanti per Francesca</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>
                     <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
@@ -399,6 +410,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
         if (!data.startDate) return "Data di arrivo non inserita"
         if (!data.endDate) return "Data di partenza non inserita"
         if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
+        if (!data.collaborationTheme) return "Tema della collaborazione non inserito (scrivere 'TBD' se non ancora definito e aggiungere successivamente)"
     }
 
     function setReferencePeople(people) {

@@ -384,6 +384,7 @@ async function notifyVisit(visit_id, message) {
     const startDate = visit.startDate.toLocaleDateString('it-IT')
     const endDate = visit.endDate.toLocaleDateString('it-IT')
     const notes = visit.notes
+    const collaborationTheme = visit.collaborationTheme
     const universityFunded = visit.universityFunded ? 'sì' : 'no'
     let text =  message || ''
 
@@ -394,6 +395,7 @@ Visitatore/trice: ${person.firstName} ${person.lastName}
 Affiliazione/i: ${affiliations}
 Grant(s) utilizzato/i: ${grants}
 Utilizzo di fondi di Ateneo: ${universityFunded}
+Tema della collaborazione: ${collaborationTheme}
 Albergo di cui si richiede la prenotazione di una camera: ${visit.requireHotel}
 Richiesta di una postazione in un ufficio di Dipartimento: ${visit.requireRoom ? 'sì' : 'no'}
 È previsto un seminario: ${visit.requireSeminar ? 'sì' : 'no'}

@@ -106,6 +106,24 @@ export default function SanityCheck() {
                 )}
             />
             <CheckCard
+                title="Seminars TBA"
+                data={data.seminarsTBA}
+                renderRow={(item) => (
+                    <td>
+                        <a className="btn" href={`/event-seminar/${item._id}`}>{item.title}</a>
+                    </td>
+                )}
+            />
+            <CheckCard
+                title="Visits TBD"
+                data={data.visitsTBD}
+                renderRow={(item) => (
+                    <td>
+                        <a className="btn" href={`/visit/${item._id}`}>{item.collaborationTheme}</a>
+                    </td>
+                )}
+            />
+            <CheckCard
                 title="Person with trailing spaces"
                 data={data.personsWithTrailingSpaces}
                 renderRow={(item, i) => RenderCheckSingleItem(item, i, '/person')}

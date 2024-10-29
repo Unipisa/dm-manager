@@ -14,6 +14,7 @@ const visitSchema = new Schema({
     affiliations: [{ type: ObjectId, label: 'affiliazioni al tempo della visita', ref: 'Institution' }],
     startDate,
     endDate,
+    collaborationTheme: { type: String, label: 'tema della collaborazione', default: ''},
     requireRoom: { type: Boolean, label: 'richiede stanza', default: false },
     requireSeminar: { type: Boolean, label: 'richiede seminario', default: false },
     requireHotel: { type: String, label: 'albergo', default: ''},
