@@ -297,7 +297,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
                 <div className="d-flex align-items-start">
                     <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
                         Indicare il tema della collaborazione da inserire nella lettera di incarico che Francesca dovrà scrivere. 
-                        Se il tema non è ancora definito inserire 'TBD' e aggiungere successivamente.</Tooltip>}>
+                        Se il tema non è ancora definito inserire 'TBA' e aggiungere successivamente.</Tooltip>}>
                         <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                     </OverlayTrigger>
                     <StringInput value={data.collaborationTheme} setValue={setter(setData, "collaborationTheme")}/>
@@ -410,7 +410,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
         if (!data.startDate) return "Data di arrivo non inserita"
         if (!data.endDate) return "Data di partenza non inserita"
         if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
-        if (!data.collaborationTheme) return "Tema della collaborazione non inserito (scrivere 'TBD' se non ancora definito e aggiungere successivamente)"
+        if (!data.collaborationTheme) return "Tema della collaborazione non inserito (scrivere 'TBA' se non ancora definito e aggiungere successivamente)"
     }
 
     function setReferencePeople(people) {
