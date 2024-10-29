@@ -82,7 +82,8 @@ router.get('/', async (req, res) => {
                     { SSD: "" } 
                 ],
                 startDate: { $lt: new Date() },
-                qualification: { $ne: 'PTA' }
+                qualification: { $ne: 'PTA' },
+                matricola: { $ne: 'a060136'} // handle Jonathan Lindsay Kay (Inglese scientifico)
             }
         }
     ])
@@ -135,7 +136,7 @@ router.get('/', async (req, res) => {
         }
     ]);
 
-    const visitsTBD = await Visit.aggregate([
+    const visitsTBA = await Visit.aggregate([
         {
             $match: {
                 $and: [
@@ -331,7 +332,7 @@ router.get('/', async (req, res) => {
         duplicatedSeminars, 
         duplicatedEvents, 
         seminarsTBA,
-        visitsTBD})
+        visitsTBA})
 })
 
 module.exports = router

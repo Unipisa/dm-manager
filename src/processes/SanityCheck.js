@@ -115,8 +115,8 @@ export default function SanityCheck() {
                 )}
             />
             <CheckCard
-                title="Visits TBD"
-                data={data.visitsTBD}
+                title="Visits TBA"
+                data={data.visitsTBA}
                 renderRow={(item) => (
                     <td>
                         <a className="btn" href={`/visit/${item._id}`}>{item.collaborationTheme}</a>

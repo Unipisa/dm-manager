@@ -4,6 +4,7 @@ const { setupDatabase } = require('./database')
 const { sendEmail, setupSMTPAccount } = require('./email')
 const Notification = require('./models/Notification')
 const Visit = require('./models/Visit')
+const Seminar = require('./models/EventSeminar')
 const User = require('./models/User')
 const config = require('./config')
 var cron = require('node-cron');
@@ -229,6 +230,249 @@ ${changesList}
         await sendEmail(emails, [], today.getDay() === 5 ? 'Persone in arrivo e nuove assegnazioni di postazioni in Dipartimento' : 'Nuove assegnazioni di postazioni in Dipartimento', emailBody);
 }
 
+async function notificaTBA() {
+    console.log("=> Notifica per visite e seminari TBA")
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    // Create dates for 1, 5, and 10 days in the future
+    const dates = [1, 5, 10].map(days => {
+        const date = new Date(today)
+        date.setDate(today.getDate() + days)
+        return date
+    })
+
+    // Build pipeline for visits
+    const visit_pipeline = [
+        {
+            $match: {
+                startDate: { $in: dates },
+                collaborationTheme: "TBA"
+            }
+        },
+        {
+            $lookup: {
+                from: 'people',
+                localField: 'person',
+                foreignField: '_id',
+                as: 'person',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            firstName: 1,
+                            lastName: 1,
+                            email: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $unwind: {
+                path: '$person',
+                preserveNullAndEmptyArrays: true
+            }
+        },
+        {
+            $lookup: {
+                from: 'people',
+                localField: 'referencePeople',
+                foreignField: '_id',
+                as: 'referencePeople',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            firstName: 1,
+                            lastName: 1,
+                            email: 1
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: 'institutions',
+                localField: 'affiliations',
+                foreignField: '_id',
+                as: 'affiliations',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            name: 1
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+
+    // Build pipeline for seminars
+    const seminar_pipeline = [
+        {
+            $match: {
+                $expr: {
+                    $and: [
+                        { $in: [{ $dateToString: { format: "%Y-%m-%d", date: "$startDatetime" } }, dates.map(date => date.toISOString().split('T')[0])] },
+                        { $eq: ["$title", "TBA"] }
+                    ]
+                }
+            }
+        },
+        {
+            $lookup: {
+                from: 'people',
+                localField: 'speakers',
+                foreignField: '_id',
+                as: 'speakers',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            firstName: 1,
+                            lastName: 1,
+                            email: 1,
+                            affiliations: 1
+                        }
+                    },
+                    {
+                        $lookup: {
+                            from: 'institutions',
+                            localField: 'affiliations',
+                            foreignField: '_id',
+                            as: 'affiliations',
+                            pipeline: [
+                                {
+                                    $project: {
+                                        _id: 1,
+                                        name: 1
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        {
+            $lookup: {
+                from: 'people',
+                localField: 'organizers',
+                foreignField: '_id',
+                as: 'organizers',
+                pipeline: [
+                    {
+                        $project: {
+                            _id: 1,
+                            firstName: 1,
+                            lastName: 1,
+                            email: 1
+                        }
+                    }
+                ]
+            }
+        }
+    ]
+
+    // Get both visits and seminars
+    const [visits, seminars] = await Promise.all([
+        Visit.aggregate(visit_pipeline),
+        Seminar.aggregate(seminar_pipeline)
+    ])
+
+    if (visits.length === 0 && seminars.length === 0) {
+        return
+    }
+    
+    let emailBody = `Si prega di aggiornare le seguenti informazioni il prima possibile.\n\n`
+
+    if (visits.length > 0) {
+        const visitsList = visits.map(visit => {
+            const daysUntilVisit = Math.round((visit.startDate - today) / (1000 * 60 * 60 * 24))
+            
+            let text = daysUntilVisit === 1 
+                ? `Visita tra ${daysUntilVisit} giorno:\n` 
+                : `Visita tra ${daysUntilVisit} giorni:\n`;
+            text += `Visitatore: ${visit.person.firstName} ${visit.person.lastName} (${visit.person.email || 'no email'})\n`
+            
+            const affiliations = visit.affiliations.map(a => a.name).join(", ")
+            text += `Affiliazione: ${affiliations || 'Non specificata'}\n`
+            
+            text += `Periodo: dal ${visit.startDate.toLocaleDateString('it-IT')} al ${visit.endDate.toLocaleDateString('it-IT')}\n`
+            
+            const references = visit.referencePeople.map(ref => 
+                `${ref.firstName} ${ref.lastName} (${ref.email || 'no email'})`
+            ).join(", ")
+            text += `Referenti: ${references}\n`
+            
+            return text
+        }).join("\n\n")
+
+        emailBody += `
+Le seguenti visite sono programmate nei prossimi giorni ma hanno ancora il tema della collaborazione da definire (TBA):
+
+${visitsList}\n\n`
+    }
+
+    if (seminars.length > 0) {
+        const seminarsList = seminars.map(seminar => {
+            const daysUntilSeminar = Math.round((seminar.startDatetime - today) / (1000 * 60 * 60 * 24))
+            
+            let text = daysUntilSeminar === 1 
+                ? `Seminario tra ${daysUntilSeminar} giorno:\n` 
+                : `Seminario tra ${daysUntilSeminar} giorni:\n`;
+            
+            const speakers = seminar.speakers.map(speaker => {
+                const affiliation = speaker.affiliations.map(a => a.name).join(", ")
+                return `${speaker.firstName} ${speaker.lastName}${affiliation ? ` (${affiliation})` : ''}`
+            }).join(", ")
+            text += `Speaker: ${speakers}\n`
+            
+            text += `Data: ${seminar.startDatetime.toLocaleString('it-IT')}\n`
+            
+            const organizers = seminar.organizers.map(org => 
+                `${org.firstName} ${org.lastName} (${org.email || 'no email'})`
+            ).join(", ")
+            text += `Organizzatori: ${organizers}\n`
+            
+            return text
+        }).join("\n\n")
+
+        emailBody += `
+I seguenti seminari sono programmati nei prossimi giorni ma hanno ancora il titolo da definire (TBA):
+
+${seminarsList}`
+    }
+
+    // Send the email
+    const channelEmails = await getEmailsForChannel('process/visits')
+    const referenceEmails = visits.flatMap(visit => 
+        visit.referencePeople
+            .filter(person => person.email)
+            .map(person => person.email)
+    )
+    const organizerEmails = seminars.flatMap(seminar =>
+        seminar.organizers
+            .filter(person => person.email)
+            .map(person => person.email)
+    )
+    const emails = [...new Set([...channelEmails, ...referenceEmails, ...organizerEmails])]
+
+
+    if (emails.length > 0) {
+        await sendEmail(
+            emails, 
+            [], 
+            'Visite e seminari da definire', 
+            emailBody
+        )
+    }
+}
+
 async function getEmailsForChannel(channel) {
     if (! channel) {
         console.log("Warning: empty channel in getEmailsForChannel(); ignoring")
@@ -294,7 +538,9 @@ async function mainloop() {
 
         // Setup cron schedule
         scheduleCronJob('0 6 * * *', notificaPortineria);
-        if (false) notificaPortineria() // for testing 
+        scheduleCronJob('0 6 * * *', notificaTBA);
+        if (false) notificaPortineria() // for testing
+        if (false) notificaTBA() // for testing
 
         setInterval(handleNotifications, 30000); // 30 seconds
     } catch (error) {
@@ -303,4 +549,3 @@ async function mainloop() {
 }
 
 mainloop()
-
