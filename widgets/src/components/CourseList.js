@@ -6,7 +6,7 @@ import remarkMath from 'remark-math'
 import axios from 'axios'
 import Accordion from './Accordion';
 import { Loading } from './Loading'
-import { formatAffiliations, formatDate, getManageURL, getDMURL } from '../utils'
+import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL } from '../utils'
 
 export function CourseList({ from, to }) {
     if (from === undefined || to === undefined) {
@@ -87,7 +87,7 @@ export function CourseList({ from, to }) {
                     <ul>
                         {course.lessons.map((lesson, index) => (
                             <li key={index}>
-                                {formatDate(lesson.date, 'en-US')} ({lesson.duration} minutes), {lesson.conferenceRoom}
+                                {formatDate(lesson.date, 'en-US')}, {formatTime(lesson.date)} ({lesson.duration} minutes), {lesson.conferenceRoom}
                             </li>
                         ))}
                     </ul>
