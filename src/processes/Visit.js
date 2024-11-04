@@ -284,7 +284,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
                     </OverlayTrigger>
                     <SelectPeopleBlock
                         people={data.referencePeople || []} setPeople={setReferencePeople}
-                        prefix="process/visits"
+                        prefix={`process/${variant}visits`}
                     />
                 </div>
             </InputRow>
