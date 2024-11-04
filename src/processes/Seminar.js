@@ -124,6 +124,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
         if (!data.startDatetime) return "Inserire la data di inizio del seminario"
         if (!data.duration || data.duration <= 0) return "Inserire la durata del seminario"
         if (!data.conferenceRoom) return "Inserire l'aula in cui si svolge il seminario"
+        if (data.organizers.length === 0) return "Inserire almeno un organizzatore per il seminario"
         return ""
     })()
 

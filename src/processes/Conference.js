@@ -103,10 +103,11 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
     const isAdmin = user.roles && user.roles.includes('admin')
 
     const requirement = (()=>{
-        if (!data.title || typeof data.title !== 'string' || data.title.trim() === "") return "inserisci il titolo"
-        if (!data.startDate) return "inserisci la data di inizio"
-        if (!data.endDate) return "inserisci la data di fine"
+        if (!data.title || typeof data.title !== 'string' || data.title.trim() === "") return "Inserire il titolo del convegno"
+        if (!data.startDate) return "Inserire la data di inizio del convegno"
+        if (!data.endDate) return "Inserire la data di fine del convegno"
         if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
+        if (data.organizers.length === 0) return "Inserire almeno un organizzatore per il convegno"
         return ""
     })()
 

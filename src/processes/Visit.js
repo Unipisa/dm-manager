@@ -164,7 +164,8 @@ function VisitForm({visit, variant}) {
     }
 
     function errorVisit() {
-        if (!data.startDate || !data.endDate || new Date(data.startDate) > new Date(data.endDate)) {
+        if (!data.startDate || !data.endDate || new Date(data.startDate) > new Date(data.endDate)
+            || data.referencePeople.length === 0 ) {
             return "Prima di poter inserire un seminario terminare di inserire i dati necessari della visita"
         }
     }
@@ -411,6 +412,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
         if (!data.endDate) return "Data di partenza non inserita"
         if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
         if (!data.collaborationTheme) return "Tema della collaborazione non inserito (scrivere 'TBA' se non ancora definito e aggiungere successivamente)"
+        if (data.referencePeople.length === 0) return "Inserire almeno un referente per la visita"
     }
 
     function setReferencePeople(people) {
