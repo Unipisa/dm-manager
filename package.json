@@ -80,6 +80,7 @@
     "react-router-dom": "^6.3.0",
     "react-to-print": "^2.14.7",
     "rehype-katex": "^7.0.0",
+    "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",
     "resolve": "^1.20.0",
     "resolve-url-loader": "^4.0.0",

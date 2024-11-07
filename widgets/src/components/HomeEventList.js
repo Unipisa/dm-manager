@@ -5,6 +5,7 @@ import axios from 'axios';
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
+import remarkGfm from 'remark-gfm';
 import { Loading } from './Loading';
 import {
   formatDateInterval,
@@ -192,7 +193,7 @@ function EventBox({ event }) {
         <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name || event.institution?.name}</div>
         <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>
         <div className="excerpt_style">
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+            <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
                 {truncateTextByWords(event.abstract ? event.abstract : event.description, 30)}
             </Markdown>
         </div>
