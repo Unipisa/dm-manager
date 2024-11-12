@@ -2,6 +2,7 @@ import {useState,useRef} from 'react'
 import {Table, Button, ButtonGroup} from 'react-bootstrap'
 import ReactToPrint from 'react-to-print'
 import { useQuery, useQueryClient } from 'react-query'
+import { myDateFormat } from '../Engine'
 
 import {useEngine} from '../Engine'
 import api from '../api'
@@ -111,7 +112,7 @@ function Display({roomLabel, onSave}) {
     </>
 }
 
-function RoomsTable({onClick, onDone, onDelete, data}) {
+function RoomsTable({onClick, onDone, onDelete, data, columns=['number','names','createdBy']}) {
     const engine = useEngine()
     // visibility of manager elements
     const visibility = (onDone || onDelete) &&  engine.user.hasSomeRole('admin', '/process/roomLabels', 'room-manager') ? "visible" : "hidden"
@@ -121,31 +122,43 @@ function RoomsTable({onClick, onDone, onDelete, data}) {
     return <Table hover>
         <thead>
             <tr>
-                <th>stanza</th>
-                <th>nomi</th>
-                <th>richiesto da</th>
-                <th style={{visibility}}>azioni</th>
+                { columns.map(column => {
+                    switch(column) {
+                        case 'number': return <th key={column}>stanza</th>
+                        case 'names': return <th key={column}>nomi</th>
+                        case 'createdBy': return <th key={column}>richiesto da</th>
+                        case 'createdAt': return <th key={column}>richiesto il</th>
+                        case 'managedAt': return <th key={column}>fatto il</th>
+                        case 'actions': return <th key={column} style={{visibility}}>azioni</th>
+                    }
+                })}
             </tr>
         </thead>
         <tbody>
             { 
             data.map(obj =>
                 <tr key={obj._id} onClick={() => onClick(obj)}>
-                    <td>{obj.number}</td>
-                    <td>{obj.names.join(", ")}</td>
-                    <td>{obj.createdBy.email || obj.createdBy.username}</td>
-                    <td style={{visibility}}>
-                        <ButtonGroup>
-                            {   obj.state === 'submitted' && onDone && 
-                                <Button className='btn-primary' onClick={() => onDone(obj)}>
-                                    fatto
-                                </Button>}
-                            {   onDelete && 
-                                <Button className='btn-danger' onClick={() => onDelete(obj)}>
-                                    elimina
-                                </Button>}
-                        </ButtonGroup>
-                    </td>
+                    { columns.map(column => {
+                        switch(column) {
+                            case 'number': return <td key={column}>{obj.number}</td>
+                            case 'names': return <td key={column}>{obj.names.join(", ")}</td>
+                            case 'createdBy': return <td key={column}>{obj.createdBy.email || obj.createdBy.username}</td>
+                            case 'createdAt': return <td key={column}>{myDateFormat(obj.createdAt)}</td>
+                            case 'managedAt': return <td key={column}>{myDateFormat(obj.updatedAt)}</td>
+                            case 'actions': return <td key={column} style={{visibility}}>
+                                <ButtonGroup>
+                                    {   obj.state === 'submitted' && onDone && 
+                                        <Button className='btn-primary' onClick={() => onDone(obj)}>
+                                            fatto
+                                        </Button>}
+                                    {   onDelete && 
+                                        <Button className='btn-danger' onClick={() => onDelete(obj)}>
+                                            elimina
+                                        </Button>}
+                                </ButtonGroup>
+                            </td>
+                        }
+                    })}
                 </tr>) 
             }
         </tbody>
@@ -175,12 +188,14 @@ function RoomLabels({data, onClick, onDone, onDelete, urlId, setUrlId }) {
             onDelete={onDelete}
             data={data.filter(obj => obj.state==='submitted')}
             label="cartellini richiesti"
+            columns={['number','names','createdBy','createdAt','actions']}
         />
         <h3>cartellini fatti</h3>
         <RoomsTable 
             onClick={onClick} 
             data={data.filter(obj => obj.state==='managed')}
             label="cartellini fatti"
+            columns={['number','names','createdBy','managedAt']}
         />
     </>
 }
