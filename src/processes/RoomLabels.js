@@ -130,6 +130,7 @@ function RoomsTable({onClick, onDone, onDelete, data, columns=['number','names',
                         case 'createdAt': return <th key={column}>richiesto il</th>
                         case 'managedAt': return <th key={column}>fatto il</th>
                         case 'actions': return <th key={column} style={{visibility}}>azioni</th>
+                        default: return <th key={column}>{column}: unknown column</th>
                     }
                 })}
             </tr>
@@ -157,6 +158,7 @@ function RoomsTable({onClick, onDone, onDelete, data, columns=['number','names',
                                         </Button>}
                                 </ButtonGroup>
                             </td>
+                            default: return <td key={column}>{column}: unknown column</td>
                         }
                     })}
                 </tr>) 
