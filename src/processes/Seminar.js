@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import remarkGfm from 'remark-gfm'
 import 'katex/dist/katex.min.css'
 
 import {SelectPeopleBlock} from './SelectPeopleBlock'
@@ -246,7 +247,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 <Card className="shadow" style={{maxWidth:"60em"}}>
                     <Card.Header>Anteprima abstract</Card.Header>
                     <Card.Body>
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
                     </Card.Body>
                 </Card>
             }

@@ -7,6 +7,7 @@ import { Loading } from './Loading'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import remarkGfm from 'remark-gfm'
 import { useQuery } from 'react-query'
 
 export function SeminarList({ from, to, category, grant, _sort, _limit }) {
@@ -29,7 +30,7 @@ export function SeminarList({ from, to, category, grant, _sort, _limit }) {
             events_block.push(
                 <div key={e._id}>
                     <SeminarTitle seminar={e} href={link}></SeminarTitle>
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
                     <hr className="my-4"></hr>
                 </div>
             );

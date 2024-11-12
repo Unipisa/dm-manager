@@ -6,6 +6,7 @@ import { useQuery, useQueryClient } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import remarkGfm from 'remark-gfm'
 import 'katex/dist/katex.min.css'
 
 import { ConferenceRoomInput, GrantInput, InputRow, DateInput, MultipleSelectInput, InstitutionInput, BooleanInput, StringInput, TextInput } from '../components/Input'
@@ -243,7 +244,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                 <Card className="shadow" style={{maxWidth:"60em"}}>
                     <Card.Header>Anteprima descrizione</Card.Header>
                     <Card.Body>
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.description}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{data.description}</Markdown>
                     </Card.Body>
                 </Card>
             }

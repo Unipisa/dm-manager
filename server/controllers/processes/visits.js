@@ -389,7 +389,7 @@ async function notifyVisit(visit_id, message) {
     let text =  message || ''
 
     text +=`
-Entrata su DM Manager: ${config.BASE_URL}/process/visits/${visit_id}
+Link visita su DM Manager: ${config.BASE_URL}/process/visits/${visit_id}
 ${visit.referencePeople.map(p => `Referente: ${p.firstName} ${p.lastName} <${p.email}>`).join('\n')}
 Visitatore/trice: ${person.firstName} ${person.lastName}
 Affiliazione/i: ${affiliations}

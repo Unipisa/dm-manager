@@ -5,6 +5,7 @@ import { Loading } from './Loading'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import remarkGfm from 'remark-gfm'
 
 import { formatDate, formatTime, formatPersonName, getDMURL, getManageURL } from '../utils'
 import { useQuery } from 'react-query'
@@ -30,7 +31,7 @@ export function Seminar({ id }) {
 
     return <div>
             <SeminarTitle seminar={data}></SeminarTitle>
-            <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
+            <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
         </div>
 }
 

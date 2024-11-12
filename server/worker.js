@@ -392,7 +392,7 @@ async function notificaTBA() {
 
     if (visits.length > 0) {
         const visitsList = visits.map(visit => {
-            const daysUntilVisit = Math.round((visit.startDate - today) / (1000 * 60 * 60 * 24))
+            const daysUntilVisit = Math.floor((visit.startDate - today) / (1000 * 60 * 60 * 24))
             
             let text = daysUntilVisit === 1 
                 ? `Visita tra ${daysUntilVisit} giorno:\n` 
@@ -408,6 +408,7 @@ async function notificaTBA() {
                 `${ref.firstName} ${ref.lastName} (${ref.email || 'no email'})`
             ).join(", ")
             text += `Referenti: ${references}\n`
+            text += `Link visita su DM Manager: ${config.BASE_URL}/process/visits/${visit._id}\n`
             
             return text
         }).join("\n\n")
@@ -423,8 +424,8 @@ ${visitsList}\n\n`
             const daysUntilSeminar = Math.round((seminar.startDatetime - today) / (1000 * 60 * 60 * 24))
             
             let text = daysUntilSeminar === 1 
-                ? `Seminario tra ${daysUntilSeminar} giorno:\n` 
-                : `Seminario tra ${daysUntilSeminar} giorni:\n`;
+                ? `Seminario tra ${daysUntilSeminar} giorno\n` 
+                : `Seminario tra ${daysUntilSeminar} giorni\n`;
             
             const speakers = seminar.speakers.map(speaker => {
                 const affiliation = speaker.affiliations.map(a => a.name).join(", ")
@@ -438,6 +439,7 @@ ${visitsList}\n\n`
                 `${org.firstName} ${org.lastName} (${org.email || 'no email'})`
             ).join(", ")
             text += `Organizzatori: ${organizers}\n`
+            text += `Link seminario su DM Manager: ${config.BASE_URL}/process/seminars/add/${seminar._id}\n`
             
             return text
         }).join("\n\n")

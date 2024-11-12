@@ -3,6 +3,7 @@ import { useQuery } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
+import remarkGfm from 'remark-gfm'
 import axios from 'axios'
 import Accordion from './Accordion';
 import { Loading } from './Loading'
@@ -102,7 +103,7 @@ export function CourseList({ from, to }) {
                     <p>From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
                     {lessons}
                     <h5 className="wp-block-heading"><strong>Description:</strong></h5>
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
                 </Accordion>
             );
         });
