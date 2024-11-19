@@ -1,6 +1,7 @@
 import moment from 'moment'
 import { useState, createContext, useContext } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
+import { useLocationState } from 'react-router-use-location-state'
 
 import api from './api'
 import Models from './models/Models'
@@ -267,7 +268,7 @@ export function useCreateEngine() {
 }
 
 export function useQueryFilter(initial) {
-    const [filter, setFilter] = useState(initial)
+    const [filter, setFilter] = useLocationState('filter', initial)
     
     function sortIcon(field) {
         const sort = filter._sort
