@@ -83,13 +83,23 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         }
     }
 
+    // This style is applied to the table when the data is being fetched / updated, to provide
+    // the user with a visual feedback of the operation that is going on; pointerEvents: none ensures
+    // that no other sorting / filters are changed in the meantime.
+    const fetchingStyle = {
+        pointerEvents: "none",
+        backgroundColor: '#ccc',
+        transition: 'background-color 200ms linear 150ms'
+    }
+
     return <>
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} value={filter.filter._search} className="mx-1 form-control" placeholder="Search..."></input>
                 <CSVLink className="btn btn-primary mx-1" data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
                 { addButton }
-            </div>            
+            </div>
+            <div style={query.isFetched ? {} : fetchingStyle}>
             { Filters && 
                 <div className="d-flex mb-4">
                     <Filters filter={filter}/>
@@ -102,7 +112,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                     </>
                     : `usa ctrl-click per selezionare una riga` && ''}
             </div>
-            <Table className="model-table" hover>
+            <Table className={"model-table" + query.isFetched ? "" : " text-muted"} hover>
                 <thead className="thead-dark">
                     <tr>
                         {
@@ -122,13 +132,13 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
                         </tr>)}
                 </tbody>
             </Table>
+            </div>
             <p>Visualizzate {data.length}/{query.data.total} righe.</p>
             { query.data.limit < query.data.total
-                && <Button ref={scrollRef} onClick={ filter.extendLimit }>visualizza altre</Button>
+                && <Button ref={scrollRef} onClick={ filter.extendLimit }>
+                    {query.isFetched ? "Visualizza altre" : "Caricamento ..."}
+                </Button>
             }
-            {/* <pre>
-                {JSON.stringify({columns, filter, fieldsInfo}, null, 2)}                  
-            </pre> */}
         </div>
     </>
 }
