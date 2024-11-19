@@ -86,7 +86,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
     return <>
         <div>
             <div className="d-flex mb-4">
-                <input onChange={updateFilter} className="mx-1 form-control" placeholder="Search..."></input>
+                <input onChange={updateFilter} value={filter.filter._search} className="mx-1 form-control" placeholder="Search..."></input>
                 <CSVLink className="btn btn-primary mx-1" data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
                 { addButton }
             </div>            
@@ -195,6 +195,5 @@ export function computeCsvHeaders(fieldsInfo) {
             headers.push(key)
         }
     }
-    console.log()
     return headers
 }
