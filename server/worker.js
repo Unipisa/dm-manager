@@ -421,7 +421,10 @@ ${visitsList}\n\n`
 
     if (seminars.length > 0) {
         const seminarsList = seminars.map(seminar => {
-            const daysUntilSeminar = Math.round((seminar.startDatetime - today) / (1000 * 60 * 60 * 24))
+            const seminarDate = new Date(seminar.startDatetime);
+            seminarDate.setHours(0, 0, 0, 0); 
+
+            const daysUntilSeminar = Math.round((seminarDate - today) / (1000 * 60 * 60 * 24))
             
             let text = daysUntilSeminar === 1 
                 ? `Seminario tra ${daysUntilSeminar} giorno\n` 
