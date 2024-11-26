@@ -15,7 +15,7 @@ export default class Room extends Model {
             'un oggetto': "una stanza", 
         }
         this.ModelName = 'Room'
-        this.indexDefaultFilter = {'_sort': 'number', '_limit': 10}
+        this.indexDefaultFilter = {'_sort': 'code', '_limit': 10}
         this.managerRoles = ['admin','room-manager']
         this.columns = {
             'code': 'codice',
