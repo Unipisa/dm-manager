@@ -20,7 +20,7 @@ export default function ModelView({ Model, buttons, key }) {
             </Button>
         ),
         index: () => (
-            <Button key='index' className="btn btn-secondary" onClick={() => navigate(Model.indexUrl())}>
+            <Button key='index' className="btn btn-secondary" onClick={() => navigate(-1)}>
                 torna all'elenco
             </Button>
         ),
