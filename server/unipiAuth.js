@@ -14,47 +14,54 @@ class UnipiAuthStrategy extends OAuth2Strategy {
       const username = profile[options.usernameField]
       console.log(`username: ${username}`)
     
-      if (! username) throw new Error("invalid username")
-    
-      Person.aggregate([{
-        $match: { 
-          $or: [
-            { email: username },
-            { alternativeEmails: username },
-          ]
-      }}]).exec(function(err, people) {
+      if (! username) return cb("invalid username")
+
+      return User.findOne({ username: username }, async function (err, user) {
         if (err) return cb(err)
-        if (people.length > 1) {
+        const people = await Person.aggregate([{
+          $match: { 
+            $or: [
+              { email: username },
+              { alternativeEmails: username },
+            ]
+          }
+        }])
+        if (people.length>1) {
           notify('admin', 'oauth', `duplicate email ${username} detected in Person collection`)
         }
-        if (people.length >= 1) {
-          const person = people[0]
-          console.log(`person: ${JSON.stringify(person)}`)
-          User.findOneAndUpdate({ username: username }, {
-            $set: {
-              username: username, 
+        if (user) {
+          if (!user.person) {
+            if (people.length === 1) {
+              user.person = people[0]._id
+              await user.save()
+            } else if (people.length === 0) {
+              notify('admin', 'oauth', `user ${username} has no person associated`)
+              return cb(err, null)
+            } else {
+              return cb(err, null)
+            }
+          }
+          return cb(err, user)
+        } else { // no user found
+          if (people.length === 1) {
+            const person = people[0]
+            const user = new User({
+              username: username,
               firstName: person.firstName,
               lastName: person.lastName,
               email: person.email,
               person: person._id,
-            }
-          }, {
-            upsert: true,
-            returnOriginal: false,
-            new: true
-          }, function (err, user) {
-            if (user.__v === 0) {
-              // user was just created
-              notify('admin', 'oauth', `user ${username} has been created, person ${user.person} [${person?.firstName} ${person?.lastName}] linked`)
-            }
-            user.oauth2 = {accessToken, refreshToken}
+            })
+            await user.save()
             return cb(err, user)
-          })
+          } else {
+            return cb(err, null)
+          }
         }
       })
     })
   }
-
+  
   userProfile(accesstoken, done) {
     // abilita questo se vuoi vedere lo "scope" del token.
     if (false) return done(null, {}) 
