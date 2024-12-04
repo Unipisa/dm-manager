@@ -11,10 +11,10 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 
-export function Grant({ id }) {
-    const { isLoading, error, data } = useQuery([ 'grant', id ], async () => {
-        if (id !== null) {
-            const res = await axios.get(getManageURL('public/grant/' + id))
+export function Grant({ grant_id }) {
+    const { isLoading, error, data } = useQuery([ 'grant', grant_id ], async () => {
+        if (grant_id !== null) {
+            const res = await axios.get(getManageURL('public/grant/' + grant_id))
             const grant = res.data.data[0]
             if (! grant) {
                 throw new Error("Impossibile trovare il grant richiesto")
