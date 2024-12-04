@@ -273,7 +273,7 @@ function GrantList ({ grants, en }) {
                 <li key={g._id}>
                     <a href={`/research/grant-details/?grant_id=${g._id}`}>{g.name}</a>
                     <span className="text-muted small"> ({g.projectType})</span><br />
-                    Principal Investigator: <em>{g.piDetails.firstName} {g.piDetails.lastName}</em><br />
+                    Principal Investigator: <em>{g.piDetails?.firstName} {g.piDetails?.lastName}</em><br />
                     {en ? "Project period" : "Periodo"}: {formatDateInterval(g.startDate, g.endDate)}
                 </li>
             );

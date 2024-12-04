@@ -22,12 +22,12 @@ export function formatDate(datetime, locale) {
     });
 }
 
-export function formatDateInterval(start, end) {
+export function formatDateInterval(start, end, locale) {
     if (start != end) {
-        return formatDate(start) + " - " + formatDate(end);
+        return formatDate(start, locale) + " - " + formatDate(end, locale);
     }
     else {
-        return formatDate(start);
+        return formatDate(start, locale);
     }
 }
 

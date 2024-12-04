@@ -118,7 +118,7 @@
 
             const seminar_id = (await (await fetch(dmwidgets.getManageURL('public/seminars'))).json()).data[0]._id
             const conference_id = (await (await fetch(dmwidgets.getManageURL('public/conferences'))).json()).data[0]._id
-            const grant_id = "66471f19f38d44852c3312bd"
+            const grant_id = "67506189b40dceadc365f8cf"
 
             dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {
                 id: seminar_id
@@ -154,7 +154,7 @@
                 to: '2026-01-01'
             })
             dmwidgets.loadComponent(document.getElementById("grant"), "Grant", {
-                id: grant_id
+                grant_id: grant_id
             })
         }
         loader();

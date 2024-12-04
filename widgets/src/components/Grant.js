@@ -37,30 +37,28 @@ export function Grant({ grant_id }) {
         </div>
     }
 
-    const en = isEnglish();
-
     return (
         <div>
             <h3 style={{ marginTop: '8px' }}>{data.name}</h3>
             <p>
                 {data.projectType && <>Project Type: {data.projectType} <br /></>}
                 {data.fundingEntity && <>Funded by: {data.fundingEntity} <br /></>}
-                {data.startDate && data.endDate && <>Period: {formatDateInterval(data.startDate, data.endDate)} <br /></>}
+                {data.startDate && data.endDate && <>Period: {formatDateInterval(data.startDate, data.endDate, 'en-us')} <br /></>}
                 {data.budgetAmount && <>Budget: {data.budgetAmount} <br /></>}
                 {data.webSite && <>Website: <a href={data.webSite}>{data.webSite}</a></>}
             </p>
             <p class='mb-3'>
-                {data.pi && <><KeyPerson person={data.pi} title="Principal Investigator"></KeyPerson>  <br /></>}
-                {data.localCoordinator && (data.localCoordinator._id !== data.pi._id) && <KeyPerson person={data.localCoordinator} title="Local Coordinator"></KeyPerson>}
+                {data.pi && data.pi.firstName && <><KeyPerson person={data.pi} title="Principal Investigator"></KeyPerson> <br /></>}
+                {data.localCoordinator && data.localCoordinator.firstName && (data.localCoordinator._id !== data.pi._id) && <KeyPerson person={data.localCoordinator} title="Local Coordinator"></KeyPerson>}
             </p>
 
             {data.members && data.members.length > 0 && (
-                <Accordion title={en ? "Participants" : "Partecipanti"}>
+                <Accordion title="Participants">
                     {data.members?.map(m => `${m.firstName} ${m.lastName}`).join(', ') || ''}
                 </Accordion>
             )}
             {data.description && (
-                <Accordion title={en ? "Description" : "Descrizione"}>
+                <Accordion title="Description">
                     <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
                     {data.description}
                     </Markdown>
