@@ -80,7 +80,12 @@
             <a class="nav-link" href="#courselist" id="courselist-label" data-toggle="tab" 
                data-target="#courselist-tab" type="button" role="tab" aria-controls="courselist" 
                aria-selected="false">CourseList</a>
-        </li>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#grant" id="grant-label" data-toggle="tab" 
+               data-target="#grant-tab" type="button" role="tab" aria-controls="grant" 
+               aria-selected="false">Grant</a>
+          </li>
         </ul>
     </nav>
 
@@ -100,6 +105,7 @@
           <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
+          <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
         </div>
       </article>
     </main>
@@ -112,6 +118,7 @@
 
             const seminar_id = (await (await fetch(dmwidgets.getManageURL('public/seminars'))).json()).data[0]._id
             const conference_id = (await (await fetch(dmwidgets.getManageURL('public/conferences'))).json()).data[0]._id
+            const grant_id = "66471f19f38d44852c3312bd"
 
             dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {
                 id: seminar_id
@@ -145,6 +152,9 @@
             dmwidgets.loadComponent(document.getElementById("courselist"), "CourseList", { 
                 from: '2021-01-01',
                 to: '2026-01-01'
+            })
+            dmwidgets.loadComponent(document.getElementById("grant"), "Grant", {
+                id: grant_id
             })
         }
         loader();
