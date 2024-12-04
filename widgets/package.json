@@ -23,7 +23,7 @@
     "webpack-dev-server": "^4.15.1"
   },
   "browserslist": [
-    "> 0.1%, not dead"
+    "> 0.05%, not dead"
   ],
   "dependencies": {
     "axios": "^1.6.2",
