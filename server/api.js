@@ -9,6 +9,7 @@ const seminarsQuery = require('./controllers/public/seminars')
 const seminarQuery = require('./controllers/public/seminar')
 const coursesQuery = require('./controllers/public/courses')
 const lessonsQuery = require('./controllers/public/lessons')
+const grantQuery = require('./controllers/public/grant')
 const seminarCategoriesQuery = require('./controllers/public/seminar-categories')
 const conferencesQuery = require('./controllers/public/conferences')
 const processes = require('./controllers/processes/router.js')
@@ -101,6 +102,10 @@ router.get('/public/conference/:id', async (req, res) => {
 
 router.get('/public/conferences', async (req, res) => {
     res.send(await conferencesQuery(req))
+})
+
+router.get('/public/grant/:id', async (req, res) => {
+    res.send(await grantQuery(req))
 })
 
 router.get('/public/seminar-categories', async (req, res) => {
