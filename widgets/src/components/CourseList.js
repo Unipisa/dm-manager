@@ -113,10 +113,10 @@ export function CourseList({ from, to }) {
         <>
             <p>The list of Ph.D. courses that will be taught during the academic year {fromYear}-{toYear} is below:</p>
             <div style={{ height: '5px' }} aria-hidden="true" className="wp-block-spacer"></div>
-            <h4 class="wp-block-heading">Fall/Winter Term</h4>
+            <h4 className="wp-block-heading">Fall/Winter Term</h4>
             {renderCourses(fallCourses)}
             <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
-            <h4 class="wp-block-heading">Winter/Spring Term</h4>
+            <h4 className="wp-block-heading">Winter/Spring Term</h4>
             {renderCourses(springCourses)}
         </>
     );

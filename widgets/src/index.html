@@ -72,6 +72,11 @@
                  aria-selected="false">HomeEventList</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="#homegrantlist" id="homegrantlist-label" data-toggle="tab" 
+               data-target="#homegrantlist-tab" type="button" role="tab" aria-controls="homegrantlist" 
+               aria-selected="false">HomeGrantList</a>
+          </li>
+          <li class="nav-item">
               <a class="nav-link" href="#persondetails" id="persondetails-label" data-toggle="tab" 
                  data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails" 
                  aria-selected="false">PersonDetails</a>
@@ -103,6 +108,7 @@
           <div class="tab-pane fade p-3" id="conferencelist-tab"><div id="conferencelist"></div></div>
           <div class="tab-pane fade p-3" id="conference-tab"><div id="conference"></div></div>
           <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
+          <div class="tab-pane fade p-3" id="homegrantlist-tab"><div id="homegrantlist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
           <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
@@ -144,6 +150,9 @@
                 // category: '653b5d8d10c0279ad486c807'
             })
             dmwidgets.loadComponent(document.getElementById('homeeventlist'), "HomeEventList", {
+              _limit: 10,
+            })
+            dmwidgets.loadComponent(document.getElementById('homegrantlist'), "HomeGrantList", {
               _limit: 10,
             })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {

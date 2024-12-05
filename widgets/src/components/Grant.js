@@ -47,7 +47,7 @@ export function Grant({ grant_id }) {
                 {data.budgetAmount && <>Budget: {data.budgetAmount} <br /></>}
                 {data.webSite && <>Website: <a href={data.webSite}>{data.webSite}</a></>}
             </p>
-            <p class='mb-3'>
+            <p className='mb-3'>
                 {data.pi && data.pi.firstName && <><KeyPerson person={data.pi} title="Principal Investigator"></KeyPerson> <br /></>}
                 {data.localCoordinator && data.localCoordinator.firstName && (data.localCoordinator._id !== data.pi._id) && <KeyPerson person={data.localCoordinator} title="Local Coordinator"></KeyPerson>}
             </p>

@@ -29,7 +29,6 @@ export function HomeEventList({}) {
         const conf = await axios.get(getManageURL("public/conferences"), { params: { _limit: numberOfEntries, _sort: "startDate", from: now} })
         if (conf.data) {
             for (const e of conf.data.data) {
-              console.log(`Conference: ${e._id}`,e)
               events[e._id] = {...e, type: 'conference'}
             }
         }

@@ -7,6 +7,7 @@ import { Conference } from './components/Conference'
 import { ConferenceList } from './components/ConferenceList';
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { HomeEventList } from './components/HomeEventList';
+import { HomeGrantList } from './components/HomeGrantList';
 import { PersonDetails } from './components/PersonDetails';
 import { CourseList } from './components/CourseList';
 import { Grant } from './components/Grant';
@@ -46,6 +47,9 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
             break;
         case 'HomeEventList':
             element = <HomeEventList></HomeEventList>
+            break;
+        case 'HomeGrantList':
+            element = <HomeGrantList></HomeGrantList>
             break;
         case 'PersonDetails':
             element = <PersonDetails {...props}></PersonDetails>
