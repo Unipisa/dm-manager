@@ -1,9 +1,65 @@
 const Visit = require('../../models/Visit')
 const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
 
+const { createSortAndLimitFilters } = require('./common-filters')
+
 async function visitsQuery(req) {
-    // restituisce le visite correnti
+    // restituisce le visite correnti se from e to non specificati
     // si può filtrare sull'email
+
+    var from = undefined;
+    switch (req.query.from) {
+        case 'now':
+            from = new Date();
+            break;
+        case undefined:
+            from = undefined;
+            break;
+        default:
+            from = new Date(req.query.from);
+    }
+    
+    var to = undefined;
+    switch (req.query.to) {
+        case 'now':
+            to = new Date();
+            break;
+        case undefined:
+            to = undefined;
+            break;
+        default:
+            to = new Date(req.query.to);
+    }
+    
+    var match = {};
+    
+    if (from !== undefined || to !== undefined) {
+        if (from !== undefined) {
+            match["endDate"] = { "$gte": from };
+        }
+        if (to !== undefined) {
+            match["startDate"] = { "$lte": to };
+        }
+    } else {
+        match = {
+            $expr: {
+                $and: [
+                    {
+                        $or: [
+                            { $eq: ["$endDate", null] },
+                            { $gte: ["$endDate", { $dateAdd: { startDate: "$$NOW", unit: "day", amount: -1 } }] }
+                        ]
+                    },
+                    {
+                        $or: [
+                            { $eq: ["$startDate", null] },
+                            { $lte: ["$startDate", "$$NOW"] }
+                        ]
+                    }
+                ]
+            }
+        };
+    }
 
     const matches = []
     if (req.query.email) {
@@ -11,24 +67,10 @@ async function visitsQuery(req) {
             { 'person.alternativeEmails': req.query.email })
     }
 
+    const sort_and_limit = createSortAndLimitFilters(req)
+
     const pipeline = [
-        {$match: {
-            $expr: {
-                $and: [
-                    { $or: [
-                        { $eq: ["$endDate", null] },
-                        { $gte: ["$endDate", {
-                            $dateAdd: {
-                                startDate: "$$NOW", 
-                                unit: "day",
-                                amount: -1
-                            }}] } ]},
-                    { $or: [
-                        { $eq: ["$startDate", null] },
-                        { $lte: ["$startDate", "$$NOW"]}
-                    ]},
-                ]},
-        }},
+        {$match: match },
         { $lookup: {
             from: 'people',
             localField: 'person',
@@ -60,6 +102,7 @@ async function visitsQuery(req) {
                 }}
             ]
         }},
+        ...sort_and_limit,
         { $project: {
             _id: 0,
             startDate: 1,
