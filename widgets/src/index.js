@@ -46,7 +46,7 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
             element = <ConferenceList {...props}></ConferenceList>
             break;
         case 'HomeEventList':
-            element = <HomeEventList></HomeEventList>
+            element = <HomeEventList {...props}></HomeEventList>
             break;
         case 'HomeGrantList':
             element = <HomeGrantList></HomeGrantList>

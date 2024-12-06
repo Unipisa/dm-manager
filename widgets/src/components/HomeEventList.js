@@ -18,8 +18,8 @@ import {
 } from '../utils';
 import './styles.css';
 
-export function HomeEventList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(6);
+export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6, columns_lg = 4 }) {
+    const [numberOfEntries, setNumberOfEntries] = useState(default_entries * 2);
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
         var events = {}
@@ -67,22 +67,22 @@ export function HomeEventList({}) {
     }
 
       const all_event_list = data.slice(0, numberOfEntries).map((x) => (
-        <EventBox event={x} key={x._id}></EventBox>
+        <EventBox event={x} key={x._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
       ));
     
       const seminar_list = filterEventsByType(data, 'seminar').slice(0, numberOfEntries).map((seminar) => (
-        <EventBox event={seminar} key={seminar._id}></EventBox>
+        <EventBox event={seminar} key={seminar._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
       ));
     
       const conference_list = filterEventsByType(data, 'conference').slice(0, numberOfEntries).map(
         (conference) => (
-          <EventBox event={conference} key={conference._id}></EventBox>
+          <EventBox event={conference} key={conference._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
         )
       );
     
       const colloquia_list = filterEventsByCategory(data, 'Colloquium').slice(0,numberOfEntries).map(
         (colloquium) => (
-          <EventBox event={colloquium} key={colloquium._id}></EventBox>
+          <EventBox event={colloquium} key={colloquium._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
         )
       );
       
@@ -130,7 +130,7 @@ export function HomeEventList({}) {
           </Tab.Container>
           {showButton && (
           <div className="d-flex flex-row justify-content-center">
-            <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
+            <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + default_entries)}>
               {isEnglish() ? 'Load more' : 'Carica altro'}
             </Button>
           </div>
@@ -147,7 +147,7 @@ function filterEventsByType(events, type) {
     return events.filter((event) => event.category?.name === category);
   }
 
-function EventBox({ event }) {    
+function EventBox({ event, columns, columns_md, columns_lg }) {    
     const date = event.endDate
     ? formatDateInterval(event.startDate, event.endDate)
     : `${formatDate(event.startDatetime)} - ${formatTime(event.startDatetime)}`;
@@ -179,7 +179,7 @@ function EventBox({ event }) {
       title = `Ph.D. Thesis Defense: ${title}`
     }
 
-    return <div className="col-6 col-md-6 col-lg-4 event-box">
+    return <div className={`col-${columns} col-md-${columns_md} col-lg-${columns_lg} event-box`}>
         <h2 className="title_style">
             <a href={link} className="title_style">
                 {truncateTextByWords(title, 20)}
