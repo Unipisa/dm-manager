@@ -67,7 +67,7 @@ function GrantBox({ grant }) {
             </a>
             <small className="text-muted"> ({grant.projectType})</small>
         </h2>
-        { grant.pi && grant.pi.firstName &&
+        { grant.pi && grant.pi.firstName && (grant.pi.staff[0]?.isInternal || !grant.localCoordinator) &&
           <div className="subtitle_style fas fa-user"> Principal Investigator: {grant.pi.firstName} {grant.pi.lastName} </div> 
         }
         { grant.localCoordinator && grant.localCoordinator.firstName && (grant.localCoordinator._id !== grant.pi._id) &&
