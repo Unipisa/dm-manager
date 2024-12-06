@@ -56,7 +56,7 @@ function GrantBox({ grant }) {
     ? formatDateInterval(grant.startDate, grant.endDate, 'en-US')
     : `${formatDate(grant.startDatetime)} - ${formatTime(grant.startDatetime)}`;
 
-    const link = getDMURL(`en/research/grant-details/?grant_id=${grant._id}`);
+    const link = getDMURL(`research/grant-details/?grant_id=${grant._id}`);
 
     var title = grant.name
 
