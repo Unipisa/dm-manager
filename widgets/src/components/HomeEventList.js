@@ -141,11 +141,11 @@ export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6
 
 function filterEventsByType(events, type) {
     return events.filter((event) => event.type === type);
-  }
+}
   
-  function filterEventsByCategory(events, category) {
+function filterEventsByCategory(events, category) {
     return events.filter((event) => event.category?.name === category);
-  }
+}
 
 function EventBox({ event, columns, columns_md, columns_lg }) {    
     const date = event.endDate

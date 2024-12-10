@@ -51,10 +51,9 @@ export function HomeGrantList({}) {
 }
 
 function GrantBox({ grant }) {    
-    console.log(grant)
     const date = grant.endDate
     ? formatDateInterval(grant.startDate, grant.endDate, 'en-US')
-    : `${formatDate(grant.startDatetime)} - ${formatTime(grant.startDatetime)}`;
+    : `${formatDate(grant.startDate)} - ${formatTime(grant.startDate)}`;
 
     const link = getDMURL(`research/grant-details/?grant_id=${grant._id}`);
 

@@ -77,6 +77,11 @@
                aria-selected="false">HomeGrantList</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="#homevisitlist" id="homevisitlist-label" data-toggle="tab" 
+               data-target="#homevisitlist-tab" type="button" role="tab" aria-controls="homevisittlist" 
+               aria-selected="false">HomeVisitList</a>
+          </li>
+          <li class="nav-item">
               <a class="nav-link" href="#persondetails" id="persondetails-label" data-toggle="tab" 
                  data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails" 
                  aria-selected="false">PersonDetails</a>
@@ -109,6 +114,7 @@
           <div class="tab-pane fade p-3" id="conference-tab"><div id="conference"></div></div>
           <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
           <div class="tab-pane fade p-3" id="homegrantlist-tab"><div id="homegrantlist"></div></div>
+          <div class="tab-pane fade p-3" id="homevisitlist-tab"><div id="homevisitlist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
           <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
@@ -157,6 +163,9 @@
             })
             dmwidgets.loadComponent(document.getElementById('homegrantlist'), "HomeGrantList", {
               _limit: 10,
+            })
+            dmwidgets.loadComponent(document.getElementById('homevisitlist'), "HomeVisitList", {
+              default_entries: 5,
             })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
                 person_id: '66471d4ef38d44852c3310e9',
