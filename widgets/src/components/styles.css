@@ -1,6 +1,6 @@
 .styled-table {
     border-collapse: collapse;
-    margin: 0 auto;
+    margin: 20px auto;
     font-size: 1rem;
     min-width: 400px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
@@ -44,6 +44,23 @@
     @media (min-width: 1383px) {
         padding: 2rem;
         height: 270px;
+    }
+}
+
+.grant-box {
+    width: 300px;
+    height: 150px;
+    overflow: hidden;
+    padding: 1rem;
+    margin-bottom: 1rem;
+
+    @media (min-width: 768px) {
+        padding: 1.5rem;
+        height: 220px;
+    }
+    @media (min-width: 1383px) {
+        padding: 2rem;
+        height: 250px;
     }
 }
 

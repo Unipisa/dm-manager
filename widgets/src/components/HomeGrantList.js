@@ -59,7 +59,7 @@ function GrantBox({ grant }) {
 
     var title = grant.name
 
-    return <div className="col-6 col-md-6 col-lg-4 event-box">
+    return <div className="col-6 col-md-6 col-lg-4 grant-box">
         <h2 className="title_style">
             <a href={link} className="title_style">
                 {truncateTextByWords(title, 20)}

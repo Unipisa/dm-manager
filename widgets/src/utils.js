@@ -106,9 +106,12 @@ function getCookie(c_name) {
     return c_value;
 }
 
-export function isEnglish() {
-    const wpml = getCookie('wp-wpml_current_language')
-    return wpml == 'en'
+export function isEnglish(defaultValue = false) {
+    const wpml = getCookie('wp-wpml_current_language');
+    if (wpml === undefined || wpml === null) {
+        return defaultValue;
+    }
+    return wpml === 'en';
 }
 
 export function getDMURL(path) {

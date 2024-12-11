@@ -18,7 +18,7 @@ import {
 } from '../utils';
 import './styles.css';
 
-export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6, columns_lg = 4 }) {
+export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6, columns_lg = 4, show_excerpt = true }) {
     const [numberOfEntries, setNumberOfEntries] = useState(default_entries * 2);
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
@@ -66,45 +66,45 @@ export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6
         return <Loading widget="Lista degli eventi" error={error}></Loading>
     }
 
-      const all_event_list = data.slice(0, numberOfEntries).map((x) => (
-        <EventBox event={x} key={x._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
-      ));
+    const all_event_list = data.slice(0, numberOfEntries).map((x) => (
+        <EventBox event={x} key={x._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
+    ));
     
-      const seminar_list = filterEventsByType(data, 'seminar').slice(0, numberOfEntries).map((seminar) => (
-        <EventBox event={seminar} key={seminar._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
-      ));
+    const seminar_list = filterEventsByType(data, 'seminar').slice(0, numberOfEntries).map((seminar) => (
+        <EventBox event={seminar} key={seminar._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
+    ));
     
-      const conference_list = filterEventsByType(data, 'conference').slice(0, numberOfEntries).map(
+    const conference_list = filterEventsByType(data, 'conference').slice(0, numberOfEntries).map(
         (conference) => (
-          <EventBox event={conference} key={conference._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
+          <EventBox event={conference} key={conference._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
         )
-      );
+    );
     
-      const colloquia_list = filterEventsByCategory(data, 'Colloquium').slice(0,numberOfEntries).map(
+    const colloquia_list = filterEventsByCategory(data, 'Colloquium').slice(0,numberOfEntries).map(
         (colloquium) => (
-          <EventBox event={colloquium} key={colloquium._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg}></EventBox>
+          <EventBox event={colloquium} key={colloquium._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
         )
-      );
+    );
       
-      const showButton = numberOfEntries <= seminar_list.length + conference_list.length ;
+    const showButton = numberOfEntries <= seminar_list.length + conference_list.length ;
 
-      return (
+    return (
         <div className="">
           <Tab.Container id="left-tabs-example" defaultActiveKey="all">
             <Nav variant="pills" className="flex-row d-flex justify-content-center">
               <Nav.Item>
                 <Nav.Link eventKey="all" className="filter-link">
-                  {isEnglish() ? 'All' : 'Tutti'}
+                  {isEnglish(true) ? 'All' : 'Tutti'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="conferences" className="filter-link">
-                  {isEnglish() ? 'Conferences' : 'Conferenze'}
+                  {isEnglish(true) ? 'Conferences' : 'Conferenze'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="seminars" className="filter-link">
-                  {isEnglish() ? 'Seminars' : 'Seminari'}
+                  {isEnglish(true) ? 'Seminars' : 'Seminari'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
@@ -131,12 +131,12 @@ export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6
           {showButton && (
           <div className="d-flex flex-row justify-content-center">
             <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + default_entries)}>
-              {isEnglish() ? 'Load more' : 'Carica altro'}
+              {isEnglish(true) ? 'Load more' : 'Carica altro'}
             </Button>
           </div>
           )}
         </div>
-      );
+    );
 }
 
 function filterEventsByType(events, type) {
@@ -147,7 +147,7 @@ function filterEventsByCategory(events, category) {
     return events.filter((event) => event.category?.name === category);
 }
 
-function EventBox({ event, columns, columns_md, columns_lg }) {    
+function EventBox({ event, columns, columns_md, columns_lg, show_excerpt }) {    
     const date = event.endDate
     ? formatDateInterval(event.startDate, event.endDate)
     : `${formatDate(event.startDatetime)} - ${formatTime(event.startDatetime)}`;
@@ -170,7 +170,7 @@ function EventBox({ event, columns, columns_md, columns_lg }) {
         );
       }
     } else {
-      tags = <a href={event.url}>{isEnglish() ? 'Website' : 'Sito web'}</a>
+      tags = <a href={event.url}>{isEnglish(true) ? 'Website' : 'Sito web'}</a>
     }
 
     var title = event.title
@@ -191,10 +191,12 @@ function EventBox({ event, columns, columns_md, columns_lg }) {
         <div className="subtitle_style far fa-calendar"> {date}</div>
         <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name || event.institution?.name}</div>
         <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>
-        <div className="excerpt_style">
+        { show_excerpt && 
+          <div className="excerpt_style">
             <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
                 {truncateTextByWords(event.abstract ? event.abstract : event.description, 30)}
             </Markdown>
-        </div>
+          </div>
+        }
     </div>
 }

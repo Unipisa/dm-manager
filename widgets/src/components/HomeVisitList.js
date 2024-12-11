@@ -14,14 +14,21 @@ export function HomeVisitList({ default_entries = 10 }) {
     const [numberOfEntries, setNumberOfEntries] = useState(default_entries)
 
     const { isLoading, error, data } = useQuery([ 'homevisits', numberOfEntries ], async () => {
-        const now = new Date()
-        now.setHours(0, 0, 0, 0)
-
-        const visits = await axios.get(getManageURL("public/visits"), { params: { _limit: numberOfEntries, _sort: "startDate", from: '2024-01-01'} })
-        if (visits.data) {
-            return visits.data.data
-        }
-    })
+        const current_visits = await axios.get(getManageURL("public/visits"), { 
+            params: { _limit: numberOfEntries, _sort: "startDate" } 
+        });
+            
+        const future_visits = await axios.get(getManageURL("public/visits"), { 
+            params: { _limit: numberOfEntries, _sort: "startDate", future: true } 
+        });
+            
+        const visits = [
+            ...(current_visits.data?.data || []),
+            ...(future_visits.data?.data || [])
+        ];
+                  
+        return visits
+    }, {keepPreviousData: true})
 
     if (isLoading || error) {
         return <Loading widget="Lista delle visite" error={error}></Loading>
@@ -30,21 +37,58 @@ export function HomeVisitList({ default_entries = 10 }) {
     const all_visit_list = data.slice(0, numberOfEntries).map((v) => (
         <VisitTableItems visit={v} key={v._id}></VisitTableItems>
     ));
+
+    const current_visit_list = filterVisitsByDate(data, 'current').slice(0, numberOfEntries).map((v) => (
+        <VisitTableItems visit={v} key={v._id}></VisitTableItems>
+    ));
+
+    const future_visit_list = filterVisitsByDate(data, 'future').slice(0, numberOfEntries).map((v) => (
+        <VisitTableItems visit={v} key={v._id}></VisitTableItems>
+    ));
         
     const showButton = numberOfEntries <= all_visit_list.length;
 
     return (
         <div className="">
-            <table className="styled-table">
-                <thead>
-                    <tr>
-                        <th>Visitor</th>
-                        <th>Period</th>
-                        <th>Office</th>
-                    </tr>
-                </thead>
-                <tbody className="">{all_visit_list}</tbody>
-            </table>
+            <Tab.Container id="left-tabs-example" defaultActiveKey="current">
+                <Nav variant="pills" className="flex-row d-flex justify-content-center">
+                    <Nav.Item>
+                        <Nav.Link eventKey="current" className="filter-link">
+                            Current
+                        </Nav.Link>
+                    </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="future" className="filter-link">
+                            Future
+                        </Nav.Link>
+                    </Nav.Item>
+                </Nav>
+                <Tab.Content>
+                    <Tab.Pane eventKey="current">
+                        <table className="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Visitor</th>
+                                    <th>Period</th>
+                                    <th>Office</th>
+                                </tr>
+                            </thead>
+                            <tbody className="">{current_visit_list}</tbody>
+                        </table>
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="future">
+                        <table className="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Visitor</th>
+                                    <th>Period</th>
+                                </tr>
+                            </thead>
+                            <tbody className="">{future_visit_list}</tbody>
+                        </table>
+                    </Tab.Pane>
+                </Tab.Content>
+            </Tab.Container>
             {showButton && (
             <div className="d-flex flex-row justify-content-center">
                 <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + default_entries)}>
@@ -56,6 +100,19 @@ export function HomeVisitList({ default_entries = 10 }) {
       );
 }
 
+const filterVisitsByDate = (visits, date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (date === "current") {
+        return visits.filter((visit) => new Date(visit.startDate) <= today);
+    } else if (date === "future") {
+        return visits.filter((visit) => new Date(visit.startDate) > today);
+    } else {
+        return visits;
+    }
+}
+
 function VisitTableItems({ visit, key }) {
     const date = formatDateInterval(visit.startDate, visit.endDate, 'en-US')
     const roomDetails = visit.roomAssignment ? getRoomDetails(visit.roomAssignment.room, '', true) : '';
@@ -64,7 +121,7 @@ function VisitTableItems({ visit, key }) {
     <tr key={key}>
         <td>{visit.person.firstName} {visit.person.lastName} ({visit.person.affiliations[0]?.name})</td>
         <td>{date}</td>
-        {roomDetails && roomDetails !== '' && (
+        {roomDetails && roomDetails !== '' && (new Date(visit.startDate) <= new Date()) && (
           <td>{roomDetails.buildingName}, {roomDetails.floorName}, {roomDetails.roomLink.text}</td>
         )}
     </tr>

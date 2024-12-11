@@ -40,6 +40,19 @@ async function visitsQuery(req) {
         if (to !== undefined) {
             match["startDate"] = { "$lte": to };
         }
+    } else if (req.query.future === "true") {
+        match = {
+            $expr: {
+                $and: [
+                    {
+                        $or: [
+                            { $eq: ["$startDate", null] },
+                            { $gte: ["$startDate", "$$NOW"] }
+                        ]
+                    }
+                ]
+            }
+        };
     } else {
         match = {
             $expr: {
