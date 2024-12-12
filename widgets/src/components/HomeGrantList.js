@@ -31,6 +31,8 @@ export function HomeGrantList({ default_entries = 3 }) {
     }
     
     const parseBudgetAmount = (budgetStr) => {
+        if (!budgetStr) return -1
+        
         const numStr = budgetStr.replace(/^[€$£]|\s/g, '')
 
         return parseFloat(numStr.replace(/\./g, '').replace(',', '.'))
