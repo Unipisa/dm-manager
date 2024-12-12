@@ -39,12 +39,12 @@ export function HomeGrantList({ default_entries = 3 }) {
       };
       
     const all_grant_list = data
-        .slice(0, numberOfEntries)
         .sort((a, b) => {
-          const amountA = parseBudgetAmount(a.budgetAmount)
-          const amountB = parseBudgetAmount(b.budgetAmount)
-          return amountB - amountA;
+            const amountA = parseBudgetAmount(a.budgetAmount)
+            const amountB = parseBudgetAmount(b.budgetAmount)
+            return amountB - amountA;
         })
+        .slice(0, numberOfEntries)
         .map((x) => (
             <GrantBox grant={x} key={x._id}></GrantBox>
     ));
