@@ -20,7 +20,7 @@ export function HomeGrantList({}) {
         const now = new Date()
         now.setHours(0, 0, 0, 0)
 
-        const grants = await axios.get(getManageURL("public/grants"), { params: { _limit: numberOfEntries, _sort: "-budgetAmount", from: now} })
+        const grants = await axios.get(getManageURL("public/grants"), { params: { _limit: numberOfEntries, from: now} })
         if (grants.data) {
             return grants.data.data
         }
@@ -30,8 +30,21 @@ export function HomeGrantList({}) {
         return <Loading widget="Lista dei grant" error={error}></Loading>
     }
     
-    const all_grant_list = data.slice(0, numberOfEntries).map((x) => (
-        <GrantBox grant={x} key={x._id}></GrantBox>
+    const parseBudgetAmount = (budgetStr) => {
+        const numStr = budgetStr.replace(/^[€$£]|\s/g, '')
+
+        return parseFloat(numStr.replace(/\./g, '').replace(',', '.'))
+      };
+      
+    const all_grant_list = data
+        .slice(0, numberOfEntries)
+        .sort((a, b) => {
+          const amountA = parseBudgetAmount(a.budgetAmount)
+          const amountB = parseBudgetAmount(b.budgetAmount)
+          return amountB - amountA;
+        })
+        .map((x) => (
+            <GrantBox grant={x} key={x._id}></GrantBox>
     ));
         
     const showButton = numberOfEntries <= all_grant_list.length;
