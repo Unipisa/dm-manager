@@ -13,14 +13,14 @@ import {
 } from '../utils';
 import './styles.css';
 
-export function HomeGrantList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(6);
+export function HomeGrantList({ default_entries = 3 }) {
+    const [numberOfEntries, setNumberOfEntries] = useState(default_entries * 2);
 
     const { isLoading, error, data } = useQuery([ 'homegrants', numberOfEntries ], async () => {
         const now = new Date()
         now.setHours(0, 0, 0, 0)
 
-        const grants = await axios.get(getManageURL("public/grants"), { params: { _limit: numberOfEntries, from: now} })
+        const grants = await axios.get(getManageURL("public/grants"), { params: { from: now} })
         if (grants.data) {
             return grants.data.data
         }
@@ -54,7 +54,7 @@ export function HomeGrantList({}) {
             <div className="row">{all_grant_list}</div>
             {showButton && (
             <div className="d-flex flex-row justify-content-center">
-                <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
+                <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + default_entries)}>
                 {'Load more'}
                 </Button>
             </div>
