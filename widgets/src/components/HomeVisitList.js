@@ -97,13 +97,10 @@ export function HomeVisitList({ default_entries = 10 }) {
 }
 
 const filterVisitsByDate = (visits, date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     if (date === "current") {
-        return visits.filter((visit) => new Date(visit.startDate) <= today);
+        return visits.filter((visit) => new Date(visit.startDate) <= new Date());
     } else if (date === "future") {
-        return visits.filter((visit) => new Date(visit.startDate) > today);
+        return visits.filter((visit) => new Date(visit.startDate) > new Date());
     } else {
         return visits;
     }
