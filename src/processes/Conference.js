@@ -108,7 +108,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
         if (!data.startDate) return "Inserire la data di inizio del convegno"
         if (!data.endDate) return "Inserire la data di fine del convegno"
         if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
-        if (data.organizers.length === 0) return "Inserire almeno un organizzatore per il convegno"
+        if (!data.organizers || data.organizers.length === 0) return "Inserire almeno un organizzatore per il convegno"
         return ""
     })()
 
