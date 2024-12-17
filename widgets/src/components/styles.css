@@ -25,6 +25,10 @@
     border-bottom: 1px solid #dddddd;
     font-family: "Titillium Web";
     font-size: 0.9rem;
+    
+    @media (max-width: 768px) {
+        font-size: 0.825rem;
+    }
 }
 
 .styled-table tbody tr:nth-of-type(even) {
