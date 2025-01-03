@@ -33,7 +33,9 @@ Il titolo del seminario è: ${seminar.title}.
 
 Il link per visualizzare il seminario sul sito del Dipartimento è: https://www.dm.unipi.it/en/seminar/?id=${seminar._id}.
 
-Il seminario su Manage si trova al seguente link: https://manage.dm.unipi.it/event-seminar/${seminar._id}.
+Gli organizzatori possono visualizzare il seminario su Manage al seguente link: https://manage.dm.unipi.it/process/seminars/add/${seminar._id}.
+
+Gli amministratori possono visualizzare il seminario su Manage al seguente link: https://manage.dm.unipi.it/event-seminar/${seminar._id}.
         `
             await notify(organizer.email, `${seminar._id}`, text)
         }
@@ -81,7 +83,9 @@ Il titolo del seminario è ${seminar.title}.
 
 Il link per visualizzare il seminario sul sito del Dipartimento è: https://www.dm.unipi.it/en/seminar/?id=${seminar._id}.
 
-Il seminario su Manage si trova al seguente link: https://manage.dm.unipi.it/event-seminar/${seminar._id}.
+Gli organizzatori possono visualizzare il seminario su Manage al seguente link: https://manage.dm.unipi.it/process/seminars/add/${seminar._id}.
+
+Gli amministratori possono visualizzare il seminario su Manage al seguente link: https://manage.dm.unipi.it/event-seminar/${seminar._id}.
         `;
         await notify('process/visits', `${v._id}`, text)
     })

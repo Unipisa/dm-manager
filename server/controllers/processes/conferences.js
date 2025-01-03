@@ -25,6 +25,10 @@ async function notifyConference(conference) {
     Il link per visualizzare il convegno sul sito del Dipartimento è: https://www.dm.unipi.it/en/conference/?id=${conference._id}
 
     Il convegno su Manage si trova al seguente link: https://manage.dm.unipi.it/event-conference/${conference._id}
+
+    Gli organizzatori possono visualizzare il convegno su Manage al seguente link: https://manage.dm.unipi.it/process/conferences/add/${conference._id}.
+
+    Gli amministratori possono visualizzare il convegno su Manage al seguente link: https://manage.dm.unipi.it/event-conference/${conference._id}. 
     `;
 
     // notify all organizers
