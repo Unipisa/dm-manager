@@ -174,10 +174,23 @@ const GET_PIPELINE = [
         foreignField: '_id',
         as: 'referencePeople',
         pipeline: [
+            { $lookup: {
+                from: 'institutions',
+                localField: 'affiliations',
+                foreignField: '_id',
+                as: 'affiliations',
+                pipeline: [
+                    { $project: {
+                        _id: 1,
+                        name: 1,
+                    }},
+                ]
+            }},
             { $project: {
                 _id: 1,
                 firstName: 1,
                 lastName: 1,
+                affiliations: 1,
                 email: 1,
             }},
         ]
