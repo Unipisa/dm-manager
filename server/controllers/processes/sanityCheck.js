@@ -131,7 +131,10 @@ router.get('/', async (req, res) => {
     const seminarsTBA = await Seminar.aggregate([
         {
             $match: {
-                $expr: { $lt: [{ $strLenCP: { $ifNull: ["$title", ""] } }, 5] } 
+                $and: [
+                    { $expr: { $lt: [{ $strLenCP: { $ifNull: ["$title", ""] } }, 5] } }, 
+                    { startDatetime: { $gt: new Date("2025-01-01T00:00:00.000Z") } }
+                ]
             }
         }
     ]);
@@ -141,7 +144,8 @@ router.get('/', async (req, res) => {
             $match: {
                 $and: [
                     { $expr: { $lt: [{ $strLenCP: { $ifNull: ["$collaborationTheme", ""] } }, 5] } },
-                    { collaborationTheme: { $exists: true } }
+                    { collaborationTheme: { $exists: true } },
+                    { startDate: { $gt: new Date("2025-01-01T00:00:00.000Z") } }
                 ]
             }
         }
