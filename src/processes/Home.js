@@ -99,6 +99,23 @@ export default function Home() {
                 </Card>
             </div>
             }
+            { user.hasProcessPermission('/process/roomAssignmentsList') &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Elenco Assegnazioni Stanze</strong>
+                            <a href="/process/roomAssignmentsList"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Visualizza le informazioni sulle assegnazioni delle stanze</li>
+                        </ul>                    
+                    </Card.Body>
+                </Card>
+            </div>
+            }
             { user.hasProcessPermission('/process/roomLabels') &&
             <div className="col-lg-6 p-3">
             <Card className="shadow">

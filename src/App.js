@@ -28,6 +28,7 @@ import ManageConferences from './processes/Conferences'
 import ProcessVisits from './processes/Visits'
 import ProcessVisit from './processes/Visit'
 import ProcessVisitsList from './processes/VisitsList'
+import ProcessRoomAssignmentsList from './processes/RoomAssignmentsList'
 import ManageRoomLabels from './processes/RoomLabels'
 import SanityCheck from './processes/SanityCheck'
 import ProcessUrls from './processes/Urls'
@@ -104,6 +105,8 @@ function Internal() {
        <Route path="/process/visits/:id" element={<ProcessVisit variant=""/>}/>
        <Route path="/process/visitsList" element={<ProcessVisitsList variant=""/>}/>
        
+       <Route path="/process/roomAssignmentsList" element={<ProcessRoomAssignmentsList variant=""/>}/>
+
        <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
 
        <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
