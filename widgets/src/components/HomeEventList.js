@@ -18,7 +18,7 @@ import {
 } from '../utils';
 import './styles.css';
 
-export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6, columns_lg = 4, show_excerpt = true }) {
+export function HomeEventList({ default_entries = 3, show_excerpt = true, en = false }) {
     const [numberOfEntries, setNumberOfEntries] = useState(default_entries * 2);
 
     const { isLoading, error, data } = useQuery([ 'homeevents', numberOfEntries ], async () => {
@@ -67,26 +67,26 @@ export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6
     }
 
     const all_event_list = data.slice(0, numberOfEntries).map((x) => (
-        <EventBox event={x} key={x._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
+        <EventBox event={x} key={x._id} show_excerpt={show_excerpt} en={en}></EventBox>
     ));
     
     const seminar_list = filterEventsByType(data, 'seminar').slice(0, numberOfEntries).map((seminar) => (
-        <EventBox event={seminar} key={seminar._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
+        <EventBox event={seminar} key={seminar._id} show_excerpt={show_excerpt} en={en}></EventBox>
     ));
     
     const conference_list = filterEventsByType(data, 'conference').slice(0, numberOfEntries).map(
         (conference) => (
-          <EventBox event={conference} key={conference._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
+          <EventBox event={conference} key={conference._id} show_excerpt={show_excerpt} en={en}></EventBox>
         )
     );
     
     const colloquia_list = filterEventsByCategory(data, 'Colloquium').slice(0,numberOfEntries).map(
         (colloquium) => (
-          <EventBox event={colloquium} key={colloquium._id} columns={columns} columns_md={columns_md} columns_lg={columns_lg} show_excerpt={show_excerpt}></EventBox>
+          <EventBox event={colloquium} key={colloquium._id} show_excerpt={show_excerpt} en={en}></EventBox>
         )
     );
       
-    const showButton = numberOfEntries <= seminar_list.length + conference_list.length ;
+    const showButton = numberOfEntries <= seminar_list.length + conference_list.length;
 
     return (
         <div className="">
@@ -94,17 +94,17 @@ export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6
             <Nav variant="pills" className="flex-row d-flex justify-content-center">
               <Nav.Item>
                 <Nav.Link eventKey="all" className="filter-link">
-                  {isEnglish(true) ? 'All' : 'Tutti'}
+                  {isEnglish(en) ? 'All' : 'Tutti'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="conferences" className="filter-link">
-                  {isEnglish(true) ? 'Conferences' : 'Conferenze'}
+                  {isEnglish(en) ? 'Conferences' : 'Conferenze'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
                 <Nav.Link eventKey="seminars" className="filter-link">
-                  {isEnglish(true) ? 'Seminars' : 'Seminari'}
+                  {isEnglish(en) ? 'Seminars' : 'Seminari'}
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
@@ -131,7 +131,7 @@ export function HomeEventList({ default_entries = 3, columns = 6, columns_md = 6
           {showButton && (
           <div className="d-flex flex-row justify-content-center">
             <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + default_entries)}>
-              {isEnglish(true) ? 'Load more' : 'Carica altro'}
+              {isEnglish(en) ? 'Load more' : 'Carica altro'}
             </Button>
           </div>
           )}
@@ -147,7 +147,7 @@ function filterEventsByCategory(events, category) {
     return events.filter((event) => event.category?.name === category);
 }
 
-function EventBox({ event, columns, columns_md, columns_lg, show_excerpt }) {    
+function EventBox({ event, show_excerpt, en }) {    
     const date = event.endDate
     ? formatDateInterval(event.startDate, event.endDate)
     : `${formatDate(event.startDatetime)} - ${formatTime(event.startDatetime)}`;
@@ -170,7 +170,7 @@ function EventBox({ event, columns, columns_md, columns_lg, show_excerpt }) {
         );
       }
     } else {
-      tags = <a href={event.url}>{isEnglish(true) ? 'Website' : 'Sito web'}</a>
+      tags = <a href={event.url}>{isEnglish(en) ? 'Website' : 'Sito web'}</a>
     }
 
     var title = event.title
@@ -179,7 +179,7 @@ function EventBox({ event, columns, columns_md, columns_lg, show_excerpt }) {
       title = `Ph.D. Thesis Defense: ${title}`
     }
 
-    return <div className={`col-${columns} col-md-${columns_md} col-lg-${columns_lg} event-box`}>
+    return <div className={`col-6 col-md-6 col-lg-4 event-box`}>
         <h2 className="title_style">
             <a href={link} className="title_style">
                 {truncateTextByWords(title, 20)}

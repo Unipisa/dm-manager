@@ -13,14 +13,14 @@ import {
 } from '../utils';
 import './styles.css';
 
-export function HomeGrantList({}) {
-    const [numberOfEntries, setNumberOfEntries] = useState(6);
+export function HomeGrantList({ default_entries = 3 }) {
+    const [numberOfEntries, setNumberOfEntries] = useState(default_entries * 2);
 
     const { isLoading, error, data } = useQuery([ 'homegrants', numberOfEntries ], async () => {
         const now = new Date()
         now.setHours(0, 0, 0, 0)
 
-        const grants = await axios.get(getManageURL("public/grants"), { params: { _limit: numberOfEntries, _sort: "-budgetAmount", from: now} })
+        const grants = await axios.get(getManageURL("public/grants"), { params: { from: now} })
         if (grants.data) {
             return grants.data.data
         }
@@ -30,8 +30,23 @@ export function HomeGrantList({}) {
         return <Loading widget="Lista dei grant" error={error}></Loading>
     }
     
-    const all_grant_list = data.slice(0, numberOfEntries).map((x) => (
-        <GrantBox grant={x} key={x._id}></GrantBox>
+    const parseBudgetAmount = (budgetStr) => {
+        if (!budgetStr) return -1
+        
+        const numStr = budgetStr.replace(/^[€$£]|\s/g, '')
+
+        return parseFloat(numStr.replace(/\./g, '').replace(',', '.'))
+      };
+      
+    const all_grant_list = data
+        .sort((a, b) => {
+            const amountA = parseBudgetAmount(a.budgetAmount)
+            const amountB = parseBudgetAmount(b.budgetAmount)
+            return amountB - amountA;
+        })
+        .slice(0, numberOfEntries)
+        .map((x) => (
+            <GrantBox grant={x} key={x._id}></GrantBox>
     ));
         
     const showButton = numberOfEntries <= all_grant_list.length;
@@ -41,7 +56,7 @@ export function HomeGrantList({}) {
             <div className="row">{all_grant_list}</div>
             {showButton && (
             <div className="d-flex flex-row justify-content-center">
-                <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + 3)}>
+                <Button className="load-button" onClick={() => setNumberOfEntries(numberOfEntries + default_entries)}>
                 {'Load more'}
                 </Button>
             </div>

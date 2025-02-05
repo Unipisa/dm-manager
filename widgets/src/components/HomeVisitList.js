@@ -33,11 +33,7 @@ export function HomeVisitList({ default_entries = 10 }) {
     if (isLoading || error) {
         return <Loading widget="Lista delle visite" error={error}></Loading>
     }
-    
-    const all_visit_list = data.slice(0, numberOfEntries).map((v) => (
-        <VisitTableItems visit={v} key={v._id}></VisitTableItems>
-    ));
-
+ 
     const current_visit_list = filterVisitsByDate(data, 'current').slice(0, numberOfEntries).map((v) => (
         <VisitTableItems visit={v} key={v._id}></VisitTableItems>
     ));
@@ -46,7 +42,7 @@ export function HomeVisitList({ default_entries = 10 }) {
         <VisitTableItems visit={v} key={v._id}></VisitTableItems>
     ));
         
-    const showButton = numberOfEntries <= all_visit_list.length;
+    const showButton = numberOfEntries <= current_visit_list.length + future_visit_list.length;
 
     return (
         <div className="">
@@ -101,13 +97,10 @@ export function HomeVisitList({ default_entries = 10 }) {
 }
 
 const filterVisitsByDate = (visits, date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
     if (date === "current") {
-        return visits.filter((visit) => new Date(visit.startDate) <= today);
+        return visits.filter((visit) => new Date(visit.startDate) <= new Date());
     } else if (date === "future") {
-        return visits.filter((visit) => new Date(visit.startDate) > today);
+        return visits.filter((visit) => new Date(visit.startDate) > new Date());
     } else {
         return visits;
     }

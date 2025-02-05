@@ -107,10 +107,10 @@ function getCookie(c_name) {
 }
 
 export function isEnglish(defaultValue = false) {
-    const wpml = getCookie('wp-wpml_current_language');
-    if (wpml === undefined || wpml === null) {
+    if (defaultValue === true) {
         return defaultValue;
     }
+    const wpml = getCookie('wp-wpml_current_language');
     return wpml === 'en';
 }
 
