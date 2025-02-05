@@ -13,12 +13,17 @@ function Display({roomLabel, onSave}) {
     const printRef = useRef(null)
     const blue = "#08467b"
     const [size, setSize] = useState(roomLabel?.size || 0)
-    const [lastId,setLastId] = useState(null)
+    const [format, setFormat] = useState('square')
+    const [lastId, setLastId] = useState(null)
 
     if (lastId !== roomLabel._id) {
         setLastId(roomLabel._id)
         setSize(roomLabel?.size || 0)
     }
+
+    const dimensions = format === 'square' 
+        ? { width: "15cm", height: "15cm" }
+        : { width: "16cm", height: "9cm" }
 
     function sanitize(str) {
         return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -27,8 +32,8 @@ function Display({roomLabel, onSave}) {
     return <>
         <div ref={printRef} 
             style={{
-                height: "15cm",
-                width: "15cm",
+                height: dimensions.height,
+                width: dimensions.width,
                 borderStyle: "solid",
                 borderColor: "#eee",
                 borderWidth: "1px",
@@ -37,15 +42,15 @@ function Display({roomLabel, onSave}) {
                 printColorAdjust: "exact"
         }}>
             <img alt="" style={{
-                height: "3cm",
+                height: format === 'square' ? "3cm" : "2.5cm",
                 opacity: "0.8",
                 marginTop: "0.2cm",
                 marginLeft: "0.2cm",
                 marginBottom: "-0.2cm"
                 }} src="/img/matematica_dx.svg" />
             <div style={{
-                height:"13cm",
-                marginTop:"-2cm"
+                height: format === 'square' ? "13cm" : "7cm",
+                marginTop: "-2cm"
             }}>
                 <div ref={namesRef} 
                     contentEditable="true" style={{
@@ -53,14 +58,14 @@ function Display({roomLabel, onSave}) {
                     textAlign: "center",
                     fontSize: `${Math.round(100*Math.pow(2,size/2))/100}cm`, 
                     position: "relative",
-                    top: "50%",
+                    top: format === 'square' ? "50%" : "55%",
                     transform: "translateY(-50%)",
                     }}
                     dangerouslySetInnerHTML={{__html: roomLabel.names.map(
                         name=>`<div>${sanitize(name)}</div>`).join('')}} />
             </div>
             <div style={{
-                marginTop: "-4cm",
+                marginTop: format === 'square' ? "-4cm" : "-3cm",
                 marginRight: "0.5cm"
             }}>
             <div ref={numberRef} 
@@ -74,17 +79,17 @@ function Display({roomLabel, onSave}) {
                     textAlign: "right",
                     paddingTop: ".5cm",
                     paddingRight: "0.1cm",
-                    marginTop: "2cm",
+                    marginTop: format === 'square' ? "2cm" : "1.5cm",
                     float: "left"
                 }}
                 dangerouslySetInnerHTML={{__html: sanitize(roomLabel.number)}}
                 />
             <img alt="" style={{
-                height: "8cm",
+                height: format === 'square' ? "8cm" : "6cm",
                 position: "relative",
                 float: "right",
                 opacity: "0.12",
-                marginTop: "-3.2cm",
+                marginTop: format === 'square' ? "-3.2cm" : "-1.7cm",
                 marginRight: "-0.4cm",
                 pointerEvents: "none"
                 }} src="/img/cherubino_pant541.png" />
@@ -99,14 +104,18 @@ function Display({roomLabel, onSave}) {
             <Button onClick={() => {
                 const names = [...namesRef.current.children].map(child => child.textContent)
                 const number = numberRef.current.textContent
-                onSave({names, number, size})
+                onSave({names, number, size, format})
             }}>aggiungi ai cartellini da fare</Button> }
-            <select value={ size } onChange={e => setSize(e.target.value)}>
+            <select value={size} onChange={e => setSize(e.target.value)}>
                 <option value="2">scritta molto grande</option>
                 <option value="1">scritta grande</option>
                 <option value="0">scritta di dimensione normale</option>
                 <option value="-1">scritta piccola</option>
                 <option value="-2">scritta molto piccola</option>
+            </select>
+            <select value={format} onChange={e => setFormat(e.target.value)}>
+                <option value="square">formato quadrato</option>
+                <option value="rectangular">formato rettangolare</option>
             </select>
         </ButtonGroup>
     </>

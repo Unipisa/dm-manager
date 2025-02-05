@@ -93,7 +93,7 @@ function AssignmentsList() {
                 <input
                     type="text"
                     className="form-control"
-                    placeholder="Cerca per nome, stanza, piano..."
+                    placeholder="Cerca per nome, stanza, affiliazione..."
                     value={filter.filter._search}
                     onChange={updateFilter}
                 />
