@@ -66,13 +66,6 @@ const INDEX_PIPELINE = [
 module.exports.INDEX_PIPELINE = INDEX_PIPELINE;
 
 router.get('/', async (req, res) => {    
-    if (!req?.user?.person || !req.user.roles.includes('admin')) {
-        res.status(401).json({
-            result: "Unauthorized"
-        })
-        return
-    }
-
     const data = await RoomAssignment.aggregate([
         { $match: {
             $expr: { 

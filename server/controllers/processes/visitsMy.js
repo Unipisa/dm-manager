@@ -18,14 +18,7 @@ require('./grantSearch')(router)
 // inject room assignment functionality
 // require('./roomAssignment')(router)
 
-router.get('/', async (req, res) => {    
-    if (!req.user) {
-        res.status(401).json({
-            result: "Unauthorized"
-        })
-        return
-    }
-
+router.get('/', async (req, res) => {
     const person = req.person
     if (!person) return res.json({ data: [], person, DAYS_BACK, note: `user ${req.user?.username} has no associated person`})
 

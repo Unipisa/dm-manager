@@ -12,12 +12,6 @@ const Event = require('../../models/EventConference')
 const Visit = require('../../models/Visit')
 
 router.get('/', async (req, res) => {    
-    if (req.user === undefined || !req.user.roles.includes('admin')) {
-        return res.status(401).json({
-            result: "Unauthorized"
-        })
-    }
-
     // find duplicated names
     const duplicatedNames = await Person.aggregate([
         {
