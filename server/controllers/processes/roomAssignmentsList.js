@@ -37,6 +37,7 @@ const INDEX_PIPELINE = [
                         firstName: 1,
                         lastName: 1,
                         email: 1,
+                        phone: 1,
                         affiliations: 1 
                     }
                 }

@@ -44,6 +44,8 @@ function AssignmentsList() {
             const searchableText = `
                 ${person.firstName?.toLowerCase() || ''}
                 ${person.lastName?.toLowerCase() || ''}
+                ${person.email?.toLowerCase() || ''}
+                ${person.phone?.toLowerCase() || ''}
                 ${person.affiliations?.map(aff => aff.name?.toLowerCase()).join(' ') || ''}
                 ${roomData.floor?.toString().toLowerCase() || ''}
                 ${roomData.number?.toString().toLowerCase() || ''}
@@ -151,7 +153,7 @@ function RoomAssignmentsTable({ assignments }) {
 
     return (
         <table className="table table-striped table-bordered">
-             <thead className="table-dark">
+            <thead className="table-dark">
                 <tr>
                     <th scope="col">Piano</th>
                     <th scope="col">Stanza</th>
@@ -162,7 +164,7 @@ function RoomAssignmentsTable({ assignments }) {
             <tbody>
                 {assignments.map((assignment) => {
                     const { person, room, startDate, endDate } = assignment;
-                    const { firstName, lastName, affiliations } = person;
+                    const { firstName, lastName, affiliations, email, phone } = person;
                     const roomData = room[0] || {};
 
                     const period =
@@ -174,12 +176,16 @@ function RoomAssignmentsTable({ assignments }) {
                             ? `Fino al ${myDateFormat(endDate)}`
                             : "";
 
+                    const affiliationNames = affiliations.map((aff) => aff.name).join(", ");
+                    const contactDetails = [phone, email].filter(Boolean).join(" | "); 
+
                     return (
                         <tr key={assignment._id}>
                             <td>{roomData.floor}</td>
                             <td>{roomData.number}</td>
                             <td>
-                                {firstName} {lastName} ({affiliations.map((aff) => aff.name).join(", ")})
+                                {firstName} {lastName} ({affiliationNames}
+                                {contactDetails ? `, ${contactDetails}` : ""})
                             </td>
                             <td>{period}</td>
                         </tr>
