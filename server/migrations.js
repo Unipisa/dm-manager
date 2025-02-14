@@ -519,6 +519,12 @@ const migrations = {
         return true
     },
 
+    D20250214_default_square_format: async function(db) {
+        const roomlabels = db.collection('roomlabels')
+        await roomlabels.updateMany({ format: { $exists: false } }, { $set: { format: 'square' } })
+        return true
+    }
+
 }
 
 async function migrate(db, options) {
