@@ -14,7 +14,7 @@ const staffSchema = new Schema({
     matricola: { type: String, label: 'matricola'},
     qualification: {type: String, label: 'qualifica', 
         enum: [
-            'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+            'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
             'Assegnista', 'Dottorando', 'PTA', 
             'Professore Emerito',
             'Collaboratore',

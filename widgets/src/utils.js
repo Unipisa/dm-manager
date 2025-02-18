@@ -177,6 +177,7 @@ export function getRoleLabel(role, english, feminine) {
         'PA': ['Professore Associato', 'Professoressa Associata', 'Associate Professor', 'Associate Professor'],
         'RTDb': ['Ricercatore a tempo determinato senior', 'Ricercatrice a tempo determinato senior', 'Tenure-track Assistant Professor', 'Tenure-track Assistant Professor'],
         'RTDa': ['Ricercatore a tempo determinato junior', 'Ricercatrice a tempo determinato junior', 'Non-Tenure-Track Assistant Professor', 'Non-Tenure-Track Assistant Professor'],
+        'RTT': ['Ricercatore a tempo determinato', 'Ricercatrice a tempo determinato', 'Tenure-Track Assistant Professor', 'Tenure-Track Assistant Professor'],
         'RIC': ['Ricercatore a tempo indeterminato', 'Ricercatrice a tempo indeterminato', 'Tenured Assistant Professor', 'Tenured Assistant Professor'],
         'Assegnista': ['Assegnista', 'Assegnista', 'Postdoctoral Fellow', 'Postdoctoral Fellow'],
         'Dottorando': ['Dottorando', 'Dottoranda', 'Ph.D. Student', 'Ph.D. Student'],

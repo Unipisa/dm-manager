@@ -119,7 +119,7 @@ function setup_routes(app) {
           // se modifchi queste qualifiche ricordati di modificare 
           // anche la descrizione in fondo alle pagine dei relativi
           // processi
-          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
             'Assegnista', 'Dottorando', 
             'Professore Emerito',
             'Collaboratore',
@@ -131,7 +131,7 @@ function setup_routes(app) {
               add_role('/process/visitsList')
               add_role('/process/my/urls')
           }
-          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
             'Assegnista', 'Dottorando', 
             'Professore Emerito',
             'Collaboratore',
