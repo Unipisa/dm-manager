@@ -58,6 +58,7 @@ const INDEX_PIPELINE = [
             "room.code": 1,
             "room.building": 1,
             "room.floor": 1,
+            "room.notes": 1,
             "room.number": 1,
             "person": 1 
         }

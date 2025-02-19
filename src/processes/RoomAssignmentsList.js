@@ -49,6 +49,7 @@ function AssignmentsList() {
                 ${person.affiliations?.map(aff => aff.name?.toLowerCase()).join(' ') || ''}
                 ${roomData.floor?.toString().toLowerCase() || ''}
                 ${roomData.number?.toString().toLowerCase() || ''}
+                ${roomData.notes?.toString().toLowerCase() || ''}
                 ${roomData.code?.toLowerCase() || ''}
                 ${roomData.building?.toLowerCase() || ''}
                 ${assignment.startDate ? myDateFormat(assignment.startDate).toLowerCase() : ''}
@@ -157,6 +158,7 @@ function RoomAssignmentsTable({ assignments }) {
                 <tr>
                     <th scope="col">Piano</th>
                     <th scope="col">Stanza</th>
+                    <th scope="col">Note</th>
                     <th scope="col">Assegnazione</th>
                     <th scope="col">Periodo</th>
                 </tr>
@@ -183,6 +185,7 @@ function RoomAssignmentsTable({ assignments }) {
                         <tr key={assignment._id}>
                             <td>{roomData.floor}</td>
                             <td>{roomData.number}</td>
+                            <td>{roomData.notes}</td>
                             <td>
                                 {firstName} {lastName} ({affiliationNames}
                                 {contactDetails ? `, ${contactDetails}` : ""})
