@@ -23,8 +23,9 @@ const {
 
 const seminarCategorySchema = new Schema({
     name: { type: String, label: 'Nome', required: true },
-    label: { type: String, label: 'Label (Wordpress)', required: true },
-    old_id: { type: Number, label: 'ID (vecchio sito)', required: false },
+    // 09/04/2025: hiding as not used anymore, CDP
+    //label: { type: String, label: 'Label (Wordpress)', required: true },
+    //old_id: { type: Number, label: 'ID (vecchio sito)', required: false },
     notes,
 
     createdBy,
