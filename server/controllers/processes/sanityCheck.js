@@ -82,6 +82,16 @@ router.get('/', async (req, res) => {
         }
     ])
 
+    // find expired internal staff 
+    const expiredInternalStaff = await Staff.aggregate([
+        {
+            $match: {
+                isInternal: true,
+                endDate: { $lt: new Date() }
+            }
+        }
+    ])
+
     // find institutions with missing country
     const missingInstitutionCountry = await Institution.aggregate([
         {
@@ -323,6 +333,7 @@ router.get('/', async (req, res) => {
         personsWithTrailingSpaces, 
         institutionsWithTrailingSpaces, 
         duplicatedEmails, 
+        expiredInternalStaff,
         missingMatricola, 
         missingSSD, 
         missingInstitutionCountry,
