@@ -179,6 +179,21 @@ function EventBox({ event, show_excerpt, en }) {
       title = `Ph.D. Thesis Defense: ${title}`
     }
 
+    let room = null;
+    
+    if (event.conferenceRoom?.name) {
+        if (event.conferenceRoom?.room) {
+            const roomUrl = en
+                ? getDMURL(`/map?sel=${event.conferenceRoom.room}`)
+                : getDMURL(`/mappa?sel=${event.conferenceRoom.room}`);
+            room = <a href={roomUrl}>{event.conferenceRoom.name}</a>;
+        } else {
+            room = event.conferenceRoom.name;
+        }
+    } else if (event.institution?.name) {
+        room = event.institution.name;
+    }
+
     return <div className={`col-6 col-md-6 col-lg-4 event-box`}>
         <h2 className="title_style">
             <a href={link} className="title_style">
@@ -189,7 +204,7 @@ function EventBox({ event, show_excerpt, en }) {
           <div className="subtitle_style fas fa-user"> {event.speakers.map(speaker => `${speaker.firstName || ''} ${speaker.lastName || ''}`).join(', ')}</div> 
         }
         <div className="subtitle_style far fa-calendar"> {date}</div>
-        <div className="subtitle_style fas fa-map-marker-alt"> {event.conferenceRoom?.name || event.institution?.name}</div>
+        <div className="subtitle_style fas fa-map-marker-alt"> {room}</div>
         <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>
         { show_excerpt && 
           <div className="excerpt_style">

@@ -8,7 +8,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 
-import { formatDateInterval } from '../utils'
+import { formatDateInterval, getDMURL, isEnglish } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Conference({ id }) {
@@ -46,6 +46,8 @@ export function Conference({ id }) {
 }
 
 export function ConferenceTitle({ conference, href }) {
+    const en = isEnglish();
+
     var title_block = <span>{conference.title}</span>
     if (href !== undefined) {
         title_block = <a href={href}>
@@ -56,6 +58,21 @@ export function ConferenceTitle({ conference, href }) {
 
     // FIXME: tradurre gli SSD nei nomi dei settori.
 
+    let room = null;
+    
+    if (conference.conferenceRoom?.name) {
+        if (conference.conferenceRoom?.room) {
+            const roomUrl = en
+                ? getDMURL(`/map?sel=${conference.conferenceRoom.room}`)
+                : getDMURL(`/mappa?sel=${conference.conferenceRoom.room}`);
+            room = <a href={roomUrl}>{conference.conferenceRoom.name}</a>;
+        } else {
+            room = conference.conferenceRoom.name;
+        }
+    } else if (conference.institution?.name) {
+        room = conference.institution.name;
+    }
+
     return <>
     {title_block}
     <p>
@@ -63,7 +80,7 @@ export function ConferenceTitle({ conference, href }) {
             <span className="far fa-calendar"></span> {
                 formatDateInterval(conference.startDate, conference.endDate)}
             <span className="mx-1"></span>
-            <span className="fas fa-map-marker-alt"></span> {conference.conferenceRoom?.name || conference.institution?.name}
+            <span className="fas fa-map-marker-alt"></span> {room}
             <span className="mx-1"></span>
             <span className="fas fa-university"></span> {(conference.SSD || [] ).map(x => <span key={x} className="mr-1">{getSSDLink(x)}</span>)}
             { conference.url && <><span className="mx-1"></span>
