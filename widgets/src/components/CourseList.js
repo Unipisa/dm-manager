@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import axios from 'axios'
 import Accordion from './Accordion';
 import { Loading } from './Loading'
-import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL } from '../utils'
+import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL, isEnglish } from '../utils'
 
 export function CourseList({ from, to }) {
     if (from === undefined || to === undefined) {
@@ -29,6 +29,7 @@ export function CourseList({ from, to }) {
         return <Loading widget="Lista dei corsi" error={error}></Loading>;
     }
 
+    const en = isEnglish();
     const fallCourses = [];
     const springCourses = [];
 
@@ -86,11 +87,21 @@ export function CourseList({ from, to }) {
                 <div>
                     <h5 className="wp-block-heading"><strong>Scheduled lessons:</strong></h5>
                     <ul>
-                        {course.lessons.map((lesson, index) => (
-                            <li key={index}>
-                                {formatDate(lesson.date, 'en-US')}, {formatTime(lesson.date)} ({lesson.duration} minutes), {lesson.conferenceRoom}
-                            </li>
-                        ))}
+                        {course.lessons.map((lesson, index) => {
+                            let room = lesson.conferenceRoom || null;
+                            if (lesson.conferenceRoom && lesson.conferenceRoomID) {
+                                const roomUrl = en
+                                    ? getDMURL(`/map?sel=${lesson.conferenceRoomID}`)
+                                    : getDMURL(`/mappa?sel=${lesson.conferenceRoomID}`);
+                                room = <a href={roomUrl}>{lesson.conferenceRoom}</a>;
+                            }
+                            
+                            return (
+                                <li key={index}>
+                                    {formatDate(lesson.date, 'en-US')}, {formatTime(lesson.date)} ({lesson.duration} minutes), {room}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
             ) : null;

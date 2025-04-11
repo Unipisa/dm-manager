@@ -108,14 +108,14 @@ const filterVisitsByDate = (visits, date) => {
 
 function VisitTableItems({ visit, key }) {
     const date = formatDateInterval(visit.startDate, visit.endDate, 'en-US')
-    const roomDetails = visit.roomAssignment ? getRoomDetails(visit.roomAssignment.room, '', true) : '';
+    const roomDetails = visit.roomAssignment ? getRoomDetails(visit.roomAssignment.room, visit.roomAssignment.room._id, true) : '';
 
     return (
     <tr key={key}>
         <td>{visit.person.firstName} {visit.person.lastName} ({visit.person.affiliations[0]?.name})</td>
         <td>{date}</td>
         {roomDetails && roomDetails !== '' && (new Date(visit.startDate) <= new Date()) && (
-          <td>{roomDetails.buildingName}, {roomDetails.floorName}, {roomDetails.roomLink.text}</td>
+          <td>{roomDetails.buildingName}, {roomDetails.floorName}, <a href={roomDetails.roomLink.url}>{roomDetails.roomLink.text}</a></td>
         )}
     </tr>
     )
