@@ -148,7 +148,7 @@ export default function Profile() {
                 <FieldOutput field="startDate" label="Data inizio" Model={Staff} obj={staff} editable={false} />
                 <FieldOutput field="endDate" label="Data fine" Model={Staff} obj={staff} editable={false} />
                 <FieldOutput field="SSD" label="SSD" Model={Staff} obj={staff} editable={false} />
-                <FieldOutput field="photoUrl" label="Foto" Model={Staff} obj={staff} editable={false} />
+                { /*<FieldOutput field="photoUrl" label="Foto" Model={Staff} obj={staff} editable={false} />*/ }
             </Card.Body>
         </Card>)
         : <Loading />}
