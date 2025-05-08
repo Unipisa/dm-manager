@@ -3,7 +3,7 @@ import { useParams, Navigate, useSearchParams } from 'react-router-dom'
 import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
-import { DateInput, NumberInput, PersonInput, StringInput, TextInput } from '../components/Input'
+import { DateInput, NumberInput, PersonInput, SelectInput, StringInput, TextInput } from '../components/Input'
 
 import Loading from '../components/Loading'
 import { ModelHeading } from '../components/ModelHeading'
@@ -272,6 +272,25 @@ export default function PhdCourseEditPage({ Model }) {
                                         setModifiedObj(obj => ({
                                             ...obj,
                                             description: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"phd"} style={{textAlign: "right"}}>
+                                Dottorato in
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <SelectInput 
+                                    id="phd"
+                                    options={["Matematica", "HPSC"]}
+                                    value={modifiedObj.phd}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            phd: value,
                                         }))
                                     }}
                                 />

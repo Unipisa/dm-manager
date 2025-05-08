@@ -17,6 +17,12 @@ const lessonSchema = new Schema({
 const eventPhdCourseSchema = new Schema({
     title: { type: String, label: 'Titolo'},
     description: { type: String, label: 'Descrizione', widget: 'text', default: '' },
+    phd: {
+        type: String,
+        label: 'Dottorato in',
+        enum: ["Matematica", "HPSC"],
+        default: "Matematica",
+    },
     startDate,
     endDate,
     lecturers: [{ type: ObjectId, label: 'Docente/i', ref: 'Person', default: [], required: true }],

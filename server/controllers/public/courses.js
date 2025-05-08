@@ -70,6 +70,7 @@ async function coursesQuery(req) {
             endDate: { $first: '$endDate' },
             title: { $first: '$title' },
             description: { $first: '$description' },
+            phd: { $first: '$phd' },
             lecturers: { $first: '$lecturers' },
             lessons: { $push: {
                 _id: '$lessons._id',
@@ -84,6 +85,7 @@ async function coursesQuery(req) {
             endDate: 1,
             title: 1,
             description: 1,
+            phd: 1,
             lecturers: 1,
             lessons: 1
         }}
