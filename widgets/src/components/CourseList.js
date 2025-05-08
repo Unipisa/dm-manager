@@ -9,12 +9,12 @@ import Accordion from './Accordion';
 import { Loading } from './Loading'
 import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL } from '../utils'
 
-export function CourseList({ from, to }) {
+export function CourseList({ from, to, phd }) {
     if (from === undefined || to === undefined) {
         return <div>Please specify both 'from' and 'to' in order to show the list of courses</div>;
     }
     
-    const filter = { from, to };
+    const filter = { from, to, phd };
 
     const { isLoading, error, data } = useQuery(['conferences', filter], async () => {
         const res = await axios.get(getManageURL('public/courses'), { params: filter });

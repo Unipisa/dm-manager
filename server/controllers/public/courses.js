@@ -35,6 +35,10 @@ async function coursesQuery(req) {
         match["startDate"] = { "$lte": to }
     }
 
+    if (req.query.phd) {
+        match["phd"] = req.query.phd
+    }
+
     const lookupPipeline = (from, localField, foreignField, as, additionalPipeline = []) => ({
         $lookup: {
             from,
