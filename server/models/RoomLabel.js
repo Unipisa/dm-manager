@@ -11,6 +11,7 @@ const RoomLabel = model('RoomLabel', new Schema({
         type: String, 
     },
     size: Number, // la dimensione effettiva sara cm: 2^(size/2)
+    format: String, // square, rectangle
     state: {
         type: String,
         enum: ['submitted', 'managed'],

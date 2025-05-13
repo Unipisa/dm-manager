@@ -13,12 +13,13 @@ function Display({roomLabel, onSave}) {
     const printRef = useRef(null)
     const blue = "#08467b"
     const [size, setSize] = useState(roomLabel?.size || 0)
-    const [format, setFormat] = useState('square')
+    const [format, setFormat] = useState(roomLabel?.format || 'square')
     const [lastId, setLastId] = useState(null)
 
     if (lastId !== roomLabel._id) {
         setLastId(roomLabel._id)
         setSize(roomLabel?.size || 0)
+        setFormat(roomLabel?.format || 'square')
     }
 
     const dimensions = format === 'square' 
@@ -216,7 +217,8 @@ export default function ManageRoomLabels() {
     const [roomLabel, setRoomLabel] = useState({
         names: ["Nome Cognome"],
         number: "123",
-        fontSize: 0
+        fontSize: 0,
+        format: 'square'
     })
 //    const patchRoomLabel = engine.usePatch('roomLabel')
     const [urlId, setUrlId] = useState(window.location.search.substring(1))

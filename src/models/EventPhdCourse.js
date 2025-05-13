@@ -33,6 +33,7 @@ export default class EventPhdCourse {
             'title': 'Titolo',
             'startDate': 'Data Inizio',
             'endDate': 'Data Fine',
+            'phd': 'Dottorato',
             'lecturers': 'Docente/i',
         }
         this.schema = null
@@ -95,9 +96,11 @@ export default class EventPhdCourse {
 function PhdCoursesFilters({filter}) {
     const setFilterFields = filter.setFilter
     const [year, setYear] = useState(0)
+    const [phd, setPhd] = useState('')
     const currentYear = new Date().getFullYear()
     const startYear = 2023
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i)
+    const phdOptions = ['Matematica', 'HPSC']
 
     return <>
         <select
@@ -123,6 +126,29 @@ function PhdCoursesFilters({filter}) {
             }}>
             <option value="">Tutti gli anni</option>
             {years.map(y => <option key={y} value={y}>{y}</option>)}
+        </select>
+        <select
+            className="mx-1 form-control"
+            style={{ width: '15%' }}
+            placeholder='seleziona dottorato'
+            value={phd || ""} 
+            onChange={evt => {
+                const phd = evt.target.value
+                setPhd(phd)
+                if (phd) {
+                    setFilterFields(prev => ({
+                        ...prev,
+                        phd: phd,
+                    }))
+                } else {
+                    setFilterFields(prev => {
+                        const {phd, ...rest} = prev
+                        return rest
+                    })
+                }
+            }}>
+            <option value="">Tutti i dottorati</option>
+            {phdOptions.map(option => <option key={option} value={option}>{option}</option>)}
         </select>
     </>
 }

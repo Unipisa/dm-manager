@@ -35,6 +35,10 @@ async function coursesQuery(req) {
         match["startDate"] = { "$lte": to }
     }
 
+    if (req.query.phd) {
+        match["phd"] = req.query.phd
+    }
+
     const lookupPipeline = (from, localField, foreignField, as, additionalPipeline = []) => ({
         $lookup: {
             from,
@@ -70,6 +74,7 @@ async function coursesQuery(req) {
             endDate: { $first: '$endDate' },
             title: { $first: '$title' },
             description: { $first: '$description' },
+            phd: { $first: '$phd' },
             lecturers: { $first: '$lecturers' },
             lessons: { $push: {
                 _id: '$lessons._id',
@@ -85,6 +90,7 @@ async function coursesQuery(req) {
             endDate: 1,
             title: 1,
             description: 1,
+            phd: 1,
             lecturers: 1,
             lessons: 1
         }}
