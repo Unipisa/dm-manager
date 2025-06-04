@@ -96,7 +96,7 @@ export function CourseList({ from, to, phd }) {
             ) : null;
 
             return (
-                <Accordion title={course.title} key={course._id}>
+                <Accordion title={course.title} badge={course.courseType} key={course._id}>
                     <h5 className="wp-block-heading"><strong>{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</strong></h5>
                     {lecturerCards}
                     <h5 className="wp-block-heading"><strong>Period:</strong></h5>

@@ -298,6 +298,25 @@ export default function PhdCourseEditPage({ Model }) {
                             <div className="col-sm-2"></div>
                         </Form.Group>
                         <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" htmlFor={"courseType"} style={{textAlign: "right"}}>
+                                Tipo
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <SelectInput 
+                                    id="courseType"
+                                    options={["", "Foundational", "Methodological", "Thematic"]}
+                                    value={modifiedObj.courseType || ""}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            courseType: value === "" ? null : value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
                             <Form.Label className="col-sm-2 col-form-label" htmlFor={"start-date"} style={{textAlign: "right"}}>
                                 Data inizio
                             </Form.Label>

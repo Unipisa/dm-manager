@@ -75,6 +75,7 @@ async function coursesQuery(req) {
             title: { $first: '$title' },
             description: { $first: '$description' },
             phd: { $first: '$phd' },
+            courseType: { $first: '$courseType' },
             lecturers: { $first: '$lecturers' },
             lessons: { $push: {
                 _id: '$lessons._id',
@@ -90,6 +91,7 @@ async function coursesQuery(req) {
             title: 1,
             description: 1,
             phd: 1,
+            courseType: 1,
             lecturers: 1,
             lessons: 1
         }}

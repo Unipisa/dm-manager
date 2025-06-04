@@ -1,7 +1,7 @@
 import React, { useState, useId } from 'react';
 import './styles.css';
 
-const Accordion = ({ title, content, markdown = true, initiallyOpen = false, clickToClose = true, autoClose = true, scroll = false, scrollOffset = 0, children }) => {
+const Accordion = ({ title, badge, content, markdown = true, initiallyOpen = false, clickToClose = true, autoClose = true, scroll = false, scrollOffset = 0, children }) => {
   const acId = useId();
   const atId = useId();
   const markdownClass = markdown ? 'markdown-compile' : '';
@@ -37,7 +37,8 @@ const Accordion = ({ title, content, markdown = true, initiallyOpen = false, cli
         aria-expanded={isOpen}
         onClick={toggleAccordion}
       >
-        {title}
+        <span>{title}</span>
+        {badge && <span className="badge badge-primary ml-2">{badge}</span>}
       </h4>
       <div
         id={acId}

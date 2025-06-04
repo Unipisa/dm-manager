@@ -23,6 +23,12 @@ const eventPhdCourseSchema = new Schema({
         enum: ["Matematica", "HPSC"],
         default: "Matematica",
     },
+    courseType: {
+        type: String,
+        label: 'Tipo',
+        enum: [null, "Foundational", "Methodological", "Thematic"],
+        default: null
+    },
     startDate,
     endDate,
     lecturers: [{ type: ObjectId, label: 'Docente/i', ref: 'Person', default: [], required: true }],
