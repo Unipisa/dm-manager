@@ -15,13 +15,6 @@ const router = express.Router()
 module.exports = router
 
 router.get('/', async (req, res) => {    
-    if (!req?.user?.person) {
-        res.status(401).json({
-            result: "Unauthorized"
-        })
-        return
-    }
-
     const data = await Visit.aggregate([
         { $match: { 
             endDate: { $gte: pastDate() },

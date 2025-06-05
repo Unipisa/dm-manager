@@ -18,7 +18,8 @@ const eventSeminarSchema = new Schema({
     category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: false, can_sort: ['name'] },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     abstract: { type: String, label: "Abstract", widget: 'text' },
-    externalid: { type: String, label: "External ID" },
+    // 09/04/2025: hiding as not used anymore, CDP
+    //externalid: { type: String, label: "External ID" },
 
     createdBy,
     updatedBy,

@@ -108,6 +108,7 @@ async function seminarsQuery(req) {
                 {$project: {
                     _id: 0,
                     name: 1,
+                    room: 1
                 }}
             ]
         }},

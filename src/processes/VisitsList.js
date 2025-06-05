@@ -11,7 +11,7 @@ export default function ProcessVisitsList() {
         Questa pagina è accessibile a tutti gli utenti 
         con permesso <i>/process/visitsList</i>. Tale permesso è automatico 
         per gli utenti che hanno una delle seguenti qualifiche interne al dipartimento:
-        'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+        'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
         'Assegnista', 'Dottorando', 
         'Professore Emerito',
         'Collaboratore',

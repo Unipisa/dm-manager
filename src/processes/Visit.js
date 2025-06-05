@@ -410,7 +410,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
     function error() {
         if (!data.startDate) return "Data di arrivo non inserita"
         if (!data.endDate) return "Data di partenza non inserita"
-        if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo successiva alla data di partenza"
+        if (new Date(data.startDate) > new Date(data.endDate)) return "Data di arrivo posteriore alla data di partenza"
         if (!data.collaborationTheme) return "Tema della collaborazione non inserito (scrivere 'TBA' se non ancora definito e aggiungere successivamente)"
         if (data.referencePeople.length === 0) return "Inserire almeno un referente per la visita"
     }

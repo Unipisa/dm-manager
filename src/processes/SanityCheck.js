@@ -106,7 +106,12 @@ export default function SanityCheck() {
                 )}
             />
             <CheckCard
-                title="Seminars TBA"
+                title="Expired Internal Staff"
+                data={data.expiredInternalStaff}
+                renderRow={(item, i) => RenderCheckSingleItem(item, i, '/staff')}
+            />
+            <CheckCard
+                title="TBA Seminars"
                 data={data.seminarsTBA}
                 renderRow={(item) => (
                     <td>
@@ -115,7 +120,7 @@ export default function SanityCheck() {
                 )}
             />
             <CheckCard
-                title="Visits TBA"
+                title="TBA Visits"
                 data={data.visitsTBA}
                 renderRow={(item) => (
                     <td>
@@ -124,12 +129,12 @@ export default function SanityCheck() {
                 )}
             />
             <CheckCard
-                title="Person with trailing spaces"
+                title="Trailing spaces person"
                 data={data.personsWithTrailingSpaces}
                 renderRow={(item, i) => RenderCheckSingleItem(item, i, '/person')}
             />
             <CheckCard
-                title="Institution with trailing spaces"
+                title="Trailing spaces institutions"
                 data={data.institutionsWithTrailingSpaces}
                 renderRow={(item, i) => RenderCheckSingleItem(item, i, '/institution')}
             />

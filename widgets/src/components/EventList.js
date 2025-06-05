@@ -65,7 +65,7 @@ export function EventList({ from, to, grants, _limit }) {
             )
         }
         else {
-            const link = getDMURL("conferenza?id=" + e._id)
+            const link = getDMURL("conference?id=" + e._id)
             events_block.push(
                 <div key={e._id}>
                     <ConferenceTitle conference={e} href={link}></ConferenceTitle>

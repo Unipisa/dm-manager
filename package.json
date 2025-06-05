@@ -1,6 +1,6 @@
 {
   "name": "dm-manager",
-  "version": "1.10.2",
+  "version": "1.10.5",
   "private": true,
   "dependencies": {
     "@babel/core": "^7.16.0",
@@ -13,7 +13,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.3.0",
     "@testing-library/user-event": "^13.5.0",
-    "axios": "^1.2.3",
+    "axios": "^1.8.2",
     "babel-jest": "^27.4.2",
     "babel-loader": "^8.2.3",
     "babel-plugin-named-asset-import": "^0.3.8",
@@ -34,7 +34,7 @@
     "eslint": "^8.3.0",
     "eslint-config-react-app": "^7.0.1",
     "eslint-webpack-plugin": "^3.1.1",
-    "express-session": "^1.17.3",
+    "express-session": "^1.18.1",
     "file-loader": "^6.2.0",
     "fs-extra": "^10.0.0",
     "he": "^1.2.0",
@@ -47,7 +47,7 @@
     "luxon": "^3.4.4",
     "mini-css-extract-plugin": "^2.4.5",
     "moment": "^2.29.4",
-    "mongoose": "^6.5.2",
+    "mongoose": "^6.13.8",
     "mongoose-permissions": "^1.0.0",
     "mongoose-schema-jsonschema": "^2.0.2",
     "morgan": "^1.10.0",
@@ -189,7 +189,7 @@
     "chai": "^4.3.6",
     "chai-as-promised": "^7.1.1",
     "jest": "^27.5.1",
-    "mocha": "^10.1.0",
+    "mocha": "^10.8.2",
     "supertest": "^6.3.3"
   },
   "babel": {

@@ -184,6 +184,10 @@ export function ProcessDropdown() {
         <NavDropdown.Item key="roomLabels" as={NavLink} to="/process/roomLabels">
             Cartellini Stanze
         </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/roomAssignmentsList')) items.push(
+        <NavDropdown.Item key="roomAssignmentsList" as={NavLink} to="/process/roomAssignmentsList">
+            Assegnazioni Stanze
+        </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/my/urls')) items.push(
         <NavDropdown.Item key="urls" as={NavLink} to="/process/my/urls">
             Alias Pagine Web

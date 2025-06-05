@@ -14,7 +14,7 @@ const staffSchema = new Schema({
     matricola: { type: String, label: 'matricola'},
     qualification: {type: String, label: 'qualifica', 
         enum: [
-            'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 
+            'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
             'Assegnista', 'Dottorando', 'PTA', 
             'Professore Emerito',
             'Collaboratore',
@@ -27,8 +27,9 @@ const staffSchema = new Schema({
     startDate,
     endDate,
     SSD,
-    photoUrl: {type: String, label: 'URL foto'},
-    wordpressId: String,
+    // 09/04/2025: hiding as not used anymore, CDP
+    // photoUrl: {type: String, label: 'URL foto'},
+    // wordpressId: String,
     notes: {type: String, label: 'note', widget: 'text'},
     createdBy,
     updatedBy,

@@ -7,7 +7,7 @@ import remarkGfm from 'remark-gfm'
 import axios from 'axios'
 import Accordion from './Accordion';
 import { Loading } from './Loading'
-import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL } from '../utils'
+import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL, isEnglish } from '../utils'
 
 export function CourseList({ from, to, phd }) {
     if (from === undefined || to === undefined) {
@@ -29,17 +29,22 @@ export function CourseList({ from, to, phd }) {
         return <Loading widget="Lista dei corsi" error={error}></Loading>;
     }
 
+    const en = isEnglish();
     const fallCourses = [];
     const springCourses = [];
+    const noDateCourses = [];
 
     const fromYear = new Date(from).getFullYear();
     const toYear = new Date(to).getFullYear();
     const springDate = new Date(`${fromYear + 1}-03-01`);
+    const noDate = new Date(`${fromYear}-09-01`);
 
     for (const course of data) {
         if (course && course.endDate) {
             const courseEndDate = new Date(course.endDate);
-            if (courseEndDate < springDate) {
+            if (courseEndDate.getTime() == noDate.getTime()) {
+                noDateCourses.push(course);
+            } else if (courseEndDate < springDate) {
                 fallCourses.push(course);
             } else {
                 springCourses.push(course);
@@ -49,6 +54,7 @@ export function CourseList({ from, to, phd }) {
     
     fallCourses.sort((a, b) => a.title.localeCompare(b.title));
     springCourses.sort((a, b) => a.title.localeCompare(b.title));
+    noDateCourses.sort((a, b) => a.title.localeCompare(b.title));
 
     const renderCourses = (courses) => {
         return courses.map(course => {
@@ -86,11 +92,21 @@ export function CourseList({ from, to, phd }) {
                 <div>
                     <h5 className="wp-block-heading"><strong>Scheduled lessons:</strong></h5>
                     <ul>
-                        {course.lessons.map((lesson, index) => (
-                            <li key={index}>
-                                {formatDate(lesson.date, 'en-US')}, {formatTime(lesson.date)} ({lesson.duration} minutes), {lesson.conferenceRoom}
-                            </li>
-                        ))}
+                        {course.lessons.map((lesson, index) => {
+                            let room = lesson.conferenceRoom || null;
+                            if (lesson.conferenceRoom && lesson.conferenceRoomID) {
+                                const roomUrl = en
+                                    ? getDMURL(`/map?sel=${lesson.conferenceRoomID}`)
+                                    : getDMURL(`/mappa?sel=${lesson.conferenceRoomID}`);
+                                room = <a href={roomUrl}>{lesson.conferenceRoom}</a>;
+                            }
+                            
+                            return (
+                                <li key={index}>
+                                    {formatDate(lesson.date, 'en-US')}, {formatTime(lesson.date)} ({lesson.duration} minutes), {room}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
             ) : null;
@@ -99,8 +115,13 @@ export function CourseList({ from, to, phd }) {
                 <Accordion title={course.title} badge={course.courseType} key={course._id}>
                     <h5 className="wp-block-heading"><strong>{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</strong></h5>
                     {lecturerCards}
-                    <h5 className="wp-block-heading"><strong>Period:</strong></h5>
-                    <p>From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
+                    {course.startDate && course.endDate && 
+                    new Date(course.startDate).getTime() !== new Date(course.endDate).getTime() && (
+                    <>
+                        <h5 className="wp-block-heading"><strong>Period:</strong></h5>
+                        <p>From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
+                    </>
+                    )}
                     {lessons}
                     <h5 className="wp-block-heading"><strong>Description:</strong></h5>
                     <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
@@ -113,11 +134,28 @@ export function CourseList({ from, to, phd }) {
         <>
             <p>The list of Ph.D. courses that will be taught during the academic year {fromYear}-{toYear} is below:</p>
             <div style={{ height: '5px' }} aria-hidden="true" className="wp-block-spacer"></div>
-            <h4 className="wp-block-heading">Fall/Winter Term</h4>
-            {renderCourses(fallCourses)}
-            <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
-            <h4 className="wp-block-heading">Winter/Spring Term</h4>
-            {renderCourses(springCourses)}
+            
+            {noDateCourses.length > 0 && (
+            <>
+                {renderCourses(noDateCourses)}
+                <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
+            </>
+            )}
+            
+            {fallCourses.length > 0 && (
+            <>
+                <h4 className="wp-block-heading">Fall/Winter Term</h4>
+                {renderCourses(fallCourses)}
+                <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
+            </>
+            )}
+            
+            {springCourses.length > 0 && (
+            <>
+                <h4 className="wp-block-heading">Winter/Spring Term</h4>
+                {renderCourses(springCourses)}
+            </>
+            )}
         </>
-    );
+        );
 }

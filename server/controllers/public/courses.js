@@ -60,12 +60,12 @@ async function coursesQuery(req) {
                 firstName: 1,
                 lastName: 1,
                 email: 1,
-                affiliations: {_id:1, name: 1}
+                affiliations: {_id: 1, name: 1}
             })
         ]),
         { $unwind: { path: '$lessons', preserveNullAndEmptyArrays: true } },
         lookupPipeline('conferencerooms', 'lessons.conferenceRoom', '_id', 'conferenceRoom', [
-            projectFields({ name: 1 })
+            projectFields({ name: 1, room: 1 })
         ]),
         { $unwind: { path: '$conferenceRoom', preserveNullAndEmptyArrays: true } },
         { $group: {
@@ -81,7 +81,8 @@ async function coursesQuery(req) {
                 _id: '$lessons._id',
                 date: '$lessons.date',
                 duration: '$lessons.duration',
-                conferenceRoom: '$conferenceRoom.name'
+                conferenceRoom: '$conferenceRoom.name',
+                conferenceRoomID: '$conferenceRoom.room'
             }}
         }},
         { $project: {

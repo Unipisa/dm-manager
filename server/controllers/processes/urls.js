@@ -13,14 +13,7 @@ const config = require('../../config')
 const { sync } = require('resolve')
 
 
-router.get('/', async (req, res) => {    
-    if (!req.user) {
-        res.status(401).json({
-            result: "Unauthorized"
-        })
-        return
-    }
-
+router.get('/', async (req, res) => {
     const data = await Url.aggregate([
         {$match: {createdBy: req.user._id}}
     ])

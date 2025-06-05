@@ -453,13 +453,6 @@ Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateSt
 module.exports.notifyVisit = notifyVisit
 
 router.get('/', async (req, res) => {    
-    if (!req.user) {
-        res.status(401).json({
-            result: "Unauthorized"
-        })
-        return
-    }
-
     const data = await Visit.aggregate([
         { $match: { 
             endDate: { $gte: pastDate() },

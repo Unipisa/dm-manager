@@ -93,11 +93,6 @@ Gli amministratori possono visualizzare il seminario su Manage al seguente link:
 }
 
 router.get('/', async (req, res) => {    
-    if (req.user === undefined) {
-        return res.status(401).json({
-            result: "Unauthorized"
-        })
-    }
     let authorization_alternatives = [
         { createdBy: req.user._id },
     ]

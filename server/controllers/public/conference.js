@@ -39,7 +39,8 @@ async function conferenceQuery(req) {
             description: 1, 
             conferenceRoom: {
                 _id: 1, 
-                name: 1
+                name: 1,
+                room: 1
             },
             url: 1
         }}

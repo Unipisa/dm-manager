@@ -12,12 +12,6 @@ const Event = require('../../models/EventConference')
 const Visit = require('../../models/Visit')
 
 router.get('/', async (req, res) => {    
-    if (req.user === undefined || !req.user.roles.includes('admin')) {
-        return res.status(401).json({
-            result: "Unauthorized"
-        })
-    }
-
     // find duplicated names
     const duplicatedNames = await Person.aggregate([
         {
@@ -84,6 +78,16 @@ router.get('/', async (req, res) => {
                 startDate: { $lt: new Date() },
                 qualification: { $ne: 'PTA' },
                 matricola: { $ne: 'a060136'} // handle Jonathan Lindsay Kay (Inglese scientifico)
+            }
+        }
+    ])
+
+    // find expired internal staff 
+    const expiredInternalStaff = await Staff.aggregate([
+        {
+            $match: {
+                isInternal: true,
+                endDate: { $lt: new Date() }
             }
         }
     ])
@@ -215,7 +219,7 @@ router.get('/', async (req, res) => {
                 byDateAndRoom: [
                     {
                         $match: {
-                            conferenceRoom: { $exists: true, $ne: "" }
+                            conferenceRoom: { $exists: true, $ne: "", $ne: null }
                         }
                     },
                     {
@@ -274,7 +278,7 @@ router.get('/', async (req, res) => {
                 byDateAndRoom: [
                     {
                         $match: {
-                            conferenceRoom: { $exists: true, $ne: "" }
+                            conferenceRoom: { $exists: true, $ne: "", $ne: null }
                         }
                     },
                     {
@@ -293,7 +297,7 @@ router.get('/', async (req, res) => {
                 byDateAndInstitution: [
                     {
                         $match: {
-                            institution: { $exists: true, $ne: "" }
+                            institution: { $exists: true, $ne: "", $ne: null }
                         }
                     },
                     {
@@ -329,6 +333,7 @@ router.get('/', async (req, res) => {
         personsWithTrailingSpaces, 
         institutionsWithTrailingSpaces, 
         duplicatedEmails, 
+        expiredInternalStaff,
         missingMatricola, 
         missingSSD, 
         missingInstitutionCountry,
