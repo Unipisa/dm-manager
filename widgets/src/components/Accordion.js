@@ -30,15 +30,15 @@ const Accordion = ({ title, badge, content, markdown = true, initiallyOpen = fal
     >
       <h4
         id={atId}
-        className="c-accordion__title js-accordion-controller"
+        className="c-accordion__title js-accordion-controller d-flex justify-content-between align-items-center"
         role="button"
         tabIndex="0"
         aria-controls={acId}
         aria-expanded={isOpen}
         onClick={toggleAccordion}
       >
-        <span>{title}</span>
-        {badge && <span className="badge badge-primary ml-2">{badge}</span>}
+        <span className="me-auto">{title}</span>
+        {badge && <span className="badge badge-primary ms-2">{badge}</span>}
       </h4>
       <div
         id={acId}
