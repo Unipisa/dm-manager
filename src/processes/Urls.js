@@ -8,6 +8,9 @@ import { ConfirmDeleteButton } from '../components/ModalDialog'
 export default function ProcessUrls() {
     return  <>
         <h1 className="text-primary pb-0">Gestione alias pagine web</h1>
+        <p>
+            Vedi <a href="https://www.dm.unipi.it/creazione-di-pagine-web/"><b>istruzioni</b></a>.
+        </p>
         <a href={`/process/my/urls/__new__`}>
             <button className="btn btn-primary my-3">Nuovo alias</button>
         </a>
