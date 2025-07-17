@@ -120,7 +120,7 @@ function setup_routes(app) {
           // anche la descrizione in fondo alle pagine dei relativi
           // processi
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Dottorando', 
+            'Assegnista', 'Dottorando in Matematica', 'Dottorando in HPSC',
             'Professore Emerito',
             'Collaboratore',
             'Personale in quiescenza',
@@ -132,7 +132,7 @@ function setup_routes(app) {
               add_role('/process/my/urls')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Dottorando', 
+            'Assegnista', 'Dottorando in Matematica', 'Dottorando in HPSC',
             'Professore Emerito',
             'Collaboratore',
             'Personale in quiescenza',

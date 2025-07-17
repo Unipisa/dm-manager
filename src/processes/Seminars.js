@@ -123,7 +123,7 @@ function SeminarList() {
         con permesso <i>/process/seminars</i>. Tale permesso è automatico 
         per gli utenti che hanno una delle seguenti qualifiche interne al dipartimento:
         'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-        'Assegnista', 'Dottorando', 
+        'Assegnista', 'Dottorando in Matematica', 'Dottorando in HPSC',
         'Professore Emerito',
         'Collaboratore',
         'Personale in quiescenza',
