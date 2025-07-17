@@ -7,6 +7,7 @@ async function roomsQuery(req, res) {
         {$project: {
             _id: 1, 
             name: 1,
+            description: 1,
             notes: 1,
             code: 1,
             building: 1,
