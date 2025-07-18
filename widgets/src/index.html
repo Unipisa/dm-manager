@@ -96,6 +96,11 @@
                data-target="#grant-tab" type="button" role="tab" aria-controls="grant" 
                aria-selected="false">Grant</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#thesislist" id="thesis-label" data-toggle="tab" 
+               data-target="#thesislist-tab" type="button" role="tab" aria-controls="grant" 
+               aria-selected="false">ThesisList</a>
+          </li>
         </ul>
     </nav>
 
@@ -118,6 +123,7 @@
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
           <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
+          <div class="tab-pane fade p-3" id="thesislist-tab"><div id="thesislist"></div></div>
         </div>
       </article>
     </main>
@@ -177,6 +183,9 @@
             })
             dmwidgets.loadComponent(document.getElementById("grant"), "Grant", {
                 grant_id: grant_id
+            })
+            dmwidgets.loadComponent(document.getElementById("thesislist"), "ThesisList", {
+                qualification: 'RTT'
             })
         }
         loader();

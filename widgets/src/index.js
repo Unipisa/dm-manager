@@ -12,6 +12,7 @@ import { HomeVisitList } from './components/HomeVisitList';
 import { PersonDetails } from './components/PersonDetails';
 import { CourseList } from './components/CourseList';
 import { Grant } from './components/Grant';
+import { ThesisList } from './components/ThesisList';
 import { getManageURL } from './utils'
 
 import 'katex/dist/katex.min.css' // `rehype-katex` does not import the CSS for you
@@ -64,7 +65,10 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
         case 'Grant':
             element = <Grant {...props}></Grant>
             break;
-
+        case 'ThesisList':
+            element = <ThesisList {...props}></ThesisList>
+            break;
+        
         default:
             console.log("Unsupported element: " + name)
     }
