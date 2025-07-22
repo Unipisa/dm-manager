@@ -38,7 +38,7 @@ function StaffsFilters({ filter }) {
     const currentYear = new Date().getFullYear()
     const startYear = 2011
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i)
-    const qualificationOptions = ['PO', 'PA', 'RTDb', 'RTDa', 'RTT', 'RIC', 'Assegnista', 'Dottorando', 'PTA', 'Professore Emerito', 'Collaboratore', 'Docente Esterno', 'Dottorando Esterno', 'Personale in quiescenza', 'ex Docente']
+    const qualificationOptions = ['PO', 'PA', 'RTDb', 'RTDa', 'RTT', 'RIC', 'Assegnista', 'Dottorando in Matematica', 'Dottorando in HPSC', 'PTA', 'Professore Emerito', 'Collaboratore', 'Docente Esterno', 'Dottorando Esterno', 'Personale in quiescenza', 'ex Docente']
     
     const options = [
         { value: 'all', label: 'Tutti' },
