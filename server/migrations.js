@@ -523,7 +523,7 @@ const migrations = {
         const roomlabels = db.collection('roomlabels')
         await roomlabels.updateMany({ format: { $exists: false } }, { $set: { format: 'square' } })
         return true
-    }/*,
+    },
 
     D20250717_update_dottorando_qualification: async function(db) {
         const staffs = db.collection('staffs')
@@ -532,7 +532,7 @@ const migrations = {
             { $set: { qualification: "Dottorando in Matematica" } }
         )
         return true
-    }*/
+    },
 }
 
 async function migrate(db, options) {
