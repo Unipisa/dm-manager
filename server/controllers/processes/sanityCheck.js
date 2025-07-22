@@ -11,7 +11,10 @@ const Seminar = require('../../models/EventSeminar')
 const Event = require('../../models/EventConference')
 const Visit = require('../../models/Visit')
 
-router.get('/', async (req, res) => {    
+router.get('/', async (req, res) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); 
+
     // find duplicated names
     const duplicatedNames = await Person.aggregate([
         {
@@ -137,7 +140,7 @@ router.get('/', async (req, res) => {
             $match: {
                 $and: [
                     { $expr: { $lt: [{ $strLenCP: { $ifNull: ["$title", ""] } }, 5] } }, 
-                    { startDatetime: { $gt: new Date("2025-01-01T00:00:00.000Z") } }
+                    { startDatetime: { $gte: today } }
                 ]
             }
         }
@@ -149,7 +152,7 @@ router.get('/', async (req, res) => {
                 $and: [
                     { $expr: { $lt: [{ $strLenCP: { $ifNull: ["$collaborationTheme", ""] } }, 5] } },
                     { collaborationTheme: { $exists: true } },
-                    { startDate: { $gt: new Date("2025-01-01T00:00:00.000Z") } }
+                    { startDate: { $gte: today } }
                 ]
             }
         }

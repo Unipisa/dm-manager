@@ -8,7 +8,6 @@ async function roomsQuery(req, res) {
             _id: 1, 
             name: 1,
             description: 1,
-            notes: 1,
             code: 1,
             building: 1,
             floor: 1,

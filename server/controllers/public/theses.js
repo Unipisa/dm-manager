@@ -42,16 +42,8 @@ async function thesesQuery(req) {
             foreignField: 'person',
             as: 'person.staff',
             pipeline: [
-                {$match: {
-                    $expr: {
-                        $and: [
-                            { $or: [
-                                { $eq: ["$endDate", null] },
-                                { $gte: ["$endDate", "$$NOW"] } ]},
-                            { $or: [
-                                { $eq: ["$startDate", null] },
-                                { $lte: ["$startDate", "$$NOW"] } ]}
-                        ]},
+                { $match: {
+                    qualification: { $regex: "Dottorando", $options: "i" } 
                 }},
             ]
         }},

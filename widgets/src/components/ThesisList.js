@@ -76,7 +76,7 @@ export function ThesisList({ year, ssd, institution, qualification, _sort, _limi
 function ThesisTableItem({ thesis }) {
     const supervisors = thesis.advisors.map((advisor, index) => {
         const isUniPisa = advisor.affiliations.some(affiliation => 
-            affiliation._id === '6644ab27871112d444fbbc2f'
+            affiliation._id === '641b8b0b840928dc5b8da2e3'
         );
         
         const name = `${advisor.firstName} ${advisor.lastName}`;
