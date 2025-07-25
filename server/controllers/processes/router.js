@@ -22,6 +22,8 @@ router.use('/roomLabels', require('./roomLabels'))
 
 router.use('/planimetrie', require('./planimetrie'))
 
+router.use('/changeRoom', require('./changeRoom'))
+
 router.use('/sanityCheck', require('./sanityCheck'))
 
 router.use('/my/urls', require('./urls'))

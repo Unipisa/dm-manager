@@ -99,6 +99,23 @@ export default function Home() {
                 </Card>
             </div>
             }
+            { user.hasProcessPermission('/process/changeRoom') &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Cambia stanza a una persona</strong>
+                            <a href="/process/changeRoom"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Permette agli amministratori di cambiare la stanza assegnata a una persona</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+            </div>
+            }
             { user.hasProcessPermission('/process/roomAssignmentsList') &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
@@ -179,6 +196,10 @@ export function ProcessDropdown() {
     if (user.person) items.push(
         <NavDropdown.Item key="visitsList" as={NavLink} to="/process/visitsList">
             Elenco Visitatori
+        </NavDropdown.Item>)
+    if (false && user.hasProcessPermission('/process/changeRoom')) items.push(
+        <NavDropdown.Item key="changeRoom" as={NavLink} to="/process/changeRoom">
+            Cambia Stanza
         </NavDropdown.Item>)
     if (user.hasProcessPermission('/process/roomLabels')) items.push(
         <NavDropdown.Item key="roomLabels" as={NavLink} to="/process/roomLabels">

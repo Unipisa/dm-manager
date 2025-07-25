@@ -33,6 +33,7 @@ import ManageRoomLabels from './processes/RoomLabels'
 import SanityCheck from './processes/SanityCheck'
 import ProcessUrls from './processes/Urls'
 import ProcessUrl from './processes/Url'
+import ChangeRoom from './processes/ChangeRoom'
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
 
@@ -109,7 +110,8 @@ function Internal() {
 
        <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
 
-       <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
+
+       <Route path="/process/changeRoom" element={<ChangeRoom/>}/>
 
        <Route path="/process/my/urls" element={<ProcessUrls/>}/>
        <Route path="/process/my/urls/:id" element={<ProcessUrl/>}/>

@@ -15,6 +15,7 @@ const thesesQuery = require('./controllers/public/theses')
 const seminarCategoriesQuery = require('./controllers/public/seminar-categories')
 const conferencesQuery = require('./controllers/public/conferences')
 const processes = require('./controllers/processes/router.js')
+const changeRoom = require('./controllers/processes/changeRoom')
 const roomsQuery = require('./controllers/public/rooms.js')
 const personQuery = require('./controllers/public/person.js')
 const unimapQuery = require('./controllers/public/unimap.js')
@@ -137,6 +138,7 @@ router.get('/public/urls', async (req, res) => {
 // async (req, res) => {
 //     res.json(await personQuery(req))
 // })
+
 
 router.use('/process', processes)
 

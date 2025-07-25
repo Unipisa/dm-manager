@@ -112,3 +112,71 @@ The result json object is something like:
 * `PATCH /api/v0/<model>/<object_id>` to update
 an existing item
 * `DELETE /api/v0/<model>/<object_id>` to delete an existing item
+
+# Descrizione del progetto: dm-manager
+
+**dm-manager** è una piattaforma web per la gestione di dati e processi accademici, sviluppata in Node.js (Express/Mongoose) per il backend e React per il frontend. Il sistema è pensato per la gestione di stanze, assegnazioni, personale, eventi, visite, tesi, gruppi, istituzioni e altro, con autenticazione locale e OAuth2 (Unipi).
+
+## Architettura
+
+- **Backend**: Node.js, Express, Mongoose (MongoDB), sessioni, autenticazione locale e OAuth2, API RESTful.
+- **Frontend**: React, React-Router, React-Bootstrap, React-Query.
+- **Database**: MongoDB.
+- **Deployment**: Docker, docker-compose, script di build e avvio.
+- **Configurazione**: tramite file `.env` o variabili ambiente.
+
+## Funzionalità principali
+
+- Gestione CRUD di modelli come: Stanze, Assegnazioni, Persone, Gruppi, Utenti, Eventi, Tesi, Istituzioni, ecc.
+- Sistema di ruoli e permessi granulare (admin, supervisor, manager, ecc.).
+- API RESTful documentata e accessibile via `/api/v0`.
+- Autenticazione tramite password o OAuth2 (Unipi).
+- Frontend React con routing e pagine dedicate per ogni processo.
+- Worker per notifiche e processi asincroni.
+- Logging, gestione sessioni, e strumenti di amministrazione.
+
+## Avvio e sviluppo
+
+1. Installa le dipendenze: `npm ci`
+2. Avvia MongoDB (es: `docker-compose up -d`)
+3. Crea l’utente admin (se necessario) impostando `ADMIN_USER` e `ADMIN_PASSWORD`
+4. Avvia backend: `npm run server`
+5. Avvia frontend: `npm start`
+6. (Opzionale) Avvia worker: `npm run worker`
+
+## API
+
+- CRUD su tutti i modelli tramite `/api/v0/<model>`
+- Filtri, ordinamenti, ricerca full-text, filtri su date e relazioni
+- Autenticazione tramite token o sessione
+
+## Modelli principali
+
+- **Room**: Stanze, con attributi come numero, piano, edificio, descrizione, ecc.
+- **RoomAssignment**: Assegnazioni di persone alle stanze, con date di inizio/fine.
+- **Person**: Persone, anagrafiche e dati di contatto.
+- **Staff**: Ruoli e qualifiche del personale.
+- **User**: Utenti del sistema, credenziali e ruoli.
+- **Group**: Gruppi di persone.
+- **Institution**: Istituzioni collegate.
+- **Grant**: Progetti e finanziamenti.
+- **Thesis**: Tesi gestite.
+- **Visit**: Visite e ospiti.
+- **EventSeminar, EventConference, EventPhdCourse**: Eventi accademici.
+- **RoomLabel, ConferenceRoom**: Etichette e sale conferenze.
+- **Form, Log, Token, Url, SeminarCategory**: Altri modelli di supporto.
+
+## Sicurezza
+
+- Gestione sessioni sicura (SESSION_SECRET)
+- Ruoli e permessi per ogni endpoint
+- Supporto per token API
+
+## Deployment
+
+- Build: `npm run build`
+- Docker: `docker build .` e `docker-compose -f docker-compose-production.yml up`
+
+---
+
+Per dettagli su un modello o controller specifico, consultare i file nella cartella `server/models` o `server/controllers`.
