@@ -210,7 +210,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
         }
 
         checkRoomWarning()
-    }, [data.conferenceRoom, data.startDatetime, data.duration, data.mrbsBookingID])
+    }, [data])
 
     const handleSaveWithRoomCheck = async () => {
         try {
