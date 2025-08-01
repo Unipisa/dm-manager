@@ -13,6 +13,7 @@ const eventSeminarSchema = new Schema({
     organizers: [{type: ObjectId, label: 'Organizzatori', ref: 'Person'}],
     title: { type: String, label: 'Titolo' },
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
+    mrbsBookingID: { type: Number, label: 'ID Prenotazione Rooms' },
     startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },
     duration: { type: Number, label: 'Durata (in minuti)', default: 60 },
     category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: false, can_sort: ['name'] },

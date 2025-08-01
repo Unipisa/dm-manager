@@ -46,6 +46,8 @@ class Options {
             UNIPI_TOKENARPI: "",
             UNIPI_TOKENARPILINK: "",
             WEB_PAGES_SERVER_UPDATE_URL: "", // "http://web.cdc:8000/alias/reload",
+            MRBS_API_SECRET_TOKEN: "",
+            MRBS_API_URL: "",
         }
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
