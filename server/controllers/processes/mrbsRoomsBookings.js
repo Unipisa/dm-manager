@@ -49,7 +49,6 @@ router.post('/', async (req, res) => {
             case 'details':
                 response = await axios.get(
                     `${baseUrl}/api.php?q=details&id=${params.id}`,
-                    null,
                     { headers }
                 )
                 break
