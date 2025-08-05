@@ -160,8 +160,8 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
             if (data.mrbsBookingID) {
                 try {
                     const bookingResponse = await getBookingDetails(data.mrbsBookingID)
-                    if (bookingResponse?.data) {
-                        const booking = bookingResponse.data
+                    if (bookingResponse) {
+                        const booking = bookingResponse
                         const startTime = new Date(parseInt(booking.start_time) * 1000)
                         const endTime = new Date(parseInt(booking.end_time) * 1000)
                         

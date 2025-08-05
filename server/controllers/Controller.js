@@ -221,6 +221,7 @@ class Controller {
                             pipeline: [{ $project: {
                                 name: 1,
                                 room: 1,
+                                mrbsRoomID: 1,
                             }}]
                         }})
                     if (single) unwind(field)
