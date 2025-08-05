@@ -102,8 +102,8 @@ export function SeminarBody({ seminar, forbidden }) {
             if (bookingData && !skipRoomBooking) {
                 setIsProcessingBooking(true)
                 const bookingResult = await createRoomBooking(bookingData)
-                if (bookingResult.success) {
-                    data.mrbsBookingID = bookingResult.bookingId
+                if (bookingResult.status === "success") {
+                    data.mrbsBookingID = bookingResult.booking.id
                 }
                 // Continue saving even if booking fails
             }
@@ -156,51 +156,11 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
 
 
     useEffect(() => {
-        const checkRoomWarning = async () => {
-            if (data.mrbsBookingID) {
-                try {
-                    const bookingResponse = await getBookingDetails(data.mrbsBookingID)
-                    if (bookingResponse) {
-                        const booking = bookingResponse
-                        const startTime = new Date(parseInt(booking.start_time) * 1000)
-                        const endTime = new Date(parseInt(booking.end_time) * 1000)
-                        
-                        const formatTime = (date) => date.toLocaleTimeString('it-IT', { 
-                            hour: '2-digit', 
-                            minute: '2-digit' 
-                        })
-                        const formatDate = (date) => date.toLocaleDateString('it-IT')
-                        
-                        let availableRoomsText = ''
-                        if (data.conferenceRoom && data.startDatetime && data.duration) {
-                            try {
-                                const result = await handleRoomBooking(data)
-                                if (result.availableRoomNames) {
-                                    availableRoomsText = ` Le aule disponibili per il periodo selezionato sono: ${result.availableRoomNames}`
-                                }
-                            } catch (error) {
-                            }
-                        }
-                        
-                        setRoomWarning(
-                            `C'è già una prenotazione sulla piattaforma Rooms associata a questo evento dal titolo "${booking.name}" per il giorno ${formatDate(startTime)} dalle ore ${formatTime(startTime)} alle ${formatTime(endTime)}.${availableRoomsText}`
-                        )
-                        return
-                    }
-                } catch (error) {
-                    // If booking details can't be retrieved, fall through to normal check
-                    console.warn('Could not retrieve existing booking details:', error)
-                }
-            }
-            
+        const updateRoomWarning = async () => {
             if (data.conferenceRoom && data.startDatetime && data.duration) {
                 try {
                     const result = await handleRoomBooking(data)
-                    if (result.warning) {
-                        setRoomWarning(result.warning)
-                    } else {
-                        setRoomWarning('')
-                    }
+                    setRoomWarning(result.warning || '')
                 } catch (error) {
                     setRoomWarning('')
                 }
@@ -208,8 +168,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 setRoomWarning('')
             }
         }
-
-        checkRoomWarning()
+        updateRoomWarning()
     }, [data])
 
     const handleSaveWithRoomCheck = async () => {
@@ -220,6 +179,8 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 onCompleted()
             } else if (roomBookingResult.type === 'error') {
                 alert(roomBookingResult.message)
+                onCompleted()
+            } else if (roomBookingResult.message === "No changes") { 
                 onCompleted()
             } else {
                 setRoomBookingData(roomBookingResult)

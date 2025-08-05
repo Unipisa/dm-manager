@@ -98,7 +98,7 @@ export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime) => {
 }
 
 export const handleRoomBooking = async (eventData) => {
-  const { conferenceRoom, startDatetime, duration, title } = eventData
+  const { conferenceRoom, startDatetime, duration, title, mrbsBookingID } = eventData
   
   // Check if the conference room has an mrbsRoomID
   if (!conferenceRoom?.mrbsRoomID) {
@@ -110,35 +110,94 @@ export const handleRoomBooking = async (eventData) => {
   const startTime = new Date(startDatetime)
   const endTime = new Date(startTime.getTime() + duration * 60000) // duration in minutes
   
+  const formatTime = (date) => date.toLocaleTimeString('it-IT', { 
+    hour: '2-digit', 
+    minute: '2-digit' 
+  })
+  const formatDate = (date) => date.toLocaleDateString('it-IT')
+  
+  // Check for existing booking first
+  let existingBooking = null
+  let hasBookingChanged = false
+  
+  if (mrbsBookingID) {
+    try {
+      const bookingResponse = await getBookingDetails(mrbsBookingID)
+      if (bookingResponse) {
+        existingBooking = bookingResponse
+        const existingStartTime = new Date(parseInt(existingBooking.start_time) * 1000)
+        const existingEndTime = new Date(parseInt(existingBooking.end_time) * 1000)
+        
+        // Check if booking details have changed
+        hasBookingChanged = startTime.getTime() !== existingStartTime.getTime() || 
+                           endTime.getTime() !== existingEndTime.getTime() ||
+                           existingBooking.name !== title
+      }
+    } catch (error) {
+      console.warn('Could not retrieve existing booking details:', error)
+    }
+  }
+
   try {
     const availability = await checkRoomAvailability(
       conferenceRoom.mrbsRoomID,
       startTime,
       endTime
     )
+
+    const availableRoomNames = availability.availableRooms
+      ?.map(room => room.name)
+      .join(', ') || ''
     
-    if (availability.available) {
+    // If there's an existing booking, treat the room as available for this event
+    const isRoomActuallyAvailable = availability.available || existingBooking
+    
+    if (isRoomActuallyAvailable) {
+      let message, warning
+      
+      if (existingBooking && hasBookingChanged) {
+        message = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile per il periodo selezionato quindi anche la prenotazione sulla piattaforma Rooms verrà aggiornata.`
+        warning = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.`
+      } else if (existingBooking && !hasBookingChanged) {
+        const startTimeFormatted = formatTime(new Date(parseInt(existingBooking.start_time) * 1000))
+        const endTimeFormatted = formatTime(new Date(parseInt(existingBooking.end_time) * 1000))
+        const dateFormatted = formatDate(new Date(parseInt(existingBooking.start_time) * 1000))
+        
+        message = "No changes"
+        warning = `C'è già una prenotazione sulla piattaforma Rooms associata a questo evento dal titolo "${existingBooking.name}" per il giorno ${dateFormatted} dalle ore ${startTimeFormatted} alle ${endTimeFormatted}.${availableRoomNames ? ` Le aule disponibili per il periodo selezionato sono: ${availableRoomNames}` : ''}`
+      } else {
+        message = `"${conferenceRoom.name}" è disponibile per il periodo selezionato. Vuoi effettuare la prenotazione sulla piattaforma Rooms?`
+        warning = `"${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.`
+      }
+      
       return {
         type: 'available',
-        message: `"${conferenceRoom.name}" è disponibile per il periodo selezionato. Vuoi effettuare la prenotazione sulla piattaforma Rooms?`,
-        warning: `"${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.`,
+        message,
+        warning,
         roomData: {
           room_id: conferenceRoom.mrbsRoomID,
           start_time: startTime,
           end_time: endTime,
-          name: `${title}`
-        }
+          name: title
+        },
+        availableRoomNames: availableRoomNames ? `${availableRoomNames}.` : undefined
       }
     } else {
-      const availableRoomNames = availability.availableRooms
-        .map(room => room.name)
-        .join(', ')
+      let message, warning
+      
+      if (existingBooking && hasBookingChanged) {
+        message = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile per il periodo selezionato. Se salvi la prenotazione sulla piattaforma Rooms verrà cancellata. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
+        warning = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato. Se salvi la prenotazione verrà cancellata. Le aule disponibili sono: ${availableRoomNames}.`
+      } else {
+        message = `"${conferenceRoom.name}" non è disponibile per il periodo selezionato. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
+        warning = `"${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato. Le aule disponibili sono: ${availableRoomNames}.`
+      }
       
       return {
         type: 'unavailable',
-        message: `"${conferenceRoom.name}" non è disponibile per il periodo selezionato perché c'è già una prenotazione ${availability.conflictingBooking ? `(titolo "${availability.conflictingBooking.name}")` : ''}. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`,
-        warning: `"${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato perché c'è già una prenotazione ${availability.conflictingBooking ? `(titolo "${availability.conflictingBooking.name}")` : ''}. Le aule disponibili sono: ${availableRoomNames}.`,
-        availableRooms: availability.availableRooms, 
+        message,
+        warning,
+        availableRooms: availability.availableRooms,
         availableRoomNames: `${availableRoomNames}.`
       }
     }
