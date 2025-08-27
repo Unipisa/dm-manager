@@ -8,7 +8,7 @@ router.post('/', async (req, res) => {
         const { action, ...params } = req.body
 
         const baseUrl = config.MRBS_API_URL
-        const token = config.MRBS_API_TOKEN
+        const token = config.MRBS_API_SECRET_TOKEN
         const headers = {
             'Authorization': `Bearer ${token}`
         }

@@ -5,7 +5,7 @@ import api from '../api'
 import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
-import { handleRoomBooking, createRoomBooking } from './RoomsBookings'
+import { handleRoomBooking, createRoomBooking, deleteBooking } from './RoomsBookings'
 import { useQuery, useQueryClient } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
@@ -101,11 +101,34 @@ export function SeminarBody({ seminar, forbidden }) {
         try {
             if (bookingData && !skipRoomBooking) {
                 setIsProcessingBooking(true)
+                
+                // If there's an existing booking, delete it first
+                if (data.mrbsBookingID) {
+                    try {
+                        await deleteBooking(data.mrbsBookingID)
+                        console.log("Previous Rooms booking deleted successfully")
+                    } catch (deleteError) {
+                        console.error("Error deleting previous Rooms booking:", deleteError)
+                        // Continue with creating new booking even if deletion fails
+                    }
+                }
+                
                 const bookingResult = await createRoomBooking(bookingData)
-                if (bookingResult.status === "success") {
-                    data.mrbsBookingID = bookingResult.booking.id
+                if (bookingResult.success) {
+                    data.mrbsBookingID = bookingResult.bookingId
+                } else {
+                    // If booking creation fails and we deleted an old one, clear the ID
+                    data.mrbsBookingID = null
                 }
                 // Continue saving even if booking fails
+            } else if (skipRoomBooking && data.mrbsBookingID) {
+                try {
+                    await deleteBooking(data.mrbsBookingID)
+                    data.mrbsBookingID = null
+                } catch (deleteError) {
+                    console.error("Error deleting Rooms booking:", deleteError)
+                    // Continue saving even if deletion fails
+                }
             }
 
             // Insert the seminar in the database
