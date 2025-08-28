@@ -26,6 +26,4 @@ router.use('/sanityCheck', require('./sanityCheck'))
 
 router.use('/my/urls', require('./urls'))
 
-router.use('/mrbsRoomsBookings', require('./mrbsRoomsBookings'))
-
 module.exports = router

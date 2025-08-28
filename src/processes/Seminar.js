@@ -105,7 +105,7 @@ export function SeminarBody({ seminar, forbidden }) {
                 // If there's an existing booking, delete it first
                 if (data.mrbsBookingID) {
                     try {
-                        await deleteBooking(data.mrbsBookingID)
+                        await deleteBooking(data.mrbsBookingID, 'seminars')
                         console.log("Previous Rooms booking deleted successfully")
                     } catch (deleteError) {
                         console.error("Error deleting previous Rooms booking:", deleteError)
@@ -113,7 +113,7 @@ export function SeminarBody({ seminar, forbidden }) {
                     }
                 }
                 
-                const bookingResult = await createRoomBooking(bookingData)
+                const bookingResult = await createRoomBooking(bookingData, 'seminars')
                 if (bookingResult.success) {
                     data.mrbsBookingID = bookingResult.bookingId
                 } else {
@@ -123,7 +123,7 @@ export function SeminarBody({ seminar, forbidden }) {
                 // Continue saving even if booking fails
             } else if (skipRoomBooking && data.mrbsBookingID) {
                 try {
-                    await deleteBooking(data.mrbsBookingID)
+                    await deleteBooking(data.mrbsBookingID, 'seminars')
                     data.mrbsBookingID = null
                 } catch (deleteError) {
                     console.error("Error deleting Rooms booking:", deleteError)
@@ -182,7 +182,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
         const updateRoomWarning = async () => {
             if (data.conferenceRoom && data.startDatetime && data.duration) {
                 try {
-                    const result = await handleRoomBooking(data)
+                    const result = await handleRoomBooking(data, 'seminars')
                     setRoomWarning(result.warning || '')
                 } catch (error) {
                     setRoomWarning('')
@@ -196,7 +196,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
 
     const handleSaveWithRoomCheck = async () => {
         try {
-            const roomBookingResult = await handleRoomBooking(data)
+            const roomBookingResult = await handleRoomBooking(data, 'seminars')
             
             if (roomBookingResult.type === 'external_room') {
                 onCompleted()

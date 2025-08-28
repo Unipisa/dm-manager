@@ -4,9 +4,9 @@ export const dateToTimestamp = (date) => {
   return Math.floor(new Date(date).getTime() / 1000)
 }
 
-export const getBookingDetails = async (bookingId) => {
+export const getBookingDetails = async (bookingId, process) => {
   try {
-    const response = await api.post('/api/v0/process/mrbsRoomsBookings', {
+    const response = await api.post(`/api/v0/process/${process}/mrbsRoomsBookings`, {
       action: 'details',
       id: bookingId
     })
@@ -19,12 +19,12 @@ export const getBookingDetails = async (bookingId) => {
   }
 }
 
-export const queryAvailableRooms = async (startTime, endTime) => {
+export const queryAvailableRooms = async (startTime, endTime, process) => {
   try {
     const start = dateToTimestamp(startTime)
     const end = dateToTimestamp(endTime)
 
-    const response = await api.post('/api/v0/process/mrbsRoomsBookings', {
+    const response = await api.post(`/api/v0/process/${process}/mrbsRoomsBookings`, {
       action: 'query',
       start_time: start,
       end_time: end
@@ -37,9 +37,9 @@ export const queryAvailableRooms = async (startTime, endTime) => {
   }
 }
 
-export const createBooking = async (bookingData) => {
+export const createBooking = async (bookingData, process) => {
   try {
-    const response = await api.post('/api/v0/process/mrbsRoomsBookings', {
+    const response = await api.post(`/api/v0/process/${process}/mrbsRoomsBookings`, {
       action: 'book',
       name: bookingData.name,
       room_id: bookingData.room_id,
@@ -53,9 +53,9 @@ export const createBooking = async (bookingData) => {
   }
 }
 
-export const deleteBooking = async (bookingId) => {
+export const deleteBooking = async (bookingId, process) => {
   try {
-    const response = await api.post('/api/v0/process/mrbsRoomsBookings', {
+    const response = await api.post(`/api/v0/process/${process}/mrbsRoomsBookings`, {
       action: 'delete',
       id: bookingId
     })
@@ -66,9 +66,9 @@ export const deleteBooking = async (bookingId) => {
   }
 }
 
-export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime) => {
+export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime, process) => {
   try {
-    const allAvailableRooms = await queryAvailableRooms(startTime, endTime)
+    const allAvailableRooms = await queryAvailableRooms(startTime, endTime, process)
 
     // Filter rooms to only include area_id 4 or 8 and exclude room_id 48 (Postazione videochiamate)
     // area_id 4 = Sala Riunioni, Aula Seminari Ex-Albergo, Aula Seminari, Sala Riunioni Piano Terra, Saletta Riunioni
@@ -97,7 +97,7 @@ export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime) => {
   }
 }
 
-export const handleRoomBooking = async (eventData) => {
+export const handleRoomBooking = async (eventData, process) => {
   const { conferenceRoom, startDatetime, duration, title, mrbsBookingID } = eventData
   
   // Check if the conference room has an mrbsRoomID
@@ -122,7 +122,7 @@ export const handleRoomBooking = async (eventData) => {
   
   if (mrbsBookingID) {
     try {
-      const bookingResponse = await getBookingDetails(mrbsBookingID)
+      const bookingResponse = await getBookingDetails(mrbsBookingID, process)
       if (bookingResponse) {
         existingBooking = bookingResponse
         const existingStartTime = new Date(parseInt(existingBooking.start_time) * 1000)
@@ -142,7 +142,8 @@ export const handleRoomBooking = async (eventData) => {
     const availability = await checkRoomAvailability(
       conferenceRoom.mrbsRoomID,
       startTime,
-      endTime
+      endTime,
+      process
     )
 
     const availableRoomNames = availability.availableRooms
@@ -211,9 +212,9 @@ export const handleRoomBooking = async (eventData) => {
   }
 }
 
-export const createRoomBooking = async (roomData) => {
+export const createRoomBooking = async (roomData, process) => {
   try {
-    const booking = await createBooking(roomData)
+    const booking = await createBooking(roomData, process)
     return {
       success: true,
       bookingId: booking.booking.id,

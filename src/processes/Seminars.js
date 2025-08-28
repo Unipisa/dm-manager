@@ -45,7 +45,7 @@ function SeminarList() {
             const seminarToDelete = data.data.find(seminar => seminar._id === deleteSeminarId)
             if (seminarToDelete && seminarToDelete.mrbsBookingID) {
                 try {
-                    await deleteBooking(seminarToDelete.mrbsBookingID)
+                    await deleteBooking(seminarToDelete.mrbsBookingID, 'seminars')
                     console.log("Rooms booking deleted successfully")
                 } catch (bookingError) {
                     console.error("Error while deleting Rooms booking:", bookingError)
