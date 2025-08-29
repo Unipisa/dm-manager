@@ -60,6 +60,25 @@ async function thesesQuery(req) {
                     foreignField: '_id',
                     as: 'affiliations'
                 }},
+                {$lookup: {
+                    from: 'staffs',
+                    localField: '_id',
+                    foreignField: 'person',
+                    as: 'staff',
+                    pipeline: [
+                        {$match: {
+                            $expr: {
+                                $and: [
+                                    { $or: [
+                                        { $eq: ["$endDate", null] },
+                                        { $gte: ["$endDate", "$$NOW"] } ]},
+                                    { $or: [
+                                        { $eq: ["$startDate", null] },
+                                        { $lte: ["$startDate", "$$NOW"] } ]}
+                                ]},
+                        }},
+                    ]
+                }},
                 {$project: {
                     _id: 1,
                     firstName: 1,
@@ -67,6 +86,10 @@ async function thesesQuery(req) {
                     affiliations: {
                         _id: 1,
                         name: 1
+                    },
+                    staff: {
+                        qualification: 1,
+                        isInternal: 1
                     }
                 }}
             ]
