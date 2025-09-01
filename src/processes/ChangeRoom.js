@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import axios from 'axios';
 import { SelectPersonBlock } from './SelectPeopleBlock';
 import { RoomInput } from '../components/Input';
 
