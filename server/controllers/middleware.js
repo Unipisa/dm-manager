@@ -31,7 +31,7 @@ const requirePathPermissions = async (req, res, next) => {
     const fullUrl = req.baseUrl + req.path
 
     const hasPermission = req.roles?.includes('admin') || req.roles.reduce(
-        (x,y) => x || fullUrl.startsWith(`/api/v0${y}`), false
+        (x,y) => x || y && fullUrl.startsWith(`/api/v0${y}`), false
     )
 
     if (! hasPermission) {

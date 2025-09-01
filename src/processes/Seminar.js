@@ -1,17 +1,17 @@
-import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { useState } from 'react'
+import { Button, Card, Form, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import axios from 'axios'
 import { DateTime, Interval } from 'luxon'
 import { Converter } from 'showdown'
+import { handleRoomBooking, createRoomBooking, deleteBooking } from './RoomsBookings'
 import { useQuery, useQueryClient } from 'react-query'
 import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import 'katex/dist/katex.min.css'
-
 import {SelectPeopleBlock} from './SelectPeopleBlock'
 import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
@@ -78,6 +78,9 @@ export function SeminarBody({ seminar, forbidden }) {
     const [data, setData] = useState(seminar)
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const [showRoomModal, setShowRoomModal] = useState(false)
+    const [roomBookingData, setRoomBookingData] = useState(null)
+    const [isProcessingBooking, setIsProcessingBooking] = useState(false)
 
     if (forbidden) {
         return <div>
@@ -94,11 +97,50 @@ export function SeminarBody({ seminar, forbidden }) {
         </div>
     }
 
-    const onCompleted = async () => {
-        // Insert the seminar in the database
-        await api.put('/api/v0/process/seminars/save', data)
-        queryClient.invalidateQueries([ 'process', 'seminar', data._id ])
-        navigate('/process/seminars')
+    const onCompleted = async (skipRoomBooking = false, bookingData = null) => {
+        try {
+            if (bookingData && !skipRoomBooking) {
+                setIsProcessingBooking(true)
+                
+                // If there's an existing booking, delete it first
+                if (data.mrbsBookingID) {
+                    try {
+                        await deleteBooking(data.mrbsBookingID, 'seminars')
+                        console.log("Previous Rooms booking deleted successfully")
+                    } catch (deleteError) {
+                        console.error("Error deleting previous Rooms booking:", deleteError)
+                        // Continue with creating new booking even if deletion fails
+                    }
+                }
+                
+                const bookingResult = await createRoomBooking(bookingData, 'seminars')
+                if (bookingResult.success) {
+                    data.mrbsBookingID = bookingResult.bookingId
+                } else {
+                    // If booking creation fails and we deleted an old one, clear the ID
+                    data.mrbsBookingID = null
+                }
+                // Continue saving even if booking fails
+            } else if (skipRoomBooking && data.mrbsBookingID) {
+                try {
+                    await deleteBooking(data.mrbsBookingID, 'seminars')
+                    data.mrbsBookingID = null
+                } catch (deleteError) {
+                    console.error("Error deleting Rooms booking:", deleteError)
+                    // Continue saving even if deletion fails
+                }
+            }
+
+            // Insert the seminar in the database
+            await api.put('/api/v0/process/seminars/save', data)
+            queryClient.invalidateQueries([ 'process', 'seminar', data._id ])
+            navigate('/process/seminars')
+        } catch (error) {
+            console.error('Error saving seminar:', error)
+        } finally {
+            setIsProcessingBooking(false)
+            setShowRoomModal(false)
+        }
     }
 
     return <PrefixProvider value="process/seminars">
@@ -111,13 +153,19 @@ export function SeminarBody({ seminar, forbidden }) {
             data={data} setData={setData}
             onCompleted={onCompleted}
             active={true}
+            showRoomModal={showRoomModal}
+            setShowRoomModal={setShowRoomModal}
+            roomBookingData={roomBookingData}
+            setRoomBookingData={setRoomBookingData}
+            isProcessingBooking={isProcessingBooking}
         />
     </PrefixProvider>
 }
 
-export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error }) {
+export function SeminarDetailsBlock({ onCompleted, data, setData, change, active, error, showRoomModal, setShowRoomModal, roomBookingData, setRoomBookingData, isProcessingBooking }) {
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
+    const [roomWarning, setRoomWarning] = useState('')
 
     const requirement = (() => {
         if (!data.speakers || data.speakers.length === 0) return "Inserire almeno uno speaker"
@@ -128,6 +176,45 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
         if (!data.organizers || data.organizers.length === 0) return "Inserire almeno un organizzatore per il seminario"
         return ""
     })()
+
+
+    useEffect(() => {
+        const updateRoomWarning = async () => {
+            if (data.conferenceRoom && data.startDatetime && data.duration) {
+                try {
+                    const result = await handleRoomBooking(data, 'seminars')
+                    setRoomWarning(result.warning || '')
+                } catch (error) {
+                    setRoomWarning('')
+                }
+            } else {
+                setRoomWarning('')
+            }
+        }
+        updateRoomWarning()
+    }, [data])
+
+    const handleSaveWithRoomCheck = async () => {
+        try {
+            const roomBookingResult = await handleRoomBooking(data, 'seminars')
+            
+            if (roomBookingResult.type === 'external_room') {
+                onCompleted()
+            } else if (roomBookingResult.type === 'error') {
+                alert(roomBookingResult.message)
+                onCompleted()
+            } else if (roomBookingResult.message === "No changes") { 
+                onCompleted()
+            } else {
+                setRoomBookingData(roomBookingResult)
+                setShowRoomModal(true)
+            }
+        } catch (error) {
+            console.error('Error checking room availability:', error)
+            // Fallback to normal save
+            onCompleted()
+        }
+    }
 
     return <PrefixProvider value="process/seminars">
         <Card className="shadow">
@@ -172,7 +259,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     </InputRow>
                     <InputRow label="Ciclo di seminari" className="my-3">
                         <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="cycle-tooltip">
                                 Si prega di selezionare tra uno dei cicli di seminari presenti nella lista. 
                                 Se il ciclo di seminari che cerchi è assente, si prega di contattare <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
@@ -188,13 +275,18 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     </InputRow>
                     <InputRow className="my-3" label="Aula">
                         <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Si ricorda che la prenotazione su <a href="https://rooms.dm.unipi.it/">Rooms</a> non è automatica
-                                e va effettuata indipendentemente</Tooltip>}>
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="room-tooltip">
+                                Per effettuare la prenotazione su <a href="https://rooms.dm.unipi.it/">Rooms</a> si prega di seguire le istruzioni
+                                che appaiono dopo aver premuto il tasto 'Salva'</Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
                             <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
                         </div>
+                        {roomWarning && (
+                            <div className="text-muted small mt-1" style={{ fontSize: '0.875rem' }}>
+                                {roomWarning}
+                            </div>
+                        )}
                     </InputRow>
                     <InputRow className="my-3" label="Grant">
                         <div className="d-flex align-items-center">
@@ -208,7 +300,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     </InputRow>
                     <InputRow className="my-3" label="Abstract">
                         <div className="d-flex align-items-start">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="abstract-tooltip">
                                 Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
                                 che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
                                 <br />
@@ -223,7 +315,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 {error && <div className="alert alert-danger">{error}</div>}
                 {requirement && <div className="alert alert-warning">{requirement}</div>}
                 <div className="d-flex flex-row justify-content-end">
-                    <Button className="text-end" onClick={onCompleted} disabled={requirement !== ''}>Salva</Button>
+                    <Button className="text-end" onClick={handleSaveWithRoomCheck} disabled={requirement !== ''}>Salva</Button>
                 </div>
             </> : <>
                 speakers: <b>{data.speakers && data.speakers.map((p,i) => <>{i>0 && ', '}{p.firstName} {p.lastName} ({p.affiliations.map(x => x.name).join(', ')})</>)}</b><br/>
@@ -251,9 +343,53 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     </Card.Body>
                 </Card>
             }
-</PrefixProvider>
+        <Modal show={showRoomModal} onHide={() => setShowRoomModal(false)} centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Prenotazione su Rooms</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {roomBookingData?.message}
+            </Modal.Body>
+            <Modal.Footer>
+                {roomBookingData?.type === 'available' ? (
+                    <>
+                        <Button 
+                            variant="secondary" 
+                            onClick={() => onCompleted(true)}
+                            disabled={isProcessingBooking}
+                        >
+                            Salva senza prenotare l'aula
+                        </Button>
+                        <Button 
+                            variant="primary" 
+                            onClick={() => onCompleted(false, roomBookingData.roomData)}
+                            disabled={isProcessingBooking}
+                        >
+                            {isProcessingBooking ? 'Prenotando...' : "Prenota l'aula e salva"}
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button 
+                            variant="secondary" 
+                            onClick={() => setShowRoomModal(false)}
+                            disabled={isProcessingBooking}
+                        >
+                            Torna indietro
+                        </Button>
+                        <Button 
+                            variant="primary" 
+                            onClick={() => onCompleted(true)}
+                            disabled={isProcessingBooking}
+                        >
+                            Salva senza prenotare l'aula
+                        </Button>
+                    </>
+                )}
+            </Modal.Footer>
+        </Modal> 
+    </PrefixProvider>
 }
-
 
 async function loadExternalData(source, seminar) {
     if (! source || ! source.includes(':')) {

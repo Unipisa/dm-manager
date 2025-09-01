@@ -3,7 +3,7 @@ import { Card } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import api from '../api'
 import { useState } from 'react'
-
+import { deleteBooking } from './RoomsBookings'
 import { ModalDeleteDialog } from '../components/ModalDialog'
 import { formatDate } from '../components/DatetimeInput'
 import { useEngine } from '../Engine'
@@ -42,13 +42,22 @@ function SeminarList() {
             return
         }
         try {
+            const seminarToDelete = data.data.find(seminar => seminar._id === deleteSeminarId)
+            if (seminarToDelete && seminarToDelete.mrbsBookingID) {
+                try {
+                    await deleteBooking(seminarToDelete.mrbsBookingID, 'seminars')
+                    console.log("Rooms booking deleted successfully")
+                } catch (bookingError) {
+                    console.error("Error while deleting Rooms booking:", bookingError)
+                }
+            }
             await api.del("/api/v0/process/seminars/" + deleteSeminarId)
+            console.log("Seminar deleted successfully")        
+        } catch (seminarError) {
+            console.error("Error while deleting the seminar:", seminarError)
         }
-        catch {
-            console.log("Error while deleting the seminar")
-        }
-        
-        queryClient.invalidateQueries([ 'process', 'seminars' ])
+    
+    queryClient.invalidateQueries([ 'process', 'seminars' ])
     }
 
     const confirmDeleteSeminar = async (id) => {

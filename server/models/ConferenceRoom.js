@@ -9,6 +9,7 @@ const {
 const schema = new Schema({
     name: { type: String, label: 'Nome', required: true, default: 'Aula ???' },
     room: { type: ObjectId, label: 'Stanza', ref: 'Room' },
+    mrbsRoomID: { type: Number, label: 'Rooms ID' },
     names: { type: [String], label: 'Nomi alternativi' },
     createdBy,
     updatedBy,

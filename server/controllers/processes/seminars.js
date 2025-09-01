@@ -18,6 +18,7 @@ const { Speaker } = require('react-bootstrap-icons')
 require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
 require('./seminarCategorySearch')(router)
+require('./mrbsRoomsBookings')(router)
 
 async function notifySeminar(seminar) {
     

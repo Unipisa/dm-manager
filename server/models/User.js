@@ -2,8 +2,8 @@ const { Schema, model } = require('./Model')
 const passportLocalMongoose = require('passport-local-mongoose')
 
 const userSchema = new Schema({
-    firstName: {type: String, label: 'cognome'},
-    lastName: {type: String, label: 'nome'},
+    firstName: {type: String, label: 'nome'},
+    lastName: {type: String, label: 'cognome'},
     email: {type: String, label: 'email'},
     username: {type: String, label: 'username', help: 'corrisponde all\'email per gli utenti autenticati con credenziali di ateneo'},
     roles: [{type: String, label: 'ruoli'}],

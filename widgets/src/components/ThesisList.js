@@ -75,13 +75,11 @@ export function ThesisList({ year, ssd, institution, qualification, _sort, _limi
 
 function ThesisTableItem({ thesis }) {
     const supervisors = thesis.advisors.map((advisor, index) => {
-        const isUniPisa = advisor.affiliations.some(affiliation => 
-            affiliation._id === '641b8b0b840928dc5b8da2e3'
-        );
+        const isInternal = advisor.staff[0]?.isInternal;
         
         const name = `${advisor.firstName} ${advisor.lastName}`;
         
-        const advisorElement = isUniPisa ? (
+        const advisorElement = isInternal ? (
             <a href={getDMURL(`en/person-details/?person_id=${advisor._id}`)} key={advisor._id}>
                 {name}
             </a>
