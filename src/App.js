@@ -110,7 +110,7 @@ function Internal() {
 
        <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
 
-
+       <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
        <Route path="/process/changeRoom" element={<ChangeRoom/>}/>
 
        <Route path="/process/my/urls" element={<ProcessUrls/>}/>

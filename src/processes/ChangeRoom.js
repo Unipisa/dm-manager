@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { SelectPersonBlock } from './SelectPeopleBlock';
@@ -32,7 +32,7 @@ function ChangeRoomProcess() {
       const payload = { personId: person._id, newRoomId: newRoom._id };
       if (startDate) payload.startDate = startDate;
       if (endDate) payload.endDate = endDate;
-      const res = await axios.post('/process/changeRoom', payload);
+      //const res = await axios.post('/process/changeRoom', payload);
       setMessage('Cambio stanza effettuato con successo!');
     } catch (err) {
       setError(err.response?.data?.error || 'Errore nella richiesta.');
