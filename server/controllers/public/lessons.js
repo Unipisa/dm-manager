@@ -1,14 +1,56 @@
 const EventPhdCourse = require('../../models/EventPhdCourse')
 
-const maxDate = new Date(8640000000000000);
-
 async function lessonsQuery(req) {
-    // TODO: Forse serve usare $add ~> <https://www.mongodb.com/docs/manual/reference/operator/aggregation/add>
-    const from = req.query.from ? new Date(req.query.from) : new Date()
-    const to = req.query.to ? new Date(req.query.to) : maxDate
+    var from = undefined;
+    switch (req.query.from) {
+        case 'now':
+            from = new Date()
+            break;
+        case undefined:
+            from = undefined
+            break;
+        default:
+            from = new Date(req.query.from)
+    }
+
+    var to = undefined;
+    switch (req.query.to) {
+        case 'now':
+            to = new Date()
+            break;
+        case undefined:
+            to = undefined
+            break;
+        default:
+            to = new Date(req.query.to)
+    }
+
+    var match = {}
+
+    if (from !== undefined || to !== undefined) {
+        let dateCondition = {}
+        if (from !== undefined) {
+            dateCondition.$gte = from
+        }
+        if (to !== undefined) {
+            dateCondition.$lte = to
+        }
+        match["lessons"] = { $elemMatch: { date: dateCondition } }
+    }
+
+    if (req.query.phd) {
+        match["phd"] = req.query.phd
+    }
 
     const pipeline = [
+        {$match: match},
         {$unwind: '$lessons'},
+        ...(from !== undefined || to !== undefined ? [{
+            $match: {
+                ...(from !== undefined && { "lessons.date": { $gte: from } }),
+                ...(to !== undefined && { "lessons.date": { $lte: to } })
+            }
+        }] : []),
         {$project: {
             date: '$lessons.date',
             duration: '$lessons.duration',
@@ -18,6 +60,7 @@ async function lessonsQuery(req) {
                 _id: '$_id',
                 title: '$title',
                 description: '$description',
+                phd: '$phd',
                 lecturers: '$lecturers',
             }
         }},
