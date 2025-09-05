@@ -168,6 +168,24 @@ export default function Home() {
                     </Card>
                 </div>
             }
+            { (user.hasProcessPermission('/process/courses')) &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Corsi di Dottorato</strong>
+                            <a href="/process/courses"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Gestione dei corsi inseriti</li>
+                            <li>Inserimento delle lezioni dei corsi</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+            </div>            
+            }
         </div>
     </>
   }
@@ -213,6 +231,10 @@ export function ProcessDropdown() {
         <NavDropdown.Item key="urls" as={NavLink} to="/process/my/urls">
             Alias Pagine Web
         </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/courses')) items.push(
+        <NavDropdown.Item key="courses" as={NavLink} to="/process/courses">
+            Corsi di Dottorato
+        </NavDropdown.Item>)       
     if (items.length === 0) return null
 
     return <NavDropdown className="mx-2 py-2" title="Processi">

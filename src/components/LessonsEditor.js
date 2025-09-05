@@ -6,22 +6,31 @@ import { Link } from 'react-router-dom';
 import { useEngine } from '../Engine';
 import { DatetimeInput, formatDate } from './DatetimeInput';
 import { ConferenceRoomInput, NumberInput } from './Input';
+import Loading from './Loading';
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
 const ConferenceRoomOutput = ({ value }) => {
     const engine = useEngine()
-    // const { isSuccess, data } = engine.useGet('conference-room', id)
-
-    if (!value)
-        return <>???</>
-
-    // if (!isSuccess) return <Loading />
+    
+    // Determine if we need to fetch data
+    const needsFetch = typeof value === 'string' || !value.name
+    const id = typeof value === 'string' ? value : value._id
+    
+    const { isSuccess, data } = engine.useGet('conference-room', id, { 
+        enabled: needsFetch 
+    })
+    
+    if (!value) return <>???</>
+    if (needsFetch && !isSuccess) return <Loading />
+    
     const { ConferenceRoom } = engine.Models
-    return <Link to={ConferenceRoom.viewUrl(value._id)}>{value.name}</Link>
+    const roomData = needsFetch ? data : value
+    
+    return <Link to={ConferenceRoom.viewUrl(roomData._id)}>{roomData.name}</Link>
 }
 
-export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom }) => {
+export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom, mrbsBookingID, setMrbsBookingID }) => {
     return (
         <>
             <Form.Group className="row my-2">
@@ -56,15 +65,28 @@ export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, se
                         value={conferenceRoom}
                         setValue={setConferenceRoom} />
                 </div>
-            </Form.Group>    
+            </Form.Group>
+            <Form.Group className="row my-2">
+                <Form.Label className="text-end col-sm-2 col-form-label" htmlFor={`${idPrefix}-mrbsBookingID`}>
+                    ID Prenotazione Rooms
+                </Form.Label>
+                <div className="col-sm-10">
+                    <NumberInput 
+                        id={`${idPrefix}-mrbsBookingID`}
+                        value={mrbsBookingID}
+                        setValue={setMrbsBookingID} />
+                </div>
+            </Form.Group>
         </>
     )
 }
+
 
 const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson }) => {
     const [dateTime, setDateTime] = useState(lesson.date)
     const [duration, setDuration] = useState(lesson.duration)
     const [conferenceRoom, setConferenceRoom] = useState(lesson.conferenceRoom)
+    const [mrbsBookingID, setMrbsBookingID] = useState(lesson.mrbsBookingID || '')
 
     const update = () => {
         updateLesson({
@@ -72,6 +94,7 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
             date: dateTime,
             duration,
             conferenceRoom,
+            mrbsBookingID,
         })
 
         close()
@@ -84,23 +107,12 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
                 dateTime, setDateTime,
                 duration, setDuration,
                 conferenceRoom, setConferenceRoom,
+                mrbsBookingID, setMrbsBookingID,
             }}/>
             <ButtonGroup className="mt-3">
-                <Button 
-                    className="btn-primary"
-                    onClick={() => update()}>
-                    Modifica Lezione
-                </Button>
-                <Button
-                    className="btn btn-secondary"
-                    onClick={() => close()}>
-                    Annulla Modifiche
-                </Button>
-                <Button
-                    className="btn btn-danger"
-                    onClick={() => deleteLesson()}>
-                    Elimina Lezione
-                </Button>
+                <Button className="btn-primary" onClick={() => update()}>Modifica Lezione</Button>
+                <Button className="btn btn-secondary" onClick={() => close()}>Annulla Modifiche</Button>
+                <Button className="btn btn-danger" onClick={() => deleteLesson()}>Elimina Lezione</Button>
             </ButtonGroup>
         </div>
     )
@@ -111,7 +123,7 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
 
     if (editing) 
         return (
-            <td colSpan={4}>
+            <td colSpan={5}>
                 <EditLessonForm {...{
                     idPrefix: `${id}-edit`,
                     lesson,
@@ -126,18 +138,13 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
             <>
                 <td>{formatDate(lesson.date)}</td>
                 <td>{lesson.duration}</td>
-                <td>
-                    <ConferenceRoomOutput value={lesson.conferenceRoom} />
-                </td>
+                <td><ConferenceRoomOutput value={lesson.conferenceRoom} /></td>
+                <td>{lesson.mrbsBookingID ?? '-'}</td>
                 <td className="d-flex justify-content-end gap-2">
-                    <Button 
-                        className="btn btn-warning btn-sm"
-                        onClick={() => setEditing(true)}>
+                    <Button className="btn btn-warning btn-sm" onClick={() => setEditing(true)}>
                         <Icon.Pencil />
                     </Button>
-                    <Button 
-                        className="btn btn-danger btn-sm"
-                        onClick={() => deleteLesson()}>
+                    <Button className="btn btn-danger btn-sm" onClick={() => deleteLesson()}>
                         <Icon.Trash />
                     </Button>
                 </td>
@@ -145,18 +152,17 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
         )
 }
 
-
 const LessonViewRow = ({ lesson }) => {
     return (
         <>
             <td>{formatDate(lesson.date)}</td>
             <td>{lesson.duration}</td>
-            <td>
-                <ConferenceRoomOutput value={lesson.conferenceRoom} />
-            </td>
+            <td><ConferenceRoomOutput value={lesson.conferenceRoom} /></td>
+            <td>{lesson.mrbsBookingID ?? '-'}</td>
         </>
     )
 }
+
 
 /**
  * @param {{ 
@@ -168,6 +174,7 @@ const LessonViewRow = ({ lesson }) => {
 const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
     const isEdit = !!updateLesson && !!deleteLesson
 
+    console.log(lessons)
     return (
         <Table className="align-middle">
             <thead className="thead-dark">
@@ -175,6 +182,7 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
                     <th>Orario</th>
                     <th>Durata (minuti)</th>
                     <th>Stanza</th>
+                    <th>ID Prenotazione Rooms</th>
                     {isEdit && <th></th>}
                 </tr>
             </thead>

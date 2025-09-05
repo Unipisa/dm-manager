@@ -31,13 +31,15 @@ class EventPhdCourseController extends Controller {
 
     async aggregatePostProcess(phdCourses) {
         for (const phdCourse of phdCourses) {
-            // dictionary of conference rooms by id 
             const conferenceRooms = Object.fromEntries(
-                phdCourse.conferenceRooms?.map(c => [c._id, c]) ?? []
+                phdCourse.conferenceRooms?.map(c => [c._id.toString(), c]) ?? []
             )
 
             for (const lesson of phdCourse.lessons) {
-                lesson.conferenceRoom = conferenceRooms[lesson.conferenceRoom]
+                const key = lesson.conferenceRoom?.toString()
+                if (key && conferenceRooms[key]) {
+                    lesson.conferenceRoom = conferenceRooms[key]
+                }
             }
 
             delete phdCourse.conferenceRooms

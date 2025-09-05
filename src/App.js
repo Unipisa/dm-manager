@@ -34,6 +34,8 @@ import SanityCheck from './processes/SanityCheck'
 import ProcessUrls from './processes/Urls'
 import ProcessUrl from './processes/Url'
 import ChangeRoom from './processes/ChangeRoom'
+import AddCourse from './processes/Course'
+import ManageCourses from './processes/Courses'
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
 
@@ -115,6 +117,11 @@ function Internal() {
 
        <Route path="/process/my/urls" element={<ProcessUrls/>}/>
        <Route path="/process/my/urls/:id" element={<ProcessUrl/>}/>
+
+       <Route path="/process/courses" element={<ManageCourses/>}/>
+       <Route path="/process/courses/add" element={<AddCourse/>}/>
+       <Route path="/process/courses/add/:id" element={<AddCourse/>}/>
+
        
        {  Object.values(Models).map(x => x.routers()) }
        

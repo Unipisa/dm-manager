@@ -28,4 +28,6 @@ router.use('/sanityCheck', require('./sanityCheck'))
 
 router.use('/my/urls', require('./urls'))
 
+router.use('/courses', require('./courses'))
+
 module.exports = router

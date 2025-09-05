@@ -12,6 +12,7 @@ const lessonSchema = new Schema({
     date: { type: Date, label: 'Data e Orario', required: true },
     duration: { type: Number, label: 'Durata (in minuti)', default: 60, required: true },
     conferenceRoom: { type: ObjectId, label: 'Aula', ref: 'ConferenceRoom', required: true },
+    mrbsBookingID: { type: Number, label: 'ID Prenotazione Rooms' },
 });
 
 const eventPhdCourseSchema = new Schema({
