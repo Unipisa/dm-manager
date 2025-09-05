@@ -17,9 +17,9 @@ router.get('/', async (req, res) => {
         ...controller.queryPipeline,
     ]
     const data = await EventPhdCourse.aggregate(pipeline)
-
+    const processedData = await controller.aggregatePostProcess(data)
     return res.send({
-        data
+        data: processedData,
     })
 })
 
@@ -54,9 +54,9 @@ router.get('/get/:id', async (req, res) => {
     ]
 
     const data = await EventPhdCourse.aggregate(pipeline)
-
+    const processedData = await controller.aggregatePostProcess(data)
     return res.send({
-        data,
+        data: processedData,
     })
 })
 

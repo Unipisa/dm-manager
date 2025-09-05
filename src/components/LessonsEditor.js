@@ -6,28 +6,15 @@ import { Link } from 'react-router-dom';
 import { useEngine } from '../Engine';
 import { DatetimeInput, formatDate } from './DatetimeInput';
 import { ConferenceRoomInput, NumberInput } from './Input';
-import Loading from './Loading';
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
 const ConferenceRoomOutput = ({ value }) => {
     const engine = useEngine()
-    
-    // Determine if we need to fetch data
-    const needsFetch = typeof value === 'string' || !value.name
-    const id = typeof value === 'string' ? value : value._id
-    
-    const { isSuccess, data } = engine.useGet('conference-room', id, { 
-        enabled: needsFetch 
-    })
-    
-    if (!value) return <>???</>
-    if (needsFetch && !isSuccess) return <Loading />
-    
+    if (!value)
+        return <>???</>
     const { ConferenceRoom } = engine.Models
-    const roomData = needsFetch ? data : value
-    
-    return <Link to={ConferenceRoom.viewUrl(roomData._id)}>{roomData.name}</Link>
+    return <Link to={ConferenceRoom.viewUrl(value._id)}>{value.name}</Link>
 }
 
 export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom, mrbsBookingID, setMrbsBookingID }) => {
@@ -68,7 +55,7 @@ export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, se
             </Form.Group>
             <Form.Group className="row my-2">
                 <Form.Label className="text-end col-sm-2 col-form-label" htmlFor={`${idPrefix}-mrbsBookingID`}>
-                    ID Prenotazione Rooms
+                    Prenotazione Rooms
                 </Form.Label>
                 <div className="col-sm-10">
                     <NumberInput 
@@ -99,7 +86,6 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
 
         close()
     }
-    
     return (
         <div>
             <h4 className="mt-2 mb-3">Modifica Lezione</h4>
@@ -173,8 +159,6 @@ const LessonViewRow = ({ lesson }) => {
  */
 const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
     const isEdit = !!updateLesson && !!deleteLesson
-
-    console.log(lessons)
     return (
         <Table className="align-middle">
             <thead className="thead-dark">
@@ -182,7 +166,7 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
                     <th>Orario</th>
                     <th>Durata (minuti)</th>
                     <th>Stanza</th>
-                    <th>ID Prenotazione Rooms</th>
+                    <th>Prenotazione Rooms</th>
                     {isEdit && <th></th>}
                 </tr>
             </thead>
