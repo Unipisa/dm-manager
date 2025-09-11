@@ -17,6 +17,7 @@ const lessonSchema = new Schema({
 
 const eventPhdCourseSchema = new Schema({
     title: { type: String, label: 'Titolo'},
+    coordinators: [{type: ObjectId, label: 'Referenti', ref: 'Person'}],
     description: { type: String, label: 'Descrizione', widget: 'text', default: '' },
     phd: {
         type: String,

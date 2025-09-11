@@ -373,6 +373,25 @@ export default function PhdCourseEditPage({ Model }) {
                         </Form.Group>
                         <Form.Group className="row my-2">
                             <Form.Label className="col-sm-2 col-form-label" style={{textAlign: "right"}}>
+                                Referente/i
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <PersonInput 
+                                    id="coordinators"
+                                    multiple={true}
+                                    value={modifiedObj.coordinators}
+                                    setValue={value => {
+                                        setModifiedObj(obj => ({
+                                            ...obj,
+                                            coordinators: value,
+                                        }))
+                                    }}
+                                />
+                            </div>
+                            <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" style={{textAlign: "right"}}>
                                 Lezioni
                             </Form.Label>
                             <div className="col-sm-10">

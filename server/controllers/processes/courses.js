@@ -3,6 +3,7 @@ const router = express.Router()
 const { ObjectId } = require('mongoose').Types
 
 const EventPhdCourse = require('../../models/EventPhdCourse')
+const Person = require('../../models/Person')
 
 const EventPhdCourseController = require('../EventPhdCourseController')
 const controller = new EventPhdCourseController()
@@ -13,7 +14,15 @@ require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
 
 router.get('/', async (req, res) => {
+    let authorization_alternatives = [
+        { createdBy: req.user._id },
+    ]
+    if (req?.person?._id) authorization_alternatives.push({ coordinators: new ObjectId(req.person._id) })
+
     const pipeline = [
+        {$match: {
+            $or: authorization_alternatives
+        }},
         ...controller.queryPipeline,
     ]
     const data = await EventPhdCourse.aggregate(pipeline)
@@ -26,16 +35,21 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const course = await EventPhdCourse.findById(new ObjectId(req.params.id))
+        let user_is_coordinator = false
+        if (course.coordinators && course.coordinators.length > 0) {
+            const coordinators = await Person.find({ _id: { $in: course.coordinators }})
+            user_is_coordinator = req.person && coordinators.some(o => o._id.equals(req.person._id))
+        }
 
         const user_is_creator = req.user.equals(course.createdBy)
 
-        if (user_is_creator) {
+        if (user_is_creator || user_is_coordinator) {
             await course.delete()
             await log(req, course, {})
             res.json({})
         } else {
             res.status(401).json({
-                error: "Cannot delete courses created by other users"
+                error: "Cannot delete courses created by other users or not in the coordinators list"
             })
         }
     } catch(error) {
@@ -46,9 +60,15 @@ router.delete('/:id', async (req, res) => {
 })
 
 router.get('/get/:id', async (req, res) => {
+    let authorization_alternatives = [
+        { createdBy: req.user._id },
+    ]
+    if (req?.person?._id) authorization_alternatives.push({ coordinators: new ObjectId(req.person._id) })
+
     const pipeline = [
         {$match: {
             _id: new ObjectId(req.params.id),
+            $or: authorization_alternatives
         }},
         ...controller.queryPipeline,
     ]
@@ -96,11 +116,22 @@ router.patch('/:id', async (req, res) => {
 
     try {
         const course = await EventPhdCourse.findById(_id)
+        if (course.coordinators && course.coordinators.length > 0) {
+            const coordinators = await Person.find({ _id: { $in: course.coordinators } })
 
-        const user_is_creator = req.user.equals(course.createdBy)
-        if (!user_is_creator) {
-            res.status(403).json({ error: "Forbidden" })
-            return
+            const user_is_creator = req.user.equals(course.createdBy)
+            const user_is_coordinator = req.person && coordinators.find(o => o._id.equals(req.person._id))
+    
+            if (!user_is_creator && !user_is_coordinator) {
+                res.status(403).json({ error: "Forbidden" })
+                return
+            }
+        } else {
+            const user_is_creator = req.user.equals(course.createdBy)
+            if (!user_is_creator) {
+                res.status(403).json({ error: "Forbidden" })
+                return
+            }
         }
         
         const was = {...course}
@@ -128,11 +159,23 @@ router.put('/save', async (req, res) => {
         }
         else {
             const course = await EventPhdCourse.findById(payload._id)
-            const user_is_creator = req.user.equals(course.createdBy)
-            if (!user_is_creator) {
-                res.status(403).json({ error: "Forbidden" })
-                return
-            }
+            if (course.coordinators && course.coordinators.length > 0) {
+                            const coordinators = await Person.find({ _id: { $in: course.coordinators } })
+                            
+                            const user_is_creator = req.user.equals(course.createdBy)
+                            const user_is_coordinator = req.person && coordinators.find(o => o._id.equals(req.person._id))
+                    
+                            if (!user_is_creator && !user_is_coordinator) {
+                                res.status(403).json({ error: "Forbidden" })
+                                return
+                            }
+                        } else {
+                            const user_is_creator = req.user.equals(course.createdBy)
+                            if (!user_is_creator) {
+                                res.status(403).json({ error: "Forbidden" })
+                                return
+                            }
+                        }
             delete payload.createdBy
             
             const was = {...course}

@@ -45,6 +45,10 @@ const PhdCourseView = ({ Model }) => {
                     <ModelFieldOutput key="lecturers" field="lecturers" schema={schema.lecturers} value={obj.lecturers} />
                 </p>
                 <p>
+                    <strong className="align-top">Referente/i: </strong>
+                    <ModelFieldOutput key="coordinators" field="coordinators" schema={schema.coordinators} value={obj.coordinators} />
+                </p>
+                <p>
                     <strong className="align-top">Descrizione: </strong>
                     <ModelFieldOutput key="description" field="description" schema={schema.description} value={obj.description} />
                 </p>

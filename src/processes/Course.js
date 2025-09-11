@@ -18,7 +18,6 @@ import { SelectPeopleBlock } from './SelectPeopleBlock'
 
 import moment from 'moment'
 
-
 export default function Course() {
     const { id } = useParams()
 
@@ -31,6 +30,7 @@ export default function Course() {
             startDate: null,
             endDate: null,
             lecturers: null,
+            coordinators: null,
             lessons: [] // Initialize lessons as empty array
         }
 
@@ -167,6 +167,9 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                     </InputRow>
                     <InputRow label="Docente/i" className="my-3">
                         <SelectPeopleBlock people={data.lecturers || []} setPeople={people => setData(data => ({...data, lecturers: people}))} prefix="process/courses"/>
+                    </InputRow>
+                    <InputRow label="Referente/i" className="my-3">
+                        <SelectPeopleBlock people={data.coordinators || []} setPeople={people => setData(data => ({...data, coordinators: people}))} prefix="process/courses"/>
                     </InputRow>
                     <InputRow label="Data di inizio" className="my-3">
                         <DateInput value={data.startDate} setValue={setter(setData,'startDate')}/>
