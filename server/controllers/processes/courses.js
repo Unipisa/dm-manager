@@ -13,6 +13,189 @@ const {log} = require('../middleware')
 require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
 
+const DAYS_BACK = 365
+module.exports.DAYS_BACK = DAYS_BACK
+
+function pastDate() {
+    const d = new Date()
+    d.setDate(d.getDate() - DAYS_BACK)
+    return d
+}
+module.exports.pastDate = pastDate
+
+const INDEX_PIPELINE = [
+    { $lookup: {
+        from: 'people',
+        localField: 'coordinators',
+        foreignField: '_id',
+        as: 'coordinators',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+            }},
+        ]
+    }},
+    { $lookup: {
+        from: 'people',
+        localField: 'lecturers',
+        foreignField: '_id',
+        as: 'lecturers',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                email: 1,
+            }},
+        ]
+    }},
+    // Basic lookup for conference rooms in lessons
+    { $addFields: {
+        lessons: {
+            $map: {
+                input: "$lessons",
+                as: "lesson",
+                in: {
+                    $mergeObjects: [
+                        "$$lesson",
+                        { conferenceRoomId: "$$lesson.conferenceRoom" }
+                    ]
+                }
+            }
+        }
+    }},
+]
+module.exports.INDEX_PIPELINE = INDEX_PIPELINE
+
+const GET_PIPELINE = [
+    { $lookup: {
+        from: 'people',
+        localField: 'coordinators',
+        foreignField: '_id',
+        as: 'coordinators',
+        pipeline: [
+            { $lookup: {
+                from: 'institutions',
+                localField: 'affiliations',
+                foreignField: '_id',
+                as: 'affiliations',
+                pipeline: [
+                    { $project: {
+                        _id: 1,
+                        name: 1,
+                    }},
+                ]
+            }},
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                affiliations: 1,
+                email: 1,
+            }},
+        ]
+    }},
+    { $lookup: {
+        from: 'people',
+        localField: 'lecturers',
+        foreignField: '_id',
+        as: 'lecturers',
+        pipeline: [
+            { $lookup: {
+                from: 'institutions',
+                localField: 'affiliations',
+                foreignField: '_id',
+                as: 'affiliations',
+                pipeline: [
+                    { $project: {
+                        _id: 1,
+                        name: 1,
+                    }},
+                ]
+            }},
+            { $project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                affiliations: 1,
+                email: 1,
+            }},
+        ]
+    }},
+    // Expand createdBy
+    {$lookup:{
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy",
+        pipeline: [
+            {$project: {
+                _id: 1,
+                username: 1,
+            }},
+        ],
+    }},
+    {$unwind: {
+        path: "$createdBy",
+        preserveNullAndEmptyArrays: true
+    }},
+    // Enhanced lessons with conference room details
+    { $addFields: {
+        lessons: {
+            $map: {
+                input: "$lessons",
+                as: "lesson",
+                in: {
+                    date: "$$lesson.date",
+                    duration: "$$lesson.duration",
+                    mrbsBookingID: "$$lesson.mrbsBookingID",
+                    conferenceRoomId: "$$lesson.conferenceRoom"
+                }
+            }
+        }
+    }},
+    // Lookup conference rooms for lessons (this is complex due to embedded structure)
+    { $lookup: {
+        from: 'conferencerooms',
+        localField: 'lessons.conferenceRoomId',
+        foreignField: '_id',
+        as: 'conferenceRoomsData'
+    }},
+    // Merge conference room data back into lessons
+    { $addFields: {
+        lessons: {
+            $map: {
+                input: "$lessons",
+                as: "lesson",
+                in: {
+                    $mergeObjects: [
+                        "$$lesson",
+                        {
+                            conferenceRoom: {
+                                $arrayElemAt: [
+                                    {
+                                        $filter: {
+                                            input: "$conferenceRoomsData",
+                                            cond: { $eq: ["$$this._id", "$$lesson.conferenceRoomId"] }
+                                        }
+                                    },
+                                    0
+                                ]
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    }},
+    // Clean up temporary fields
+    { $unset: ["conferenceRoomsData", "lessons.conferenceRoomId"] }
+]
+module.exports.GET_PIPELINE = GET_PIPELINE
+
 router.get('/', async (req, res) => {
     let authorization_alternatives = [
         { createdBy: req.user._id },

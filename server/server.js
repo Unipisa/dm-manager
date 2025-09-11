@@ -138,6 +138,7 @@ function setup_routes(app) {
             'Personale in quiescenza',
             ].includes(staff.qualification)) {
               add_role('/process/my/visits')
+              add_role('/process/my/courses')
           }
         }
       }
