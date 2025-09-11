@@ -7,10 +7,35 @@ import { ModalDeleteDialog } from '../components/ModalDialog'
 import { formatDate } from '../components/DatetimeInput'
 import { useEngine } from '../Engine'
 
-export default function ManageCourses() {
-    return (
-        <CourseList></CourseList>
-    )
+export default function ManageCourses({variant}) {
+    // variant è '' per /process/courses
+    // ed è 'my/' per /process/my/courses
+    return <>
+        <h1 className="text-primary pb-0">Gestione {variant==='my/'?"miei":""} corsi di dottorato</h1>
+        <a href="/process/courses/add">
+            <button className="btn btn-primary my-3">Nuovo corso di dottorato</button>
+        </a>
+        <div className="row">
+            <CourseList variant={variant}/>
+        </div>
+        Vengono visualizzati i corsi di dottorato terminati da non più di un anno.
+        <hr />
+        <div>
+        <i>Chi può accedere a questa pagina?</i>
+        <br />
+        {variant === 'my/' && <>
+            Tutte le persone inserite in anagrafica possono vedere 
+            i corsi di dottorato di cui sono insegnati o referenti.
+        </>}
+        {variant === '' && <>
+            Solo chi ha il permesso <i>/process/courses</i> 
+            può gestire tutti i corsi di dottorato terminati da non più di un anno.
+            Contattare gli amministratori
+            <a href="mailto:help@dm.unipi.it">[help@dm.unipi.it]</a>
+            se c'è la necessita di modificare i corsi più vecchi.
+        </>}
+        </div>
+    </>
 }
 
 function CourseList() {
@@ -54,23 +79,13 @@ function CourseList() {
     }
 
     return <>
-        <h1 className="text-primary pb-0">Gestione corsi di dottorato</h1>
         <ModalDeleteDialog show={showDeleteDialog} objectName={deleteObjectName} handleClose={deleteCourse}></ModalDeleteDialog>
-        <a href="/process/courses/add">
-            <button className="btn btn-primary my-3">Nuovo corso di dottorato</button>
-        </a>
         <div className="row">
             {data.data.map(course => 
                 <div className="p-3 col-lg-6 p-0" key={"course-" + course._id}>
                     <Course course={course} onDelete={() => confirmDeleteCourse(course._id)} />
                 </div>
             )}
-        </div>
-        <hr />
-        <div>
-        <i>Chi può accedere a questa pagina?</i><br />
-        Questa pagina è accessibile a tutti gli utenti 
-        con permesso <i>/process/courses</i>.
         </div>
     </>
 }

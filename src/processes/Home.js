@@ -168,6 +168,26 @@ export default function Home() {
                     </Card>
                 </div>
             }
+            { user.hasProcessPermission('/process/my/courses') && user.person &&
+            // il ruolo '/process/my/courses' viene assegnato al volo
+            // vedi: server/server.js
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>I Miei Corsi di Dottorato</strong>
+                            <a href="/process/my/courses"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Inserisci un tuo corso di dottorato</li>
+                            <li>Informazioni sui tuoi corsi di dottorato inseriti</li>    
+                        </ul>         
+                    </Card.Body>
+                </Card>
+            </div>            
+            }
             { (user.hasProcessPermission('/process/courses')) &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
