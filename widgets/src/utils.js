@@ -187,6 +187,8 @@ export function getRoleLabel(role, english, feminine) {
         'Collaboratore': ['Collaboratore', 'Collaboratrice', 'Affiliate Member', 'Affiliate Member'], 
         'Docente Esterno': ['Docente con contratto esterno', 'Docente con contratto esterno', 'Adjunct Professor', 'Adjunct Professor'],
         'Studente': ['Studente', 'Studentessa', 'Student', 'Student'],
+        'ex Docente' : ['Ex docente', 'Ex docente', 'Former Faculty Member', 'Former Faculty Member'],
+        'Personale in quiescenza' : ['Personale in quiescenza', 'Personale in quiescenza', 'Retired Staff', 'Retired Staff'],
     }
 
     const i = (feminine ? 1 : 0) + (english ? 2 : 0)
