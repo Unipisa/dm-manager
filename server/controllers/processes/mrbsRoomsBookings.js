@@ -35,6 +35,7 @@ module.exports = (router) => {
                             room_id: params.room_id,
                             start_time: params.start_time,
                             end_time: params.end_time,
+                            description: params.description,
                             repeat_rule: 'none'
                         },
                         { 

@@ -37,14 +37,15 @@ export const queryAvailableRooms = async (startTime, endTime, process) => {
   }
 }
 
-export const createBooking = async (bookingData, process) => {
+export const createBooking = async (bookingData, customDescription = null, process) => {
   try {
     const response = await api.post(`/api/v0/process/${process}/mrbsRoomsBookings`, {
       action: 'book',
       name: bookingData.name,
       room_id: bookingData.room_id,
       start_time: dateToTimestamp(bookingData.start_time),
-      end_time: dateToTimestamp(bookingData.end_time)
+      end_time: dateToTimestamp(bookingData.end_time),
+      description: customDescription
     })
     return response
   } catch (error) {
@@ -98,7 +99,7 @@ export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime, proc
 }
 
 export const handleRoomBooking = async (eventData, process) => {
-  const { conferenceRoom, startDatetime, duration, title, mrbsBookingID } = eventData
+  const { conferenceRoom, startDatetime, duration, title, mrbsBookingID, organizers } = eventData
   
   // Check if the conference room has an mrbsRoomID
   if (!conferenceRoom?.mrbsRoomID) {
@@ -179,7 +180,8 @@ export const handleRoomBooking = async (eventData, process) => {
           room_id: conferenceRoom.mrbsRoomID,
           start_time: startTime,
           end_time: endTime,
-          name: title
+          name: title,
+          organizers: organizers || []
         },
         availableRoomNames: availableRoomNames ? `${availableRoomNames}.` : undefined
       }
@@ -214,7 +216,13 @@ export const handleRoomBooking = async (eventData, process) => {
 
 export const createRoomBooking = async (roomData, process) => {
   try {
-    const booking = await createBooking(roomData, process)
+    const organizersNames = roomData.organizers && roomData.organizers.length > 0
+      ? roomData.organizers.map(org => `${org.firstName} ${org.lastName}`).join(', ')
+      : 'Unknown'
+    
+    const description = `Booked through the API via Manage by ${organizersNames}`
+
+    const booking = await createBooking(roomData, description, process)
     return {
       success: true,
       bookingId: booking.booking.id,
