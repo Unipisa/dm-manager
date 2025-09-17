@@ -117,6 +117,10 @@ export const handleRoomBooking = async (eventData, process) => {
   })
   const formatDate = (date) => date.toLocaleDateString('it-IT')
   
+  // Check if this room requires approval
+  // room 33 is Aula Magna
+  const requiresApproval = conferenceRoom.mrbsRoomID === 33
+
   // Check for existing booking first
   let existingBooking = null
   let hasBookingChanged = false
@@ -158,18 +162,29 @@ export const handleRoomBooking = async (eventData, process) => {
       let message, warning
       
       if (existingBooking && hasBookingChanged) {
-        message = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile per il periodo selezionato quindi anche la prenotazione sulla piattaforma Rooms verrà aggiornata.`
-        warning = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.`
+        const approvalSuffix = requiresApproval ? ' La prenotazione richiederà approvazione.' : ''
+        message = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile per il periodo selezionato quindi anche la prenotazione sulla piattaforma Rooms verrà aggiornata.${approvalSuffix}`
+        warning = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.${approvalSuffix}`
       } else if (existingBooking && !hasBookingChanged) {
         const startTimeFormatted = formatTime(new Date(parseInt(existingBooking.start_time) * 1000))
         const endTimeFormatted = formatTime(new Date(parseInt(existingBooking.end_time) * 1000))
         const dateFormatted = formatDate(new Date(parseInt(existingBooking.start_time) * 1000))
         
+        let approvalStatus = ''
+        if (requiresApproval) {
+          if (existingBooking.awaiting_approval) {
+            approvalStatus = ' (in attesa di approvazione)'
+          } else {
+            approvalStatus = ' (approvata)'
+          }
+        }
+        
         message = "No changes"
-        warning = `C'è già una prenotazione sulla piattaforma Rooms associata a questo evento dal titolo "${existingBooking.name}" per il giorno ${dateFormatted} dalle ore ${startTimeFormatted} alle ${endTimeFormatted}.${availableRoomNames ? ` Le aule disponibili per il periodo selezionato sono: ${availableRoomNames}` : ''}`
+        warning = `C'è già una prenotazione sulla piattaforma Rooms associata a questo evento dal titolo "${existingBooking.name}" per il giorno ${dateFormatted} dalle ore ${startTimeFormatted} alle ${endTimeFormatted}${approvalStatus}.${availableRoomNames ? ` Le aule disponibili per il periodo selezionato sono: ${availableRoomNames}` : ''}`
       } else {
-        message = `"${conferenceRoom.name}" è disponibile per il periodo selezionato. Vuoi effettuare la prenotazione sulla piattaforma Rooms?`
-        warning = `"${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.`
+        const approvalSuffix = requiresApproval ? ' Questa aula richiede approvazione.' : ''
+        message = `"${conferenceRoom.name}" è disponibile per il periodo selezionato. Vuoi effettuare la prenotazione sulla piattaforma Rooms?${approvalSuffix}`
+        warning = `"${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.${approvalSuffix}`
       }
       
       return {
@@ -189,11 +204,13 @@ export const handleRoomBooking = async (eventData, process) => {
       let message, warning
       
       if (existingBooking && hasBookingChanged) {
-        message = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile per il periodo selezionato. Se salvi la prenotazione sulla piattaforma Rooms verrà cancellata. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
-        warning = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato. Se salvi la prenotazione verrà cancellata. Le aule disponibili sono: ${availableRoomNames}.`
+        const approvalNote = requiresApproval ? ' (questa aula richiede approvazione)' : ''
+        message = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile per il periodo selezionato${approvalNote}. Se salvi la prenotazione sulla piattaforma Rooms verrà cancellata. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
+        warning = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato${approvalNote}. Se salvi la prenotazione verrà cancellata. Le aule disponibili sono: ${availableRoomNames}.`
       } else {
-        message = `"${conferenceRoom.name}" non è disponibile per il periodo selezionato. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
-        warning = `"${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato. Le aule disponibili sono: ${availableRoomNames}.`
+        const approvalNote = requiresApproval ? ' (questa aula richiede approvazione)' : ''
+        message = `"${conferenceRoom.name}" non è disponibile per il periodo selezionato${approvalNote}. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
+        warning = `"${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato${approvalNote}. Le aule disponibili sono: ${availableRoomNames}.`
       }
       
       return {
