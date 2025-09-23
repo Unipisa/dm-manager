@@ -514,17 +514,17 @@ class Controller {
     }
 
     async search(req, res) {
-        console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
+        //console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
         return this.performQuery({_search: req.query.q || ''}, res)
     }
 
     async index (req, res) {
-        console.log(`*** INDEX ${req.path} ${JSON.stringify(req.query)}`)
+        //console.log(`*** INDEX ${req.path} ${JSON.stringify(req.query)}`)
         return this.performQuery(req.query, res)
     }
 
     async put(req, res) {
-        console.log(`*** PUT ${req.path} ${JSON.stringify(req.body)}`)
+        //console.log(`*** PUT ${req.path} ${JSON.stringify(req.body)}`)
         let payload = {
             ...req.body,
             createdBy: req.user._id,
@@ -544,7 +544,7 @@ class Controller {
     }
 
     async patch(req, res, id) {    
-        console.log(`*** PATCH ${id} ${JSON.stringify(req.body)}`)
+        //console.log(`*** PATCH ${id} ${JSON.stringify(req.body)}`)
         try {
             const was = await this.Model.findById(id)
             
@@ -566,7 +566,7 @@ class Controller {
     }
 
     async delete(req, res, id) {
-        console.log(`*** DELETE ${req.path} id=${id}`)
+        //console.log(`*** DELETE ${req.path} id=${id}`)
         try {
             const obj = await this.Model.findById(id)
             await log(req, obj.toObject(), {})
