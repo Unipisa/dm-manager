@@ -4,6 +4,7 @@ const User = require('./models/User')
 const Person = require('./models/Person')
 const { notify} = require('./models/Notification')
 const config = require('./config')
+const Log = require('./models/Log')
   
 class UnipiAuthStrategy extends OAuth2Strategy {
   constructor(options) {
@@ -13,8 +14,25 @@ class UnipiAuthStrategy extends OAuth2Strategy {
       console.log(`profile: ${JSON.stringify(profile)}`)
       const username = profile[options.usernameField]
       console.log(`username: ${username}`)
+
+      const log_function = async (msg) => {
+        await Log.create({
+          who: null, when: new Date(),
+          what: "POST",
+          where: "/login/oauth2/callback",
+          was: {},
+          will: {
+            "error": msg,
+            "profile": profile,
+            "usernameField": options.usernameField
+          }
+        })
+      }
     
-      if (! username) return cb("invalid username")
+      if (! username) {
+        log_function("no username passwd to UnipiAuthStrategy")
+        return cb("invalid username")
+      }
 
       return User.findOne({ username: username }, async function (err, user) {
         if (err) return cb(err)
@@ -27,6 +45,7 @@ class UnipiAuthStrategy extends OAuth2Strategy {
           }
         }])
         if (people.length>1) {
+          await log_function(`user ${username} has multiple persons associated`)
           notify('admin', 'oauth', `duplicate email ${username} detected in Person collection`)
         }
         if (user) {
@@ -35,6 +54,7 @@ class UnipiAuthStrategy extends OAuth2Strategy {
               user.person = people[0]._id
               await user.save()
             } else if (people.length === 0) {
+              await log_function(`user ${username} has no persons associated`)
               notify('admin', 'oauth', `user ${username} has no person associated`)
               return cb(err, null)
             } else {
@@ -55,6 +75,7 @@ class UnipiAuthStrategy extends OAuth2Strategy {
             await user.save()
             return cb(err, user)
           } else {
+            await log_function(`user ${username} has no person associated`)
             return cb(err, null)
           }
         }
