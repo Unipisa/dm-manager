@@ -17,6 +17,15 @@ class PersonController extends Controller {
         this.searchFields = [ 'lastName', 'firstName', 'affiliations.name', 'notes' ]
         this.searchRoles.push(...PERSON_SEARCH_ROLES)
         this.queryPipeline.push(...Staff.personStaffPipeline())
+        this.indexPipeline = [{
+            $lookup: {
+                from: "institutions",
+                localField: "affiliations",
+                foreignField: "_id",
+                as: "affiliations",
+                pipeline:[{$project:{name : 1}}]
+            }
+        }]
     }
 }
 

@@ -42,6 +42,10 @@ class Controller {
         // the pipeline used in aggregate query of this.index
         this.queryPipeline = []
 
+        // the pipeline used in index and search endpoints; if not specified, 
+        // this defaults to this.queryPipeline
+        this.indexPipeline = []
+
         // Fields used in the search endpoint
         this.searchFields = []
         this.abc = []
@@ -456,7 +460,7 @@ class Controller {
             }}
         ]
         
-        //console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
+        console.log(`${path} aggregate pipeline: ${JSON.stringify(pipeline/*, null, 2*/)}`)
 
         let result = await this.Model.aggregate(pipeline)
         
@@ -515,12 +519,14 @@ class Controller {
 
     async search(req, res) {
         //console.log(`*** SEARCH ${req.path} ${JSON.stringify(req.query.q)}`)
-        return this.performQuery({_search: req.query.q || ''}, res)
+        return this.performQuery({_search: req.query.q || ''}, res,
+            {queryPipeline: this.indexPipeline.length ? this.indexPipeline : this.queryPipeline})
     }
 
     async index (req, res) {
         //console.log(`*** INDEX ${req.path} ${JSON.stringify(req.query)}`)
-        return this.performQuery(req.query, res)
+        return this.performQuery(req.query, res,
+            {queryPipeline: this.indexPipeline.length ? this.indexPipeline : this.queryPipeline})
     }
 
     async put(req, res) {
