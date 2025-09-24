@@ -40,13 +40,13 @@ export default function ManageCourses({variant}) {
     </>
 }
 
-function CourseList() {
+function CourseList({variant}) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false)
     const [deleteObjectName, setDeleteObjectName] = useState(null)
     const [deleteCourseId, setDeleteCourseId] = useState(null)
 
     const queryClient = useQueryClient()
-    const { isLoading, error, data } = useQuery([ 'process', 'courses' ])
+    const { isLoading, error, data } = useQuery(`process/${variant}courses`.split('/'))
 
     if (isLoading) {
         return "Loading"

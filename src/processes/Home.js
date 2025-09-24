@@ -168,7 +168,7 @@ export default function Home() {
                     </Card>
                 </div>
             }
-            { user.person &&
+            { user.hasProcessPermission('/process/my/courses') && user.person &&
             // il ruolo '/process/my/courses' viene assegnato al volo
             // vedi: server/server.js
             <div className="col-lg-6 p-3">

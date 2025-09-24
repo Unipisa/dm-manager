@@ -140,6 +140,11 @@ function setup_routes(app) {
               add_role('/process/my/visits')
               add_role('/process/my/courses')
           }
+          if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
+            'PTA',
+            ].includes(staff.qualification)) {
+              add_role('/process/my/courses')
+          }
         }
       }
       req.log_who = user.username || `${user._id}`
