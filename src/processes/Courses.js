@@ -12,9 +12,11 @@ export default function ManageCourses({variant}) {
     // ed è 'my/' per /process/my/courses
     return <>
         <h1 className="text-primary pb-0">Gestione {variant==='my/'?"miei":""} corsi di dottorato</h1>
-        <a href="/process/courses/add">
-            <button className="btn btn-primary my-3">Nuovo corso di dottorato</button>
-        </a>
+        {variant === '' && <>
+            <a href="/process/courses/add">
+                <button className="btn btn-primary my-3">Nuovo corso di dottorato</button>
+            </a>
+        </>}    
         <div className="row">
             <CourseList variant={variant}/>
         </div>
@@ -25,13 +27,13 @@ export default function ManageCourses({variant}) {
         <br />
         {variant === 'my/' && <>
             Tutte le persone inserite in anagrafica possono vedere 
-            i corsi di dottorato di cui sono insegnati o referenti.
+            i corsi di dottorato di cui sono insegnanti o referenti.
         </>}
         {variant === '' && <>
-            Solo chi ha il permesso <i>/process/courses</i> 
+            Solo chi ha il permesso <i>/process/courses </i>  
             può gestire tutti i corsi di dottorato terminati da non più di un anno.
             Contattare gli amministratori
-            <a href="mailto:help@dm.unipi.it">[help@dm.unipi.it]</a>
+            <a href="mailto:help@dm.unipi.it"> [help@dm.unipi.it] </a>
             se c'è la necessita di modificare i corsi più vecchi.
         </>}
         </div>

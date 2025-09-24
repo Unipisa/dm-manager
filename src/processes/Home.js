@@ -168,7 +168,7 @@ export default function Home() {
                     </Card>
                 </div>
             }
-            { user.hasProcessPermission('/process/my/courses') && user.person &&
+            { user.person &&
             // il ruolo '/process/my/courses' viene assegnato al volo
             // vedi: server/server.js
             <div className="col-lg-6 p-3">
@@ -181,8 +181,8 @@ export default function Home() {
                     </Card.Header>
                     <Card.Body>
                         <ul>
-                            <li>Inserisci un tuo corso di dottorato</li>
-                            <li>Informazioni sui tuoi corsi di dottorato inseriti</li>    
+                            <li>Informazioni sui tuoi corsi di dottorato inseriti</li>
+                            <li>Inserimento delle lezioni dei corsi</li>  
                         </ul>         
                     </Card.Body>
                 </Card>
@@ -199,8 +199,8 @@ export default function Home() {
                     </Card.Header>
                     <Card.Body>
                         <ul>
+                            <li>Inserimento corsi di dottorato</li>
                             <li>Gestione dei corsi inseriti</li>
-                            <li>Inserimento delle lezioni dei corsi</li>
                         </ul>
                     </Card.Body>
                 </Card>
