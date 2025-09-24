@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+module.exports = router
 const { ObjectId } = require('mongoose').Types
 
 const EventPhdCourse = require('../../models/EventPhdCourse')
