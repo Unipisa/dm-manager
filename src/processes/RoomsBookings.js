@@ -132,7 +132,7 @@ export const handleRoomBooking = async (eventData, process) => {
         existingBooking = bookingResponse
         const existingStartTime = new Date(parseInt(existingBooking.start_time) * 1000)
         const existingEndTime = new Date(parseInt(existingBooking.end_time) * 1000)
-        
+
         // Check if booking details have changed
         hasBookingChanged = startTime.getTime() !== existingStartTime.getTime() || 
                            endTime.getTime() !== existingEndTime.getTime() ||
@@ -228,6 +228,30 @@ export const handleRoomBooking = async (eventData, process) => {
       warning: "Non è stato possibile verificare la disponibilità dell'aula sulla piattaforma Rooms.",
       error
     }
+  }
+}
+
+export const getRoomBookingStatus = (roomBookingResult, mrbsBookingID) => {
+  if (!roomBookingResult) return ''
+  
+  switch (roomBookingResult.type) {
+    case 'external_room':
+      return 'Aula esterna - non disponibile su Rooms'
+    
+    case 'available':
+      if (roomBookingResult.message === "No changes") {
+        return mrbsBookingID ? 'Prenotazione esistente valida' : 'Disponibile per prenotazione'
+      }
+      return 'Disponibile per prenotazione'
+    
+    case 'unavailable':
+      return 'Non disponibile - conflitto orario'
+    
+    case 'error':
+      return 'Errore nel controllo disponibilità'
+    
+    default:
+      return ''
   }
 }
 

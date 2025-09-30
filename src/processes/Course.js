@@ -1,5 +1,5 @@
 import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
 import { useQuery, useQueryClient } from 'react-query'
@@ -15,6 +15,7 @@ import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
 import { setter, useEngine } from '../Engine'
 import { SelectPeopleBlock } from './SelectPeopleBlock'
+import { handleRoomBooking } from './RoomsBookings'
 
 import moment from 'moment'
 
@@ -244,7 +245,6 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                 <Card.Header>
                     <div className="d-flex d-row justify-content-between align-items-center">
                         <div>Gestione Lezioni</div>
-                        
                     </div>
                 </Card.Header>
                 <Card.Body>
@@ -280,6 +280,33 @@ function AddLessonButton({ onAdd }) {
     const [conferenceRoom, setConferenceRoom] = useState(null)
     const [cadence, setCadence] = useState('single')
     const [repetitions, setRepetitions] = useState(1)
+    const [roomWarning, setRoomWarning] = useState('')
+
+    useEffect(() => {
+        const updateRoomWarning = async () => {
+            if (cadence !== 'single') {
+                // Show warning for repeated lessons
+                setRoomWarning('Quando una cadenza è selezionata, far attenzione ai messaggi di disponibilità delle aule dopo aver generato le lezioni')
+            } else if (conferenceRoom && dateTime && duration) {
+                // Check room availability only for single lessons
+                try {
+                    const lessonData = {
+                        conferenceRoom,
+                        startDatetime: dateTime,
+                        duration,
+                        mrbsBookingID: null
+                    }
+                    const result = await handleRoomBooking(lessonData, 'courses')
+                    setRoomWarning(result.warning || '')
+                } catch (error) {
+                    setRoomWarning('')
+                }
+            } else {
+                setRoomWarning('')
+            }
+        }
+        updateRoomWarning()
+    }, [conferenceRoom, dateTime, duration, cadence])
 
     const handleAdd = () => {
         if (!dateTime || !duration || !conferenceRoom) return
@@ -346,6 +373,7 @@ function AddLessonButton({ onAdd }) {
                 setDuration={setDuration}
                 conferenceRoom={conferenceRoom}
                 setConferenceRoom={setConferenceRoom}
+                roomWarning={roomWarning}
             />
 
             <Form.Group className="row my-2">
