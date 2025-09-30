@@ -54,7 +54,7 @@ const PhdCourseView = ({ Model }) => {
                 </p>
                 <h4>Lezioni</h4>
                 <Container>
-                    <LessonsEditor lessons={obj.lessons} />
+                    <LessonsEditor lessons={obj.lessons} showBookingIdColumn={true} />
                 </Container>
                 <ButtonGroup>
                     <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>

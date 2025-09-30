@@ -413,7 +413,8 @@ export default function PhdCourseEditPage({ Model }) {
                                     <LessonsEditor 
                                         lessons={modifiedObj.lessons}
                                         updateLesson={updateLesson}
-                                        deleteLesson={deleteLesson} />
+                                        deleteLesson={deleteLesson}
+                                        showBookingIdColumn={true} />
                                 </Container>
                             </div>
                         </Form.Group>

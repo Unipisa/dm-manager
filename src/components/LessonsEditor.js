@@ -63,10 +63,11 @@ export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, se
     )
 }
 
-const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson }) => {
+const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson, showBookingIdColumn = false }) => {
     const [dateTime, setDateTime] = useState(lesson.date)
     const [duration, setDuration] = useState(lesson.duration)
     const [conferenceRoom, setConferenceRoom] = useState(lesson.conferenceRoom)
+    const [mrbsBookingID, setMrbsBookingID] = useState(lesson.mrbsBookingID || '')
     const [roomWarning, setRoomWarning] = useState('')
 
     useEffect(() => {
@@ -77,7 +78,7 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
                         conferenceRoom,
                         startDatetime: dateTime,
                         duration,
-                        mrbsBookingID: lesson.mrbsBookingID // Use the original booking ID for checking
+                        mrbsBookingID
                     }
                     const result = await handleRoomBooking(lessonData, 'courses')
                     setRoomWarning(result.warning || '')
@@ -89,7 +90,7 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
             }
         }
         updateRoomWarning()
-    }, [conferenceRoom, dateTime, duration, lesson.mrbsBookingID])
+    }, [conferenceRoom, dateTime, duration, mrbsBookingID])
 
     const update = () => {
         updateLesson({
@@ -97,7 +98,7 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
             date: dateTime,
             duration,
             conferenceRoom,
-            // mrbsBookingID stays the same - we don't let users edit it manually
+            mrbsBookingID: showBookingIdColumn ? mrbsBookingID : lesson.mrbsBookingID, // Only update if column is shown
         })
         close()
     }
@@ -111,6 +112,19 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
                 conferenceRoom, setConferenceRoom,
                 roomWarning,
             }}/>
+            {showBookingIdColumn && (
+                <Form.Group className="row my-2">
+                    <Form.Label className="text-end col-sm-2 col-form-label" htmlFor={`${idPrefix}-mrbsBookingID`}>
+                        ID Rooms
+                    </Form.Label>
+                    <div className="col-sm-10">
+                        <NumberInput 
+                            id={`${idPrefix}-mrbsBookingID`}
+                            value={mrbsBookingID}
+                            setValue={setMrbsBookingID} />
+                    </div>
+                </Form.Group>
+            )}
             <ButtonGroup className="mt-3">
                 <Button className="btn-primary" onClick={() => update()}>Modifica Lezione</Button>
                 <Button className="btn btn-secondary" onClick={() => close()}>Annulla Modifiche</Button>
@@ -120,7 +134,7 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
     )
 }
 
-const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
+const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson, showBookingIdColumn = false }) => {
     const [editing, setEditing] = useState(false)
     const [bookingStatus, setBookingStatus] = useState('')
 
@@ -150,13 +164,14 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
 
     if (editing) 
         return (
-            <td colSpan={5}>
+            <td colSpan={showBookingIdColumn ? 6 : 5}>
                 <EditLessonForm {...{
                     idPrefix: `${id}-edit`,
                     lesson,
                     close: () => setEditing(false),
                     updateLesson,
                     deleteLesson,
+                    showBookingIdColumn,
                 }} />
             </td>
         )
@@ -167,6 +182,7 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
                 <td>{lesson.duration}</td>
                 <td><ConferenceRoomOutput value={lesson.conferenceRoom} /></td>
                 <td>{bookingStatus}</td>
+                {showBookingIdColumn && <td>{lesson.mrbsBookingID ?? '-'}</td>}
                 <td className="d-flex justify-content-end gap-2">
                     <Button className="btn btn-warning btn-sm" onClick={() => setEditing(true)}>
                         <Icon.Pencil />
@@ -179,7 +195,7 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
         )
 }
 
-const LessonViewRow = ({ lesson }) => {
+const LessonViewRow = ({ lesson, showBookingIdColumn = false }) => {
     const [bookingStatus, setBookingStatus] = useState('')
 
     useEffect(() => {
@@ -193,7 +209,6 @@ const LessonViewRow = ({ lesson }) => {
                         mrbsBookingID: lesson.mrbsBookingID
                     }
                     const result = await handleRoomBooking(lessonData, 'courses')
-                    console.log(result)
                     setBookingStatus(getRoomBookingStatus(result, lesson.mrbsBookingID))
                 } catch (error) {
                     setBookingStatus(lesson.mrbsBookingID ? `ID: ${lesson.mrbsBookingID}` : 'Nessuna prenotazione')
@@ -211,10 +226,10 @@ const LessonViewRow = ({ lesson }) => {
             <td>{lesson.duration}</td>
             <td><ConferenceRoomOutput value={lesson.conferenceRoom} /></td>
             <td>{bookingStatus}</td>
+            {showBookingIdColumn && <td>{lesson.mrbsBookingID ?? '-'}</td>}
         </>
     )
 }
-
 
 /**
  * @param {{ 
@@ -223,7 +238,7 @@ const LessonViewRow = ({ lesson }) => {
  *      deleteLesson: (index: number) => void
  *  }} props 
  */
-const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
+const LessonsEditor = ({ lessons, updateLesson, deleteLesson, showBookingIdColumn = false }) => {
     const isEdit = !!updateLesson && !!deleteLesson
     return (
         <Table className="align-middle">
@@ -232,7 +247,8 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
                     <th>Orario</th>
                     <th>Durata (minuti)</th>
                     <th>Stanza</th>
-                    <th>Prenotazione Rooms</th>
+                    <th>Stato Prenotazione</th>
+                    {showBookingIdColumn && <th>ID Rooms</th>}
                     {isEdit && <th></th>}
                 </tr>
             </thead>
@@ -243,10 +259,11 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
                             <LessonEditRow id={`lesson-${i}`} {...{ 
                                 lesson, 
                                 updateLesson: lesson => updateLesson(i, lesson), 
-                                deleteLesson: () => deleteLesson(i), 
+                                deleteLesson: () => deleteLesson(i),
+                                showBookingIdColumn,
                             }} />
                         ) : (
-                            <LessonViewRow lesson={lesson} />
+                            <LessonViewRow lesson={lesson} showBookingIdColumn={showBookingIdColumn} />
                         )}
                     </tr>
                 ))}
@@ -254,6 +271,5 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
         </Table>
     )
 }
-
 
 export default LessonsEditor
