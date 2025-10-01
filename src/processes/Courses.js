@@ -65,13 +65,13 @@ function CourseList({variant}) {
             return
         }
         try {
-            await api.del("/api/v0/process/courses/" + deleteCourseId)
+            await api.del(`/api/v0/process/${variant}courses/${deleteCourseId}`)
         }
         catch {
             console.log("Error while deleting the course")
         }
         
-        queryClient.invalidateQueries([ 'process', 'courses' ])
+        queryClient.invalidateQueries(`process/${variant}courses`.split('/'))
     }
 
     const confirmDeleteCourse = async (id) => {
@@ -85,14 +85,14 @@ function CourseList({variant}) {
         <div className="row">
             {data.data.map(course => 
                 <div className="p-3 col-lg-6 p-0" key={"course-" + course._id}>
-                    <Course course={course} onDelete={() => confirmDeleteCourse(course._id)} />
+                    <Course course={course} onDelete={() => confirmDeleteCourse(course._id)} variant={variant} />
                 </div>
             )}
         </div>
     </>
 }
 
-function Course({course, onDelete}) {
+function Course({course, onDelete, variant}) {
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
 
@@ -112,7 +112,7 @@ function Course({course, onDelete}) {
                 {onDelete && <button className="ms-2 btn btn-danger" onClick={onDelete}>
                     Elimina
                 </button>}
-                <Link className="ms-2" to={"/process/courses/add/" + course._id}>
+                <Link className="ms-2" to={`/process/${variant}courses/add/${course._id}`} >
                     <button className="btn btn-primary">
                         Modifica
                     </button>
