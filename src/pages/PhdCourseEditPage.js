@@ -72,7 +72,7 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
             return
         }
 
-        const baseLesson = { date: dateTime, duration, conferenceRoom: conferenceRoom._id, mrbsBookingID }
+        const baseLesson = { date: dateTime, duration, conferenceRoom, mrbsBookingID }
         CADENCE_TEMPLATE_GENERATORS[cadence]?.(addLesson, baseLesson, repetitions)
         
         close()
