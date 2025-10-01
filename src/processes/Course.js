@@ -1,4 +1,4 @@
-import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card, Form, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap'
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
@@ -8,14 +8,14 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import 'katex/dist/katex.min.css'
-
+import { formatDate } from '../components/DatetimeInput'
 import { InputRow, DateInput, NumberInput, SelectInput, StringInput, TextInput } from '../components/Input'
 import LessonsEditor, { LessonFormFields } from '../components/LessonsEditor'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
 import { setter, useEngine } from '../Engine'
 import { SelectPeopleBlock } from './SelectPeopleBlock'
-import { handleRoomBooking } from './RoomsBookings'
+import { handleRoomBooking, createRoomBooking, deleteBooking } from './RoomsBookings'
 
 import moment from 'moment'
 
@@ -63,8 +63,12 @@ export default function Course() {
 
 export function CourseBody({ course, forbidden }) {
     const [data, setData] = useState(course)
+    const [originalLessons, setOriginalLessons] = useState(course.lessons || [])
     const navigate = useNavigate()
     const queryClient = useQueryClient()
+    const [showBookingModal, setShowBookingModal] = useState(false)
+    const [bookingActions, setBookingActions] = useState(null)
+    const [isProcessingBookings, setIsProcessingBookings] = useState(false)
 
     if (forbidden) {
         return <div>
@@ -81,11 +85,184 @@ export function CourseBody({ course, forbidden }) {
         </div>
     }
 
+    const analyzeBookingActions = async (currentLessons, originalLessons) => {
+        const actions = {
+            toBook: [],      // New lessons or lessons with changed details
+            toDelete: [],    // Lessons that were deleted
+            toUpdate: [],    // Existing lessons with booking that need updating
+            conflicts: [],   // Lessons that can't be booked due to conflicts
+            noChange: [],    // Lessons with valid existing bookings
+            external: []     // Lessons in external rooms (no booking needed)
+        }
+
+        // Find deleted lessons (in original but not in current)
+        for (const originalLesson of originalLessons) {
+            const lessonId = originalLesson._id
+            if (lessonId && !currentLessons.find(l => l._id === lessonId)) {
+                if (originalLesson.mrbsBookingID) {
+                    actions.toDelete.push({
+                        lesson: originalLesson,
+                        bookingId: originalLesson.mrbsBookingID
+                    })
+                }
+            }
+        }
+
+        // Check each current lesson
+        for (const lesson of currentLessons) {
+            if (!lesson.conferenceRoom || !lesson.date || !lesson.duration) {
+                continue // Skip incomplete lessons
+            }
+
+            // Check if room is external (no mrbsRoomID)
+            if (!lesson.conferenceRoom.mrbsRoomID) {
+                actions.external.push({ lesson })
+                continue
+            }
+
+            // Find if this lesson existed before
+            const originalLesson = lesson._id 
+                ? originalLessons.find(l => l._id === lesson._id)
+                : null
+
+            const hasChanged = originalLesson && (
+                new Date(lesson.date).getTime() !== new Date(originalLesson.date).getTime() ||
+                lesson.duration !== originalLesson.duration ||
+                lesson.conferenceRoom._id !== originalLesson.conferenceRoom?._id
+            )
+
+            // Check room availability
+            try {
+                const lessonData = {
+                    conferenceRoom: lesson.conferenceRoom,
+                    startDatetime: lesson.date,
+                    duration: lesson.duration,
+                    mrbsBookingID: lesson.mrbsBookingID,
+                    title: data.title
+                }
+                const result = await handleRoomBooking(lessonData, 'courses')
+
+                if (result.type === 'available') {
+                    if (result.message === "No changes" && lesson.mrbsBookingID) {
+                        actions.noChange.push({ lesson, result })
+                    } else if (hasChanged && lesson.mrbsBookingID) {
+                        // Existing lesson with booking that has changed
+                        actions.toUpdate.push({ 
+                            lesson, 
+                            result,
+                            oldBookingId: lesson.mrbsBookingID,
+                            roomData: result.roomData
+                        })
+                    } else if (!lesson.mrbsBookingID) {
+                        // New lesson needs booking
+                        actions.toBook.push({ 
+                            lesson, 
+                            result,
+                            roomData: result.roomData
+                        })
+                    }
+                } else if (result.type === 'unavailable') {
+                    actions.conflicts.push({ lesson, result })
+                    // If there was a booking before, we need to delete it
+                    if (lesson.mrbsBookingID) {
+                        actions.toDelete.push({
+                            lesson,
+                            bookingId: lesson.mrbsBookingID
+                        })
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking lesson availability:', error)
+            }
+        }
+
+        return actions
+    }
+
     const onCompleted = async () => {
-        // Insert the course in the database
-        await api.put('/api/v0/process/courses/save', data)
-        queryClient.invalidateQueries([ 'process', 'course', data._id ])
-        navigate('/process/courses')
+        const actions = await analyzeBookingActions(data.lessons || [], originalLessons)
+        
+        // Check if there are any booking actions needed
+        const hasActions = actions.toBook.length > 0 || 
+                        actions.toDelete.length > 0 || 
+                        actions.toUpdate.length > 0 || 
+                        actions.conflicts.length > 0
+
+        if (hasActions) {
+            setBookingActions(actions)
+            setShowBookingModal(true)
+        } else {
+            // No booking actions needed, just save
+            await saveCourse()
+        }
+    }
+
+    const saveCourse = async (executeBookings = false) => {
+        try {
+            if (executeBookings && bookingActions) {
+                setIsProcessingBookings(true)
+                
+                // Delete bookings first
+                for (const action of bookingActions.toDelete) {
+                    try {
+                        await deleteBooking(action.bookingId, 'courses')
+                        console.log(`Deleted booking ${action.bookingId}`)
+                    } catch (error) {
+                        console.error(`Error deleting booking ${action.bookingId}:`, error)
+                    }
+                }
+
+                // Update bookings (delete old, create new)
+                for (const action of bookingActions.toUpdate) {
+                    try {
+                        await deleteBooking(action.oldBookingId, 'courses')
+                        const bookingResult = await createRoomBooking({
+                                ...action.roomData,
+                                organizers: data.coordinators || []
+                            }, 'courses')
+                        if (bookingResult.success) {
+                            // Update the lesson with new booking ID
+                            const lessonIndex = data.lessons.findIndex(l => l === action.lesson)
+                            if (lessonIndex !== -1) {
+                                data.lessons[lessonIndex].mrbsBookingID = bookingResult.bookingId
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error updating booking:', error)
+                    }
+                }
+
+                // Create new bookings
+                for (const action of bookingActions.toBook) {
+                    try {
+                        const bookingResult = await createRoomBooking({
+                            ...action.roomData,
+                            organizers: data.coordinators || []
+                        }, 'courses')
+                        if (bookingResult.success) {
+                            // Update the lesson with booking ID
+                            const lessonIndex = data.lessons.findIndex(l => l === action.lesson)
+                            if (lessonIndex !== -1) {
+                                data.lessons[lessonIndex].mrbsBookingID = bookingResult.bookingId
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error creating booking:', error)
+                    }
+                }
+            }
+
+            // Save the course
+            await api.put('/api/v0/process/courses/save', data)
+            queryClient.invalidateQueries(['process', 'course', data._id])
+            setOriginalLessons([...data.lessons])
+            navigate('/process/courses')
+        } catch (error) {
+            console.error('Error saving course:', error)
+        } finally {
+            setIsProcessingBookings(false)
+            setShowBookingModal(false)
+        }
     }
 
     return <PrefixProvider value="process/courses">
@@ -99,6 +276,100 @@ export function CourseBody({ course, forbidden }) {
             onCompleted={onCompleted}
             active={true}
         />
+        <Modal show={showBookingModal} onHide={() => setShowBookingModal(false)} size="lg" centered>
+            <Modal.Header closeButton>
+                <Modal.Title>Riepilogo Prenotazioni</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {bookingActions && (
+                    <div>
+                        {bookingActions.toBook.length > 0 && (
+                            <div className="mb-3">
+                                <h6>✓ Lezioni da prenotare su Rooms ({bookingActions.toBook.length}):</h6>
+                                <ul>
+                                    {bookingActions.toBook.map((action, i) => (
+                                        <li key={i}>
+                                            {formatDate(action.lesson.date)} - {action.lesson.conferenceRoom.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {bookingActions.toUpdate.length > 0 && (
+                            <div className="mb-3">
+                                <h6>↻ Lezioni da aggiornare su Rooms ({bookingActions.toUpdate.length}):</h6>
+                                <ul>
+                                    {bookingActions.toUpdate.map((action, i) => (
+                                        <li key={i}>
+                                            {formatDate(action.lesson.date)} - {action.lesson.conferenceRoom.name}
+                                            <small className="text-muted"> (la prenotazione precedente verrà cancellata e ricreata)</small>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {bookingActions.toDelete.length > 0 && (
+                            <div className="mb-3">
+                                <h6>✗ Prenotazioni da cancellare su Rooms ({bookingActions.toDelete.length}):</h6>
+                                <ul>
+                                    {bookingActions.toDelete.map((action, i) => (
+                                        <li key={i}>
+                                            {formatDate(action.lesson.date)} - {action.lesson.conferenceRoom?.name || 'Aula rimossa'}
+                                            <small className="text-muted"> (ID: {action.bookingId})</small>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {bookingActions.conflicts.length > 0 && (
+                            <div className="mb-3 alert alert-warning">
+                                <h6>⚠ Conflitti - Impossibile prenotare su Rooms ({bookingActions.conflicts.length}):</h6>
+                                <ul>
+                                    {bookingActions.conflicts.map((action, i) => (
+                                        <li key={i}>
+                                            {formatDate(action.lesson.date)} - {action.lesson.conferenceRoom.name}
+                                            <br />
+                                            <small>{action.result.warning}</small>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {bookingActions.noChange.length > 0 && (
+                            <div className="mb-3">
+                                <h6 className="text-muted">✓ Prenotazioni esistenti valide su Rooms ({bookingActions.noChange.length})</h6>
+                            </div>
+                        )}
+
+                        {bookingActions.external.length > 0 && (
+                            <div className="mb-3">
+                                <h6 className="text-muted">ℹ Aule esterne - nessuna prenotazione su Rooms necessaria ({bookingActions.external.length})</h6>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </Modal.Body>
+            <Modal.Footer>
+                <Button 
+                    variant="secondary" 
+                    onClick={() => setShowBookingModal(false)}
+                    disabled={isProcessingBookings}
+                >
+                    Annulla
+                </Button>
+                <Button 
+                    variant="primary" 
+                    onClick={() => saveCourse(true)}
+                    disabled={isProcessingBookings}
+                >
+                    {isProcessingBookings ? 'Salvando...' : 'Continua'}
+                </Button>
+            </Modal.Footer>
+        </Modal>
     </PrefixProvider>
 }
 
@@ -244,7 +515,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
             <Card className="shadow mt-3">
                 <Card.Header>
                     <div className="d-flex d-row justify-content-between align-items-center">
-                        <div>Gestione Lezioni</div>
+                        <div>Gestione Lezioni (le prenotazioni su Rooms sono gestite quando si preme "Salva")</div>
                     </div>
                 </Card.Header>
                 <Card.Body>

@@ -132,11 +132,11 @@ export const handleRoomBooking = async (eventData, process) => {
         existingBooking = bookingResponse
         const existingStartTime = new Date(parseInt(existingBooking.start_time) * 1000)
         const existingEndTime = new Date(parseInt(existingBooking.end_time) * 1000)
-
+        
         // Check if booking details have changed
-        hasBookingChanged = startTime.getTime() !== existingStartTime.getTime() || 
-                           endTime.getTime() !== existingEndTime.getTime() ||
-                           existingBooking.name !== title
+        hasBookingChanged = Math.floor(startTime.getTime() / 1000) !== parseInt(existingBooking.start_time) || 
+                           Math.floor(endTime.getTime() / 1000) !== parseInt(existingBooking.end_time) ||
+                           (!!title && existingBooking.name !== title)
       }
     } catch (error) {
       console.warn('Could not retrieve existing booking details:', error)
