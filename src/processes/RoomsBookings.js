@@ -130,8 +130,6 @@ export const handleRoomBooking = async (eventData, process) => {
       const bookingResponse = await getBookingDetails(mrbsBookingID, process)
       if (bookingResponse) {
         existingBooking = bookingResponse
-        const existingStartTime = new Date(parseInt(existingBooking.start_time) * 1000)
-        const existingEndTime = new Date(parseInt(existingBooking.end_time) * 1000)
         
         // Check if booking details have changed
         hasBookingChanged = Math.floor(startTime.getTime() / 1000) !== parseInt(existingBooking.start_time) || 
