@@ -59,6 +59,7 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
     const [dateTime, setDateTime] = useState('')
     const [duration, setDuration] = useState(60)
     const [conferenceRoom, setConferenceRoom] = useState(null)
+    const [mrbsBookingID, setMrbsBookingID] = useState(null)
 
     const [cadence, setCadence] = useState('single')
     const [repetitions, setRepetitions] = useState(1)
@@ -71,7 +72,7 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
             return
         }
 
-        const baseLesson = { date: dateTime, duration, conferenceRoom: conferenceRoom._id }
+        const baseLesson = { date: dateTime, duration, conferenceRoom: conferenceRoom._id, mrbsBookingID }
         CADENCE_TEMPLATE_GENERATORS[cadence]?.(addLesson, baseLesson, repetitions)
         
         close()
@@ -84,6 +85,17 @@ const GenerateLessonForm = ({ addLesson, close, ...rest }) => {
                 duration, setDuration,
                 conferenceRoom, setConferenceRoom,
             }} />
+            <Form.Group className="row my-2">
+                <Form.Label className="text-end col-sm-2 col-form-label" htmlFor="mrbsBookingID">
+                    ID Rooms
+                </Form.Label>
+                <div className="col-sm-10">
+                    <NumberInput 
+                        id="value"
+                        value={mrbsBookingID}
+                        setValue={setMrbsBookingID} />
+                </div>
+            </Form.Group>
             <Form.Group className="row my-2">
                 <Form.Label className="text-end col-sm-2 col-form-label" htmlFor="new-lesson-repeat-cadence">
                     Cadenza
