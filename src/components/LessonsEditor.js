@@ -247,7 +247,7 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson, showBookingIdColum
                     <th>Orario</th>
                     <th>Durata (minuti)</th>
                     <th>Stanza</th>
-                    <th>Stato Prenotazione</th>
+                    <th>Prenotazione Rooms</th>
                     {showBookingIdColumn && <th>ID Rooms</th>}
                     {isEdit && <th></th>}
                 </tr>
