@@ -54,14 +54,17 @@ const PhdCourseView = ({ Model }) => {
                 </p>
                 <h4>Lezioni</h4>
                 <Container>
-                    <LessonsEditor lessons={obj.lessons} />
+                    <LessonsEditor lessons={obj.lessons} showBookingIdColumn={true} />
                 </Container>
                 <ButtonGroup>
                     <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
-                        Modifica
+                        modifica
                     </Button>
                     <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('__new__')}?clone=${obj._id}`)}>
-                        Duplica
+                        duplica
+                    </Button>
+                    <Button key='index' className="btn btn-secondary" onClick={() => navigate(-1)}>
+                        torna all'elenco
                     </Button>
                 </ButtonGroup>
             </Card.Body>

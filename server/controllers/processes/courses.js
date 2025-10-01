@@ -13,6 +13,7 @@ const {log} = require('../middleware')
 /* inject functionality for widgets */
 require('./personSearch')(router)
 require('./conferenceRoomSearch')(router)
+require('./mrbsRoomsBookings')(router)
 
 const DAYS_BACK = 365
 module.exports.DAYS_BACK = DAYS_BACK

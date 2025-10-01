@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button, ButtonGroup, Form, Table } from 'react-bootstrap'
 import * as Icon from 'react-bootstrap-icons'
 import { Link } from 'react-router-dom';
@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { useEngine } from '../Engine';
 import { DatetimeInput, formatDate } from './DatetimeInput';
 import { ConferenceRoomInput, NumberInput } from './Input';
+import { handleRoomBooking, getRoomBookingStatus } from '../processes/RoomsBookings'
 
 /** @typedef {import('../models/EventPhdCourse').Lesson} Lesson */
 
@@ -17,7 +18,7 @@ const ConferenceRoomOutput = ({ value }) => {
     return <Link to={ConferenceRoom.viewUrl(value._id)}>{value.name}</Link>
 }
 
-export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom, mrbsBookingID, setMrbsBookingID }) => {
+export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom, roomWarning }) => {
     return (
         <>
             <Form.Group className="row my-2">
@@ -51,29 +52,45 @@ export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, se
                         id={`${idPrefix}-room`}
                         value={conferenceRoom}
                         setValue={setConferenceRoom} />
-                </div>
-            </Form.Group>
-            <Form.Group className="row my-2">
-                <Form.Label className="text-end col-sm-2 col-form-label" htmlFor={`${idPrefix}-mrbsBookingID`}>
-                    Prenotazione Rooms
-                </Form.Label>
-                <div className="col-sm-10">
-                    <NumberInput 
-                        id={`${idPrefix}-mrbsBookingID`}
-                        value={mrbsBookingID}
-                        setValue={setMrbsBookingID} />
+                    {roomWarning && (
+                        <div className="text-muted small mt-1" style={{ fontSize: '0.875rem' }}>
+                            {roomWarning}
+                        </div>
+                    )}
                 </div>
             </Form.Group>
         </>
     )
 }
 
-
-const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson }) => {
+const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson, showBookingIdColumn = false }) => {
     const [dateTime, setDateTime] = useState(lesson.date)
     const [duration, setDuration] = useState(lesson.duration)
     const [conferenceRoom, setConferenceRoom] = useState(lesson.conferenceRoom)
     const [mrbsBookingID, setMrbsBookingID] = useState(lesson.mrbsBookingID || '')
+    const [roomWarning, setRoomWarning] = useState('')
+
+    useEffect(() => {
+        const updateRoomWarning = async () => {
+            if (conferenceRoom && dateTime && duration) {
+                try {
+                    const lessonData = {
+                        conferenceRoom,
+                        startDatetime: dateTime,
+                        duration,
+                        mrbsBookingID
+                    }
+                    const result = await handleRoomBooking(lessonData, 'courses')
+                    setRoomWarning(result.warning || '')
+                } catch (error) {
+                    setRoomWarning('')
+                }
+            } else {
+                setRoomWarning('')
+            }
+        }
+        updateRoomWarning()
+    }, [conferenceRoom, dateTime, duration, mrbsBookingID])
 
     const update = () => {
         updateLesson({
@@ -81,11 +98,11 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
             date: dateTime,
             duration,
             conferenceRoom,
-            mrbsBookingID,
+            mrbsBookingID: showBookingIdColumn ? mrbsBookingID : lesson.mrbsBookingID, // Only update if column is shown
         })
-
         close()
     }
+    
     return (
         <div>
             <h4 className="mt-2 mb-3">Modifica Lezione</h4>
@@ -93,8 +110,21 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
                 dateTime, setDateTime,
                 duration, setDuration,
                 conferenceRoom, setConferenceRoom,
-                mrbsBookingID, setMrbsBookingID,
+                roomWarning,
             }}/>
+            {showBookingIdColumn && (
+                <Form.Group className="row my-2">
+                    <Form.Label className="text-end col-sm-2 col-form-label" htmlFor={`${idPrefix}-mrbsBookingID`}>
+                        ID Rooms
+                    </Form.Label>
+                    <div className="col-sm-10">
+                        <NumberInput 
+                            id={`${idPrefix}-mrbsBookingID`}
+                            value={mrbsBookingID}
+                            setValue={setMrbsBookingID} />
+                    </div>
+                </Form.Group>
+            )}
             <ButtonGroup className="mt-3">
                 <Button className="btn-primary" onClick={() => update()}>Modifica Lezione</Button>
                 <Button className="btn btn-secondary" onClick={() => close()}>Annulla Modifiche</Button>
@@ -104,18 +134,44 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson })
     )
 }
 
-const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
+const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson, showBookingIdColumn = false }) => {
     const [editing, setEditing] = useState(false)
+    const [bookingStatus, setBookingStatus] = useState('')
+
+    useEffect(() => {
+        if (!editing) {
+            const checkBookingStatus = async () => {
+                if (lesson.conferenceRoom && lesson.date && lesson.duration) {
+                    try {
+                        const lessonData = {
+                            conferenceRoom: lesson.conferenceRoom,
+                            startDatetime: lesson.date,
+                            duration: lesson.duration,
+                            mrbsBookingID: lesson.mrbsBookingID
+                        }
+                        const result = await handleRoomBooking(lessonData, 'courses')
+                        setBookingStatus(getRoomBookingStatus(result, lesson.mrbsBookingID))
+                    } catch (error) {
+                        setBookingStatus(lesson.mrbsBookingID ? `ID: ${lesson.mrbsBookingID}` : 'Nessuna prenotazione')
+                    }
+                } else {
+                    setBookingStatus(lesson.mrbsBookingID ? `ID: ${lesson.mrbsBookingID}` : 'Nessuna prenotazione')
+                }
+            }
+            checkBookingStatus()
+        }
+    }, [lesson, editing])
 
     if (editing) 
         return (
-            <td colSpan={5}>
+            <td colSpan={showBookingIdColumn ? 6 : 5}>
                 <EditLessonForm {...{
                     idPrefix: `${id}-edit`,
                     lesson,
                     close: () => setEditing(false),
                     updateLesson,
                     deleteLesson,
+                    showBookingIdColumn,
                 }} />
             </td>
         )
@@ -125,7 +181,8 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
                 <td>{formatDate(lesson.date)}</td>
                 <td>{lesson.duration}</td>
                 <td><ConferenceRoomOutput value={lesson.conferenceRoom} /></td>
-                <td>{lesson.mrbsBookingID ?? '-'}</td>
+                <td>{bookingStatus}</td>
+                {showBookingIdColumn && <td>{lesson.mrbsBookingID ?? '-'}</td>}
                 <td className="d-flex justify-content-end gap-2">
                     <Button className="btn btn-warning btn-sm" onClick={() => setEditing(true)}>
                         <Icon.Pencil />
@@ -138,17 +195,41 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson }) => {
         )
 }
 
-const LessonViewRow = ({ lesson }) => {
+const LessonViewRow = ({ lesson, showBookingIdColumn = false }) => {
+    const [bookingStatus, setBookingStatus] = useState('')
+
+    useEffect(() => {
+        const checkBookingStatus = async () => {
+            if (lesson.conferenceRoom && lesson.date && lesson.duration) {
+                try {
+                    const lessonData = {
+                        conferenceRoom: lesson.conferenceRoom,
+                        startDatetime: lesson.date,
+                        duration: lesson.duration,
+                        mrbsBookingID: lesson.mrbsBookingID
+                    }
+                    const result = await handleRoomBooking(lessonData, 'courses')
+                    setBookingStatus(getRoomBookingStatus(result, lesson.mrbsBookingID))
+                } catch (error) {
+                    setBookingStatus(lesson.mrbsBookingID ? `ID: ${lesson.mrbsBookingID}` : 'Nessuna prenotazione')
+                }
+            } else {
+                setBookingStatus(lesson.mrbsBookingID ? `ID: ${lesson.mrbsBookingID}` : 'Nessuna prenotazione')
+            }
+        }
+        checkBookingStatus()
+    }, [lesson])
+
     return (
         <>
             <td>{formatDate(lesson.date)}</td>
             <td>{lesson.duration}</td>
             <td><ConferenceRoomOutput value={lesson.conferenceRoom} /></td>
-            <td>{lesson.mrbsBookingID ?? '-'}</td>
+            <td>{bookingStatus}</td>
+            {showBookingIdColumn && <td>{lesson.mrbsBookingID ?? '-'}</td>}
         </>
     )
 }
-
 
 /**
  * @param {{ 
@@ -157,7 +238,7 @@ const LessonViewRow = ({ lesson }) => {
  *      deleteLesson: (index: number) => void
  *  }} props 
  */
-const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
+const LessonsEditor = ({ lessons, updateLesson, deleteLesson, showBookingIdColumn = false }) => {
     const isEdit = !!updateLesson && !!deleteLesson
     return (
         <Table className="align-middle">
@@ -166,7 +247,8 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
                     <th>Orario</th>
                     <th>Durata (minuti)</th>
                     <th>Stanza</th>
-                    <th>Prenotazione Rooms</th>
+                    <th>Stato Prenotazione</th>
+                    {showBookingIdColumn && <th>ID Rooms</th>}
                     {isEdit && <th></th>}
                 </tr>
             </thead>
@@ -177,10 +259,11 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
                             <LessonEditRow id={`lesson-${i}`} {...{ 
                                 lesson, 
                                 updateLesson: lesson => updateLesson(i, lesson), 
-                                deleteLesson: () => deleteLesson(i), 
+                                deleteLesson: () => deleteLesson(i),
+                                showBookingIdColumn,
                             }} />
                         ) : (
-                            <LessonViewRow lesson={lesson} />
+                            <LessonViewRow lesson={lesson} showBookingIdColumn={showBookingIdColumn} />
                         )}
                     </tr>
                 ))}
@@ -188,6 +271,5 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson }) => {
         </Table>
     )
 }
-
 
 export default LessonsEditor

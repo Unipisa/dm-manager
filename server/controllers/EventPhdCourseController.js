@@ -22,7 +22,7 @@ class EventPhdCourseController extends Controller {
                     foreignField: '_id',
                     as: 'conferenceRooms',
                     pipeline: [
-                        { $project: { name: 1 } },
+                        { $project: { name: 1, mrbsRoomID: 1 } },
                     ],
                 }
             },
