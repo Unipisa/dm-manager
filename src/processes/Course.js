@@ -142,7 +142,7 @@ export function CourseBody({ course, forbidden, variant }) {
                     mrbsBookingID: lesson.mrbsBookingID,
                     title: data.title
                 }
-                const result = await handleRoomBooking(lessonData, 'courses')
+                const result = await handleRoomBooking(lessonData, `${variant}courses`))
 
                 if (result.type === 'available') {
                     if (result.message === "No changes" && lesson.mrbsBookingID) {
@@ -207,7 +207,7 @@ export function CourseBody({ course, forbidden, variant }) {
                 // Delete bookings first
                 for (const action of bookingActions.toDelete) {
                     try {
-                        await deleteBooking(action.bookingId, 'courses')
+                        await deleteBooking(action.bookingId, `${variant}courses`))
                         console.log(`Deleted booking ${action.bookingId}`)
                     } catch (error) {
                         console.error(`Error deleting booking ${action.bookingId}:`, error)
@@ -217,11 +217,11 @@ export function CourseBody({ course, forbidden, variant }) {
                 // Update bookings (delete old, create new)
                 for (const action of bookingActions.toUpdate) {
                     try {
-                        await deleteBooking(action.oldBookingId, 'courses')
+                        await deleteBooking(action.oldBookingId, `${variant}courses`))
                         const bookingResult = await createRoomBooking({
                                 ...action.roomData,
                                 organizers: data.coordinators || []
-                            }, 'courses')
+                            }, `${variant}courses`))
                         if (bookingResult.success) {
                             // Update the lesson with new booking ID
                             const lessonIndex = data.lessons.findIndex(l => l === action.lesson)
@@ -240,7 +240,7 @@ export function CourseBody({ course, forbidden, variant }) {
                         const bookingResult = await createRoomBooking({
                             ...action.roomData,
                             organizers: data.coordinators || []
-                        }, 'courses')
+                        }, `${variant}courses`))
                         if (bookingResult.success) {
                             // Update the lesson with booking ID
                             const lessonIndex = data.lessons.findIndex(l => l === action.lesson)
@@ -256,7 +256,7 @@ export function CourseBody({ course, forbidden, variant }) {
 
             // Save the course
             await api.put(`/api/v0/process/${variant}courses/save`, data)
-            queryClient.invalidateQueries(['process', 'course', variant, data._id])
+            queryClient.invalidateQueries(['process', variant, 'course', data._id])
             setOriginalLessons([...data.lessons])
             navigate(`/process/${variant}courses`)
         } catch (error) {
@@ -569,7 +569,7 @@ function AddLessonButton({ onAdd }) {
                         duration,
                         mrbsBookingID: null
                     }
-                    const result = await handleRoomBooking(lessonData, 'courses')
+                    const result = await handleRoomBooking(lessonData, `${variant}courses`))
                     setRoomWarning(result.warning || '')
                 } catch (error) {
                     setRoomWarning('')
