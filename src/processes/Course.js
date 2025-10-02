@@ -142,7 +142,7 @@ export function CourseBody({ course, forbidden, variant }) {
                     mrbsBookingID: lesson.mrbsBookingID,
                     title: data.title
                 }
-                const result = await handleRoomBooking(lessonData, `${variant}courses`))
+                const result = await handleRoomBooking(lessonData, `${variant}courses`)
 
                 if (result.type === 'available') {
                     if (result.message === "No changes" && lesson.mrbsBookingID) {
@@ -207,7 +207,7 @@ export function CourseBody({ course, forbidden, variant }) {
                 // Delete bookings first
                 for (const action of bookingActions.toDelete) {
                     try {
-                        await deleteBooking(action.bookingId, `${variant}courses`))
+                        await deleteBooking(action.bookingId, `${variant}courses`)
                         console.log(`Deleted booking ${action.bookingId}`)
                     } catch (error) {
                         console.error(`Error deleting booking ${action.bookingId}:`, error)
@@ -217,11 +217,11 @@ export function CourseBody({ course, forbidden, variant }) {
                 // Update bookings (delete old, create new)
                 for (const action of bookingActions.toUpdate) {
                     try {
-                        await deleteBooking(action.oldBookingId, `${variant}courses`))
+                        await deleteBooking(action.oldBookingId, `${variant}courses`)
                         const bookingResult = await createRoomBooking({
                                 ...action.roomData,
                                 organizers: data.coordinators || []
-                            }, `${variant}courses`))
+                            }, `${variant}courses`)
                         if (bookingResult.success) {
                             // Update the lesson with new booking ID
                             const lessonIndex = data.lessons.findIndex(l => l === action.lesson)
@@ -240,7 +240,7 @@ export function CourseBody({ course, forbidden, variant }) {
                         const bookingResult = await createRoomBooking({
                             ...action.roomData,
                             organizers: data.coordinators || []
-                        }, `${variant}courses`))
+                        }, `${variant}courses`)
                         if (bookingResult.success) {
                             // Update the lesson with booking ID
                             const lessonIndex = data.lessons.findIndex(l => l === action.lesson)
@@ -277,6 +277,7 @@ export function CourseBody({ course, forbidden, variant }) {
             data={data} setData={setData}
             onCompleted={onCompleted}
             active={true}
+            variant={variant}
         />
         <Modal show={showBookingModal} onHide={() => setShowBookingModal(false)} size="lg" centered>
             <Modal.Header closeButton>
@@ -375,7 +376,7 @@ export function CourseBody({ course, forbidden, variant }) {
     </PrefixProvider>
 }
 
-export function CourseDetailsBlock({ onCompleted, data, setData, change, active, error }) {
+export function CourseDetailsBlock({ onCompleted, data, setData, change, active, error, variant }) {
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
 
@@ -530,7 +531,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                     ) : (
                         <p className="text-muted">Nessuna lezione inserita. Clicca "Aggiungi Lezione" per iniziare.</p>
                     )}
-                    <AddLessonButton onAdd={addLesson} />
+                    <AddLessonButton onAdd={addLesson} variant={variant} />
                 </Card.Body>
             </Card>
         )}
@@ -546,7 +547,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
 </PrefixProvider>
 }
 
-function AddLessonButton({ onAdd }) {
+function AddLessonButton({ onAdd, variant }) {
     const [showForm, setShowForm] = useState(false)
     const [dateTime, setDateTime] = useState(new Date())
     const [duration, setDuration] = useState(60)
@@ -569,7 +570,7 @@ function AddLessonButton({ onAdd }) {
                         duration,
                         mrbsBookingID: null
                     }
-                    const result = await handleRoomBooking(lessonData, `${variant}courses`))
+                    const result = await handleRoomBooking(lessonData, `${variant}courses`)
                     setRoomWarning(result.warning || '')
                 } catch (error) {
                     setRoomWarning('')
@@ -579,7 +580,7 @@ function AddLessonButton({ onAdd }) {
             }
         }
         updateRoomWarning()
-    }, [conferenceRoom, dateTime, duration, cadence])
+    }, [conferenceRoom, dateTime, duration, cadence, variant])
 
     const handleAdd = () => {
         if (!dateTime || !duration || !conferenceRoom) return
