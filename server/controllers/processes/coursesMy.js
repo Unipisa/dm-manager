@@ -111,7 +111,9 @@ router.get('/get/:id', async (req, res) => {
         return res.status(404).json({ error: "Not found" })
     }
     
-    res.json({...processedData[0], user_person: person})
+    return res.send({
+        data: processedData,
+    })
 })
 
 router.post('/', async (req, res) => {
