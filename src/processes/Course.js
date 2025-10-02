@@ -19,10 +19,12 @@ import { handleRoomBooking, createRoomBooking, deleteBooking } from './RoomsBook
 
 import moment from 'moment'
 
-export default function Course() {
+export default function Course({variant}) {
+    // variant è '' per /process/courses
+    // ed è 'my/' per /process/my/courses    
     const { id } = useParams()
 
-    const { isLoading, error, data } = useQuery([ 'process', 'course', id ], async function () {
+    const { isLoading, error, data } = useQuery([ 'process', 'course', variant, id ], async function () {
         var course = { 
             title: "", 
             description: "",
@@ -36,7 +38,7 @@ export default function Course() {
         }
 
         if (id) {
-            const res = await api.get(`/api/v0/process/courses/get/${id}`)
+            const res = await api.get(`/api/v0/process/${variant}courses/get/${id}`)
             course = res.data[0]
 
             // If the course could not be loaded, then either it does not exist, or it 
@@ -58,10 +60,10 @@ export default function Course() {
     if (isLoading) return <Loading error={error}></Loading>
     if (error) return <div>{`${error}`}</div>
 
-    return <CourseBody course={data.course} forbidden={data.forbidden}/>
+    return <CourseBody course={data.course} forbidden={data.forbidden} variant={variant}/>
 }
 
-export function CourseBody({ course, forbidden }) {
+export function CourseBody({ course, forbidden, variant }) {
     const [data, setData] = useState(course)
     const [originalLessons, setOriginalLessons] = useState(course.lessons || [])
     const navigate = useNavigate()
@@ -253,10 +255,10 @@ export function CourseBody({ course, forbidden }) {
             }
 
             // Save the course
-            await api.put('/api/v0/process/courses/save', data)
-            queryClient.invalidateQueries(['process', 'course', data._id])
+            await api.put(`/api/v0/process/${variant}courses/save`, data)
+            queryClient.invalidateQueries(['process', 'course', variant, data._id])
             setOriginalLessons([...data.lessons])
-            navigate('/process/courses')
+            navigate(`/process/${variant}courses`)
         } catch (error) {
             console.error('Error saving course:', error)
         } finally {
