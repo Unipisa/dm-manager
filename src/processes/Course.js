@@ -24,7 +24,7 @@ export default function Course({variant}) {
     // ed è 'my/' per /process/my/courses    
     const { id } = useParams()
 
-    const { isLoading, error, data } = useQuery([ 'process', 'course', variant, id ], async function () {
+    const { isLoading, error, data } = useQuery([ 'process', variant, 'course', id ], async function () {
         var course = { 
             title: "", 
             description: "",

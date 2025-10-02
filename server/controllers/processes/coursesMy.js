@@ -71,7 +71,7 @@ router.delete('/:id', async (req, res) => {
     }
 })
 
-router.get('/:id', async (req, res) => {
+router.get('/get/:id', async (req, res) => {
     assert(req.user._id)
     const person = req.person
     if (!person) return res.status(404).json({ 
