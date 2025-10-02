@@ -119,7 +119,8 @@ function Internal() {
        <Route path="/process/my/urls/:id" element={<ProcessUrl/>}/>
       
        <Route path="/process/my/courses" element={<ManageCourses variant="my/"/>}/>
-       <Route path="/process/my/courses/:id" element={<AddCourse variant="my/"/>}/>
+       <Route path="/process/courses/add" element={<AddCourse variant="my/"/>}/>
+       <Route path="/process/my/courses/add/:id" element={<AddCourse variant="my/"/>}/>
        <Route path="/process/courses" element={<ManageCourses variant=""/>}/>
        <Route path="/process/courses/add" element={<AddCourse variant=""/>}/>
        <Route path="/process/courses/add/:id" element={<AddCourse variant=""/>}/>
