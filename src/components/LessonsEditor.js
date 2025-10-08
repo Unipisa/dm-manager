@@ -162,7 +162,7 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson, showBookingIdCo
             }
             checkBookingStatus()
         }
-    }, [lesson, editing])
+    }, [lesson, editing, variant])
 
     if (editing) 
         return (
@@ -220,7 +220,7 @@ const LessonViewRow = ({ lesson, showBookingIdColumn = false, variant }) => {
             }
         }
         checkBookingStatus()
-    }, [lesson])
+    }, [lesson, variant])
 
     return (
         <>
