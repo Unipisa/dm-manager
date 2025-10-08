@@ -189,9 +189,10 @@ export function TextInput({ value, setValue }) {
 //  <PersonInput label="Persona" value={person} setValue={setPerson} edit={true}></PersonInput>
 //
 // TODO: valutare widget alternativo: https://react-select.com/home
-export function ObjectInput({ placeholder, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple }) {
+export function ObjectInput({ placeholder, apiPrefix, render, new_object, objCode, objName, oa, inputs, value, setValue, multiple }) {
     const id = useInputId()
-    const api_prefix = usePrefix()
+    const prefixFromHook = usePrefix()
+    const api_prefix = apiPrefix ?? prefixFromHook
 
     const engine = useEngine()
     const [options, setOptions] = useState([])
@@ -475,7 +476,7 @@ export function RoomInput({ value, setValue }) {
     />
 }
 
-export function ConferenceRoomInput({ value, setValue, disableCreation }) {
+export function ConferenceRoomInput({ value, setValue, disableCreation, apiPrefix }) {
     return <ObjectInput
         value={value}
         setValue={setValue}
@@ -488,6 +489,7 @@ export function ConferenceRoomInput({ value, setValue, disableCreation }) {
             name: 'Nome',
         }}
         placeholder="Aula per conferenza..."
+        apiPrefix={apiPrefix}
     />
 }
 

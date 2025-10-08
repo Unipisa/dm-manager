@@ -2,7 +2,6 @@ const express = require('express')
 const assert = require('assert')
 const { ObjectId } = require('mongoose').Types
 const EventPhdCourse = require('../../models/EventPhdCourse')
-const Person = require('../../models/Person')
 const { log } = require('../middleware')
 const EventPhdCourseController = require('../EventPhdCourseController')
 const controller = new EventPhdCourseController()

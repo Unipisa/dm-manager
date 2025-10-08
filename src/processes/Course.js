@@ -507,7 +507,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                     <>
                         <br/>
                         <strong>Lezioni:</strong><br/>
-                        <LessonsEditor lessons={data.lessons} />
+                        <LessonsEditor lessons={data.lessons} variant={variant} />
                     </>
                 )}
             </>}
@@ -527,6 +527,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                             lessons={data.lessons}
                             updateLesson={updateLesson}
                             deleteLesson={deleteLesson}
+                            variant={variant}
                         />
                     ) : (
                         <p className="text-muted">Nessuna lezione inserita. Clicca "Aggiungi Lezione" per iniziare.</p>
@@ -648,6 +649,7 @@ function AddLessonButton({ onAdd, variant }) {
                 conferenceRoom={conferenceRoom}
                 setConferenceRoom={setConferenceRoom}
                 roomWarning={roomWarning}
+                variant={variant}
             />
 
             <Form.Group className="row my-2">

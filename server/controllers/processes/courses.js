@@ -2,10 +2,7 @@ const express = require('express')
 const router = express.Router()
 module.exports = router
 const { ObjectId } = require('mongoose').Types
-
 const EventPhdCourse = require('../../models/EventPhdCourse')
-const Person = require('../../models/Person')
-
 const EventPhdCourseController = require('../EventPhdCourseController')
 const controller = new EventPhdCourseController()
 const {log} = require('../middleware')
