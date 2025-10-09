@@ -18,7 +18,7 @@ const ConferenceRoomOutput = ({ value }) => {
     return <Link to={ConferenceRoom.viewUrl(value._id)}>{value.name}</Link>
 }
 
-export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom, roomWarning, variant }) => {
+export const LessonFormFields = ({ idPrefix, dateTime, setDateTime, duration, setDuration, conferenceRoom, setConferenceRoom, roomWarning, variant = ''}) => {
     return (
         <>
             <Form.Group className="row my-2">
@@ -136,7 +136,7 @@ const EditLessonForm = ({ idPrefix, close, lesson, updateLesson, deleteLesson, s
     )
 }
 
-const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson, showBookingIdColumn = false, variant }) => {
+const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson, showBookingIdColumn = false, variant = '' }) => {
     const [editing, setEditing] = useState(false)
     const [bookingStatus, setBookingStatus] = useState('')
 
@@ -197,7 +197,7 @@ const LessonEditRow = ({ id, lesson, updateLesson, deleteLesson, showBookingIdCo
         )
 }
 
-const LessonViewRow = ({ lesson, showBookingIdColumn = false, variant }) => {
+const LessonViewRow = ({ lesson, showBookingIdColumn = false, variant = '' }) => {
     const [bookingStatus, setBookingStatus] = useState('')
 
     useEffect(() => {
