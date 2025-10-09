@@ -6,7 +6,15 @@ const userSchema = new Schema({
     lastName: {type: String, label: 'cognome'},
     email: {type: String, label: 'email'},
     username: {type: String, label: 'username', help: 'corrisponde all\'email per gli utenti autenticati con credenziali di ateneo'},
-    roles: [{type: String, label: 'ruoli'}],
+    roles: {
+      type: [{type: String}],
+      label: 'ruoli',
+      help: `i ruoli assegnabili sono: 
+        admin, 
+        /process/visits, /process/seminars, /process/conferences, 
+        /process/visitsList, process/roomLabels, process/roomAssignmentsList, 
+        notify/admin, notify/portineria, notify/process/visits, notify/process/conferences`
+    },
     person: {type: Schema.Types.ObjectId, ref: 'Person', label: 'persona', null: true, default: null},
  }, { timestamps: true })
 
