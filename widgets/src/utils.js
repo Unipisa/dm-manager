@@ -18,7 +18,8 @@ export function formatDate(datetime, locale) {
     const resolvedLocale = locale || (isEnglish() ? 'en-US' : 'it-IT');
 
     return date.toLocaleDateString(resolvedLocale, {
-        weekday: "long", year: "numeric", month: "short", day: "numeric"
+        weekday: "long", year: "numeric", month: "short", day: "numeric",
+        timeZone: "UTC"
     });
 }
 
@@ -34,10 +35,10 @@ export function formatDateInterval(start, end, locale) {
 export function formatTime(datetime) {
     const date = new Date(datetime)
 
-    // Consider passing en-us or it-it in place of undefined, if 
-    // you want to force the locale.
+    // Display time in UTC to match how it was entered (as Pisa/local time)
     return date.toLocaleTimeString(undefined, {
-        timeStyle: "short"
+        timeStyle: "short",
+        timeZone: "UTC"
     })
 }
 

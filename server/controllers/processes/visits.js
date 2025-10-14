@@ -394,8 +394,8 @@ async function notifyVisit(visit_id, message) {
     const person = visit.person
     const affiliations = visit.affiliations.map(a => a.name).join(', ')
     const grants = (visit.grants || []).map(g => g.name).join(', ')
-    const startDate = visit.startDate.toLocaleDateString('it-IT')
-    const endDate = visit.endDate.toLocaleDateString('it-IT')
+    const startDate = visit.startDate.toLocaleDateString('it-IT', { timeZone: 'UTC' })
+    const endDate = visit.endDate.toLocaleDateString('it-IT', { timeZone: 'UTC' })
     const notes = visit.notes
     const collaborationTheme = visit.collaborationTheme
     const universityFunded = visit.universityFunded ? 'sì' : 'no'
@@ -416,7 +416,7 @@ Data di inizio della visita: ${startDate}
 Data di fine della visita: ${endDate}
 Note: ${notes}
 Creato da: ${visit?.createdBy?.username||visit?.createdBy||'???'}
-Ultima modifica: ${(visit.updatedAt || visit.createdAt).toLocaleDateString('it-IT')}
+Ultima modifica: ${(visit.updatedAt || visit.createdAt).toLocaleDateString('it-IT', { timeZone: 'UTC' })}
 `
     for (ra of (visit?.roomAssignments || [])) {
         text += `
@@ -424,9 +424,9 @@ Ufficio del Dipartimento assegnato: ${ra.room.code} -> Edificio ${ra.room.buildi
 ra.room.floor === '1' ? 'primo piano' : 
 ra.room.floor === '2' ? 'secondo piano' : 
 'piano ' + ra.room.floor}, ufficio ${ra.room.number}
-Data inizio: ${ra.startDate?.toLocaleDateString('it-IT')}
-Data fine: ${ra.endDate?.toLocaleDateString('it-IT')}
-Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateString('it-IT')}
+Data inizio: ${ra.startDate?.toLocaleDateString('it-IT', { timeZone: 'UTC' })}
+Data fine: ${ra.endDate?.toLocaleDateString('it-IT', { timeZone: 'UTC' })}
+Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateString('it-IT', { timeZone: 'UTC' })}
         `
     }
 
@@ -434,11 +434,11 @@ Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateStrin
         text += `
 Titolo del seminario: ${seminar.title}
 Ciclo di seminari: ${seminar.category?.name || '---'}
-Data del seminario: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
+Data del seminario: ${seminar.startDatetime?.toLocaleDateString('it-IT', { timeZone: 'UTC' })}
 Durata: ${seminar.duration}
 Aula del seminario: ${seminar.conferenceRoom.name}
 Grant(s) utilizzato/i: ${(seminar.grants || []).map(g => g.name).join(', ')}
-Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT')}
+Creato da: ${seminar.createdBy?.username} il ${seminar.createdAt?.toLocaleDateString('it-IT', { timeZone: 'UTC' })}
         `
     }
 

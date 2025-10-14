@@ -113,9 +113,12 @@ export const handleRoomBooking = async (eventData, process) => {
   
   const formatTime = (date) => date.toLocaleTimeString('it-IT', { 
     hour: '2-digit', 
-    minute: '2-digit' 
+    minute: '2-digit',
+    timeZone: 'UTC'
   })
-  const formatDate = (date) => date.toLocaleDateString('it-IT')
+  const formatDate = (date) => date.toLocaleDateString('it-IT', {
+    timeZone: 'UTC'
+  })
   
   // Check if this room requires approval
   // room 33 is Aula Magna
