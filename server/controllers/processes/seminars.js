@@ -73,8 +73,8 @@ Gli amministratori possono visualizzare il seminario su Manage al seguente link:
     const visits = await Visit.aggregate(pipeline)
 
     visits.map(async (v) => {
-        const startDate = v.startDate.toLocaleDateString('it-IT')
-        const endDate = v.endDate.toLocaleDateString('it-IT')
+        const startDate = v.startDate.toLocaleDateString('it-IT', { timeZone: 'UTC' })
+        const endDate = v.endDate.toLocaleDateString('it-IT', { timeZone: 'UTC' })
 
         const text = `
 È stato creato o modificato un seminario per l'ospite ${v.person.firstName} ${v.person.lastName}, 

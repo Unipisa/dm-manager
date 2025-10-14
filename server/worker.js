@@ -169,8 +169,8 @@ async function notificaPortineria() {
             }        
             text += `Affiliazione: ${affiliation}\n`
             const r = x.room
-            const start = x.startDate?.toLocaleDateString('it-IT') || ""
-            const end = x.endDate?.toLocaleDateString('it-IT') || ""
+            const start = x.startDate?.toLocaleDateString('it-IT', { timeZone: 'UTC' }) || ""
+            const end = x.endDate?.toLocaleDateString('it-IT', { timeZone: 'UTC' }) || ""
             const buildingName = r.building === 'X' ? 'Ex Albergo' : r.building;
             text += `Ufficio in Dipartimento assegnato: Edificio ${buildingName}, Piano ${r.floor}, Stanza ${r.number}\n`
             text += `Periodo: dal ${start} al ${end}`
@@ -191,7 +191,7 @@ async function notificaPortineria() {
             affiliation = x.affiliations.map(x => x.name).join(", ")
         }
         text += `Affiliazione: ${affiliation}\n`
-        text += `Periodo: dal ${x.startDate ? x.startDate.toLocaleDateString('it-IT') : ""} al ${x.endDate ? x.endDate.toLocaleDateString('it-IT') : ""}\n`
+        text += `Periodo: dal ${x.startDate ? x.startDate.toLocaleDateString('it-IT', { timeZone: 'UTC' }) : ""} al ${x.endDate ? x.endDate.toLocaleDateString('it-IT', { timeZone: 'UTC' }) : ""}\n`
         for (const person of x.referencePeople) {
             text += `Referente: ${person.firstName} ${person.lastName}\n`
         }
@@ -402,7 +402,7 @@ async function notificaTBA() {
             const affiliations = visit.affiliations.map(a => a.name).join(", ")
             text += `Affiliazione: ${affiliations || 'Non specificata'}\n`
             
-            text += `Periodo: dal ${visit.startDate.toLocaleDateString('it-IT')} al ${visit.endDate.toLocaleDateString('it-IT')}\n`
+            text += `Periodo: dal ${visit.startDate.toLocaleDateString('it-IT', { timeZone: 'UTC' })} al ${visit.endDate.toLocaleDateString('it-IT', { timeZone: 'UTC' })}\n`
             
             const references = visit.referencePeople.map(ref => 
                 `${ref.firstName} ${ref.lastName} (${ref.email || 'no email'})`
