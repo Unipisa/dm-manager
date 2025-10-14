@@ -2,19 +2,20 @@ import { useState } from "react";
 
 /**
  * Formats a date to "YYYY-MM-DD HH:mm" or "YYYY-MM-DD" based on a parameter
+ * Uses UTC methods to ensure consistent timezone handling (treats all dates as Pisa/Europe time)
  * @type {(date: string | Date, includeTime?: boolean) => string}
  */
 export const formatDate = (date, includeTime = true) => {
     if (!date) return '';
     if (typeof date === 'string') date = new Date(date);
 
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const day = date.getDate().toString().padStart(2, '0');
+    const year = date.getUTCFullYear();
+    const month = (date.getUTCMonth() + 1).toString().padStart(2, '0');
+    const day = date.getUTCDate().toString().padStart(2, '0');
 
     if (includeTime) {
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
+        const hours = date.getUTCHours().toString().padStart(2, '0');
+        const minutes = date.getUTCMinutes().toString().padStart(2, '0');
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     } else {
         return `${year}-${month}-${day}`;
@@ -25,6 +26,7 @@ export const formatDate = (date, includeTime = true) => {
 /**
  * Crea una nuova data partendo da quella fornita e ci imposta la data e
  * l'orario partendo da delle stringhe in formato "yyyy-mm-dd" e "HH:mm".
+ * Uses UTC methods to treat all input as Pisa time (avoiding local timezone conversion)
  * 
  * @type {(timeStr: string, date: Date | null | undefined) => Date} updateDatetimeFromString
  */
@@ -33,17 +35,17 @@ const updateDatetimeFromString = (dateStr, timeStr, date) => {
     
     if (dateStr && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
         const [year, month, date] = dateStr.split('-').map(s => parseInt(s))
-        newDate.setFullYear(year)
-        newDate.setMonth(month - 1)
-        newDate.setDate(date)
+        newDate.setUTCFullYear(year)
+        newDate.setUTCMonth(month - 1)
+        newDate.setUTCDate(date)
     }
 
     if (timeStr && timeStr.match(/^\d{2}:\d{2}$/)) {
         const [hours, minutes] = timeStr.split(':').map(s => parseInt(s))
-        newDate.setHours(hours)
-        newDate.setMinutes(minutes)
-        newDate.setSeconds(0)
-        newDate.setMilliseconds(0)
+        newDate.setUTCHours(hours)
+        newDate.setUTCMinutes(minutes)
+        newDate.setUTCSeconds(0)
+        newDate.setUTCMilliseconds(0)
     }
 
     return newDate
@@ -55,11 +57,11 @@ export function DatetimeInput({ value, setValue }) {
     const pad = (v, n) => v.toString().padStart(n, '0');
 
     const [date, setDate] = useState(value
-        ? `${pad(value.getFullYear(), 4)}-${pad(value.getMonth() + 1, 2)}-${pad(value.getDate(), 2)}`
+        ? `${pad(value.getUTCFullYear(), 4)}-${pad(value.getUTCMonth() + 1, 2)}-${pad(value.getUTCDate(), 2)}`
         : ''
     )
     const [time, setTime] = useState(value
-        ? `${pad(value.getHours(), 2)}:${pad(value.getMinutes(), 2)}`
+        ? `${pad(value.getUTCHours(), 2)}:${pad(value.getUTCMinutes(), 2)}`
         : ''
     )
 
