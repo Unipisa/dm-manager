@@ -19,7 +19,7 @@ const staffSchema = new Schema({
             'PTA', 
             'Professore Emerito',
             'Collaboratore',
-            'Docente Esterno',
+            'Docente Esterno', 'Docente Esterno Dottorato HPSC',
             'Dottorando Esterno',
             'Personale in quiescenza',
             'ex Docente',
