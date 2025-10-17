@@ -186,6 +186,7 @@ export function getRoleLabel(role, english, feminine) {
         'Professore Emerito': ['Professore Emerito', 'Professore Emerito', 'Emeritus Professor', 'Emeritus Professor'],
         'Collaboratore': ['Collaboratore', 'Collaboratrice', 'Affiliate Member', 'Affiliate Member'], 
         'Docente Esterno': ['Docente con contratto esterno', 'Docente con contratto esterno', 'Adjunct Professor', 'Adjunct Professor'],
+        'Docente Esterno Dottorato HPSC' : ['Docente del Dottorato in HPSC afferente all\'Università di Pisa', 'Docente del Dottorato in HPSC afferente all\'Università di Pisa', 'Professor of the Ph.D. programme in HPSC from the University of Pisa', 'Professor of the Ph.D. programme in HPSC from the University of Pisa'],
         'Studente': ['Studente', 'Studentessa', 'Student', 'Student'],
         'ex Docente' : ['Ex docente', 'Ex docente', 'Former Faculty Member', 'Former Faculty Member'],
         'Personale in quiescenza' : ['Personale in quiescenza', 'Personale in quiescenza', 'Retired Staff', 'Retired Staff'],
