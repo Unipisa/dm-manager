@@ -339,6 +339,19 @@ const GET_PIPELINE = [
                 path: "$conferenceRoom",
                 preserveNullAndEmptyArrays: true
             }},
+            {$lookup: {
+                from: 'grants',
+                localField: 'grants',
+                foreignField: '_id',
+                as: 'grants',
+                pipeline: [
+                    { $project: {
+                        _id: 1,
+                        name: 1,
+                        identifier: 1,
+                    }},
+                ]
+            }},
             // espande createdBy
             {$lookup:{
                 from: "users",

@@ -154,7 +154,7 @@ export const handleRoomBooking = async (eventData, process) => {
       .join(', ') || ''
     
     // If there's an existing booking, treat the room as available for this event
-    const isRoomActuallyAvailable = availability.available || (!!title && existingBooking.name == title)
+    const isRoomActuallyAvailable = availability.available || (!!title && existingBooking?.name === title)
     
     if (isRoomActuallyAvailable) {
       let message, warning
