@@ -248,6 +248,10 @@ export function ObjectInput({ placeholder, apiPrefix, render, new_object, objCod
         // Filter the entries removing the "No Object selected entries, if any"
         evt = Array.from(evt).filter(x => ! (x.noObjectSelected || x.newObjectEntry))
 
+        if (!multiple && evt.length > 1) {
+            evt = [evt[evt.length - 1]]
+        }
+
         typeaheadref.current.hideMenu()
 
         if (evt.length > 0) {
@@ -362,7 +366,7 @@ export function ObjectInput({ placeholder, apiPrefix, render, new_object, objCod
           placeholder={placeholder}
           selected={selected}
           renderMenuItemChildren={menuRenderFunction}
-          multiple={multiple}
+          multiple={true}
         />
     </>
 }
