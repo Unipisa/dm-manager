@@ -192,7 +192,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
             }
         }
         updateRoomWarning()
-    }, [data])
+    }, [data, active])
 
     const handleSaveWithRoomCheck = async () => {
         try {

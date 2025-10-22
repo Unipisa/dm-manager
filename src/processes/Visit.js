@@ -12,6 +12,7 @@ import {myDateFormat,setter} from '../Engine'
 import RoomAssignmentHelper from '../components/RoomAssignmentHelper'
 import {SeminarDetailsBlock} from './Seminar'
 import { useEngine } from '../Engine'
+import { createRoomBooking, deleteBooking } from './RoomsBookings'
 
 export default function Visit({variant}) {
     // variant è '' per /process/visit
@@ -471,17 +472,61 @@ function RoomAssignments({person, visit, roomAssignments, active, done, edit, va
 function Seminar({seminar, change, active, done, variant}) {
     const [data, setData] = useState(seminar)
     const [error, setError] = useState('')
+    const [showRoomModal, setShowRoomModal] = useState(false)
+    const [roomBookingData, setRoomBookingData] = useState(null)
+    const [isProcessingBooking, setIsProcessingBooking] = useState(false)
     const queryClient = useQueryClient()
     const user = useEngine().user
 
     const canModifySeminar = user.hasProcessPermission('/process/seminars')
 
-    return <SeminarDetailsBlock data={data} setData={setData} onCompleted={save} disabled={!canModifySeminar} change={change} active={active} error={error}/>
+    return <SeminarDetailsBlock 
+        data={data} 
+        setData={setData} 
+        onCompleted={save} 
+        disabled={!canModifySeminar} 
+        change={change} 
+        active={active} 
+        error={error}
+        showRoomModal={showRoomModal}
+        setShowRoomModal={setShowRoomModal}
+        roomBookingData={roomBookingData}
+        setRoomBookingData={setRoomBookingData}
+        isProcessingBooking={isProcessingBooking}
+    />
 
-    async function save() {
+    async function save(skipRoomBooking = false, bookingData = null) {
         setError('')
         console.log(`save seminar: ${JSON.stringify(data)}`)
         try {
+            if (bookingData && !skipRoomBooking) {
+                setIsProcessingBooking(true)
+                
+                // If there's an existing booking, delete it first
+                if (data.mrbsBookingID) {
+                    try {
+                        await deleteBooking(data.mrbsBookingID, 'seminars')
+                        console.log("Previous Rooms booking deleted successfully")
+                    } catch (deleteError) {
+                        console.error("Error deleting previous Rooms booking:", deleteError)
+                    }
+                }
+                
+                const bookingResult = await createRoomBooking(bookingData, 'seminars')
+                if (bookingResult.success) {
+                    data.mrbsBookingID = bookingResult.bookingId
+                } else {
+                    data.mrbsBookingID = null
+                }
+            } else if (skipRoomBooking && data.mrbsBookingID) {
+                try {
+                    await deleteBooking(data.mrbsBookingID, 'seminars')
+                    data.mrbsBookingID = null
+                } catch (deleteError) {
+                    console.error("Error deleting Rooms booking:", deleteError)
+                }
+            }
+            
             if (data._id) {
                 await api.patch(`/api/v0/process/seminars/${data._id}`, data)
             } else {
@@ -491,6 +536,9 @@ function Seminar({seminar, change, active, done, variant}) {
             done()
         } catch (e) {
             setError(e.response?.data.error || e?.message || `${e}`)
+        } finally {
+            setIsProcessingBooking(false)
+            setShowRoomModal(false)
         }
     }
 }
