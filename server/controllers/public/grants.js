@@ -38,6 +38,7 @@ async function grantsQuery(req) {
     }
 
     if (req.query.ssd) {
+        // SSD is now an array; MongoDB will match if the array contains this value
         match["SSD"] = req.query.ssd
     }
 

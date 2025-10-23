@@ -76,7 +76,8 @@ router.get('/', async (req, res) => {
                 isInternal: true,
                 $or: [
                     { SSD: { $exists: false } },
-                    { SSD: "" } 
+                    { SSD: [] },
+                    { SSD: "" } // handle legacy data if migration hasn't run yet
                 ],
                 startDate: { $lt: new Date() },
                 qualification: { $ne: 'PTA' },

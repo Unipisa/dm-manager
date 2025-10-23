@@ -48,7 +48,8 @@ function PersonBlock({data, en}) {
     const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2024/07/No-Image-Placeholder.png";
     const feminine = data.gender === 'Donna';
     const qualification = (data.staffs || []).map(q => getRoleLabel(q.qualification, en, feminine)).join(', ');
-    const researchGroup = [...new Set(data.staffs.map(q => q.SSD).filter(q => q).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ');
+    // SSD is now an array, so we need to flatten it
+    const researchGroup = [...new Set(data.staffs.flatMap(q => q.SSD || []).filter(ssd => ssd).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ');
     const roomDetails = (data.roomAssignments || []).map(r => getRoomDetails(r.roomDetails, r.room, en));
 
     return (

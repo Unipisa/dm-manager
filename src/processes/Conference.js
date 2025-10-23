@@ -23,7 +23,7 @@ export default function Conference() {
             title: "", 
             startDate: null,
             endDate: null,
-            SSD: null,
+            SSD: [],
             url: "",
             conferenceRoom: null,
             institution: null,
