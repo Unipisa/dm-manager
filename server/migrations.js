@@ -533,6 +533,36 @@ const migrations = {
         )
         return true
     },
+
+    D20251023_staff_ssd_to_array: async function(db) {
+        const staffs = db.collection('staffs')
+        // Convert existing SSD string values to arrays
+        // For documents where SSD is a string (not already an array)
+        const result = await staffs.updateMany(
+            { SSD: { $type: "string" } },
+            [{
+                $set: {
+                    SSD: {
+                        $cond: {
+                            if: { $or: [{ $eq: ["$SSD", ""] }, { $eq: ["$SSD", null] }] },
+                            then: [],
+                            else: ["$SSD"]
+                        }
+                    }
+                }
+            }]
+        )
+        console.log(`Converted ${result.modifiedCount} staff SSD fields from string to array`)
+        
+        // Ensure documents without SSD field get an empty array
+        const result2 = await staffs.updateMany(
+            { SSD: { $exists: false } },
+            { $set: { SSD: [] } }
+        )
+        console.log(`Set ${result2.modifiedCount} missing SSD fields to empty array`)
+        
+        return true
+    },
 }
 
 async function migrate(db, options) {

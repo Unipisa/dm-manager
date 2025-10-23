@@ -30,7 +30,9 @@ export default function Visit({variant}) {
     // set SSD from user staffs info
     if (id === '__new__' && variant === 'my/') {
         for (const staff of user.staffs) {
-            if (staff.SSD) visit.SSD = staff.SSD
+            if (staff.SSD && staff.SSD.length > 0) {
+                visit.SSD = Array.isArray(staff.SSD) ? staff.SSD[0] : staff.SSD
+            }
         }
     }
 
@@ -422,8 +424,9 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
             for (const person of people) {
                 if (!person.staffs) continue
                 for (const staff of person.staffs) {
-                    if (staff.SSD) {
-                        setData(data => ({...data, SSD: staff.SSD}))
+                    if (staff.SSD && staff.SSD.length > 0) {
+                        const ssdValue = Array.isArray(staff.SSD) ? staff.SSD[0] : staff.SSD
+                        setData(data => ({...data, SSD: ssdValue}))
                     }
                 }
             }
