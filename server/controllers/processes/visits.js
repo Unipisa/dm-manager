@@ -136,6 +136,138 @@ const ROOM_ASSIGNMENTS_LOOKUP = {$lookup: {
 
 module.exports.ROOM_ASSIGNMENTS_LOOKUP = ROOM_ASSIGNMENTS_LOOKUP
 
+const SEMINARS_ENRICHMENT_PIPELINE = [
+    {$lookup: {
+        from: 'people',
+        localField: 'speakers',
+        foreignField: '_id',
+        as: 'speakers',
+        pipeline: [
+            {$project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                affiliations: 1,
+                email: 1,
+            }},
+            {
+                $lookup: {
+                    from: 'institutions',
+                    localField: 'affiliations',
+                    foreignField: '_id',
+                    as: 'affiliations',
+                    pipeline: [
+                        {$project: {
+                            _id: 1,
+                            name: 1,
+                        }},
+                    ]
+                }
+            }
+        ]
+    }},
+    {$lookup: {
+        from: 'people',
+        localField: 'organizers',
+        foreignField: '_id',
+        as: 'organizers',
+        pipeline: [
+            {$project: {
+                _id: 1,
+                firstName: 1,
+                lastName: 1,
+                affiliations: 1,
+                email: 1,
+            }},
+            {
+                $lookup: {
+                    from: 'institutions',
+                    localField: 'affiliations',
+                    foreignField: '_id',
+                    as: 'affiliations',
+                    pipeline: [
+                        {$project: {
+                            _id: 1,
+                            name: 1,
+                        }},
+                    ]
+                }
+            }
+        ]
+    }},
+    {$lookup: {
+        from: 'seminarcategories',
+        localField: 'category',
+        foreignField: '_id',
+        as: 'category',
+    }},
+    {$unwind: {
+        path: "$category",
+        preserveNullAndEmptyArrays: true
+    }},
+    {$lookup: {
+        from: 'conferencerooms',
+        localField: 'conferenceRoom',
+        foreignField: '_id',
+        as: 'conferenceRoom',
+    }},
+    {$unwind: {
+        path: "$conferenceRoom",
+        preserveNullAndEmptyArrays: true
+    }},
+    {$lookup: {
+        from: 'grants',
+        localField: 'grants',
+        foreignField: '_id',
+        as: 'grants',
+        pipeline: [
+            { $project: {
+                _id: 1,
+                name: 1,
+                identifier: 1,
+            }},
+        ]
+    }},
+    // espande createdBy
+    {$lookup:{
+        from: "users",
+        localField: "createdBy",
+        foreignField: "_id",
+        as: "createdBy",
+        pipeline: [
+            {$project: {
+                _id: 1,
+                username: 1,
+            }},
+        ],
+    }},
+    {$unwind: {
+        path: "$createdBy",
+        preserveNullAndEmptyArrays: true
+    }},
+    {$project: {
+        "speakers": 1,
+        "organizers": 1,
+        "startDatetime": 1,
+        "title": 1,
+        "mrbsBookingID": 1,
+        "category._id": 1,
+        "category.name": 1,
+        "category.label": 1,
+        "abstract": 1,
+        "grants": 1,
+        "conferenceRoom._id": 1,
+        "conferenceRoom.name": 1,
+        "conferenceRoom.mrbsRoomID": 1,
+        "duration": 1,
+        "createdBy": 1,
+        "createdAt": 1,
+    }},
+    {$sort: {"startDatetime": 1}},
+]
+
+module.exports.SEMINARS_ENRICHMENT_PIPELINE = SEMINARS_ENRICHMENT_PIPELINE
+
 const GET_PIPELINE = [
     { $lookup: {
         from: 'people',
@@ -261,133 +393,7 @@ const GET_PIPELINE = [
                     ]},
                 },
             },
-            {$lookup: {
-                from: 'people',
-                localField: 'speakers',
-                foreignField: '_id',
-                as: 'speakers',
-                pipeline: [
-                    {$project: {
-                        _id: 1,
-                        firstName: 1,
-                        lastName: 1,
-                        affiliations: 1,
-                        email: 1,
-                    }},
-                    {
-                        $lookup: {
-                            from: 'institutions',
-                            localField: 'affiliations',
-                            foreignField: '_id',
-                            as: 'affiliations',
-                            pipeline: [
-                                {$project: {
-                                    _id: 1,
-                                    name: 1,
-                                }},
-                            ]
-                        }
-                    }
-                ]
-            }},
-            {$lookup: {
-                from: 'people',
-                localField: 'organizers',
-                foreignField: '_id',
-                as: 'organizers',
-                pipeline: [
-                    {$project: {
-                        _id: 1,
-                        firstName: 1,
-                        lastName: 1,
-                        affiliations: 1,
-                        email: 1,
-                    }},
-                    {
-                        $lookup: {
-                            from: 'institutions',
-                            localField: 'affiliations',
-                            foreignField: '_id',
-                            as: 'affiliations',
-                            pipeline: [
-                                {$project: {
-                                    _id: 1,
-                                    name: 1,
-                                }},
-                            ]
-                        }
-                    }
-                ]
-            }},
-            {$lookup: {
-                from: 'seminarcategories',
-                localField: 'category',
-                foreignField: '_id',
-                as: 'category',
-            }},
-            {$unwind: {
-                path: "$category",
-                preserveNullAndEmptyArrays: true
-            }},
-            {$lookup: {
-                from: 'conferencerooms',
-                localField: 'conferenceRoom',
-                foreignField: '_id',
-                as: 'conferenceRoom',
-            }},
-            {$unwind: {
-                path: "$conferenceRoom",
-                preserveNullAndEmptyArrays: true
-            }},
-            {$lookup: {
-                from: 'grants',
-                localField: 'grants',
-                foreignField: '_id',
-                as: 'grants',
-                pipeline: [
-                    { $project: {
-                        _id: 1,
-                        name: 1,
-                        identifier: 1,
-                    }},
-                ]
-            }},
-            // espande createdBy
-            {$lookup:{
-                from: "users",
-                localField: "createdBy",
-                foreignField: "_id",
-                as: "createdBy",
-                pipeline: [
-                    {$project: {
-                        _id: 1,
-                        username: 1,
-                    }},
-                ],
-            }},
-            {$unwind: {
-                path: "$createdBy",
-                preserveNullAndEmptyArrays: true
-            }},
-            {$project: {
-                "speakers": 1,
-                "organizers": 1,
-                "startDatetime": 1,
-                "title": 1,
-                "mrbsBookingID": 1,
-                "category._id": 1,
-                "category.name": 1,
-                "category.label": 1,
-                "abstract": 1,
-                "grants": 1,
-                "conferenceRoom._id": 1,
-                "conferenceRoom.name": 1,
-                "conferenceRoom.mrbsRoomID": 1,
-                "duration": 1,
-                "createdBy": 1,
-                "createdAt": 1,
-            }},
-            {$sort: {"startDatetime": 1}},
+            ...SEMINARS_ENRICHMENT_PIPELINE,
         ]
     }},
 ]
@@ -600,133 +606,7 @@ router.get('/seminars/:personId', async (req, res) => {
                 }
             }
         },
-        {$lookup: {
-            from: 'people',
-            localField: 'speakers',
-            foreignField: '_id',
-            as: 'speakers',
-            pipeline: [
-                {$project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    affiliations: 1,
-                    email: 1,
-                }},
-                {
-                    $lookup: {
-                        from: 'institutions',
-                        localField: 'affiliations',
-                        foreignField: '_id',
-                        as: 'affiliations',
-                        pipeline: [
-                            {$project: {
-                                _id: 1,
-                                name: 1,
-                            }}
-                        ]
-                    }
-                }
-            ]
-        }},
-        {$lookup: {
-            from: 'people',
-            localField: 'organizers',
-            foreignField: '_id',
-            as: 'organizers',
-            pipeline: [
-                {$project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    affiliations: 1,
-                    email: 1,
-                }},
-                {
-                    $lookup: {
-                        from: 'institutions',
-                        localField: 'affiliations',
-                        foreignField: '_id',
-                        as: 'affiliations',
-                        pipeline: [
-                            {$project: {
-                                _id: 1,
-                                name: 1,
-                            }},
-                        ]
-                    }
-                }
-            ]
-        }},
-        {$lookup: {
-            from: 'seminarcategories',
-            localField: 'category',
-            foreignField: '_id',
-            as: 'category',
-        }},
-        {$unwind: {
-            path: "$category",
-            preserveNullAndEmptyArrays: true
-        }},
-        {$lookup: {
-            from: 'conferencerooms',
-            localField: 'conferenceRoom',
-            foreignField: '_id',
-            as: 'conferenceRoom',
-        }},
-        {$unwind: {
-            path: "$conferenceRoom",
-            preserveNullAndEmptyArrays: true
-        }},
-        {$lookup: {
-            from: 'grants',
-            localField: 'grants',
-            foreignField: '_id',
-            as: 'grants',
-            pipeline: [
-                { $project: {
-                    _id: 1,
-                    name: 1,
-                    identifier: 1,
-                }},
-            ]
-        }},
-        // espande createdBy
-        {$lookup:{
-            from: "users",
-            localField: "createdBy",
-            foreignField: "_id",
-            as: "createdBy",
-            pipeline: [
-                {$project: {
-                    _id: 1,
-                    username: 1,
-                }},
-            ],
-        }},
-        {$unwind: {
-            path: "$createdBy",
-            preserveNullAndEmptyArrays: true
-        }},
-        {$project: {
-            "speakers": 1,
-            "organizers": 1,
-            "startDatetime": 1,
-            "title": 1,
-            "mrbsBookingID": 1,
-            "category._id": 1,
-            "category.name": 1,
-            "category.label": 1,
-            "abstract": 1,
-            "grants": 1,
-            "conferenceRoom._id": 1,
-            "conferenceRoom.name": 1,
-            "conferenceRoom.mrbsRoomID": 1,
-            "duration": 1,
-            "createdBy": 1,
-            "createdAt": 1,
-        }},
-        {$sort: {"startDatetime": 1}}
+        ...SEMINARS_ENRICHMENT_PIPELINE
     ]);
 
     res.json({ data: seminars });
