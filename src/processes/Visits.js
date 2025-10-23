@@ -6,6 +6,7 @@ import { myDateFormat } from '../Engine'
 import { ConfirmDeleteButton } from '../components/ModalDialog'
 import api from '../api'
 import { useEngine } from '../Engine'
+import { deleteBooking } from './RoomsBookings'
 
 export default function ProcessVisits({variant}) {
     // variant è '' per /process/visits
@@ -144,7 +145,33 @@ function VisitList({variant}) {
     </>
 
     async function removeVisit(id) {
-        await api.del(`/api/v0/process/${variant}visits/${id}`)
+        try {
+            const visitResponse = await api.get(`/api/v0/process/${variant}visits/${id}`)
+            const visit = visitResponse.data || visitResponse
+            
+            console.log("Visit data:", visit)
+            // If the visit has seminars with room bookings, delete them
+            if (visit.seminars && Array.isArray(visit.seminars)) {
+                for (const seminar of visit.seminars) {
+                    if (seminar.mrbsBookingID) {
+                        try {
+                            await deleteBooking(seminar.mrbsBookingID, 'seminars')
+                            console.log(`Room booking ${seminar.mrbsBookingID} deleted successfully for seminar ${seminar._id}`)
+                        } catch (bookingError) {
+                            console.error(`Error while deleting room booking for seminar ${seminar._id}:`, bookingError)
+                        }
+                    }
+                }
+            }
+            
+            // Delete the visit itself
+            await api.del(`/api/v0/process/${variant}visits/${id}`)
+            console.log("Visit deleted successfully")
+            
+        } catch (error) {
+            console.error("Error while deleting visit:", error)
+        }
+        
         queryClient.invalidateQueries(`process/${variant}visits`.split('/'))
     }
 
