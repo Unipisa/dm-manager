@@ -11,6 +11,7 @@ var cron = require('node-cron');
 
 const { personRoomAssignmentPipeline } = require('./models/RoomAssignment')
 const RoomAssignment = require('./models/RoomAssignment')
+const RoomLabel = require('./models/RoomLabel')
 
 const ROLE_PREFIX = 'notify/'
 
@@ -478,6 +479,86 @@ ${seminarsList}`
     }
 }
 
+async function notificaCartellini() {
+    console.log("=> Notifica per cartellini da fare")
+
+    // Query for RoomLabels with state = 'submitted'
+    const submittedLabels = await RoomLabel.aggregate([
+        {
+            $match: {
+                state: 'submitted'
+            }
+        },
+        {
+            $lookup: {
+                from: 'users',
+                localField: 'createdBy',
+                foreignField: '_id',
+                as: 'createdBy',
+                pipeline: [{
+                    $project: {
+                        _id: 1,
+                        firstName: 1,
+                        lastName: 1,
+                        email: 1,
+                    }
+                }]
+            }
+        },
+        {
+            $unwind: {
+                path: '$createdBy',
+                preserveNullAndEmptyArrays: true,
+            }
+        },
+        {
+            $sort: {
+                createdAt: -1,
+            }
+        }
+    ])
+
+    // If there are no submitted labels, no notification is needed
+    if (submittedLabels.length === 0) {
+        return
+    }
+
+    // Build the email body with the list of submitted labels
+    const labelsList = submittedLabels.map(label => {
+        let text = ""
+        text += `Nomi: ${label.names.join(", ")}\n`
+        text += `Numero: ${label.number || 'N/A'}\n`
+        text += `Dimensione: ${label.size ? `2^(${label.size}/2) cm` : 'N/A'}\n`
+        text += `Formato: ${label.format || 'N/A'}\n`
+        if (label.createdBy) {
+            text += `Richiesto da: ${label.createdBy.firstName} ${label.createdBy.lastName} (${label.createdBy.email || 'no email'})\n`
+        }
+        text += `Data richiesta: ${label.createdAt ? label.createdAt.toLocaleString('it-IT') : 'N/A'}\n`
+        text += `Link su DM Manager: ${config.BASE_URL}/process/roomLabels\n`
+        return text
+    }).join("\n\n")
+
+    const emailBody = `
+Ci sono ${submittedLabels.length} cartellini da fare:
+
+${labelsList}
+
+Si prega di gestire le richieste il prima possibile accedendo al sistema DM Manager.
+`
+
+    // Get emails for users with role /process/roomLabels
+    const emails = await getEmailsForChannel('process/roomLabels')
+    
+    if (emails.length > 0) {
+        await sendEmail(
+            emails, 
+            [], 
+            'Cartellini da fare', 
+            emailBody
+        )
+    }
+}
+
 async function getEmailsForChannel(channel) {
     if (! channel) {
         console.log("Warning: empty channel in getEmailsForChannel(); ignoring")
@@ -544,8 +625,10 @@ async function mainloop() {
         // Setup cron schedule
         scheduleCronJob('0 6 * * *', notificaPortineria);
         scheduleCronJob('0 6 * * *', notificaTBA);
+        scheduleCronJob('0 6 * * *', notificaCartellini);
         if (false) notificaPortineria() // for testing
         if (false) notificaTBA() // for testing
+        if (false) notificaCartellini() // for testing
 
         setInterval(handleNotifications, 30000); // 30 seconds
     } catch (error) {
