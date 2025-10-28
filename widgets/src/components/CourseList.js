@@ -62,25 +62,32 @@ export function CourseList({ from, to, phd }) {
                 const showAffiliations = lecturer.affiliations && lecturer.affiliations.length > 0 && 
                     !lecturer.affiliations.some(affiliation => affiliation._id === '641b8b0b840928dc5b8da2e3');
                 const formattedAffiliations = showAffiliations ? formatAffiliations(lecturer.affiliations) : '';
-            
+                const hasInternalStaff = lecturer.staffs && lecturer.staffs.some(staff => staff.isInternal === true);
+                
                 return (
                     <div className="col-lg-6 col-12 py-2" key={lecturer._id}>
                         <div className="card h-100 m-2 shadow-sm">
                             <div className="card-body">
-                                {showAffiliations ? (
-                                    <i className="fas fa-id-card fa-fw"></i>
+                                {hasInternalStaff ? (
+                                    <a href={getDMURL(`en/person-details/?person_id=${lecturer._id}`)}>
+                                        <i className="fas fa-id-card fa-fw"></i>
+                                    </a>
+                                ) : lecturer.personalPage ? (
+                                    <a href={lecturer.personalPage} target="_blank" rel="noopener noreferrer">
+                                        <i className="fas fa-id-card fa-fw"></i>
+                                    </a>
                                 ) : (
-                                    <a href={getDMURL(`en/person-details/?person_id=${lecturer._id}`)}><i className="fas fa-id-card fa-fw"></i></a>
+                                    <i className="fas fa-id-card fa-fw"></i>
                                 )}
                                 <span className="card-title ml-2 h5">
                                     {lecturer.firstName} {lecturer.lastName} {formattedAffiliations}
                                 </span>
                                 <br />
                                 {lecturer.email && (
-                                <>
-                                    <i className="fas fa-at mr-3"></i>
-                                    <a href={`mailto:${lecturer.email}`}>{lecturer.email}</a>
-                                </>
+                                    <>
+                                        <i className="fas fa-at mr-3"></i>
+                                        <a href={`mailto:${lecturer.email}`}>{lecturer.email}</a>
+                                    </>
                                 )}
                             </div>
                         </div>

@@ -114,6 +114,7 @@ class Controller {
                                 affiliations: 1,
                                 email: 1,
                                 phone: 1,
+                                personalPage: 1,
                                 affiliation: 1,
                             }},{
                                 $sort: { 'lastName': 1 }

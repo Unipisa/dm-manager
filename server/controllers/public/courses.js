@@ -39,6 +39,11 @@ async function coursesQuery(req) {
         match["phd"] = req.query.phd
     }
 
+    const matchActive = [
+        { $or: [ { $eq: ["$endDate", null] }, { $gte: ["$endDate", "$$NOW"] } ] },
+        { $or: [ { $eq: ["$startDate", null] }, { $lte: ["$startDate", "$$NOW"] } ] }
+    ];
+
     const lookupPipeline = (from, localField, foreignField, as, additionalPipeline = []) => ({
         $lookup: {
             from,
@@ -55,12 +60,17 @@ async function coursesQuery(req) {
         { $match: match },
         lookupPipeline('people', 'lecturers', '_id', 'lecturers', [
             lookupPipeline('institutions', 'affiliations', '_id', 'affiliations'),
+            lookupPipeline('staffs', '_id', 'person', 'staffs', [
+                { $match: { $expr: { $and: matchActive } } }
+            ]),
             projectFields({
                 _id: 1,
                 firstName: 1,
                 lastName: 1,
                 email: 1,
-                affiliations: {_id: 1, name: 1}
+                personalPage: 1,
+                affiliations: {_id: 1, name: 1},
+                staffs: { qualification: 1, SSD: 1, matricola: 1, isInternal: 1 },
             })
         ]),
         { $unwind: { path: '$lessons', preserveNullAndEmptyArrays: true } },
