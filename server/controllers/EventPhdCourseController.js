@@ -9,10 +9,7 @@ class EventPhdCourseController extends Controller {
         this.managerRoles.push('event-phd-course-manager')
         this.supervisorRoles.push('event-phd-course-manager', 'event-phd-course-supervisor')
 
-        this.searchFields = [
-            'title',
-            'description',
-        ]
+        this.searchFields = [ 'title', 'phd', 'startDate', 'endDate', 'lecturers.firstName', 'lecturers.lastName' ]
 
         this.queryPipeline.push(
             {   
@@ -27,6 +24,21 @@ class EventPhdCourseController extends Controller {
                 }
             },
         )
+
+        this.indexPipeline = [
+            {
+                $lookup: {
+                    from: "people",
+                    localField: "lecturers",
+                    foreignField: "_id",
+                    as: "lecturers",
+                    pipeline: [
+                        { $project: { firstName: 1, lastName: 1 } },
+                        { $sort: { lastName: 1 } },
+                    ]
+                }
+            }
+        ]
     }
 
     async aggregatePostProcess(phdCourses) {

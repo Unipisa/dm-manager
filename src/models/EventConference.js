@@ -25,7 +25,7 @@ export default class EventConference {
             'startDate': 'Data Inizio',
             'endDate': 'Data Fine',
             'SSD': 'SSD',
-            'conferenceRoom': 'Aula',
+            'organizers': 'Organizzatori',
         }
         this.schema = null
         this.IndexPage = ModelsPage

@@ -14,7 +14,7 @@ class PersonController extends Controller {
         this.path = 'person'
         this.managerRoles.push('person-manager')
         this.supervisorRoles.push('person-manager', 'person-supervisor')
-        this.searchFields = [ 'lastName', 'firstName', 'affiliations.name', 'notes' ]
+        this.searchFields = [ 'lastName', 'firstName', 'email', 'affiliations.name', 'notes' ]
         this.searchRoles.push(...PERSON_SEARCH_ROLES)
         this.queryPipeline.push(...Staff.personStaffPipeline())
         this.indexPipeline = [{

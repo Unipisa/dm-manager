@@ -8,7 +8,7 @@ class InstitutionController extends Controller {
         this.path = 'institution'
         this.managerRoles.push('institution-manager')
         this.supervisorRoles.push('institution-manager', 'institution-supervisor')
-        this.searchFields = ['name', 'country', 'city', 'notes']
+        this.searchFields = ['name', 'country', 'city']
         this.searchRoles.push(...PERSON_SEARCH_ROLES)
     }
 }

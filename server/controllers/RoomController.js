@@ -19,7 +19,17 @@ class RoomController extends Controller {
                 endDate: "$$NOW",
             }},
             ...RoomAssignment.roomRoomAssignmentPipeline()
-        ) 
+        )
+        
+        this.indexPipeline = [
+            {
+                $addFields: {
+                    startDate: "$$NOW",
+                    endDate: "$$NOW",
+                }
+            },
+            ...RoomAssignment.roomRoomAssignmentPipeline()
+        ]
     }
 }
 

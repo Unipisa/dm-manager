@@ -6,7 +6,7 @@ class UserController extends Controller {
         super(User)
         this.path = 'user'
         this.fields.lastName.match_regex = true
-        this.searchFields = [ 'username', 'email', 'firstName', 'lastName' ]
+        this.searchFields = [ 'username', 'email', 'firstName', 'lastName', 'roles' ]
     }
 }
 

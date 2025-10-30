@@ -7,8 +7,28 @@ class GrantController extends Controller {
         this.path = 'grant'
         this.managerRoles.push('grant-manager')
         this.supervisorRoles.push('grant-manager', 'grant-supervisor')
-        this.searchFields = ['identifier', 'description', 'name', 'pi.lastName', 'localCoordinator.lastName']
+        this.searchFields = ['name', 'identifier', 'projectType', 'pi.lastName', 'pi.firstName']
         this.searchRoles.push('visit-manager', 'grant-manager', 'grant-supervisor')
+        this.indexPipeline = [
+            {
+                $lookup: {
+                    from: "people",
+                    localField: "pi",
+                    foreignField: "_id",
+                    as: "pi",
+                    pipeline: [
+                        { $project: { firstName: 1, lastName: 1 } },
+                        { $sort: { lastName: 1 } },
+                    ]
+                }
+            },
+            {
+                $unwind: {
+                    path: "$pi",
+                    preserveNullAndEmptyArrays: true
+                }
+            }
+        ]
     }
 }
 
