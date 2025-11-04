@@ -99,7 +99,7 @@ export function CourseList({ from, to, phd }) {
                 <div>
                     <h5 className="wp-block-heading"><strong>Scheduled lessons:</strong></h5>
                     <ul>
-                        {course.lessons.map((lesson, index) => {
+                        {[...course.lessons].sort((a, b) => new Date(a.date) - new Date(b.date)).map((lesson, index) => {
                             let room = lesson.conferenceRoom || null;
                             if (lesson.conferenceRoom && lesson.conferenceRoomID) {
                                 const roomUrl = en
