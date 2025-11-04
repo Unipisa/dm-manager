@@ -242,6 +242,16 @@ const LessonViewRow = ({ lesson, showBookingIdColumn = false, variant = '' }) =>
  */
 const LessonsEditor = ({ lessons, updateLesson, deleteLesson, showBookingIdColumn = false , variant }) => {
     const isEdit = !!updateLesson && !!deleteLesson
+    
+    // Sort lessons but keep track of original indices
+    const sortedLessonsWithIndex = lessons
+        .map((lesson, originalIndex) => ({ lesson, originalIndex }))
+        .sort((a, b) => {
+            const dateA = new Date(a.lesson.date);
+            const dateB = new Date(b.lesson.date);
+            return dateA - dateB;
+        });
+    
     return (
         <Table className="align-middle">
             <thead className="thead-dark">
@@ -255,13 +265,13 @@ const LessonsEditor = ({ lessons, updateLesson, deleteLesson, showBookingIdColum
                 </tr>
             </thead>
             <tbody>
-                {lessons.map((lesson, i) => (
+                {sortedLessonsWithIndex.map(({ lesson, originalIndex }, i) => (
                     <tr key={i}>
                         {isEdit ? (
                             <LessonEditRow id={`lesson-${i}`} {...{ 
                                 lesson, 
-                                updateLesson: lesson => updateLesson(i, lesson), 
-                                deleteLesson: () => deleteLesson(i),
+                                updateLesson: lesson => updateLesson(originalIndex, lesson), 
+                                deleteLesson: () => deleteLesson(originalIndex),
                                 showBookingIdColumn,
                                 variant
                             }} />
