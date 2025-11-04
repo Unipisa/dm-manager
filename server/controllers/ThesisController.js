@@ -8,26 +8,26 @@ class ThesisController extends Controller {
         this.managerRoles.push('thesis-manager')
         this.supervisorRoles.push('thesis-manager', 'thesis-supervisor')
         this.searchFields = ['title', 'SSD', 'date', 'person.lastName', 'person.firstName' ]
-        this.indexPipeline = [
-            {
-                $lookup: {
-                    from: "people",
-                    localField: "person",
-                    foreignField: "_id",
-                    as: "person",
-                    pipeline: [
-                        { $project: { firstName: 1, lastName: 1 } },
-                        { $sort: { lastName: 1 } },
-                    ]
-                }
-            },
-            {
-                $unwind: {
-                    path: "$person",
-                    preserveNullAndEmptyArrays: true
-                }
-            }
-        ]
+//        this.indexPipeline = [
+//            {
+//                $lookup: {
+//                    from: "people",
+//                    localField: "person",
+//                    foreignField: "_id",
+//                    as: "person",
+//                    pipeline: [
+//                        { $project: { firstName: 1, lastName: 1 } },
+//                        { $sort: { lastName: 1 } },
+//                    ]
+//                }
+//            },
+//            {
+//                $unwind: {
+//                    path: "$person",
+//                    preserveNullAndEmptyArrays: true
+//                }
+//            }
+//        ]
     }
 }
 
