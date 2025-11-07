@@ -454,7 +454,7 @@ Creato da: ${ra.createdBy?.username||'---'} il ${ra.createdAt?.toLocaleDateStrin
     for(seminar of visit?.seminars || []) {
         text += `
 Titolo del seminario: ${seminar.title}
-Ciclo di seminari: ${(seminar.category || []).map(c => c.name).join(', ') || '---'}
+Ciclo di seminari: ${(seminar.category || []).map(c => c.label || c.name).join(', ') || '---'}
 Data del seminario: ${seminar.startDatetime?.toLocaleDateString('it-IT')}
 Durata: ${seminar.duration}
 Aula del seminario: ${seminar.conferenceRoom.name}
