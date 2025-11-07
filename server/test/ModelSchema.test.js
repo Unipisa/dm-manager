@@ -17,19 +17,19 @@ describe('staff_SSD_is_array', () => {
 })
 
 describe('thesis_institutions_is_array', () => {
-    it('is array type', () => {
+    it('is array type', async () => {
         expect(ModelSchemas.Thesis.fields.institutions.type).toBe('array')
     })
     
-    it('can_filter', () => {
+    it('can_filter', async () => {
         expect(ModelSchemas.Thesis.fields.institutions.can_filter).toBe(true)
     })
     
-    it('is related field', () => {
+    it('is related field', async () => {
         expect(ModelSchemas.Thesis.fields.institutions.related_field).toBe(true)
     })
     
-    it('is related many', () => {
+    it('is related many', async () => {
         expect(ModelSchemas.Thesis.fields.institutions.related_many).toBe(true)
     })
 })
