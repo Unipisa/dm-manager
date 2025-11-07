@@ -13,7 +13,7 @@ const userSchema = new Schema({
         admin, 
         /process/visits, /process/seminars, /process/conferences, 
         /process/visitsList, process/roomLabels, process/roomAssignmentsList, 
-        notify/admin, notify/portineria, notify/process/visits, notify/process/conferences`
+        notify/admin, notify/portineria, notify/process/visits, notify/process/conferences, notify/process/roomLabels`
     },
     person: {type: Schema.Types.ObjectId, ref: 'Person', label: 'persona', null: true, default: null},
  }, { timestamps: true })
