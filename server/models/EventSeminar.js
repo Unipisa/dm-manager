@@ -16,7 +16,7 @@ const eventSeminarSchema = new Schema({
     mrbsBookingID: { type: Number, label: 'ID Prenotazione Rooms' },
     startDatetime: { type: Date, label: 'Inizio', widget: 'datetime', default: null },
     duration: { type: Number, label: 'Durata (in minuti)', default: 60 },
-    category: { type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', required: false, can_sort: ['name'] },
+    category: [{ type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', can_sort: ['name'] }],
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
     abstract: { type: String, label: "Abstract", widget: 'text' },
     // 09/04/2025: hiding as not used anymore, CDP
@@ -62,5 +62,5 @@ SeminarCategory.relatedModels.push({
     modelName: 'EventSeminar',
     url: 'event-seminar',
     field: 'category',
-    multiple: false,
+    multiple: true,
 })

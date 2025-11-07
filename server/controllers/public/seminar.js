@@ -40,10 +40,7 @@ async function seminarQuery(req) {
                 }}
             ]
         }},
-        { $unwind: {
-            path: '$category',
-            preserveNullAndEmptyArrays: true
-        }}, {$lookup: {
+        {$lookup: {
             from: 'conferencerooms',
             localField: 'conferenceRoom',
             foreignField: '_id',

@@ -497,7 +497,7 @@ export function ConferenceRoomInput({ value, setValue, disableCreation, apiPrefi
     />
 }
 
-export function SeminarCategoryInput({ value, setValue, disableCreation }) {
+export function SeminarCategoryInput({ value, setValue, disableCreation, multiple }) {
     return <ObjectInput
         value={value}
         setValue={setValue}
@@ -511,6 +511,7 @@ export function SeminarCategoryInput({ value, setValue, disableCreation }) {
             label: 'Label',
         }}
         placeholder="Ciclo di seminari..."
+        multiple={multiple}
     />
 }
 

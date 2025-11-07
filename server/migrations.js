@@ -563,6 +563,33 @@ const migrations = {
         
         return true
     },
+
+    D20251107_seminar_category_to_array: async function(db) {
+        const seminars = db.collection('eventseminars')
+        // Convert existing category ObjectId values to arrays
+        // For documents where category is an ObjectId (not already an array)
+        const result = await seminars.updateMany(
+            { category: { $type: "objectId" } },
+            [{
+                $set: {
+                    category: ["$category"]
+                }
+            }]
+        )
+        console.log(`Converted ${result.modifiedCount} seminar category fields from ObjectId to array`)
+        
+        // Ensure documents without category field or with null get an empty array
+        const result2 = await seminars.updateMany(
+            { $or: [
+                { category: { $exists: false } },
+                { category: null }
+            ]},
+            { $set: { category: [] } }
+        )
+        console.log(`Set ${result2.modifiedCount} missing/null category fields to empty array`)
+        
+        return true
+    },
 }
 
 async function migrate(db, options) {
