@@ -588,7 +588,8 @@ const migrations = {
         )
         console.log(`Set ${result2.modifiedCount} missing institution fields to empty institutions array`)
         
-        // Remove the old institution field
+        // Remove the old institution field after successful conversion
+        // This is safe because the previous operations are atomic and complete before this runs
         await theses.updateMany({}, { $unset: { institution: "" } })
         console.log(`Removed old institution field from all theses`)
         
