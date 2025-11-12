@@ -97,12 +97,8 @@ async function thesesQuery(req) {
         { $lookup: {
             from: 'institutions',
             foreignField: '_id',
-            localField: 'institution',
-            as: 'institution'
-        }},
-        { $unwind: {
-            path: '$institution',
-            preserveNullAndEmptyArrays: true
+            localField: 'institutions',
+            as: 'institutions'
         }},
         ...sort_and_limit,
         { $project: {
@@ -119,7 +115,7 @@ async function thesesQuery(req) {
             },
             advisors: 1,
             date: 1,
-            institution: {
+            institutions: {
                 _id: 1,
                 name: 1
             },
