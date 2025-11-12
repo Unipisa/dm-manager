@@ -23,7 +23,7 @@ export function ThesisList({ year, ssd, institution, qualification, _sort, _limi
 
     if (institution) {
         filteredData = filteredData.filter(thesis => 
-            thesis.institution._id === institution
+            thesis.institutions && thesis.institutions.some(inst => inst._id === institution)
         );
     }
 
