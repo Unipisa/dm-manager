@@ -587,6 +587,10 @@ const migrations = {
             { $set: { category: [] } }
         )
         console.log(`Set ${result2.modifiedCount} missing/null category fields to empty array`)
+      
+        return true
+    },
+
     D20251107_thesis_institutions_to_array: async function(db) {
         const theses = db.collection('theses')
         // Convert existing institution field (single ObjectId) to institutions array
@@ -617,7 +621,7 @@ const migrations = {
         console.log(`Removed old institution field from all theses`)
         
         return true
-    },
+    }
 }
 
 async function migrate(db, options) {
