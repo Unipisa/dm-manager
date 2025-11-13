@@ -33,12 +33,6 @@ class EventSeminarController extends Controller {
                     ]
                 }
             },
-            {
-                $unwind: {
-                    path: "$category",
-                    preserveNullAndEmptyArrays: true
-                }
-            }
         ]
     }
 }
