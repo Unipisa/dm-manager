@@ -587,6 +587,34 @@ const migrations = {
             { $set: { category: [] } }
         )
         console.log(`Set ${result2.modifiedCount} missing/null category fields to empty array`)
+    D20251107_thesis_institutions_to_array: async function(db) {
+        const theses = db.collection('theses')
+        // Convert existing institution field (single ObjectId) to institutions array
+        // For documents where institution exists and is not null
+        const result = await theses.updateMany(
+            { institution: { $exists: true, $ne: null } },
+            [{
+                $set: {
+                    institutions: ["$institution"]
+                }
+            }]
+        )
+        console.log(`Converted ${result.modifiedCount} thesis institution fields to institutions array`)
+        
+        // For documents where institution is null or doesn't exist, set institutions to empty array
+        const result2 = await theses.updateMany(
+            { $or: [
+                { institution: null },
+                { institution: { $exists: false } }
+            ]},
+            { $set: { institutions: [] } }
+        )
+        console.log(`Set ${result2.modifiedCount} missing institution fields to empty institutions array`)
+        
+        // Remove the old institution field after successful conversion
+        // This is safe because the previous operations are atomic and complete before this runs
+        await theses.updateMany({}, { $unset: { institution: "" } })
+        console.log(`Removed old institution field from all theses`)
         
         return true
     },

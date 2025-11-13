@@ -14,7 +14,7 @@ const thesisSchema = new Schema({
     title: { type: String, label: 'titolo', default: ''},
     advisors: [{ type: ObjectId, label: 'relatori', ref: 'Person' }],
     date,
-    institution: { type: ObjectId, label: 'istituto', ref: 'Institution'},
+    institutions: [{ type: ObjectId, label: 'istituti', ref: 'Institution' }],
     fileUrl: {type: String, label: 'URL file'},
     SSD,
     notes,
@@ -47,6 +47,6 @@ Institution.relatedModels.push({
     model: Thesis,
     modelName: 'Thesis',
     url: 'thesis',
-    field: 'institution',
-    multiple: false,
+    field: 'institutions',
+    multiple: true,
 })
