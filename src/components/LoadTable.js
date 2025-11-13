@@ -151,6 +151,7 @@ function displayField(obj, key, fieldsInfo={}) {
     if (key === 'roomAssignment') return `${value.room.code}`
     if (key === 'roomAssignments') return value.map(ra => `${ra.person.lastName}`).join(', ')
     const field = fieldsInfo[key]
+
     if (field && field.type === 'array') {
         if (!field.items['x-ref']) return value.join(', ')
         if (field.items['x-ref'] === 'Person') {
@@ -158,6 +159,9 @@ function displayField(obj, key, fieldsInfo={}) {
         } else if (field.items['x-ref'] === 'Institution') {
             if (!value) return '???'
             return value.map(inst => `${inst.name}`).join(' and ')
+        } else if (field.items['x-ref'] === 'SeminarCategory') {
+            if (!value) return '???'
+            return value.map(cat => `${cat.name}`).join(', ')
         } else {
             return `array of ${field.items['x-ref']} not implemented`
         }

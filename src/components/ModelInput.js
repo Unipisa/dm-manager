@@ -40,13 +40,13 @@ export function ModelFieldInput({ schema, value, setValue }) {
         if (schema.items['x-ref'] === 'Person') return element(PersonInput, {multiple:true})
         if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true})        
         if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true})
+        if (schema.items['x-ref'] === 'SeminarCategory') return element(SeminarCategoryInput, {multiple:true})
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
         const xref = schema['x-ref']
         if (xref === 'Person') return element(PersonInput)
         if (xref === 'Room') return element(RoomInput)
         if (xref === 'ConferenceRoom') return element(ConferenceRoomInput)
-        if (xref === 'SeminarCategory') return element(SeminarCategoryInput)
         if (xref === 'Institution') return element(InstitutionInput)
         if (xref === 'User') return element(StringInput)
         if (xref) return <p>x-ref to {xref} not yet implemented</p> 

@@ -42,17 +42,18 @@ export function SeminarTitle({ seminar, href }) {
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
     var category_tags = [ <a href={getDMURL("en/seminars")} key="seminars-category">Seminars</a> ]
-    if (seminar.category !== undefined) {
-        const link = getDMURL("en/seminars/?category=" + seminar.category._id)
-        category_tags.push(<span key={seminar.category._id}>, <a href={link}>{seminar.category.name}</a>
-        </span>)
+    if (seminar.category !== undefined && seminar.category.length > 0) {
+        seminar.category.forEach(cat => {
+            const link = getDMURL("en/seminars/?category=" + cat._id)
+            category_tags.push(<span key={cat._id}>, <a href={link}>{cat.name}</a></span>)
+        })
     }
 
     const speakers = seminar.speakers.map(speaker => formatPersonName(speaker)).join(", ")
 
     var title_block = <>{seminar.title} &ndash; {speakers}</>
 
-    if (seminar?.category?.label === 'phd-thesis-defense') {
+    if (seminar.category?.some(cat => cat.label === 'phd-thesis-defense')) {
         title_block = <>Ph.D. Thesis Defense: {title_block}</>
     }
 

@@ -161,13 +161,15 @@ function EventBox({ event, show_excerpt, en }) {
         <a href={getDMURL("en/seminars")} key="seminars-category">Seminars</a>
       ];
     
-      if (event.category !== undefined) {
-        const link = getDMURL(`en/seminars/?category=${event.category._id}`);
-        tags.push(
-          <span key={event.category._id}>
-            , <a href={link}>{event.category.name}</a>
-          </span>
-        );
+      if (event.category !== undefined && event.category.length > 0) {
+        event.category.forEach(cat => {
+          const link = getDMURL(`en/seminars/?category=${cat._id}`);
+          tags.push(
+            <span key={cat._id}>
+              , <a href={link}>{cat.name}</a>
+            </span>
+          );
+        });
       }
     } else {
       tags = <a href={event.url}>{isEnglish(en) ? 'Website' : 'Sito web'}</a>
@@ -175,7 +177,7 @@ function EventBox({ event, show_excerpt, en }) {
 
     var title = event.title
 
-    if (event.category?.label === 'phd-thesis-defense') {
+    if (event.category?.some(cat => cat.label === 'phd-thesis-defense')) {
       title = `Ph.D. Thesis Defense: ${title}`
     }
 
