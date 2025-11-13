@@ -45,7 +45,7 @@ async function seminarsQuery(req) {
     }
 
     if (req.query.category) {
-        match["category"] = ObjectId(req.query.category)
+        match["category"] = { $in: [ObjectId(req.query.category)] }
     }
 
     if (req.query.grant) {
@@ -94,10 +94,6 @@ async function seminarsQuery(req) {
                     label: 1,
                 }}
             ]
-        }},
-        { $unwind: {
-            path: '$category',
-            preserveNullAndEmptyArrays: true
         }},
         {$lookup: {
             from: 'conferencerooms',

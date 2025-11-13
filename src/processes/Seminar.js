@@ -34,7 +34,7 @@ export default function Seminar() {
             startDatetime: null,
             duration: 60,
             conferenceRoom: null,
-            category: null,
+            category: [],
             abstract: "",
             grants: null, 
             externalid: "",
@@ -264,7 +264,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                                 Se il ciclo di seminari che cerchi è assente, si prega di contattare <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>                
-                            <SeminarCategoryInput value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
+                            <SeminarCategoryInput multiple={true} value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
                         </div>
                     </InputRow>
                     <InputRow label="Data e ora" className="my-3">
@@ -321,7 +321,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 speakers: <b>{data.speakers && data.speakers.map((p,i) => <>{i>0 && ', '}{p.firstName} {p.lastName} ({p.affiliations.map(x => x.name).join(', ')})</>)}</b><br/>
                 organizers: <b>{data.organizers && data.organizers.map((p,i)=><>{i>0 && ', '}{p.firstName} {p.lastName}</>)}</b><br />
                 titolo: <b>{data.title}</b><br/>
-                ciclo: <b>{data.category?.label || data.category?.name || '---'}</b><br/>
+                ciclo: <b>{(data.category || []).map(c => c.label || c.name).join(', ') || '---'}</b><br/>
                 data: <b>{myDatetimeFormat(data.startDatetime)}</b><br/>
                 durata: <b>{data.duration}</b><br/>
                 aula: <b>{data.conferenceRoom && data.conferenceRoom.name}</b><br/>
@@ -444,7 +444,7 @@ async function loadIndicoData(indico_id, seminar) {
         params: { name: indico_seminar.category }
     })).data
     if (res_cat && res_cat.data && res_cat.data.length > 0) {
-        seminar.category = res_cat.data[0]
+        seminar.category = [res_cat.data[0]]
         console.log(seminar.category)
     }
 
