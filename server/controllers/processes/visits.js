@@ -201,10 +201,6 @@ const SEMINARS_ENRICHMENT_PIPELINE = [
         foreignField: '_id',
         as: 'category',
     }},
-    {$unwind: {
-        path: "$category",
-        preserveNullAndEmptyArrays: true
-    }},
     {$lookup: {
         from: 'conferencerooms',
         localField: 'conferenceRoom',
