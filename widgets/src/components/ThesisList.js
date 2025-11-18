@@ -6,7 +6,7 @@ import { Loading } from './Loading';
 import Accordion from './Accordion';
 import './styles.css';
 
-export function ThesisList({ year, ssd, institution, qualification, excludeQualification, _sort, _limit  }) {
+export function ThesisList({ year, ssd, institution, qualification, exclude_qualification, _sort, _limit  }) {
 
     const filter = { year, ssd, _sort, _limit }
 
@@ -33,9 +33,9 @@ export function ThesisList({ year, ssd, institution, qualification, excludeQuali
         );
     }
     
-    if (excludeQualification) {
+    if (exclude_qualification) {
         filteredData = filteredData.filter(thesis => 
-            !thesis.person.staff.some(staffItem => staffItem.qualification === excludeQualification)
+            !thesis.person.staff.some(staffItem => staffItem.qualification === exclude_qualification)
         );
     }
 
