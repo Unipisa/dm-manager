@@ -98,12 +98,27 @@ function ThesisTableItem({ thesis }) {
             advisorElement;
     });
 
+    const hasMultipleInstitutions = thesis.institutions && thesis.institutions.length > 1;
+    
+    const institutionNames = hasMultipleInstitutions 
+        ? thesis.institutions.map(inst => inst.name).join(' and ')
+        : null;
+
     return (
-        <tr>
-            <td>{thesis.person.firstName}</td>
-            <td>{thesis.person.lastName}</td>
-            <td>{thesis.title}</td>
-            <td>{supervisors}</td>
-        </tr>
+        <>
+            <tr>
+                <td>{thesis.person.firstName}</td>
+                <td>{thesis.person.lastName}</td>
+                <td>{thesis.title}{hasMultipleInstitutions && '*'}</td>
+                <td>{supervisors}</td>
+            </tr>
+            {hasMultipleInstitutions && (
+                <tr>
+                    <td colSpan="4" className="joint-phd-notice">
+                        *Joint PhD thesis with {institutionNames}
+                    </td>
+                </tr>
+            )}
+        </>
     )
 }
