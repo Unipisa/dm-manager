@@ -107,8 +107,8 @@ function getCookie(c_name) {
 }
 
 export function isEnglish(defaultValue = false) {
-    if (defaultValue === true) {
-        return defaultValue;
+    if (defaultValue === true || defaultValue === "true") {
+        return true;
     }
     const wpml = getCookie('wp-wpml_current_language');
     return wpml === 'en';
