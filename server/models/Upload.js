@@ -9,6 +9,7 @@ const {
 const schema = new Schema({
     filename: String,
     mimetype: String,
+    private: { type: Boolean, default: false },
     createdBy,
     updatedBy,
 }, {

@@ -16,6 +16,7 @@ const schema = new Schema({
     endDate,
     members: [{ type: ObjectId, label: 'membri', ref: 'Person', default: [], required: true }],
     notes,
+    code: { type: String, label: 'codice', help: 'Codice identificativo del gruppo (opzionale): accomuna lo stesso gruppo negli anni (esempio: cds-mat, cd-mat, paritetica-mat).', default: '' },
     chair: { type: ObjectId, label: 'chair', ref: 'Person', help: "Presidente / direttore / coordinatore / ecc. (opzionale)"}, 
     chair_title: { type: String, label: 'titolo del chair', help: 'Nome della carica "chair": (es. "presidente", "direttore")' },
     vice: { type: ObjectId, label: 'vice', ref: 'Person', help: "Vice (opzionale)"}, 

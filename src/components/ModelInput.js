@@ -17,7 +17,8 @@ import {
     AttachmentInput,
     ImageInput,
     ConferenceRoomInput,
-    SeminarCategoryInput
+    SeminarCategoryInput,
+    PrivateAttachmentInput
 } from './Input'
 import { DatetimeInput } from './DatetimeInput'
 
@@ -61,6 +62,8 @@ export function ModelFieldInput({ schema, value, setValue }) {
             switch (schema.widget) {
                 case 'text':
                     return element(TextInput)
+                case 'private-attachment':
+                    return element(PrivateAttachmentInput)
                 case 'attachment':
                     return element(AttachmentInput)
                 case 'image':

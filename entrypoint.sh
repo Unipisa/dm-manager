@@ -12,6 +12,7 @@ if [ $1 = "server" ]; then
     echo "entrypoint: starting server"
     mkdir -p /logs/
     mkdir -p /uploads
+    mkdir -p /uploads/private
 
     node /app/server/run-server.js
     exit 0

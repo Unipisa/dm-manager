@@ -621,6 +621,25 @@ const migrations = {
         console.log(`Removed old institution field from all theses`)
         
         return true
+    }, 
+
+    D20251125_add_codes_to_groups: async function(db) {
+        const groups = db.collection('groups')
+
+        const group_codes = {
+            "Commissione Paritetica Dipartimento": "paritetica-mat",
+            "Consiglio CdS": "cds-mat",
+            "Consiglio di Dipartimento": "cd-mat",
+            "Collegio dei Docenti del Dottorato in Matematica": "dottorato-mat",
+            "Collegio dei Docenti del Dottorato in HPSC": "dottorato-hpsc"
+        }
+
+        for (const [group_name, group_code] of Object.entries(group_codes)) {
+            await groups.updateMany({ name: group_name }, { $set: { code: group_code } })
+            console.log(`Group ${group_name} set to code ${group_code}`)
+        } 
+        
+        return true
     }
 }
 

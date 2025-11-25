@@ -68,12 +68,18 @@ export function EmailInput({ value, setValue }) {
         return email
     }
 
-}   
+}
 
-export function AttachmentInput({ value, setValue, image }) {
+export function PrivateAttachmentInput({ value, setValue }) {
+    return <AttachmentInput value={value} setValue={setValue} _private={true} />
+}
+
+export function AttachmentInput({ value, setValue, image, _private }) {
     // const [uploading, setUploading] = useState(false)
     const engine = useEngine()
     const id = useInputId()
+
+    console.log(_private)
 
     function getNewAttachment() {
         const input = document.createElement('input')
@@ -86,7 +92,8 @@ export function AttachmentInput({ value, setValue, image }) {
                     const data = {
                         filename: file.name, 
                         mimetype: file.type, 
-                        data: btoa(reader.result)
+                        data: btoa(reader.result),
+                        private: _private || false,
                     }
                     api.post('/api/v0/upload', data).then(data => {
                         setValue(data.url)

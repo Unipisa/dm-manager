@@ -59,6 +59,7 @@ export default function Header() {
     return <>
       <NavDropdown title="Personale" className="mx-2 py-2">
         <NavDropdown.Item as={NavLink} to="/person">Anagrafica</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/document">Documenti</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/group">Gruppi</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/staff">Qualifiche</NavDropdown.Item>
       </NavDropdown>

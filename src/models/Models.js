@@ -14,6 +14,7 @@ import Form from './Form'
 import Log from './Log'
 import Thesis from './Thesis'
 import Url from './Url'
+import Document from './Document'
 
 import EventSeminar from './EventSeminar'
 import EventConference from './EventConference'
@@ -32,6 +33,7 @@ const Models = {
     Person: new Person(),
     Group: new Group(),
     Staff: new Staff(),
+    Document: new Document(),
 
     // ricerca:
     Grant: new Grant(),

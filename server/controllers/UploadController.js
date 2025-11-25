@@ -5,7 +5,8 @@ const fs = require('fs/promises');
 const valid_mimetypes = [
     'text/plain', 
     'image/png',
-    'image/jpeg'
+    'image/jpeg',
+    'application/pdf'
 ]
 
 class UploadController {
@@ -60,11 +61,13 @@ class UploadController {
 
             const upload = await Upload.create({
                 filename: data.filename, 
-                mimetype: data.mimetype
+                mimetype: data.mimetype,
+                private: data.private || false,
             })
 
             try {
-                await fs.writeFile(config.UPLOAD_DIRECTORY + "/" + upload._id, filedata)
+                const subfolder = upload.private ? "/private/" : "/";
+                await fs.writeFile(config.UPLOAD_DIRECTORY + subfolder + upload._id, filedata)
             } catch (err) {
                 console.log(err)
                 await upload.remove()
@@ -73,7 +76,13 @@ class UploadController {
                 return
             }
 
-            res.send({ upload, url: `${config.BASE_URL}${config.API_PATH}/upload/${upload._id}` })
+            const url = upload.private ? 
+                `${upload._id}` : `${config.BASE_URL}${config.API_PATH}/upload/${upload._id}`;
+
+            res.send({ 
+                upload, 
+                url
+            })
         }
     }
 
