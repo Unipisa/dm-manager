@@ -1,11 +1,10 @@
-import { useParams, useNavigate } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import Loading from "../components/Loading"
 import { useQuery } from "react-query"
-import { Button, Card } from "react-bootstrap"
+import { Card } from "react-bootstrap"
 
 export default function Document() {
     const { id } = useParams()
-    const navigate = useNavigate()
 
     const { isLoading, error, data } = useQuery([ 'document', id ])
 
