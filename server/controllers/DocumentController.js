@@ -12,7 +12,7 @@ class DocumentController extends Controller {
         this.path = 'document'
         this.managerRoles.push('document-manager')
         this.supervisorRoles.push('document-manager', 'document-supervisor')
-        this.searchFields = ['name' ]
+        this.searchFields = [ 'name' ]
     }
 
     register(router) {
@@ -21,7 +21,7 @@ class DocumentController extends Controller {
             requireUser,
             (req, res) => this.download(req, res, req.params.id))
         router.get("/document/:id", requireUser, 
-            (req, res) => this.get(req, res, req.params.id)
+            (req, res) => this.getDocument(req, res, req.params.id)
         )
         return []
     }
@@ -57,7 +57,7 @@ class DocumentController extends Controller {
         return true
     }
 
-    async get(req, res, id) {
+    async getDocument(req, res, id) {
         const document = await Document.findById(id)
 
         if (! document) {
