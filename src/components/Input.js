@@ -103,9 +103,9 @@ export function MultipleAttachmentInput({ value, setValue }) {
     const id = useInputId()
 
     return <div className='form-row'>
-        <div className="d-inline-block col-sm-10 form-row row">
+        <div className="d-inline-block col-sm-10 form-row row" id={id}>
             { (value || []).map( (val, idx) => 
-                <div key={idx} className="mb-2 col-sm-6 d-inline-block">
+                <div key={val._id} className="mb-2 col-sm-6 d-inline-block">
                     <Card className="">
                         <Card.Header>{val.filename}</Card.Header>
                         <Card.Body>
@@ -123,7 +123,7 @@ export function MultipleAttachmentInput({ value, setValue }) {
             )}
         </div>
         <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
-            <button type="button" onClick={ () => uploadNewAttachment( (newUrl) => {
+            <button type="button" onClick={() => uploadNewAttachment((newUrl) => {
                     setValue([ ...(value || []), newUrl ])
                 }, true, engine, false) } className="w-100 btn btn-primary">
                 Upload
