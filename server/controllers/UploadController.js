@@ -1,6 +1,9 @@
 const config = require('../config')
 const Upload = require('../models/Upload')
 const fs = require('fs/promises');
+const Document = require('../models/Document')
+const DocumentController = require('./DocumentController');
+const { createdBy } = require('../models/Model');
 
 const valid_mimetypes = [
     'text/plain', 
@@ -20,6 +23,7 @@ class UploadController {
 
     async getPhoto(req, res, id) {
         const upload = await Upload.findById(id)
+        console.log(upload)
         
         if (! upload) {
             res.status(404)
@@ -27,6 +31,32 @@ class UploadController {
             return
         }
 
+        // We need to check for permissions before serving private files.
+        if (upload.private) {
+            let allowed = false
+            if (req.user._id.equals(upload.createdBy)) {
+                allowed = true
+            }
+
+            if (! allowed) {
+                const documentcontroller = new DocumentController()
+                // Try to find a document that references this upload
+                const documents = await Document.find({ attachments: upload._id })
+                for (let doc of documents) {
+                    if (await documentcontroller.checkPermission(req, doc)) {
+                        allowed = true
+                        break
+                    }
+                }
+            }
+            
+            if (! allowed ) {
+                res.status(403)
+                res.send({ error: "You don't have permission to access this file" })
+                return
+            }
+        }
+        
         res.sendFile(id, {
             root: config.UPLOAD_DIRECTORY, 
             headers: {
@@ -63,11 +93,12 @@ class UploadController {
                 filename: data.filename, 
                 mimetype: data.mimetype,
                 private: data.private || false,
+                createdBy: req.user._id,
+                updatedBy: req.user._id,
             })
 
             try {
-                const subfolder = upload.private ? "/private/" : "/";
-                await fs.writeFile(config.UPLOAD_DIRECTORY + subfolder + upload._id, filedata)
+                await fs.writeFile(config.UPLOAD_DIRECTORY + "/" + upload._id, filedata)
             } catch (err) {
                 console.log(err)
                 await upload.remove()
@@ -76,8 +107,7 @@ class UploadController {
                 return
             }
 
-            const url = upload.private ? 
-                `${upload._id}` : `${config.BASE_URL}${config.API_PATH}/upload/${upload._id}`;
+            const url = `${config.BASE_URL}${config.API_PATH}/upload/${upload._id}`;
 
             res.send({ 
                 upload, 

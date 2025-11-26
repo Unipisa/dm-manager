@@ -6,13 +6,15 @@ import { Card } from "react-bootstrap"
 export default function Document() {
     const { id } = useParams()
 
-    const { isLoading, error, data } = useQuery([ 'document', id ])
+    const { isLoading, error, data } = useQuery([ 'document', id, 'details' ])
 
     if (isLoading) return <Loading error={error}></Loading>
     if (error) return <div>{`${error}`}</div>
 
     const document = data.document
     const allowed = data.allowed
+
+    console.log(document)
 
     return <div>
         <Card>

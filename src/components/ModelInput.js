@@ -18,7 +18,8 @@ import {
     ImageInput,
     ConferenceRoomInput,
     SeminarCategoryInput,
-    PrivateAttachmentInput
+    PrivateAttachmentInput,
+    MultipleAttachmentInput
 } from './Input'
 import { DatetimeInput } from './DatetimeInput'
 
@@ -42,6 +43,7 @@ export function ModelFieldInput({ schema, value, setValue }) {
         if (schema.items['x-ref'] === 'Grant') return element(GrantInput, {multiple:true})        
         if (schema.items['x-ref'] === 'Institution') return element(InstitutionInput, {multiple:true})
         if (schema.items['x-ref'] === 'SeminarCategory') return element(SeminarCategoryInput, {multiple:true})
+        if (schema.items['x-ref'] === 'Upload') return element(MultipleAttachmentInput, {multiple:true})
         return <p>x-ref to {schema.items['x-ref']} not yet implemented in array</p>
     } else {
         const xref = schema['x-ref']

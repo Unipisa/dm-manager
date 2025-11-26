@@ -20,7 +20,7 @@ class DocumentController extends Controller {
         router.get("/document/:id/download", 
             requireUser,
             (req, res) => this.download(req, res, req.params.id))
-        router.get("/document/:id", requireUser, 
+        router.get("/document/:id/details", requireUser, 
             (req, res) => this.getDocument(req, res, req.params.id)
         )
         return []

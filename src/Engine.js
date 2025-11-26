@@ -247,9 +247,6 @@ export function useCreateEngine() {
         useGetRelated: (modelName, _id) => {
             const related = state.Models[modelName].schema.related
             const path = 'getRelated/' + modelName + '/' + _id
-            console.log(path)
-            console.log(state.Models[modelName].schema)
-            console.log(related)
             return useQuery(path, async () => {
                 const data = []
                 for (const info of related) {

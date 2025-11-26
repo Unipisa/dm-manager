@@ -5,7 +5,7 @@ import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { useState, useRef } from 'react';
 import { useQuery } from 'react-query'
 import { useId, createContext, useContext } from 'react'
-import { Form } from 'react-bootstrap'
+import { Card, Form } from 'react-bootstrap'
 
 import api from '../api'
 import { useEngine } from '../Engine'
@@ -67,7 +67,69 @@ export function EmailInput({ value, setValue }) {
 
         return email
     }
+}
 
+function uploadNewAttachment(setValue, _private, engine, urlOnly) {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.onchange = e => {
+        const file = e.target.files[0]
+        if (file) {
+            var reader = new FileReader()
+            reader.onload = () => {
+                const data = {
+                    filename: file.name, 
+                    mimetype: file.type, 
+                    data: btoa(reader.result),
+                    private: _private || false,
+                }
+                api.post('/api/v0/upload', data).then(data => {
+                    if (urlOnly)
+                        setValue(data.url)
+                    else
+                        setValue(data.upload)
+                }).catch(data => {
+                    engine.addMessage(data.message, 'error')
+                })
+            }
+            reader.readAsBinaryString(file)
+        }
+    }
+    input.click()
+}
+
+export function MultipleAttachmentInput({ value, setValue }) {
+    const engine = useEngine()
+    const id = useInputId()
+
+    return <div className='form-row'>
+        <div className="d-inline-block col-sm-10 form-row row">
+            { (value || []).map( (val, idx) => 
+                <div key={idx} className="mb-2 col-sm-6 d-inline-block">
+                    <Card className="">
+                        <Card.Header>{val.filename}</Card.Header>
+                        <Card.Body>
+                            <Button className='btn-sm btn-primary me-3' onClick={() => {
+                                window.location.href = `/api/v0/upload/${val._id}`
+                            }}>Open</Button>   
+                            <Button className='btn-sm btn-danger' onClick={() => {
+                                const newValue = [ ...value ]
+                                newValue.splice(idx, 1)
+                                setValue(newValue)
+                            }}>Remove</Button>   
+                        </Card.Body>
+                    </Card>
+                </div>
+            )}
+        </div>
+        <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
+            <button type="button" onClick={ () => uploadNewAttachment( (newUrl) => {
+                    setValue([ ...(value || []), newUrl ])
+                }, true, engine, false) } className="w-100 btn btn-primary">
+                Upload
+            </button>
+        </div>
+    </div>
 }
 
 export function PrivateAttachmentInput({ value, setValue }) {
@@ -76,36 +138,9 @@ export function PrivateAttachmentInput({ value, setValue }) {
 
 export function AttachmentInput({ value, setValue, image, _private }) {
     // const [uploading, setUploading] = useState(false)
-    const engine = useEngine()
     const id = useInputId()
-
-    console.log(_private)
-
-    function getNewAttachment() {
-        const input = document.createElement('input')
-        input.type = 'file'
-        input.onchange = e => {
-            const file = e.target.files[0]
-            if (file) {
-                var reader = new FileReader()
-                reader.onload = () => {
-                    const data = {
-                        filename: file.name, 
-                        mimetype: file.type, 
-                        data: btoa(reader.result),
-                        private: _private || false,
-                    }
-                    api.post('/api/v0/upload', data).then(data => {
-                        setValue(data.url)
-                    }).catch(data => {
-                        engine.addMessage(data.message, 'error')
-                    })
-                }
-                reader.readAsBinaryString(file)
-            }
-        }
-        input.click()
-    }
+    const engine = useEngine()
+    const getNewAttachment = () => uploadNewAttachment(setValue, _private, engine, true)
 
     return <div className="form-row">
         <div className="d-inline-block col-sm-10">

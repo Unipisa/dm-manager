@@ -244,7 +244,23 @@ class Controller {
                         }})
                     if (single) unwind(field)
                 }
-            })
+            else if (info.ref === 'Upload') {
+                this.queryPipeline.push(
+                    {$lookup: {
+                        from: "uploads",
+                        localField: field,
+                        foreignField: "_id",
+                        as: field,
+                        pipeline: [{ $project: {
+                            filename: 1,
+                            mimetype: 1,
+                            data: 1,
+                            private: 1,
+                        }}]
+                    }})
+                if (single) unwind(field)
+            }
+        })
     }
 
     async getModel(req, res) {
