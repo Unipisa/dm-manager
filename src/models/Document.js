@@ -23,4 +23,15 @@ export default class Document extends Model {
     }
 
     describe(obj) { return `${obj.name}` }
+
+    additionalInfo(obj) {
+        return (
+            <div>
+                <strong>Link esterno al documento: </strong> 
+                <a href={`/process/document/${obj._id}`}>
+                    {window.location.origin + `/process/document/${obj._id}`}
+                </a>
+            </div>
+        )
+    }
 }

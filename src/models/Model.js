@@ -58,6 +58,9 @@ export default class Model {
     // absolute url of object with given id
     editUrl(id) {return `/${this.code}/${id}/edit`}
 
+    // (optional) additional info to show in object view page
+    additionalInfo(obj) {  return null; }
+
     onObjectChange(setObj) {}
 
     // react routers to object pages
