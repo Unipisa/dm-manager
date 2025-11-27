@@ -5,6 +5,7 @@ const config = require('../config')
 const Group = require('../models/Group')
 const { startDate } = require('../models/Model')
 const { requireUser } = require('./middleware')
+const { ObjectId } = require('mongoose').Types
 
 class DocumentController extends Controller {
     constructor() {
@@ -27,6 +28,11 @@ class DocumentController extends Controller {
     }
 
     async checkPermission(req, document) {
+        // Allow admin access, and owner access
+        if (req.roles?.includes('admin') || (document.owners || []).some(ownerId => ownerId.equals(req.user._id))) {
+            return true
+        }
+
         if (! req.user.person) {
             return false
         }
@@ -58,13 +64,18 @@ class DocumentController extends Controller {
     }
 
     async getDocument(req, res, id) {
-        const document = await Document.findById(id)
+        const documents = await Document.aggregate([
+            { $match: { _id: new ObjectId(id) } },
+            ...this.queryPipeline,
+        ])
 
-        if (! document) {
+        if (documents.length === 0) {
             res.status(404)
             res.send({ error: "Document not found" })
             return
         }
+
+        const document = documents[0]
 
         const allowed = await this.checkPermission(req, document)
         

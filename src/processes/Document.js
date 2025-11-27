@@ -14,8 +14,6 @@ export default function Document() {
     const document = data.document
     const allowed = data.allowed
 
-    console.log(document)
-
     return <div>
         <Card>
             <Card.Header>{document.name}</Card.Header>
@@ -24,13 +22,19 @@ export default function Document() {
                 {document.description && <><strong>Descrizione</strong>: {document.description}</>}
 
                 <div className="my-3"></div>
-                { allowed && 
-                <a className="btn btn-primary"
-                    href={`/api/v0/document/${document._id}/download`}>
-                    Download
-                </a>}
+                { allowed && <AttachmentList attachments={document.attachments} /> }                
                 { !allowed && <div>Non hai il permesso di scaricare questo documento.</div>}
             </Card.Body>
         </Card>
     </div>
+}
+
+function AttachmentList({ attachments }) {
+    return <ul>
+        {attachments.map(att => (
+            <li key={att._id}>
+                <a href={`/api/v0/upload/${att._id}`}>{att.filename}</a>
+            </li>
+        ))}
+    </ul>
 }

@@ -69,31 +69,51 @@ export function EmailInput({ value, setValue }) {
     }
 }
 
-function uploadNewAttachment(setValue, _private, engine, urlOnly) {
-    const input = document.createElement('input')
-    input.type = 'file'
-    input.onchange = e => {
-        const file = e.target.files[0]
-        if (file) {
-            var reader = new FileReader()
-            reader.onload = () => {
-                const data = {
-                    filename: file.name, 
-                    mimetype: file.type, 
-                    data: btoa(reader.result),
-                    private: _private || false,
-                }
-                api.post('/api/v0/upload', data).then(data => {
-                    if (urlOnly)
-                        setValue(data.url)
-                    else
-                        setValue(data.upload)
-                }).catch(data => {
-                    engine.addMessage(data.message, 'error')
-                })
+async function uploadFiles(files, _private, engine, urlOnly) {
+    const readFile = (file) => {
+        return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = async () => {
+            const data = {
+                filename: file.name, 
+                mimetype: file.type, 
+                data: btoa(reader.result),
+                private: _private || false,
             }
-            reader.readAsBinaryString(file)
+            try {
+                const upload_data = await api.post('/api/v0/upload', data)
+                resolve(urlOnly ? upload_data.url : upload_data.upload)
+            } catch (err) {
+                engine.addMessage(err.message, 'error')
+                reject(err.message)
+            }
         }
+        reader.onerror = () => reject(reader.error);
+        reader.readAsBinaryString(file); // or readAsDataURL / readAsArrayBuffer / readAsBinaryString
+    });
+  };
+
+  const results = [];
+
+  for (const file of files) {
+    const content = await readFile(file);
+    results.push(content);
+  }
+
+  return results;
+}
+
+function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false) {
+    const input = document.createElement('input')   
+    input.type = 'file'
+    input.multiple = multiple
+    input.onchange = async e => {
+        const newUploads = await uploadFiles(e.target.files, _private, engine, urlOnly)
+        if (multiple)
+            setValue(newUploads)
+        else
+            setValue(newUploads[0])
     }
     input.click()
 }
@@ -124,8 +144,8 @@ export function MultipleAttachmentInput({ value, setValue }) {
         </div>
         <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
             <button type="button" onClick={() => uploadNewAttachment((newUrl) => {
-                    setValue([ ...(value || []), newUrl ])
-                }, true, engine, false) } className="w-100 btn btn-primary">
+                    setValue([ ...(value || []), ...newUrl ])
+                }, true, engine, false, true) } className="w-100 btn btn-primary">
                 Upload
             </button>
         </div>

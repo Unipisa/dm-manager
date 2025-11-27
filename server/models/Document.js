@@ -7,15 +7,13 @@ const {
     updatedBy,
 } = require('./Model')
 
-const Upload = require('./Upload')
-
 const documentSchema = new Schema({
-    name: { type: String, label: 'titolo', required: true },
+    name: { type: String, label: 'nome', required: true },
     description: { type: String, label: 'descrizione', widget: 'text', default: '' },
     date: { type: Date, label: 'data', default: Date.now },
     group_codes: {type: [String], label: 'codici gruppi', help: 'I membri dei gruppi con questi codici hanno accesso al documento', default: [] },
     owners: [{ type: ObjectId, ref: 'Person', label: 'proprietari', default: [] }],
-    attachments: [{ type: ObjectId, ref: 'Upload', label: 'allegati', widget: 'multiple-attachment', can_edit_in_profile: true}],
+    attachments: [{ type: ObjectId, ref: 'Upload', label: 'allegati', widget: 'multiple-attachment'}],
     notes,
     createdBy,
     updatedBy,

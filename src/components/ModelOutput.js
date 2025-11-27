@@ -13,8 +13,15 @@ export function ModelFieldOutput({ field, schema, value }) {
     function render(value, xref) {
         if (!xref) return value
         const Model = Models[xref]
-        if (Model) return <Link key={value._id} to={Model.viewUrl(value._id)}>{Model.describe(value)}</Link>
-        return `x-ref to ${xref} not yet implemented`
+        const url = Model.viewUrl(value._id)
+        if (Model) {
+            if (/^\/api\/v0\//.test(url))
+                return <a key={value._id} href={url} target="_blank" rel="noreferrer">{Model.describe(value)}</a>
+            else
+                return <Link key={value._id} to={Model.viewUrl(value._id)}>{Model.describe(value)}</Link>
+            }
+        else
+            return `x-ref to ${xref} not yet implemented`
     }
     if (schema.type === 'array') {
         if (schema.enum) return value.join(', ')
