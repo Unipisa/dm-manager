@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom"
 import Loading from "../components/Loading"
 import { useQuery } from "react-query"
 import { Card } from "react-bootstrap"
+import { formatDate } from '../components/DatetimeInput'
 
 export default function Document() {
     const { id } = useParams()
@@ -16,9 +17,9 @@ export default function Document() {
 
     return <div>
         <Card>
-            <Card.Header>{document.name}</Card.Header>
+            <Card.Header><h4>{document.name}</h4></Card.Header>
             <Card.Body>
-                <strong>Data</strong>: {document.date} <br></br>
+                <strong>Data</strong>: {formatDate(document.date, false)} <br></br>
                 {document.description && <><strong>Descrizione</strong>: {document.description}</>}
 
                 <div className="my-3"></div>
@@ -30,11 +31,13 @@ export default function Document() {
 }
 
 function AttachmentList({ attachments }) {
-    return <ul>
+    return <>
+    <strong>Allegati:</strong>
+        <ul>
         {attachments.map(att => (
             <li key={att._id}>
                 <a href={`/api/v0/upload/${att._id}`}>{att.filename}</a>
             </li>
         ))}
-    </ul>
+    </ul></>
 }

@@ -13,7 +13,7 @@ class DocumentController extends Controller {
         this.path = 'document'
         this.managerRoles.push('document-manager')
         this.supervisorRoles.push('document-manager', 'document-supervisor')
-        this.searchFields = [ 'name' ]
+        this.searchFields = [ 'name', 'group_codes' ]
     }
 
     register(router) {

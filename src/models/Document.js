@@ -18,6 +18,8 @@ export default class Document extends Model {
         this.indexDefaultFilter = {'_sort': 'name', '_limit': 10}
         this.columns = {
             'name': "nome",
+            'date': "data",
+            'group_codes': "codici gruppi",
             'updatedAt': "modificato",
         }
     }
