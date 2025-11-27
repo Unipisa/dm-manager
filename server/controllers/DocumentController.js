@@ -37,6 +37,12 @@ class DocumentController extends Controller {
             return false
         }
 
+        // if document.group_codes is empty, we treat it as a special 
+        // case the only requires a logged-in user.
+        if ((document.group_codes || []).length === 0) {
+            return true
+        }
+
         const valid_groups = await Group.aggregate([
             {
                 $match: {
