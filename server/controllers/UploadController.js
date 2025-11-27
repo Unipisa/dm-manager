@@ -34,18 +34,21 @@ class UploadController {
         // We need to check for permissions before serving private files.
         if (upload.private) {
             let allowed = false
-            if (req.user._id.equals(upload.createdBy)) {
-                allowed = true
-            }
 
-            if (! allowed) {
-                const documentcontroller = new DocumentController()
-                // Try to find a document that references this upload
-                const documents = await Document.find({ attachments: upload._id })
-                for (let doc of documents) {
-                    if (await documentcontroller.checkPermission(req, doc)) {
-                        allowed = true
-                        break
+            if (req.user) {
+                if (req.user._id.equals(upload.createdBy)) {
+                    allowed = true
+                }
+
+                if (! allowed) {
+                    const documentcontroller = new DocumentController()
+                    // Try to find a document that references this upload
+                    const documents = await Document.find({ attachments: upload._id })
+                    for (let doc of documents) {
+                        if (await documentcontroller.checkPermission(req, doc)) {
+                            allowed = true
+                            break
+                        }
                     }
                 }
             }
