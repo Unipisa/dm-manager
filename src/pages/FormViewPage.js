@@ -47,7 +47,7 @@ function FormDataView() {
     const form = useObject()
     const Form = engine.Models.Form
     const authColumns = form.requireAuthentication ? ['email', 'firstName', 'lastName'] : []
-    const columns = ['createdAt', ...authColumns, 'data']
+    const columns = [...authColumns, 'data']
     const csvHeaders = [
         'createdAt', 
         ...authColumns,

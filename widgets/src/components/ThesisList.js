@@ -6,7 +6,7 @@ import { Loading } from './Loading';
 import Accordion from './Accordion';
 import './styles.css';
 
-export function ThesisList({ year, ssd, institution, qualification, excludeQualification, _sort, _limit  }) {
+export function ThesisList({ year, ssd, institution, qualification, exclude_qualification, _sort, _limit  }) {
 
     const filter = { year, ssd, _sort, _limit }
 
@@ -33,9 +33,9 @@ export function ThesisList({ year, ssd, institution, qualification, excludeQuali
         );
     }
     
-    if (excludeQualification) {
+    if (exclude_qualification) {
         filteredData = filteredData.filter(thesis => 
-            !thesis.person.staff.some(staffItem => staffItem.qualification === excludeQualification)
+            !thesis.person.staff.some(staffItem => staffItem.qualification === exclude_qualification)
         );
     }
 
@@ -98,12 +98,27 @@ function ThesisTableItem({ thesis }) {
             advisorElement;
     });
 
+    const hasMultipleInstitutions = thesis.institutions && thesis.institutions.length > 1;
+    
+    const institutionNames = hasMultipleInstitutions 
+        ? thesis.institutions.map(inst => inst.name).join(' and ')
+        : null;
+
     return (
-        <tr>
-            <td>{thesis.person.firstName}</td>
-            <td>{thesis.person.lastName}</td>
-            <td>{thesis.title}</td>
-            <td>{supervisors}</td>
-        </tr>
+        <>
+            <tr>
+                <td>{thesis.person.firstName}</td>
+                <td>{thesis.person.lastName}</td>
+                <td>{thesis.title}{hasMultipleInstitutions && '*'}</td>
+                <td>{supervisors}</td>
+            </tr>
+            {hasMultipleInstitutions && (
+                <tr>
+                    <td colSpan="4" className="joint-phd-notice">
+                        *Joint PhD thesis with {institutionNames}
+                    </td>
+                </tr>
+            )}
+        </>
     )
 }
