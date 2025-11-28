@@ -96,8 +96,8 @@ class UploadController {
                 filename: data.filename, 
                 mimetype: data.mimetype,
                 private: data.private || false,
-                createdBy: req.user._id,
-                updatedBy: req.user._id,
+                createdBy: req.user?._id,
+                updatedBy: req.user?._id,
             })
 
             try {

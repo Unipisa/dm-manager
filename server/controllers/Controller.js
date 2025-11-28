@@ -550,8 +550,8 @@ class Controller {
         //console.log(`*** PUT ${req.path} ${JSON.stringify(req.body)}`)
         let payload = {
             ...req.body,
-            createdBy: req.user._id,
-            updatedBy: req.user._id,
+            createdBy: req.user?._id,
+            updatedBy: req.user?._id,
         }
         delete payload.createdAt
         delete payload.updatedAt
