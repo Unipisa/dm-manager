@@ -62,6 +62,8 @@ async function uploadDocuments(root_url, token, file_path) {
     const fileContent = fs.readFileSync(file_path, 'utf-8');
     const data = JSON.parse(fileContent);
 
+    const document_list = [];
+
     for (const doc of data.documents) {
         const name = doc.name;
 
@@ -86,6 +88,11 @@ async function uploadDocuments(root_url, token, file_path) {
         const exists = existing_docs.total > 0;
 
         if (exists) {
+            document_list.push({
+                _id: existing_docs["data"][0]._id,
+                name: name,
+                date: date
+            })
             console.log(`Document ${name} with date ${date} already exists, skipping.`);
             continue;
         }
@@ -104,7 +111,15 @@ async function uploadDocuments(root_url, token, file_path) {
         // Create the document
         const created_doc = await makeRequest(root_url, 'PUT', '/api/v0/document', token, new_doc);
         console.log(`Created document with ID: ${created_doc._id}`);
+
+        document_list.push({
+            _id: created_doc._id,
+            name: name,
+            date: date
+        })
     }
+
+    return document_list;
 }
 
 // Read the command-line arguments, with the format upload-documents.js <root_url> <token> <file_path>
@@ -118,5 +133,44 @@ if (!root_url || !token || !file_path) {
 }
 
 // Sample request to list the documents
-const req = uploadDocuments(root_url, token, file_path);
+const docs = uploadDocuments(root_url, token, file_path);
 
+docs.then(async (docs) => {
+    const file_content = fs.readFileSync(file_path, 'utf-8');
+    const config = JSON.parse(file_content);
+
+    const startYearTag = config.output.startYearTag || "<h2>";
+    const endYearTag = config.output.endYearTag || "</h2>";
+    const startListTag = config.output.startListTag || "<ul>";
+    const endListTag = config.output.endListTag || "</ul>";
+
+    docs.sort((a, b) => { new Date(b.date) - new Date(a.date) });
+
+    console.log("Sample HTML list with the new links to be use in the website:");
+    console.log("");
+
+
+    const firstYear = (new Date(docs[0].date)).getFullYear();
+    let currentYear = firstYear + 1;
+
+    // Generate a random ID made of 5 integers
+    let id = Math.floor(Math.random() * 100000);
+    console.log(`${startYearTag.replace(/@UUID@/g, id)}${firstYear}${endYearTag.replace(/@UUID@/g, id)}`);
+
+    console.log(`${startListTag.replace(/@UUID@/g, id)}`);
+    for (const doc of docs) {
+        if ((new Date(doc.date)).getFullYear() < currentYear) {
+            currentYear = (new Date(doc.date)).getFullYear();
+            console.log(`${endListTag}`);
+            id = Math.floor(Math.random() * 100000);
+            console.log(`${startYearTag.replace(/@UUID@/g, id)}${currentYear}${endYearTag.replace(/@UUID@/g, id)}`);
+            console.log(`${startListTag.replace(/@UUID@/g, id)}`);
+        }
+
+        console.log(`<!-- wp:list-item --><li><a href="${root_url}/process/document/${doc._id}">${doc.name}</a> (${doc.date.split('T')[0]})</li><!-- /wp:list-item -->`);
+    }
+    console.log(`${endListTag}`)
+
+}).catch((err) => {
+    console.error("Error uploading documents:", err);
+});
