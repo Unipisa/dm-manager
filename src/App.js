@@ -76,7 +76,7 @@ function Internal() {
     return <EngineProvider value={engine}>
       <BrowserRouter>
       <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
-      <Container className="p-5">
+      <Container fluid>
         <Routes>  
           <Route path={`/pub/fill/:id`} element={<FormFillPage />} />
           <Route path="*" element={<LoginPage engine={engine} />} />
@@ -90,7 +90,7 @@ function Internal() {
   <BrowserRouter>
    <Header/>
    <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
-   <Container className="p-5">
+   <Container fluid className="pt-5 p-lg-5">
      <Routes>  
        <Route path="/" element={<Home />} />
        <Route path="/profile" element={<Profile />} />
