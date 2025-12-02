@@ -25,12 +25,12 @@ function LoginPage({ engine }) {
     background: "linear-gradient(135deg, #eef2f7 0%, #d7e6f7 100%)"
   }}
 >
-  <Card className="shadow rounded-lg-4 border-0 px-3 py-3"
+  <Card className="shadow rounded-lg-4 border-0 px-3 py-3 mx-2"
         style={{ width: "100%", maxWidth: "440px" }}>
 
     <Card.Header className="bg-white border-0 text-center pb-3">
       <h3 className="fw-semibold mb-1">Sign In</h3>
-      <div className="text-muted small">&mdash; manage.dm.unipi.it &mdash;</div>
+      <div className="text-muted small">dm-manager</div>
     </Card.Header>
 
 
