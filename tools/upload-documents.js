@@ -139,10 +139,10 @@ docs.then(async (docs) => {
     const file_content = fs.readFileSync(file_path, 'utf-8');
     const config = JSON.parse(file_content);
 
-    const startYearTag = config.output.startYearTag || "<h2>";
-    const endYearTag = config.output.endYearTag || "</h2>";
-    const startListTag = config.output.startListTag || "<ul>";
-    const endListTag = config.output.endListTag || "</ul>";
+    const startYearTag = config.output?.startYearTag || "<h2>";
+    const endYearTag = config.output?.endYearTag || "</h2>";
+    const startListTag = config.output?.startListTag || "<ul>";
+    const endListTag = config.output?.endListTag || "</ul>";
 
     docs.sort((a, b) => { new Date(b.date) - new Date(a.date) });
 
