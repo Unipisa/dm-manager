@@ -2,16 +2,16 @@ import { useState } from 'react'
 import { Card, Button } from 'react-bootstrap'
 
 function LoginPage({ engine }) {
-    const [ email, setEmail ] = useState("")
+    const [ username, setUsername ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
     const [ error, setError ] = useState(null)
 
-    async function login(email, password) {
+    async function login(username, password) {
         setError(null)
         setWaiting(true)
         try {
-            await engine.login(email, password)
+            await engine.login(username, password)
         } catch(error) {
           console.error(error)
           setError(`Login error: ${error.message}`)
@@ -56,7 +56,7 @@ function LoginPage({ engine }) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          login(email, password);
+          login(username, password);
         }}
       >
         <h5 className="fw-semibold mb-3 text-center">Credenziali locali</h5>
@@ -70,11 +70,10 @@ function LoginPage({ engine }) {
         <div className="mb-3">
           <input
             id="email"
-            type="email"
-            placeholder="Email address"
+            placeholder="username"
             className="form-control form-control-lg rounded-3"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
 
@@ -87,7 +86,7 @@ function LoginPage({ engine }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") login(email, password);
+              if (e.key === "Enter") login(username, password);
             }}
           />
         </div>
