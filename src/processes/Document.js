@@ -3,6 +3,7 @@ import Loading from "../components/Loading"
 import { useQuery } from "react-query"
 import { Card } from "react-bootstrap"
 import { formatDate } from '../components/DatetimeInput'
+import Markdown from 'react-markdown'
 
 export default function Document() {
     const { id } = useParams()
@@ -19,10 +20,12 @@ export default function Document() {
         <Card>
             <Card.Header><h4>{document.name}</h4></Card.Header>
             <Card.Body>
-                <strong>Data</strong>: {formatDate(document.date, false)} <br></br>
-                {document.description && <><strong>Descrizione</strong>: {document.description}</>}
+                {document.description && <Markdown>
+                    {"##### Descrizione del documento\n\n" + document.description}
+                </Markdown>}
 
                 <div className="my-3"></div>
+                <strong>Data</strong>: {formatDate(document.date, false)} <br></br>
                 { allowed && <AttachmentList attachments={document.attachments} /> }                
                 { !allowed && <div>Non hai il permesso di scaricare questo documento.</div>}
             </Card.Body>
