@@ -6,6 +6,7 @@ function LoginPage({ engine }) {
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
     const [ error, setError ] = useState(null)
+    const config = engine.config
 
     async function login(username, password) {
         setError(null)
@@ -30,7 +31,7 @@ function LoginPage({ engine }) {
 
     <Card.Header className="bg-white border-0 text-center pb-3">
       <h3 className="fw-semibold mb-1">Sign In</h3>
-      <div className="text-muted small">dm-manager</div>
+      <div className="text-muted small">{config.SERVER_NAME}</div>
     </Card.Header>
 
 
