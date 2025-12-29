@@ -36,15 +36,15 @@ export function CourseList({ from, to, phd }) {
 
     const fromYear = new Date(from).getFullYear();
     const toYear = new Date(to).getFullYear();
-    const springDate = new Date(`${fromYear + 1}-01-01`);
+    const springDate = new Date(`${toYear}-01-01`);
     const noDate = new Date(`${fromYear}-09-01`);
 
     for (const course of data) {
-        if (course && course.endDate) {
-            const courseEndDate = new Date(course.endDate);
-            if (courseEndDate.getTime() == noDate.getTime()) {
+        if (course && course.startDate) {
+            const courseStartDate = new Date(course.startDate);
+            if (courseStartDate.getTime() == noDate.getTime()) {
                 noDateCourses.push(course);
-            } else if (courseEndDate < springDate) {
+            } else if (courseStartDate < springDate) {
                 fallCourses.push(course);
             } else {
                 springCourses.push(course);
