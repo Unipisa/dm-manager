@@ -43,21 +43,38 @@ class DocumentController extends Controller {
             return true
         }
 
+        const today = new Date()
+
         const valid_groups = await Group.aggregate([
             {
                 $match: {
                     code: { $in: document.group_codes },
                     members: req.user.person._id,
-                    $and: [
-                        { $or: [
-                            { startDate: null },
-                            { startDate: { $lte: document.date } }
+                    $or: [
+                        // We check if the user was member of the group 
+                        // at the document's date
+                        { $and: [
+                            { $or: [
+                                { startDate: null },
+                                { startDate: { $lte: document.date } }
+                            ]},
+                            { $or: [
+                                { endDate: null },
+                                { endDate: { $gte: document.date } }
+                            ]}
                         ]},
-                        { $or: [
-                            { endDate: null },
-                            { endDate: { $gte: document.date } }
+                        // Also check if the user is currently member of the group
+                        { $and: [
+                            { $or: [
+                                { startDate: null },
+                                { startDate: { $lte: today } }
+                            ]},
+                            { $or: [
+                                { endDate: null },
+                                { endDate: { $gte: today } }
+                            ]}
                         ]}
-                    ]
+                    ]                    
                 }
             }
         ]);
