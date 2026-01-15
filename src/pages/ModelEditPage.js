@@ -1,24 +1,34 @@
-import { useParams, useSearchParams, Navigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 
 import ModelEdit from '../components/ModelEdit'
 
 export default function ModelEditPage({ Model }) {
     const params = useParams()
     const [searchParams] = useSearchParams()
+    const navigate = useNavigate()
     const id = params.id
     const clone_id = searchParams.get('clone')
-    const [ redirect, setRedirect ] = useState(null)
-
-    if (redirect !== null) return <Navigate to={redirect} />
+    const isNew = id === '__new__'
 
     return <ModelEdit 
         Model={Model} 
         id={id} 
         clone_id={clone_id}
-        onSave={obj => setRedirect(Model.viewUrl(obj._id))}
-        onCancel={obj => setRedirect(obj._id ? Model.viewUrl(obj._id) : Model.indexUrl())}
-        onDelete={obj => setRedirect(Model.indexUrl())}
+        onSave={obj => {
+            if (isNew && clone_id) {
+                // For duplica: go back 2 steps (to ModelsPage), then navigate to new view
+                navigate(-2)
+                setTimeout(() => navigate(Model.viewUrl(obj._id)), 0)
+            } else if (isNew) {
+                // For new from ModelsPage: replace edit with view
+                navigate(Model.viewUrl(obj._id), { replace: true })
+            } else {
+                // For editing: just go back
+                navigate(-1)
+            }
+        }}
+        onCancel={() => navigate(-1)}
+        onDelete={() => navigate(-2)}
     />
 }
 
