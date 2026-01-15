@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, Navigate, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
 import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
@@ -149,9 +149,8 @@ export default function PhdCourseEditPage({ Model }) {
     
     const [searchParams] = useSearchParams()
     const clone_id = searchParams.get('clone')
+    const navigate = useNavigate()
     
-    const [redirect, setRedirect] = useState(null)
-
     const create = id === '__new__'
     const [modifiedObj, setModifiedObj] = useState(null)
     const engine = useEngine()
@@ -176,8 +175,6 @@ export default function PhdCourseEditPage({ Model }) {
     }, [clone_id, status, cloneStatus, data, cloneData])
 
     const [showGenerateLessonForm, setShowGenerateLessonForm] = useState(false)
-
-    if (redirect !== null) return <Navigate to={redirect} />
 
     if (status === "error") return <div>errore caricamento</div>
     if (status === "loading") return <Loading />
@@ -227,18 +224,25 @@ export default function PhdCourseEditPage({ Model }) {
         if (modifiedObj._id) {
             await patchObj(modifiedObj)
             engine.addInfoMessage(`Corso di dottorato modificato`)
-            setRedirect(Model.viewUrl(originalObj._id))
+            navigate(-1)
         } else {
             const resultObj = await putObj(modifiedObj)
             engine.addInfoMessage(`Nuovo corso di dottorato "${Model.describe(resultObj)}" inserito`)
-            setRedirect(Model.viewUrl(resultObj._id))
+            if (clone_id) {
+                // For duplica: go back 2 steps (to ModelsPage), then navigate to new view
+                navigate(-2)
+                setTimeout(() => navigate(Model.viewUrl(resultObj._id)), 0)
+            } else {
+                // For new from ModelsPage: replace edit with view
+                navigate(Model.viewUrl(resultObj._id), { replace: true })
+            }
         }
     }
 
     const deletePhdCourse = async () => {
         await engineDeleteObj(originalObj)
         engine.addWarningMessage(`Corso di Dottorato ${Model.describe(originalObj)} eliminato`)
-        setRedirect(Model.indexUrl())
+        navigate(-2)
     }
 
     return (
@@ -439,7 +443,7 @@ export default function PhdCourseEditPage({ Model }) {
                             </Button>
                             <Button
                                 className="btn btn-secondary"
-                                onClick={() => setRedirect(originalObj._id ? Model.viewUrl(originalObj._id) : Model.indexUrl())}>
+                                onClick={() => navigate(-1)}>
                                 Annulla Modifiche
                             </Button>
                             {!create && (
