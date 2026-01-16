@@ -90,7 +90,7 @@ function Internal() {
   <BrowserRouter>
    <Header/>
    <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
-   <Container fluid className="pt-5 p-lg-5">
+   <Container fluid className="pt-5 p-lg-5 main-container">
      <Routes>  
        <Route path="/" element={<Home />} />
        <Route path="/profile" element={<Profile />} />
