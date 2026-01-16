@@ -97,7 +97,7 @@ function PersonBlock({data, en}) {
                     {data.personalPage && (
                         <p className="my-1">
                             <i className="fas fa-link mr-2"></i>
-                            <a href={data.personalPage}>{data.personalPage}</a>
+                            <a href={data.personalPage}>{en ? "Personal web page" : "Pagina web personale"}</a>
                             <br />
                             <span className="small text-muted">
                                 {en ? "(The CV is available on this webpage)" : "(Il CV è disponibile a questa pagina web)"}

@@ -2,16 +2,17 @@ import { useState } from 'react'
 import { Card, Button } from 'react-bootstrap'
 
 function LoginPage({ engine }) {
-    const [ email, setEmail ] = useState("")
+    const [ username, setUsername ] = useState("")
     const [ password, setPassword ] = useState("")
     const [ waiting, setWaiting ] = useState(false)
     const [ error, setError ] = useState(null)
+    const config = engine.config
 
-    async function login(email, password) {
+    async function login(username, password) {
         setError(null)
         setWaiting(true)
         try {
-            await engine.login(email, password)
+            await engine.login(username, password)
         } catch(error) {
           console.error(error)
           setError(`Login error: ${error.message}`)
@@ -25,12 +26,12 @@ function LoginPage({ engine }) {
     background: "linear-gradient(135deg, #eef2f7 0%, #d7e6f7 100%)"
   }}
 >
-  <Card className="shadow rounded-lg-4 border-0 px-3 py-3"
+  <Card className="shadow rounded-lg-4 border-0 px-3 py-3 mx-2"
         style={{ width: "100%", maxWidth: "440px" }}>
 
     <Card.Header className="bg-white border-0 text-center pb-3">
       <h3 className="fw-semibold mb-1">Sign In</h3>
-      <div className="text-muted small">&mdash; manage.dm.unipi.it &mdash;</div>
+      <div className="text-muted small">{config.SERVER_NAME}</div>
     </Card.Header>
 
 
@@ -56,7 +57,7 @@ function LoginPage({ engine }) {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          login(email, password);
+          login(username, password);
         }}
       >
         <h5 className="fw-semibold mb-3 text-center">Credenziali locali</h5>
@@ -70,11 +71,10 @@ function LoginPage({ engine }) {
         <div className="mb-3">
           <input
             id="email"
-            type="email"
-            placeholder="Email address"
+            placeholder="username"
             className="form-control form-control-lg rounded-3"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           />
         </div>
 
@@ -87,7 +87,7 @@ function LoginPage({ engine }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") login(email, password);
+              if (e.key === "Enter") login(username, password);
             }}
           />
         </div>
