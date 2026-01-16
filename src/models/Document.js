@@ -1,4 +1,34 @@
 import Model from './Model'
+import { Button } from 'react-bootstrap'
+import { useEngine } from '../Engine'
+
+// Separate functional component that can use hooks
+const DocumentAdditionalInfo = ({ obj }) => {
+    const externalLink = `${window.location.origin}/process/document/${obj._id}`
+    const { addInfoMessage } = useEngine()
+    
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(externalLink)
+            addInfoMessage("link copiato")
+        } catch (err) {
+            console.error('Failed to copy:', err)
+        }
+    }
+
+    return (
+        <div>
+            <strong>Link esterno al documento: </strong> 
+            <a href={`/process/document/${obj._id}`}>
+                {externalLink}
+            </a>
+            {' '}
+            <Button className="btn-primary" onClick={handleCopy}>
+                copia link
+            </Button>
+        </div>
+    )
+}
 
 export default class Document extends Model {
     constructor() {
@@ -27,13 +57,6 @@ export default class Document extends Model {
     describe(obj) { return `${obj.name}` }
 
     additionalInfo(obj) {
-        return (
-            <div>
-                <strong>Link esterno al documento: </strong> 
-                <a href={`/process/document/${obj._id}`}>
-                    {window.location.origin + `/process/document/${obj._id}`}
-                </a>
-            </div>
-        )
+        return <DocumentAdditionalInfo obj={obj} />
     }
 }
