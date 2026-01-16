@@ -1,5 +1,5 @@
 import React from 'react';
-import { getManageURL, getSSDLink } from '../utils';
+import { getManageURL, getNewSSD } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -82,7 +82,7 @@ export function ConferenceTitle({ conference, href }) {
             <span className="mx-1"></span>
             <span className="fas fa-map-marker-alt"></span> {room}
             <span className="mx-1"></span>
-            <span className="fas fa-university"></span> {(conference.SSD || [] ).map(x => <span key={x} className="mr-1">{getSSDLink(x)}</span>)}
+            <span className="fas fa-university"></span> {(conference.SSD || [] ).map(x => <span key={x} className="mr-1">{getNewSSD(x)}</span>)}
             { conference.url && <><span className="mx-1"></span>
             <span className="fas fa-link"></span> <a href={conference.url}>Web</a></> }
         </small>

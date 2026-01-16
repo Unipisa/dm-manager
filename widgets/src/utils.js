@@ -131,54 +131,40 @@ export function getDMURL(path) {
     }
 }
 
-export function getSSDLink(SSD) {
-    var label = ""
+export function getNewSSD(SSD) {
     var newSSD = ""
 
     switch (SSD) {
         case "MAT/01":
-            label = "Mathematical Logic"
             newSSD = "MATH-01/A"
             break;
         case "MAT/02":
-            label = "Algebra"
             newSSD = "MATH-02/A"
             break;
         case "MAT/03":
-            label = "Geometry"
             newSSD = "MATH-02/B"
             break;
         case "MAT/04":
-            label = "Mathematics Education and History of Mathematics"
             newSSD = "MATH-01/B"
             break;
         case "MAT/05":
-            label = "Mathematical Analysis"
             newSSD = "MATH-03/A"
             break;
         case "MAT/06":
-            label = "Probability and Mathematical Statistics"
             newSSD = "MATH-03/B"
             break;
         case "MAT/07":
-            label = "Mathematical Physics"
             newSSD = "MATH-04/A"
             break;
         case "MAT/08":
-            label = "Numerical Analysis"
             newSSD = "MATH-05/A"
             break;
         case "MAT/09":
-            label = "Operation Research"
             newSSD = "MATH-06/A"
             break;
     }
     
-    if (label != "") {
-        return <a key={"SSD-link-" + SSD} href={"https://www.dm.unipi.it/en/conferences?ssd=" + SSD.replace("/", "%2F")}>{newSSD}</a>
-    }
-
-    return ""
+    return newSSD || ""
 }
 
 export function getRoleLabel(role, english, feminine) {
