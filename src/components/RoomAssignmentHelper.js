@@ -51,6 +51,8 @@ function RoomListing({rooms, createAssignment}) {
 export default function RoomAssignmentHelper({ person, startDate, endDate, onChange }) {
     const prefix = usePrefix()
     const {useIndex,usePut,usePatch,useDelete,addMessage} = useEngine()
+    const originalStartDate = startDate
+    const originalEndDate = endDate
     startDate = startDate ? new Date(startDate) : minDate
     endDate = endDate ? new Date(endDate) : maxDate
     let filter = {
@@ -137,8 +139,8 @@ export default function RoomAssignmentHelper({ person, startDate, endDate, onCha
         const assignment = {
             person: person._id,
             room: room._id,
-            startDate: startDate,
-            endDate: endDate,
+            startDate: originalStartDate ? new Date(originalStartDate) : null,
+            endDate: originalEndDate ? new Date(originalEndDate) : null,
         }
         await putRoomAssignment(assignment)
         console.log(`assignment created`)
