@@ -35,6 +35,7 @@ function StaffsFilters({ filter }) {
     const setFilterFields = filter.setFilter
     const [selectedOption, setSelectedOption] = useState('all');
     const [qualification, setQualification] = useState('')
+    const [isInternal, setIsInternal] = useState('all')
     const currentYear = new Date().getFullYear()
     const startYear = 2011
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i)
@@ -119,6 +120,29 @@ function StaffsFilters({ filter }) {
                 }}>
                 <option value="">Tutte le qualifiche</option>
                 {qualificationOptions.map(option => <option key={option} value={option}>{option}</option>)}
+            </select>
+            <select
+                className="mx-1 form-control"
+                style={{ width: '15%' }}
+                value={isInternal}
+                onChange={evt => {
+                    const value = evt.target.value
+                    setIsInternal(value)
+                    if (value === 'all') {
+                        setFilterFields(prev => {
+                            const { isInternal, ...rest } = prev
+                            return rest
+                        })
+                    } else {
+                        setFilterFields(prev => ({
+                            ...prev,
+                            isInternal: value === 'true',
+                        }))
+                    }
+                }}>
+                <option value="all">Tutti (interni/esterni)</option>
+                <option value="true">Interni al dipartimento</option>
+                <option value="false">Esterni</option>
             </select>
         </>
     );
