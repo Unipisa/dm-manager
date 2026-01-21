@@ -8,7 +8,7 @@
                     "url": "https://www.dm.unipi.it/didattica/wp-content/uploads/sites/3/2025/11/VerbaleParitetica21ottobre2025criptato.pdf"
                 }
             ],
-            "group_codes": [],
+            "access_codes": [ "pubblico" ],
             "owners": []
         }, 
         {
@@ -19,7 +19,7 @@
                     "url": "https://www.dm.unipi.it/wp-content/uploads/2025/05/VerbaleParitetica22maggio2025-criptato.pdf"
                 }
             ],
-            "group_codes": [],
+            "access_codes": [ "pubblico" ],
             "owners": []
         }
     ]

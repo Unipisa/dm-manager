@@ -13,7 +13,7 @@ class DocumentController extends Controller {
         this.path = 'document'
         this.managerRoles.push('document-manager')
         this.supervisorRoles.push('document-manager', 'document-supervisor')
-        this.searchFields = [ 'name', 'group_codes' ]
+        this.searchFields = [ 'name', 'access_codes' ]
     }
 
     register(router) {
@@ -33,22 +33,35 @@ class DocumentController extends Controller {
             return true
         }
 
-        if (! req.user.person) {
-            return false
-        }
+        const access_codes = document.access_codes || []
 
-        // if document.group_codes is empty, we treat it as a special 
-        // case the only requires a logged-in user.
-        if ((document.group_codes || []).length === 0) {
+        // If "pubblico" is in access_codes, allow access to anyone
+        if (access_codes.includes('pubblico')) {
             return true
         }
 
+        // If "utente-con-credenziali-manage" is in access_codes, allow access to logged-in users with person
+        if (access_codes.includes('utente-con-credenziali-manage')) {
+            return req.user?.person ? true : false
+        }
+
+        // If no access_codes are selected (and not pubblico/utente-con-credenziali-manage), refuse access
+        if (access_codes.length === 0) {
+            return false
+        }
+
+        // For any other access codes, user must have a person associated
+        if (!req.user?.person) {
+            return false
+        }
+
+        // Check if user is member of any of the specified groups
         const today = new Date()
 
         const valid_groups = await Group.aggregate([
             {
                 $match: {
-                    code: { $in: document.group_codes },
+                    code: { $in: access_codes },
                     members: req.user.person._id,
                     $or: [
                         // We check if the user was member of the group 
@@ -77,13 +90,9 @@ class DocumentController extends Controller {
                     ]                    
                 }
             }
-        ]);
+        ])
 
-        if (valid_groups.length === 0) {            
-            return false
-        }
-
-        return true
+        return valid_groups.length > 0
     }
 
     async getDocument(req, res, id) {

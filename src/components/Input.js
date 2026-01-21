@@ -503,20 +503,57 @@ export function BooleanInput({ value, setValue }) {
     />                 
 }
 
-export function MultipleSelectInput({ options, value, setValue}) {
+export function MultipleSelectInput({ options, value, setValue }) {
     const id = useInputId()
+    const selectedValues = value || []
 
-    return <select 
-        multiple className="form-control col-sm-10"
-        id={ id }
-        value={ value || [] }
-        onChange={ (evt) => {
-            const opts = Array.from(evt.target.options)
-            const selectedOpts = opts.filter(x => x.selected).map(x => x.value)
-            setValue(selectedOpts)
-        }}>
-        { options.map(value => <option key={value} value={value}>{ value }</option>)}
-    </select>
+    const toggleOption = (optionValue) => {
+        if (selectedValues.includes(optionValue)) {
+            setValue(selectedValues.filter(v => v !== optionValue))
+        } else {
+            setValue([...selectedValues, optionValue])
+        }
+    }
+
+    return (
+        <div className="col-sm-10">
+            {/* Selected items as badges */}
+            {selectedValues.length > 0 && (
+                <div className="mb-2">
+                    {selectedValues.map(val => (
+                        <span key={val} className="badge bg-primary me-1 mb-1">
+                            {val}
+                            <button
+                                type="button"
+                                className="btn-close btn-close-white ms-1"
+                                style={{ fontSize: '0.6rem' }}
+                                onClick={() => toggleOption(val)}
+                                aria-label="Remove"
+                            />
+                        </span>
+                    ))}
+                </div>
+            )}
+            
+            {/* Checkbox list */}
+            <div className="border rounded p-2" style={{ maxHeight: '200px', overflowY: 'auto' }}>
+                {options.map(option => (
+                    <div key={option} className="form-check">
+                        <input
+                            type="checkbox"
+                            className="form-check-input"
+                            id={`${id}-${option}`}
+                            checked={selectedValues.includes(option)}
+                            onChange={() => toggleOption(option)}
+                        />
+                        <label className="form-check-label" htmlFor={`${id}-${option}`}>
+                            {option}
+                        </label>
+                    </div>
+                ))}
+            </div>
+        </div>
+    )
 }
 
 export function RoomInput({ value, setValue }) {

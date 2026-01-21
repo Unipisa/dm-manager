@@ -49,7 +49,7 @@ export default class Document extends Model {
         this.columns = {
             'name': "nome",
             'date': "data",
-            'group_codes': "codici gruppi",
+            'access_codes': "codici accesso",
             'updatedAt': "modificato",
         }
     }

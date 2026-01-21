@@ -31,7 +31,7 @@ for a in soup.select("a"):
                 "attachments": [
                     {"url": href}
                 ],
-                "group_codes": [],
+                "access_codes": [ "pubblico" ],
                 "owners": []
             })
 

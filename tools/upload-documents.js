@@ -75,7 +75,7 @@ async function uploadDocuments(root_url, token, file_path) {
             date: date,
             description: doc.description || '',
             owners: doc.owners || [],
-            group_codes: doc.group_codes || [],
+            access_codes: doc.access_codes || [],
             attachments: []
         }
 
