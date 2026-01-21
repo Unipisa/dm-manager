@@ -19,9 +19,8 @@ class DocumentController extends Controller {
     register(router) {
         super.register(router)
         router.get("/document/:id/download", 
-            requireUser,
             (req, res) => this.download(req, res, req.params.id))
-        router.get("/document/:id/details", requireUser, 
+        router.get("/document/:id/details", 
             (req, res) => this.getDocument(req, res, req.params.id)
         )
         return []
