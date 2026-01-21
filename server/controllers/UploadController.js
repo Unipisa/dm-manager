@@ -16,12 +16,12 @@ class UploadController {
 
     register(router) {
         router.get('/upload', (req, res) => res.send({ config })),
-        router.get('/upload/:id', (req, res) => this.getPhoto(req, res, req.params.id))
-        router.post('/upload', (req, res) => this.postPhoto(req, res))
+        router.get('/upload/:id', (req, res) => this.getFile(req, res, req.params.id))
+        router.post('/upload', (req, res) => this.postFile(req, res))
         return []
     }
 
-    async getPhoto(req, res, id) {
+    async getFile(req, res, id) {
         const upload = await Upload.findById(id)
         console.log(upload)
         
@@ -69,7 +69,7 @@ class UploadController {
         })
     }
 
-    async postPhoto(req, res) {
+    async postFile(req, res) {
         const data = req.body
 
         if (! data.data) {

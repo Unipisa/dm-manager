@@ -69,73 +69,87 @@ function Internal() {
   if (! engine.connected) {
     return <Connecting engine={engine}/>
   }
+
+  const publicRoutes = [
+    '/pub/fill/',  
+    '/process/document/'
+  ]
+
+  const isPublicRoute = () => {
+    const path = window.location.pathname
+    return publicRoutes.some(route => path.startsWith(route))
+  }
   
-  if (! engine.loggedIn) {
-    // console.log("user is not logged in");
-    //return <LoginPage engine={engine}/>
+  if (! engine.loggedIn && !isPublicRoute()) {
     return <EngineProvider value={engine}>
       <BrowserRouter>
-      <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
-      <Container fluid>
-        <Routes>  
-          <Route path={`/pub/fill/:id`} element={<FormFillPage />} />
-          <Route path="*" element={<LoginPage engine={engine} />} />
-        </Routes>
-      </Container>
+        <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
+        <Container fluid>
+          <Routes>  
+            <Route path={`/pub/fill/:id`} element={<FormFillPage />} />
+            <Route path="*" element={<LoginPage engine={engine} />} />
+          </Routes>
+        </Container>
       </BrowserRouter>    
-   </EngineProvider>
+    </EngineProvider>
   }
 
   return <EngineProvider value={engine}>
-  <BrowserRouter>
-   <Header/>
-   <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
-   <Container fluid className="pt-5 p-lg-5 main-container">
-     <Routes>  
-       <Route path="/" element={<Home />} />
-       <Route path="/profile" element={<Profile />} />
+    <BrowserRouter>
+      {engine.loggedIn && <Header/>}
+      <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
+      <Container fluid className="pt-5 p-lg-5 main-container">
+        <Routes>
+          {/* Public routes */}
+          <Route path={`/pub/fill/:id`} element={<FormFillPage />} />
+          <Route path="/process/document/:id" element={<Document />} />
+          
+          {/* Protected routes - only rendered if logged in */}
+          {engine.loggedIn && <>
+            <Route path="/" element={<Home />} />
+            <Route path="/profile" element={<Profile />} />
 
-       <Route path="/process/seminars" element={<ManageSeminars/>}/>
-       <Route path="/process/seminars/add" element={<AddSeminar/>}/>
-       <Route path="/process/seminars/add/:id" element={<AddSeminar/>}/>
+            <Route path="/process/seminars" element={<ManageSeminars/>}/>
+            <Route path="/process/seminars/add" element={<AddSeminar/>}/>
+            <Route path="/process/seminars/add/:id" element={<AddSeminar/>}/>
 
-       <Route path="/process/conferences" element={<ManageConferences/>}/>
-       <Route path="/process/conferences/add" element={<AddConference/>}/>
-       <Route path="/process/conferences/add/:id" element={<AddConference/>}/>
+            <Route path="/process/conferences" element={<ManageConferences/>}/>
+            <Route path="/process/conferences/add" element={<AddConference/>}/>
+            <Route path="/process/conferences/add/:id" element={<AddConference/>}/>
 
-       <Route path="/process/my/visits" element={<ProcessVisits variant="my/"/>}/>
-       <Route path="/process/my/visits/:id" element={<ProcessVisit variant="my/"/>}/>
-       <Route path="/process/visits" element={<ProcessVisits variant=""/>}/>
-       <Route path="/process/visits/:id" element={<ProcessVisit variant=""/>}/>
-       <Route path="/process/visitsList" element={<ProcessVisitsList variant=""/>}/>
-       
-       <Route path="/process/roomAssignmentsList" element={<ProcessRoomAssignmentsList variant=""/>}/>
+            <Route path="/process/my/visits" element={<ProcessVisits variant="my/"/>}/>
+            <Route path="/process/my/visits/:id" element={<ProcessVisit variant="my/"/>}/>
+            <Route path="/process/visits" element={<ProcessVisits variant=""/>}/>
+            <Route path="/process/visits/:id" element={<ProcessVisit variant=""/>}/>
+            <Route path="/process/visitsList" element={<ProcessVisitsList variant=""/>}/>
+            
+            <Route path="/process/roomAssignmentsList" element={<ProcessRoomAssignmentsList variant=""/>}/>
 
-       <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
+            <Route path="/process/roomLabels" element={<ManageRoomLabels/>}/>
 
-       <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
-       <Route path="/process/changeRoom" element={<ChangeRoom/>}/>
+            <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
+            <Route path="/process/changeRoom" element={<ChangeRoom/>}/>
 
-       <Route path="/process/my/urls" element={<ProcessUrls/>}/>
-       <Route path="/process/my/urls/:id" element={<ProcessUrl/>}/>
-      
-       <Route path="/process/my/courses" element={<ManageCourses variant="my/"/>}/>
-       <Route path="/process/courses/add" element={<AddCourse variant="my/"/>}/>
-       <Route path="/process/my/courses/add/:id" element={<AddCourse variant="my/"/>}/>
-       <Route path="/process/courses" element={<ManageCourses variant=""/>}/>
-       <Route path="/process/courses/add" element={<AddCourse variant=""/>}/>
-       <Route path="/process/courses/add/:id" element={<AddCourse variant=""/>}/>
+            <Route path="/process/my/urls" element={<ProcessUrls/>}/>
+            <Route path="/process/my/urls/:id" element={<ProcessUrl/>}/>
+            
+            <Route path="/process/my/courses" element={<ManageCourses variant="my/"/>}/>
+            <Route path="/process/courses/add" element={<AddCourse variant="my/"/>}/>
+            <Route path="/process/my/courses/add/:id" element={<AddCourse variant="my/"/>}/>
+            <Route path="/process/courses" element={<ManageCourses variant=""/>}/>
+            <Route path="/process/courses/add" element={<AddCourse variant=""/>}/>
+            <Route path="/process/courses/add/:id" element={<AddCourse variant=""/>}/>
 
-       <Route path="/process/document/:id" element={<Document />} />
-
-       
-       {  Object.values(Models).map(x => x.routers()) }
-       
-       <Route path="/map" element={<Map />} />
-       
-       <Route path="*" element={<NotFound />} />
+            <Route path="/process/document/:id" element={<Document />} />
+            
+            { Object.values(Models).map(x => x.routers()) }
+            
+            <Route path="/map" element={<Map />} />
+          </>}
+          
+          <Route path="*" element={engine.loggedIn ? <NotFound /> : <LoginPage engine={engine} />} />
      </Routes>
-   </Container>
+    </Container>
   </BrowserRouter>    
  </EngineProvider>
 }  

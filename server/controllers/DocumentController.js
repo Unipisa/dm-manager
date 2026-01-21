@@ -28,15 +28,15 @@ class DocumentController extends Controller {
     }
 
     async checkPermission(req, document) {
-        // Allow admin access, and owner access
-        if (req.roles?.includes('admin') || (document.owners || []).some(ownerId => ownerId._id.equals(req.user._id))) {
-            return true
-        }
-
         const access_codes = document.access_codes || []
 
         // If "pubblico" is in access_codes, allow access to anyone
         if (access_codes.includes('pubblico')) {
+            return true
+        }
+
+        // Allow admin access, and owner access
+        if (req.roles?.includes('admin') || (document.owners || []).some(ownerId => ownerId._id.equals(req.user._id))) {
             return true
         }
 

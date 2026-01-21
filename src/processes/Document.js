@@ -1,12 +1,14 @@
 import { useParams } from "react-router-dom"
 import Loading from "../components/Loading"
 import { useQuery } from "react-query"
-import { Card } from "react-bootstrap"
+import { Card, Button } from "react-bootstrap"
 import { formatDate } from '../components/DatetimeInput'
 import Markdown from 'react-markdown'
+import { useEngine } from '../Engine'
 
 export default function Document() {
     const { id } = useParams()
+    const engine = useEngine()
 
     const { isLoading, error, data } = useQuery([ 'document', id, 'details' ])
 
@@ -25,9 +27,24 @@ export default function Document() {
                 </Markdown>}
 
                 <div className="my-3"></div>
-                <strong>Data</strong>: {formatDate(document.date, false)} <br></br>
-                { allowed && <AttachmentList attachments={document.attachments} /> }                
-                { !allowed && <div>Non hai il permesso di scaricare questo documento.</div>}
+                <strong>Data</strong>: {formatDate(document.date, false)} <br />
+                
+                {allowed && <AttachmentList attachments={document.attachments} />}
+                
+                {!allowed && !engine.loggedIn && (
+                    <div className="alert alert-info mt-3">
+                        <p>Questo documento richiede l'autenticazione.</p>
+                        <Button variant="primary" onClick={() => window.location.href = '/login'}>
+                            Accedi per visualizzare
+                        </Button>
+                    </div>
+                )}
+                
+                {!allowed && engine.loggedIn && (
+                    <div className="alert alert-warning mt-3">
+                        Non hai il permesso di accedere a questo documento.
+                    </div>
+                )}
             </Card.Body>
         </Card>
     </div>
@@ -35,12 +52,13 @@ export default function Document() {
 
 function AttachmentList({ attachments }) {
     return <>
-    <strong>Allegati:</strong>
+        <strong>Allegati:</strong>
         <ul>
-        {attachments.map(att => (
-            <li key={att._id}>
-                <a href={`/api/v0/upload/${att._id}`}>{att.filename}</a>
-            </li>
-        ))}
-    </ul></>
+            {attachments.map(att => (
+                <li key={att._id}>
+                    <a href={`/api/v0/upload/${att._id}`}>{att.filename}</a>
+                </li>
+            ))}
+        </ul>
+    </>
 }
