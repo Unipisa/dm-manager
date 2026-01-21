@@ -34,7 +34,7 @@ export default function Document() {
                 {!allowed && !engine.loggedIn && (
                     <div className="alert alert-info mt-3">
                         <p>Questo documento richiede l'autenticazione.</p>
-                        <Button variant="primary" onClick={() => window.location.href = '/login'}>
+                        <Button variant="primary" onClick={() => window.location.href = '/'}>
                             Accedi per visualizzare
                         </Button>
                     </div>
