@@ -61,36 +61,39 @@ class DocumentController extends Controller {
             {
                 $match: {
                     code: { $in: access_codes },
-                    $or: [
-                        { members: req.user.person._id },
-                        { chair: req.user.person._id },
-                        { vice: req.user.person._id }
-                    ],
-                    $or: [
-                        // We check if the user was member/chair/vice of the group 
-                        // at the document's date
-                        { $and: [
-                            { $or: [
-                                { startDate: null },
-                                { startDate: { $lte: document.date } }
-                            ]},
-                            { $or: [
-                                { endDate: null },
-                                { endDate: { $gte: document.date } }
-                            ]}
+                    $and: [
+                        // User must be member, chair, or vice
+                        { $or: [
+                            { members: req.user.person._id },
+                            { chair: req.user.person._id },
+                            { vice: req.user.person._id }
                         ]},
-                        // Also check if the user is currently member/chair/vice of the group
-                        { $and: [
-                            { $or: [
-                                { startDate: null },
-                                { startDate: { $lte: today } }
+                        // Date checks
+                        { $or: [
+                            // Check if the user was in the group at the document's date
+                            { $and: [
+                                { $or: [
+                                    { startDate: null },
+                                    { startDate: { $lte: document.date } }
+                                ]},
+                                { $or: [
+                                    { endDate: null },
+                                    { endDate: { $gte: document.date } }
+                                ]}
                             ]},
-                            { $or: [
-                                { endDate: null },
-                                { endDate: { $gte: today } }
+                            // Also check if the user is currently in the group
+                            { $and: [
+                                { $or: [
+                                    { startDate: null },
+                                    { startDate: { $lte: today } }
+                                ]},
+                                { $or: [
+                                    { endDate: null },
+                                    { endDate: { $gte: today } }
+                                ]}
                             ]}
                         ]}
-                    ]                    
+                    ]
                 }
             }
         ])
