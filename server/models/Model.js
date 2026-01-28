@@ -50,6 +50,21 @@ const endDate = {...date, label: 'data fine',
         message: props => `endDate must be greater than startDate`
     }
 }
+const groupCodes = [
+    'collegio-dottorato-hpsc', 
+    'collegio-dottorato-matematica',
+    'commissione-coordinamento-eccellenza',
+    'commissione-riesame-cds',
+    'commissione-riesame-dottorato-matematica',
+    'consiglio-cds', 
+    'consiglio-dipartimento', 
+    'direttore', 'vicedirettore',
+    'giunta-dipartimento',
+    'paritetica-cds', 
+    'paritetica-dipartimento',
+    'personale-ta',
+    'riesame-dottorato-matematica', 
+]
 
 const model = function(name, schema) {
     const M = mongoose.model(name, schema)
@@ -189,4 +204,5 @@ module.exports = {
     SSD, 
     multipleSSDs,
     notes,
+    groupCodes,
  }

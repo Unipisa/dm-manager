@@ -8,6 +8,7 @@ const {
     createdBy, 
     updatedBy, 
     notes,
+    groupCodes,
 } = require('./Model')
 
 const schema = new Schema({
@@ -18,14 +19,7 @@ const schema = new Schema({
     notes,
     code: {type: String, label: 'codice',
         help: 'Codice identificativo per accomunare lo stesso gruppo negli anni', 
-        enum: [
-            'collegio-dottorato-hpsc', 'collegio-dottorato-matematica',
-            'commissione-riesame-cds',
-            'consiglio-cds', 'consiglio-dipartimento', 
-            'giunta-dipartimento',
-            'paritetica-cds', 'paritetica-dipartimento',
-            'riesame-dottorato-matematica', 
-        ],
+        enum: groupCodes,
         default: ''},
     chair: { type: ObjectId, label: 'chair', ref: 'Person', help: "Presidente / direttore / coordinatore / ecc. (opzionale)"}, 
     chair_title: { type: String, label: 'titolo del chair', help: 'Nome della carica "chair": (es. "presidente", "direttore")' },

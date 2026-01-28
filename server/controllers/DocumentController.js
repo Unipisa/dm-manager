@@ -54,16 +54,20 @@ class DocumentController extends Controller {
             return false
         }
 
-        // Check if user is member of any of the specified groups
+        // Check if user is member/chair/vice of any of the specified groups
         const today = new Date()
 
         const valid_groups = await Group.aggregate([
             {
                 $match: {
                     code: { $in: access_codes },
-                    members: req.user.person._id,
                     $or: [
-                        // We check if the user was member of the group 
+                        { members: req.user.person._id },
+                        { chair: req.user.person._id },
+                        { vice: req.user.person._id }
+                    ],
+                    $or: [
+                        // We check if the user was member/chair/vice of the group 
                         // at the document's date
                         { $and: [
                             { $or: [
@@ -75,7 +79,7 @@ class DocumentController extends Controller {
                                 { endDate: { $gte: document.date } }
                             ]}
                         ]},
-                        // Also check if the user is currently member of the group
+                        // Also check if the user is currently member/chair/vice of the group
                         { $and: [
                             { $or: [
                                 { startDate: null },

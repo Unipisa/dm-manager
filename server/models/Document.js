@@ -3,6 +3,7 @@ const {
     model,
     ObjectId,
     notes,
+    groupCodes,
     createdBy,
     updatedBy,
 } = require('./Model')
@@ -18,15 +19,7 @@ const documentSchema = new Schema({
         enum: [
             'pubblico',
             'utente-con-credenziali-manage',
-            'collegio-dottorato-hpsc', 
-            'collegio-dottorato-matematica',
-            'commissione-riesame-cds',
-            'consiglio-cds', 
-            'consiglio-dipartimento', 
-            'giunta-dipartimento',
-            'paritetica-cds', 
-            'paritetica-dipartimento',
-            'riesame-dottorato-matematica', 
+            ...groupCodes 
         ],
         default: ['pubblico'],
         can_filter: true
