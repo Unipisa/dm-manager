@@ -51,6 +51,7 @@ const endDate = {...date, label: 'data fine',
     }
 }
 const groupCodes = [
+    '',
     'collegio-dottorato-hpsc', 
     'collegio-dottorato-matematica',
     'commissione-coordinamento-eccellenza',

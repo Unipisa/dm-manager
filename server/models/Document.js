@@ -15,11 +15,11 @@ const documentSchema = new Schema({
     access_codes: {
         type: [String], 
         label: 'codici accesso',
-        help: 'Controlla chi può accedere al documento: "pubblico" = tutti, "utente-con-credenziali-manage" = utenti loggati, codici gruppo specifici = solo membri di quei gruppi. Per selezionare più di un gruppo premere Ctrl', 
+        help: 'Controlla chi può accedere al documento: "pubblico" = tutti, "utente-con-credenziali-manage" = utenti loggati, codici gruppo specifici = solo membri di quei gruppi. Se nessuna selezione viene effettuato, il default sarà "pubblico"', 
         enum: [
             'pubblico',
             'utente-con-credenziali-manage',
-            ...groupCodes 
+            ...groupCodes.filter(code => code !== '')
         ],
         default: ['pubblico'],
         can_filter: true
