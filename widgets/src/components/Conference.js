@@ -74,11 +74,9 @@ export function ConferenceTitle({ conference, href }) {
     let ssdDisplay = null;
     
     if (ssdArray.length === 1) {
-        // Single SSD: show the label
         ssdDisplay = <span>{getResearchGroupLabel(ssdArray[0], en)}</span>;
-    } else if (ssdArray.length > 1) {
-        // Multiple SSDs: show the list of new SSDs
-        ssdDisplay = ssdArray.map(x => <span key={x} className="mr-1">{getNewSSD(x)}</span>);
+    } else if (ssdArray.length === 2) {
+        ssdDisplay = <span>{getResearchGroupLabel(ssdArray[0], en)}, {getResearchGroupLabel(ssdArray[1], en)}</span>;
     }
 
     return <>
