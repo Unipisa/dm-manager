@@ -54,7 +54,7 @@ export function EventList({ from, to, grants, _limit, en = false }) {
 
         if (e.type == 'seminar') {
             const e = data[i]
-            const link = getDMURL(isEnglish(en) ? `en/seminar?id=${e._id}` : `seminario?id=${e._id}`)
+            const link = getDMURL(isEnglish(en) ? `seminar?id=${e._id}` : `seminario?id=${e._id}`)
     
             events_block.push(
                 <div key={e._id}>
@@ -65,7 +65,7 @@ export function EventList({ from, to, grants, _limit, en = false }) {
             )
         }
         else {
-            const link = getDMURL(isEnglish(en) ? `en/conference?id=${e._id}` : `conferenza?id=${e._id}`)
+            const link = getDMURL(isEnglish(en) ? `conference?id=${e._id}` : `conferenza?id=${e._id}`)
             events_block.push(
                 <div key={e._id}>
                     <ConferenceTitle conference={e} href={link}></ConferenceTitle>

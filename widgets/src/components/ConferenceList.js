@@ -29,7 +29,7 @@ export function ConferenceList({ from, to, grants, ssd, is_outreach, _sort, _lim
         const e = data[i];
         if (typeof(e) != 'undefined') {
             const en = isEnglish();
-            const link = getDMURL(en ? `en/conference?id=${e._id}` : `conferenza?id=${e._id}`);
+            const link = getDMURL(en ? `conference?id=${e._id}` : `conferenza?id=${e._id}`);
             events_block.push(
                 <div key={e._id}>
                     <ConferenceTitle conference={e} href={link}></ConferenceTitle>

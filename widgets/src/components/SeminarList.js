@@ -27,7 +27,7 @@ export function SeminarList({ from, to, category, grant, _sort, _limit }) {
         const e = data[i];
         if (typeof(e) != 'undefined') {
             const en = isEnglish();
-            const link = getDMURL(en ? `en/seminar?id=${e._id}` : `seminario?id=${e._id}`)
+            const link = getDMURL(en ? `seminar?id=${e._id}` : `seminario?id=${e._id}`)
             events_block.push(
                 <div key={e._id}>
                     <SeminarTitle seminar={e} href={link}></SeminarTitle>
