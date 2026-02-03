@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import { truncateText, getManageURL, getDMURL } from '../utils'
+import { truncateText, getManageURL, getDMURL, isEnglish } from '../utils'
 import { ConferenceTitle } from './Conference'
 import { Loading } from './Loading'
 
@@ -28,7 +28,8 @@ export function ConferenceList({ from, to, grants, ssd, is_outreach, _sort, _lim
     for (var i = 0; i < data.length; i++) {
         const e = data[i];
         if (typeof(e) != 'undefined') {
-            const link = getDMURL("en/conference?id=" + e._id);
+            const en = isEnglish();
+            const link = getDMURL(en ? `en/conference?id=${e._id}` : `conferenza?id=${e._id}`);
             events_block.push(
                 <div key={e._id}>
                     <ConferenceTitle conference={e} href={link}></ConferenceTitle>

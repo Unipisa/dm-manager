@@ -41,10 +41,10 @@ export function SeminarTitle({ seminar, href }) {
     var endDatetime = new Date(seminar.startDatetime)
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
-    var category_tags = [ <a href={getDMURL("en/seminars")} key="seminars-category">Seminars</a> ]
+    var category_tags = [ <a href={getDMURL(en ? "en/seminars" : "prossimi-seminari")} key="seminars-category">Seminars</a> ]
     if (seminar.category !== undefined && seminar.category.length > 0) {
         seminar.category.forEach(cat => {
-            const link = getDMURL("en/seminars/?category=" + cat._id)
+            const link = getDMURL(en ? "en/seminars/?category=" + cat._id : "prossimi-seminari/?category=" + cat._id)
             category_tags.push(<span key={cat._id}>, <a href={link}>{cat.name}</a></span>)
         })
     }

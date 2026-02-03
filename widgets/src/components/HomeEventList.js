@@ -152,18 +152,20 @@ function EventBox({ event, show_excerpt, en }) {
     ? formatDateInterval(event.startDate, event.endDate)
     : `${formatDate(event.startDatetime)} - ${formatTime(event.startDatetime)}`;
 
-    const link = event.type === 'seminar' ? getDMURL(`en/seminar?id=${event._id}`) : getDMURL(`en/conference?id=${event._id}`);
+    const link = event.type === 'seminar' 
+        ? getDMURL(isEnglish(en) ? `en/seminar?id=${event._id}` : `seminario?id=${event._id}`) 
+        : getDMURL(isEnglish(en) ? `en/conference?id=${event._id}` : `conferenza?id=${event._id}`);
 
     let tags;
 
     if (event.type === "seminar") {
       tags = [
-        <a href={getDMURL("en/seminars")} key="seminars-category">Seminars</a>
+        <a href={getDMURL(isEnglish(en) ? "en/seminars" : "prossimi-seminari")} key="seminars-category">Seminars</a>
       ];
     
       if (event.category !== undefined && event.category.length > 0) {
         event.category.forEach(cat => {
-          const link = getDMURL(`en/seminars/?category=${cat._id}`);
+          const link = getDMURL(isEnglish(en) ? `en/seminars/?category=${cat._id}` : `prossimi-seminari/?category=${cat._id}`);
           tags.push(
             <span key={cat._id}>
               , <a href={link}>{cat.name}</a>

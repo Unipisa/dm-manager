@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import { truncateText, getManageURL, getDMURL } from '../utils'
+import { truncateText, getManageURL, getDMURL, isEnglish } from '../utils'
 import { ConferenceTitle } from './Conference'
 import { SeminarTitle } from './Seminar'
 import { Loading } from './Loading'
@@ -11,7 +11,7 @@ import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import { useQuery } from 'react-query'
 
-export function EventList({ from, to, grants, _limit }) {
+export function EventList({ from, to, grants, _limit, en = false }) {
     const filter = { from, to, grants, _limit }
 
     const { isLoading, error, data } = useQuery([ 'events', filter ], async () => {
@@ -54,7 +54,7 @@ export function EventList({ from, to, grants, _limit }) {
 
         if (e.type == 'seminar') {
             const e = data[i]
-            const link = getDMURL("seminario?id=" + e._id)
+            const link = getDMURL(isEnglish(en) ? `en/seminar?id=${e._id}` : `seminario?id=${e._id}`)
     
             events_block.push(
                 <div key={e._id}>
@@ -65,7 +65,7 @@ export function EventList({ from, to, grants, _limit }) {
             )
         }
         else {
-            const link = getDMURL("conference?id=" + e._id)
+            const link = getDMURL(isEnglish(en) ? `en/conference?id=${e._id}` : `conferenza?id=${e._id}`)
             events_block.push(
                 <div key={e._id}>
                     <ConferenceTitle conference={e} href={link}></ConferenceTitle>
