@@ -1,5 +1,4 @@
 import React from 'react';
-import { getManageURL, getNewSSD } from '../utils';
 import axios from 'axios'
 import { Loading } from './Loading'
 
@@ -8,7 +7,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 
-import { formatDateInterval, getDMURL, isEnglish } from '../utils'
+import { formatDateInterval, getManageURL, getNewSSD, getResearchGroupLabel, getDMURL, isEnglish } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Conference({ id }) {
@@ -56,8 +55,6 @@ export function ConferenceTitle({ conference, href }) {
     }
     title_block = <h3 className="title entry-title">{title_block}</h3>
 
-    // FIXME: tradurre gli SSD nei nomi dei settori.
-
     let room = null;
     
     if (conference.conferenceRoom?.name) {
@@ -73,19 +70,37 @@ export function ConferenceTitle({ conference, href }) {
         room = conference.institution.name;
     }
 
+    const ssdArray = conference.SSD || [];
+    let ssdDisplay = null;
+    
+    if (ssdArray.length === 1) {
+        // Single SSD: show the label
+        ssdDisplay = <span>{getResearchGroupLabel(ssdArray[0], en)}</span>;
+    } else if (ssdArray.length > 1) {
+        // Multiple SSDs: show the list of new SSDs
+        ssdDisplay = ssdArray.map(x => <span key={x} className="mr-1">{getNewSSD(x)}</span>);
+    }
+
     return <>
     {title_block}
     <p>
         <small>
             <span className="far fa-calendar"></span> {
                 formatDateInterval(conference.startDate, conference.endDate)}
-            <span className="mx-1"></span>
-            <span className="fas fa-map-marker-alt"></span> {room}
-            <span className="mx-1"></span>
-            <span className="fas fa-university"></span> {(conference.SSD || [] ).map(x => <span key={x} className="mr-1">{getNewSSD(x)}</span>)}
+            {room && (
+                <>
+                    <span className="mx-1"></span>
+                    <span className="fas fa-map-marker-alt"></span> {room}
+                </>
+            )}
+            {ssdDisplay && (
+                <>
+                    <span className="mx-1"></span>
+                    <span className="fas fa-university"></span> {ssdDisplay}
+                </>
+            )}
             { conference.url && <><span className="mx-1"></span>
             <span className="fas fa-link"></span> <a href={conference.url}>Web</a></> }
         </small>
     </p></>
 }
-
