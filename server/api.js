@@ -49,6 +49,7 @@ let ModelSchemas = {}
     require('./controllers/EventPhdCourseController'),
     require('./controllers/UrlController.js'),
     require('./controllers/DocumentController.js'),
+    require('./controllers/TimesheetController.js'),
 ].forEach(Controller => {
     const controller = new Controller()
     if (controller.getSchema) {

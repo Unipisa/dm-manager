@@ -104,7 +104,7 @@ async function uploadFiles(files, _private, engine, urlOnly) {
   return results;
 }
 
-function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false) {
+export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false) {
     const input = document.createElement('input')   
     input.type = 'file'
     input.multiple = multiple

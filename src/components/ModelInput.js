@@ -93,7 +93,11 @@ export function ModelInput({ field, modified, schema, value, setValue}) {
 
 export function ModelInputs({ modifiedFields, schema, obj, setObj, onChange}) {
     return Object.entries(schema)
-        .filter(([field]) => !RESERVED_FIELDS.includes(field))
+        .filter(([field, field_schema]) => {
+            if (RESERVED_FIELDS.includes(field)) return false;
+            if (field_schema.widget === 'hidden') return false; 
+            return true;
+        })
         .map(([field, field_schema]) => <>
             <ModelInput
                 modified={modifiedFields.includes(field)}

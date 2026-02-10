@@ -16,11 +16,10 @@ import Thesis from './Thesis'
 import Url from './Url'
 import Document from './Document'
 import Upload from './Upload'
-
+import Timesheet from './Timesheet'
 import EventSeminar from './EventSeminar'
 import EventConference from './EventConference'
 import EventPhdCourse from './EventPhdCourse'
-
 import SeminarCategory from './SeminarCategory'
 
 const Models = { 
@@ -41,6 +40,7 @@ const Models = {
     Thesis: new Thesis(),
     Visit: new Visit(),
     Institution: new Institution(),
+    Timesheet: new Timesheet(),
 
     // stanze:
     RoomAssignment: new RoomAssignment(),

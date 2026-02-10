@@ -68,6 +68,7 @@ export default function Header() {
         <NavDropdown.Item as={NavLink} to="/thesis">Tesi Dottorato</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/visit">Visite</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/institution">Affiliazioni</NavDropdown.Item>
+        <NavDropdown.Item as={NavLink} to="/timesheet">Timesheet</NavDropdown.Item>
       </NavDropdown>
       <NavDropdown title="Eventi" className="mx-2 py-2">
         <NavDropdown.Item as={NavLink} to="/event-seminar">Seminari</NavDropdown.Item>
