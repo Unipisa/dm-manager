@@ -24,13 +24,23 @@ export default function Messages({ messages, acknowledge }) {
                     <div className="d-flex justify-right">
                         <Button type="button" className="ms-auto btn-close" onClick={acknowledge} aria-label="Close"></Button>
                     </div>
-                    { messages.map(([type, msg], i) =>
-                        <div key={ i } className={'border-start border-3 ps-2 border-' + {
-                                    'error': 'danger',
-                                    'warning': 'warning',
-                                    'info': 'info',
-                                }[type]}>
-                            <p>{ msg.length < 300 ? msg :  msg.slice(0,200)+"…" }</p>
+                    { messages.map(m =>
+                        <div
+                            key={m.id}
+                            className={
+                                'border-start border-3 ps-2 border-' +
+                                {
+                                    error: 'danger',
+                                    warning: 'warning',
+                                    info: 'info',
+                                }[m.type]
+                            }
+                        >
+                            <p>
+                                {m.message.length < 300
+                                    ? m.message
+                                    : m.message.slice(0, 200) + "…"}
+                            </p>
                         </div>
                     )}
                     

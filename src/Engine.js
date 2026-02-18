@@ -58,11 +58,30 @@ export function useCreateEngine() {
 
     const queryClient = useQueryClient()
 
-    const addMessage = (message, type='error') => {
-        setState( s => ({
+    const timeoutMap = {
+        info: 5000,
+        warning: 8000,
+        error: null
+    }
+
+    const addMessage = (message, type = 'error') => {
+        const id = Date.now() + Math.random()
+
+        setState(s => ({
             ...s,
-            messages: [...s.messages, [type, message]]
+            messages: [...s.messages, { id, type, message }]
         }))
+
+        const duration = timeoutMap[type]
+
+        if (duration) {
+            setTimeout(() => {
+                setState(s => ({
+                    ...s,
+                    messages: s.messages.filter(m => m.id !== id)
+                }))
+            }, duration)
+        }
     }
 
     // questo oggetto è l'engine creato in App.js
