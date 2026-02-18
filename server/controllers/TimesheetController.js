@@ -202,8 +202,8 @@ class TimesheetController extends Controller {
     // Update existing months preserving data (used on edit)
     updateMonths(existingMonths, oldStart, oldEnd, newStart, newEnd, oldGrants, newGrants) {
         // Figure out which grant IDs were added/removed
-        const oldGrantIds = oldGrants.map(g => g.toString())
-        const newGrantIds = newGrants.map(g => g.toString())
+        const oldGrantIds = oldGrants.map(g => g._id)
+        const newGrantIds = newGrants.map(g => g._id)
         const addedGrants = newGrantIds.filter(id => !oldGrantIds.includes(id))
         const removedGrants = oldGrantIds.filter(id => !newGrantIds.includes(id))
         const grantsChanged = addedGrants.length > 0 || removedGrants.length > 0
@@ -244,7 +244,7 @@ class TimesheetController extends Controller {
                             if (grantsChanged) {
                                 // Remove deleted grants
                                 existingDay.grantHours = existingDay.grantHours.filter(
-                                    gh => !removedGrants.includes(gh.grant.toString())
+                                    gh => !removedGrants.includes(gh._id)
                                 )
                                 // Add new grants
                                 for (const grantId of addedGrants) {

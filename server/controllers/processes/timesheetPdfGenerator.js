@@ -78,7 +78,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         console.error('Error loading logos:', err)
     }
 
-    currentY += 70
+    currentY += 50
 
     // Title
     doc.fontSize(18)
@@ -148,7 +148,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         doc.font(regularFont).fontSize(8)
         for (const grant of timesheet.grants) {
             const grantText = `• ${grant.name || grant.identifier} (${grant.identifier}${grant.projectType ? ', ' + grant.projectType : ''})`
-            doc.text(grantText, leftColX + 5, currentY, { width: boxWidth / 2 - 20 })
+            doc.text(grantText, leftColX + 5, currentY, { width: boxWidth - 25 })
             currentY += grantLineHeight
         }
         doc.fontSize(9)
@@ -158,10 +158,11 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     currentY = boxY + 10
 
     doc.font(boldFont).text('Beneficiary:', rightColX, currentY)
+    const beneficiaryY = currentY
     doc.font(regularFont).text(timesheet.beneficiary || '---', rightColX + 65, currentY, { 
         width: boxWidth / 2 - 75 
     })
-    currentY += lineHeight
+    currentY = Math.max(doc.y, beneficiaryY + lineHeight)
 
     doc.font(boldFont).text('Head of Dept:', rightColX, currentY)
     doc.font(regularFont).text(
@@ -191,7 +192,6 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     const numDays = monthData.days.length
     const rowHeight = 11
     const headerHeight_table = 22
-    const tableHeight = headerHeight_table + (numDays + 1) * rowHeight // +1 for totals row
 
     // Table headers with blue background (#1A315D or #225DD7)
     const headerColor = '#1A315D'
@@ -285,7 +285,8 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
         // Alternate row colors (#F0F0F0)
         if (day.day % 2 === 0) {
-            doc.fillColor('#F0F0F0').rect(margin, yPos, pageWidth - 2 * margin, rowHeight).fill()
+            const tableWidth = colWidths.day + colWidths.type + (numGrants + fixedCols + 1) * activityColWidth
+            doc.fillColor('#F0F0F0').rect(margin, yPos, tableWidth, rowHeight).fill()
         }
         doc.fillColor('#000000')
 
@@ -395,7 +396,8 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     doc.font(boldFont)
 
     // Blue background for totals
-    doc.fillColor(headerColor).rect(margin, yPos, pageWidth - 2 * margin, rowHeight).fill()
+    const tableWidth = colWidths.day + colWidths.type + (numGrants + fixedCols + 1) * activityColWidth
+    doc.fillColor(headerColor).rect(margin, yPos, tableWidth, rowHeight).fill()
     doc.fillColor('#FFFFFF')
 
     // "Total" label spanning Day + Type columns
@@ -471,6 +473,13 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     const signatureHeight = 90
     const sigY = pageHeight - margin - signatureHeight
     if (yPos < sigY) yPos = sigY
+
+    // Warn user if available space will be exceeded
+    const tableHeight = headerHeight_table + (numDays + 1) * rowHeight // +1 for totals row
+    const availableSpace = pageHeight - tableTop - signatureHeight - 60 // 60 for description
+    if (tableHeight > availableSpace) {
+        console.warn(`Warning: Table height (${tableHeight}pt) may exceed available space (${availableSpace}pt)`)
+    }
 
     // Signatures section
     doc.fontSize(9).font(regularFont)
