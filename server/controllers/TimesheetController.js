@@ -1,6 +1,7 @@
 const Timesheet = require('../models/Timesheet')
 const Controller = require('./Controller')
 const { ObjectId } = require('mongoose').Types
+const { isItalianHoliday } = require('./processes/italianHolidays')
 
 class TimesheetController extends Controller {
     constructor() {
@@ -8,7 +9,7 @@ class TimesheetController extends Controller {
         this.path = 'timesheet'
         this.managerRoles.push('timesheet-manager')
         this.supervisorRoles.push('timesheet-manager', 'timesheet-supervisor')
-        this.searchFields = ['employee.lastName', 'employee.firstName', 'fiscalCode']
+        this.searchFields = ['employee.lastName', 'employee.firstName']
 
         this.indexPipeline = [
             {
@@ -27,6 +28,18 @@ class TimesheetController extends Controller {
                 $unwind: {
                     path: '$employee',
                     preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: 'grants',
+                    localField: 'grants',
+                    foreignField: '_id',
+                    as: 'grants',
+                    pipeline: [
+                        { $project: { name: 1 } },
+                        { $sort: { name: 1 } }
+                    ]
                 }
             }
         ]
@@ -135,66 +148,146 @@ class TimesheetController extends Controller {
         return new Date(year, month, 0).getDate()
     }
 
-    // Helper function to generate months with all days pre-populated
+    // Get dayType for a given date
+    getDayType(date) {
+        const dayOfWeek = date.getDay()
+        if (dayOfWeek === 0 || dayOfWeek === 6) return 'weekend'
+        if (isItalianHoliday(date)) return 'public-holiday'
+        return 'weekday'
+    }
+
+    // Create a fresh day entry
+    createDayEntry(date, grants) {
+        return {
+            day: date.getDate(),
+            date: date,
+            dayType: this.getDayType(date),
+            grantHours: grants.map(grantId => ({ grant: grantId, hours: 0 })),
+            roleHours: 0,
+            teachingHours: 0,
+            institutionalHours: 0,
+            otherHours: 0,
+        }
+    }
+
+    // Generate all months from scratch (used on create)
     generateMonths(startDate, endDate, grants) {
         const months = []
         const start = new Date(startDate)
         const end = new Date(endDate)
         
-        // Get all unique year-month combinations in the range
         const current = new Date(start.getFullYear(), start.getMonth(), 1)
         const lastMonth = new Date(end.getFullYear(), end.getMonth(), 1)
         
         while (current <= lastMonth) {
             const year = current.getFullYear()
-            const month = current.getMonth() + 1 // 1-12
+            const month = current.getMonth() + 1
             const daysInMonth = this.getDaysInMonth(year, month)
             
             const days = []
-            
-            // Generate all days for this month
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(year, month - 1, day)
-                
-                // Only include days within the employment period
                 if (date >= start && date <= end) {
-                    const dayOfWeek = date.getDay()
-                    const dayType = (dayOfWeek === 0 || dayOfWeek === 6) ? 'weekend' : 'weekday'
-                    
-                    // Pre-populate grantHours with all grants set to 0
-                    const grantHours = grants.map(grantId => ({
-                        grant: grantId,
-                        hours: 0
-                    }))
-                    
-                    days.push({
-                        day: day,
-                        date: date,
-                        dayType: dayType,
-                        grantHours: grantHours,
-                        teachingHours: 0,
-                        institutionalHours: 0,
-                        otherHours: 0
-                    })
+                    days.push(this.createDayEntry(date, grants))
                 }
             }
             
-            months.push({
-                year: year,
-                month: month,
-                locked: false,
-                days: days
-            })
-            
-            // Move to next month
+            months.push({ year, month, locked: false, days })
             current.setMonth(current.getMonth() + 1)
         }
         
         return months
     }
 
+    // Update existing months preserving data (used on edit)
+    updateMonths(existingMonths, oldStart, oldEnd, newStart, newEnd, oldGrants, newGrants) {
+        // Figure out which grant IDs were added/removed
+        const oldGrantIds = oldGrants.map(g => g.toString())
+        const newGrantIds = newGrants.map(g => g.toString())
+        const addedGrants = newGrantIds.filter(id => !oldGrantIds.includes(id))
+        const removedGrants = oldGrantIds.filter(id => !newGrantIds.includes(id))
+        const grantsChanged = addedGrants.length > 0 || removedGrants.length > 0
+
+        // Build a map of existing months for easy lookup: "year-month" -> monthData
+        const existingMap = {}
+        for (const m of existingMonths) {
+            existingMap[`${m.year}-${m.month}`] = m
+        }
+
+        const months = []
+        const current = new Date(newStart.getFullYear(), newStart.getMonth(), 1)
+        const lastMonth = new Date(newEnd.getFullYear(), newEnd.getMonth(), 1)
+
+        while (current <= lastMonth) {
+            const year = current.getFullYear()
+            const month = current.getMonth() + 1
+            const key = `${year}-${month}`
+            const daysInMonth = this.getDaysInMonth(year, month)
+
+            const existing = existingMap[key]
+
+            if (existing) {
+                // Month already exists - update days preserving data
+                const existingDaysMap = {}
+                for (const d of existing.days) {
+                    existingDaysMap[d.day] = d
+                }
+
+                const days = []
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month - 1, day)
+                    if (date >= newStart && date <= newEnd) {
+                        if (existingDaysMap[day]) {
+                            // Day exists - preserve data, update grants if needed
+                            const existingDay = existingDaysMap[day]
+                            
+                            if (grantsChanged) {
+                                // Remove deleted grants
+                                existingDay.grantHours = existingDay.grantHours.filter(
+                                    gh => !removedGrants.includes(gh.grant.toString())
+                                )
+                                // Add new grants
+                                for (const grantId of addedGrants) {
+                                    existingDay.grantHours.push({ grant: grantId, hours: 0 })
+                                }
+                            }
+                            
+                            days.push(existingDay)
+                        } else {
+                            // Day is new (date range extended) - create fresh
+                            days.push(this.createDayEntry(date, newGrants))
+                        }
+                    }
+                    // Days outside new range are simply not included (deleted)
+                }
+
+                months.push({
+                    year,
+                    month,
+                    locked: existing.locked,
+                    signedPdf: existing.signedPdf,
+                    activityDescription: existing.activityDescription,
+                    days,
+                })
+            } else {
+                // Month is entirely new - create fresh
+                const days = []
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(year, month - 1, day)
+                    if (date >= newStart && date <= newEnd) {
+                        days.push(this.createDayEntry(date, newGrants))
+                    }
+                }
+                months.push({ year, month, locked: false, days })
+            }
+
+            current.setMonth(current.getMonth() + 1)
+        }
+
+        return months
+    }
+
     async put(req, res) {
-        // Generate months if startDate, endDate, and grants are provided
         if (req.body.startDate && req.body.endDate) {
             const grants = req.body.grants || []
             const months = this.generateMonths(
@@ -221,21 +314,23 @@ class TimesheetController extends Controller {
         const grants    = req.body.grants    ?? existing.grants
 
         if (startDate && endDate) {
-            const oldStart = existing.startDate?.getTime()
-            const oldEnd   = existing.endDate?.getTime()
-            const newStart = new Date(startDate).getTime()
-            const newEnd   = new Date(endDate).getTime()
+            const oldStart = existing.startDate
+            const oldEnd   = existing.endDate
+            const newStart = new Date(startDate)
+            const newEnd   = new Date(endDate)
             
-            // Also check if grants changed
+            const datesChanged = oldStart.getTime() !== newStart.getTime() || 
+                                 oldEnd.getTime() !== newEnd.getTime()
             const grantsChanged = JSON.stringify(grants) !== JSON.stringify(existing.grants)
 
-            if (oldStart !== newStart || oldEnd !== newEnd || grantsChanged) {
-                const months = this.generateMonths(
-                    new Date(startDate),
-                    new Date(endDate),
+            if (datesChanged || grantsChanged) {
+                req.body.months = this.updateMonths(
+                    existing.months,
+                    oldStart, oldEnd,
+                    newStart, newEnd,
+                    existing.grants,
                     grants
                 )
-                req.body.months = months
             }
         }
         

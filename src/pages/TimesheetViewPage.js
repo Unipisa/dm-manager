@@ -13,44 +13,30 @@ import { uploadNewAttachment } from '../components/Input'
 const MonthSummary = ({ timesheet, refreshTimesheet }) => {
     const engine = useEngine()
     const [uploadingMonth, setUploadingMonth] = useState(null)
+    const navigate = useNavigate()
     
-    // Calculate total hours per month
     const getMonthHours = (year, month) => {
-        // Find the month object
         const monthData = timesheet.months?.find(m => m.year === year && m.month === month)
-        
         if (!monthData || !monthData.days) return 0
-        
-        // Sum hours from all days in this month
         return monthData.days.reduce((total, day) => {
             const grantTotal = day.grantHours?.reduce((sum, gh) => sum + (gh.hours || 0), 0) || 0
-            return total + grantTotal + (day.teachingHours || 0) + (day.institutionalHours || 0) + (day.otherHours || 0)
+            return total + grantTotal + (day.roleHours || 0) + (day.teachingHours || 0) + (day.institutionalHours || 0) + (day.otherHours || 0)
         }, 0)
     }
 
     const handleToggleLock = async (year, month, locked) => {
         const action = locked ? 'unlock' : 'lock'
-
         try {
-            await api.patch(
-                `/api/v0/timesheet/${timesheet._id}/month/${year}/${month}/${action}`
-            )
-
-            engine.addInfoMessage(
-                `Mese ${month}/${year} ${locked ? 'sbloccato' : 'bloccato'}`
-            )
-
-            // ALWAYS refresh after success
+            await api.patch(`/api/v0/timesheet/${timesheet._id}/month/${year}/${month}/${action}`)
+            engine.addInfoMessage(`Mese ${month}/${year} ${locked ? 'sbloccato' : 'bloccato'}`)
             refreshTimesheet()
         } catch (err) {
-            engine.addErrorMessage(
-                err?.response?.data?.error || 'Operazione fallita'
-            )
+            engine.addErrorMessage(err?.response?.data?.error || 'Operazione fallita')
         }
     }
 
     const handlePrintMonth = (year, month) => {
-        engine.addInfoMessage(`Stampa mese ${month}/${year} (funzionalità da implementare)`)
+        window.open(`/api/v0/process/timesheets/${timesheet._id}/${year}/${month}/pdf`, '_blank')
     }
 
     const handleUploadPdf = async (year, month) => {
@@ -79,11 +65,18 @@ const MonthSummary = ({ timesheet, refreshTimesheet }) => {
             },
             true,     // private
             engine,
-            false     // urlOnly = false → we want the upload id
+            false,     // urlOnly = false → we want the upload id
+            false,
+            () => setUploadingMonth(null) 
         )
     }
-    
-    const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
+
+    const handleEditMonth = (year, month) => {
+        navigate(`/process/timesheets/${timesheet._id}/${year}/${month}`)
+    }
+
+    const monthNames = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 
+                        'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic']
 
     return (
         <div className="my-4">
@@ -120,40 +113,55 @@ const MonthSummary = ({ timesheet, refreshTimesheet }) => {
                                             href={`/api/v0/upload/${monthData.signedPdf._id || monthData.signedPdf}`} 
                                             target="_blank" 
                                             rel="noreferrer"
+                                            className="btn btn-sm btn-success"
                                             style={{ textDecoration: 'none' }}
+                                            title="Clicca per scaricare il PDF firmato"
                                         >
-                                            <span className="badge bg-success" style={{ cursor: 'pointer' }}>
-                                                ✓ Caricato (Apri)
-                                            </span>
+                                            ⬇️ Scarica PDF
                                         </a>
                                     ) : (
-                                        <span className="badge bg-secondary">- Non caricato</span>
+                                        <span className="badge bg-secondary">Non caricato</span>
                                     )}
                                 </td>
                                 <td>
-                                    <ButtonGroup size="sm">
+                                    <div className="d-flex flex-wrap gap-1">
+                                        {/* Edit month - same process as employee */}
                                         <Button
-                                            variant={isLocked ? 'warning' : 'success'}
-                                            onClick={() =>
-                                                handleToggleLock(monthData.year, monthData.month, monthData.locked)
-                                            }
-                                        >
-                                            {isLocked ? 'Sblocca' : 'Blocca'}
-                                        </Button>
-                                        <Button 
-                                            variant="primary" 
+                                            variant="primary"
                                             size="sm"
-                                            onClick={() => handlePrintMonth(monthData.year, monthData.month)}>
-                                            Stampa
+                                            title="Modifica le ore del mese"
+                                            onClick={() => handleEditMonth(monthData.year, monthData.month)}>
+                                            ✏️ Modifica
                                         </Button>
+
+                                        {/* Lock/Unlock */}
+                                        <Button
+                                            variant={isLocked ? 'success' : 'danger'}
+                                            size="sm"
+                                            title={isLocked ? 'Sblocca il mese' : 'Blocca il mese'}
+                                            onClick={() => handleToggleLock(monthData.year, monthData.month, monthData.locked)}>
+                                            {isLocked ? '🔓 Sblocca' : '🔒 Blocca'}
+                                        </Button>
+
+                                        {/* Print */}
                                         <Button 
-                                            variant="info" 
+                                            variant="secondary"
+                                            size="sm"
+                                            title="Stampa il timesheet del mese"
+                                            onClick={() => handlePrintMonth(monthData.year, monthData.month)}>
+                                            🖨️ Stampa
+                                        </Button>
+
+                                        {/* Upload PDF */}
+                                        <Button 
+                                            variant="primary"
                                             size="sm"
                                             disabled={isUploading}
+                                            title="Carica il PDF firmato"
                                             onClick={() => handleUploadPdf(monthData.year, monthData.month)}>
-                                            {isUploading ? 'Caricamento...' : 'Upload PDF'}
+                                            {isUploading ? '⏳ Caricamento...' : '📎 Carica PDF'}
                                         </Button>
-                                    </ButtonGroup>
+                                    </div>
                                 </td>
                             </tr>
                         )
@@ -167,7 +175,6 @@ const MonthSummary = ({ timesheet, refreshTimesheet }) => {
 const TimesheetView = ({ Model, refreshTimesheet }) => {
     const obj = useObject()
     const navigate = useNavigate()
-
     const schema = Model.schema.fields
 
     return (
@@ -176,7 +183,6 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                 <h3>Timesheet {Model.describe(obj)}</h3>
             </Card.Header>
             <Card.Body>
-                <h4>Informazioni Dipendente</h4>
                 <p>
                     <strong className="align-top">Dipendente: </strong>
                     <ModelFieldOutput field="employee" schema={schema.employee} value={obj.employee} />
@@ -194,12 +200,12 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                     <ModelFieldOutput field="headOfDepartment" schema={schema.headOfDepartment} value={obj.headOfDepartment} />
                 </p>
                 <p>
-                    <strong className="align-top">Tipo Contratto: </strong>
+                    <strong className="align-top">Contratto: </strong>
                     {obj.employmentType}
                 </p>
                 <p>
                     <strong className="align-top">Ruolo: </strong>
-                    {obj.role || '---'}
+                    {obj.role === 'research' ? 'Ricerca' : obj.role === 'administrative' ? 'Amministrativo' : '---'}
                 </p>
                 <p>
                     <strong className="align-top">Data Inizio: </strong>
@@ -214,7 +220,7 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                     <ModelFieldOutput field="grants" schema={schema.grants} value={obj.grants} />
                 </p>
 
-                <MonthSummary timesheet={obj} refreshTimesheet={refreshTimesheet}/>
+                <MonthSummary timesheet={obj} refreshTimesheet={refreshTimesheet} />
 
                 <ButtonGroup>
                     <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
@@ -237,9 +243,7 @@ export default function TimesheetViewPage({ Model }) {
     const id = params.id
     const [refreshKey, setRefreshKey] = useState(0)
 
-    const refreshTimesheet = () => {
-        setRefreshKey(k => k + 1)
-    }
+    const refreshTimesheet = () => setRefreshKey(k => k + 1)
 
     return <>
         <ObjectProvider key={refreshKey} path={Model.code} id={id}>

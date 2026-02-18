@@ -162,6 +162,9 @@ function displayField(obj, key, fieldsInfo={}) {
         } else if (field.items['x-ref'] === 'SeminarCategory') {
             if (!value) return '???'
             return value.map(cat => `${cat.name}`).join(', ')
+        } else if (field.items['x-ref'] === 'Grant') {
+            if (!value) return '???'
+            return value.map(grant => `${grant.name}`).join(' and ')    
         } else {
             return `array of ${field.items['x-ref']} not implemented`
         }

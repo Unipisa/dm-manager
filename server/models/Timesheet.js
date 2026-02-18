@@ -14,21 +14,47 @@ const dayEntrySchema = new Schema({
     date: { type: Date, required: true },
     dayType: { 
         type: String, 
-        enum: ['weekday', 'weekend', 'holiday'], 
+        enum: ['weekday', 'weekend', 'sick-leave', 'public-holiday', 'annual-holiday', 'other-absence'], 
         default: 'weekday',
         label: 'Tipo giorno'
     },
-    
-    // Hours per grant
     grantHours: [{
         grant: { type: ObjectId, ref: 'Grant' },
         hours: { type: Number, min: 0, max: 24, default: 0 }
     }],
-    
     // Fixed activity categories
-    teachingHours: { type: Number, min: 0, max: 24, default: 0, label: 'Ore didattica' },
-    institutionalHours: { type: Number, min: 0, max: 24, default: 0, label: 'Ore istituzionali' },
-    otherHours: { type: Number, min: 0, max: 24, default: 0, label: 'Altre ore' },
+    roleHours: { 
+        type: Number, 
+        min: 0, 
+        max: 24, 
+        default: 0, 
+        label: 'Ore dedicate alla ricerca o attività amministrativa',
+        help: 'per il personale dedicato alla ricerca (professori e ricercatori) identifica l\'attività di ricerca, per il personale tecnico amministrativo identifica l\'attività amministrativa ordinaria'
+    },
+    teachingHours: { 
+        type: Number, 
+        min: 0, 
+        max: 24, 
+        default: 0, 
+        label: 'Ore didattica', 
+        help: 'Ore di didattica (frontale e non)' 
+    },
+    institutionalHours: { 
+        type: Number, 
+        min: 0, 
+        max: 24, 
+        default: 0, 
+        label: 'Ore istituzionali',
+        help: 'Consigli di Dipartimento, di corso di studio, consigli di dottorato, ecc.'
+    },
+    otherHours: { 
+        type: Number, 
+        min: 0, 
+        max: 24, 
+        default: 0, 
+        label: 'Altre ore',
+        help: 'Tutte le attività che non rientrano nelle voci precedenti' 
+    },
 }, { _id: false })
 
 // Month with all its days and metadata
@@ -37,8 +63,12 @@ const monthSchema = new Schema({
     month: { type: Number, required: true, min: 1, max: 12 },
     locked: { type: Boolean, default: false, label: 'Bloccato' },
     signedPdf: { type: ObjectId, ref: 'Upload', label: 'PDF firmato' },
-    
-    // All days in this month
+    activityDescription: { 
+        type: String, 
+        label: 'Descrizione attività del mese', 
+        widget: 'text',
+        default: ''
+    },
     days: {
         type: [dayEntrySchema],
         default: []
@@ -46,40 +76,63 @@ const monthSchema = new Schema({
 }, { _id: false })
 
 const timesheetSchema = new Schema({
-    // Employee info
-    employee: { type: ObjectId, ref: 'Person', label: 'Dipendente' },
-    fiscalCode: { type: String, label: 'Codice fiscale' },
-    beneficiary: { type: String, label: 'Beneficiario' },
-    headOfDepartment: { type: ObjectId, ref: 'Person', label: 'Direttore' },
-    
-    // Employment details
+    employee: { 
+        type: ObjectId, 
+        ref: 'Person', 
+        label: 'Dipendente', 
+        required: true, 
+        help: 'il soggetto che lavora al progetto' 
+    },
+    fiscalCode: { 
+        type: String, 
+        label: 'Codice fiscale', 
+        help: 'il codice fiscale del soggetto che lavora al progetto' 
+    },
+    beneficiary: { 
+        type: String, 
+        label: 'Beneficiario', 
+        help: 'es. UNIPI - Dipartimento di Matematica' 
+    },
+    headOfDepartment: { 
+        type: ObjectId, 
+        ref: 'Person', 
+        label: 'Direttore',
+        help: 'il Direttore del Dipartimento/Centro di afferenza del dipendente'
+    },    
     employmentType: { 
         type: String, 
         enum: ['full-time', 'part-time'], 
         default: 'full-time',
-        label: 'Tipo contratto'
+        label: 'Contratto'
     },
-    role: { type: String, label: 'Ruolo/Qualifica' },
-    
-    // Period
+    role: {
+        type: String,
+        enum: ['research', 'administrative'],
+        label: 'Ruolo',
+        default: 'research',
+        help: 'Selezionare "research" per personale dedicato alla ricerca (usa "Institutional research") o "administrative" per personale tecnico amministrativo (usa "Administrative activities")'
+    },
     startDate,
     endDate,
-    
-    // Grants assigned to this employee
-    grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
-
+    grants: [{
+        type: ObjectId, 
+        label: 'grants', 
+        ref: 'Grant',
+        help: 'i progetti/grant afferenti al dipendente'
+    }],
     // Months with daily entries and metadata
     months: {
         type: [monthSchema],
         widget: 'hidden',
     },
-    
     createdBy,
     updatedBy,
 }, {
     timestamps: true
 })
 
+// Ensure one timesheet per employee
+timesheetSchema.index({ employee: 1 }, { unique: true })
 
 const Timesheet = model('Timesheet', timesheetSchema)
 Timesheet.relatedModels = []

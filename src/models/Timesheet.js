@@ -15,13 +15,12 @@ export default class Timesheet extends Model {
             'un oggetto': "un timesheet", 
         }
         this.ModelName = 'Timesheet'
-        this.indexDefaultFilter = {'_sort': '-startDate', '_limit': 10}
+        this.indexDefaultFilter = {'_sort': 'employee', '_limit': 10}
         this.columns = {
             'employee': 'Dipendente',
-            'fiscalCode': 'Codice Fiscale',
             'startDate': 'Data Inizio',
             'endDate': 'Data Fine',
-            'employmentType': 'Tipo Contratto',
+            'grants': 'Grant'
         }
         this.ViewPage = TimesheetViewPage 
     }
