@@ -104,17 +104,33 @@ async function uploadFiles(files, _private, engine, urlOnly) {
   return results;
 }
 
-export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false) {
+export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false, onCancel = () => {}) {
     const input = document.createElement('input')   
     input.type = 'file'
     input.multiple = multiple
+    let fileSelected = false 
     input.onchange = async e => {
+        if (!e.target.files || e.target.files.length === 0) {
+            return
+        }
+        fileSelected = true 
         const newUploads = await uploadFiles(e.target.files, _private, engine, urlOnly)
         if (multiple)
             setValue(newUploads)
         else
             setValue(newUploads[0])
     }
+    window.addEventListener(
+        'focus',
+        () => {
+            setTimeout(() => {
+                if (!fileSelected) {
+                    onCancel()
+                }
+            }, 300)
+        },
+        { once: true }
+    )
     input.click()
 }
 

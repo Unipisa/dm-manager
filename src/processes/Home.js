@@ -206,6 +206,23 @@ export default function Home() {
                 </Card>
             </div>            
             }
+            { (user.hasProcessPermission('/process/timesheets')) &&
+            <div className="col-lg-6 p-3">
+                <Card className="shadow">
+                    <Card.Header>                    
+                        <div className="d-flex flex-row justify-content-between">
+                            <strong>Timesheet</strong>
+                            <a href="/process/timesheets"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
+                        </div>
+                    </Card.Header>
+                    <Card.Body>
+                        <ul>
+                            <li>Gestione del proprio timesheet</li>
+                        </ul>
+                    </Card.Body>
+                </Card>
+            </div>            
+            }
         </div>
     </>
   }
@@ -254,6 +271,10 @@ export function ProcessDropdown() {
     if (user.hasProcessPermission('/process/courses')) items.push(
         <NavDropdown.Item key="courses" as={NavLink} to="/process/courses">
             Corsi di Dottorato
+        </NavDropdown.Item>)
+    if (user.hasProcessPermission('/process/timesheets')) items.push(
+        <NavDropdown.Item key="timesheets" as={NavLink} to="/process/timesheets">
+            Timesheet
         </NavDropdown.Item>)       
     if (items.length === 0) return null
 

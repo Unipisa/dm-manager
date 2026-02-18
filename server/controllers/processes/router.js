@@ -32,4 +32,6 @@ router.use('/courses', require('./courses'))
 
 router.use('/my/courses', require('./coursesMy'))
 
+router.use('/timesheets', require('./timesheets'))
+
 module.exports = router

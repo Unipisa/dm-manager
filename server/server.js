@@ -143,6 +143,7 @@ function setup_routes(app) {
             'PTA', 'Assegnista',
             ].includes(staff.qualification)) {
               add_role('/process/my/courses')
+              add_role('/process/timesheets')
           }
         }
       }
