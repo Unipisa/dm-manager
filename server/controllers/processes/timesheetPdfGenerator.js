@@ -26,8 +26,8 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
     // Register Titillium Web font if available
     try {
-        const fontPath = path.join(__dirname, '../../../public/fonts/TitilliumWeb-Regular.ttf')
-        const fontBoldPath = path.join(__dirname, '../../../public/fonts/TitilliumWeb-Bold.ttf')
+        const fontPath = path.join(__dirname, '../../../build/fonts/TitilliumWeb-Regular.ttf')
+        const fontBoldPath = path.join(__dirname, '../../../build/fonts/TitilliumWeb-Bold.ttf')
         
         if (fs.existsSync(fontPath)) {
             doc.registerFont('Titillium', fontPath)
@@ -64,13 +64,13 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
     try {
         // Left logo (matematica)
-        const leftLogoPath = path.join(__dirname, '../../../public/img/matematica_dx_blu.png')
+        const leftLogoPath = path.join(__dirname, '../../../build/img/matematica_dx_blu.png')
         if (fs.existsSync(leftLogoPath)) {
             doc.image(leftLogoPath, margin, currentY, { height: 40 })
         }
 
         // Right logo (UNIPI)
-        const rightLogoPath = path.join(__dirname, '../../../public/img/marchio_unipi_orizz_pant541.png')
+        const rightLogoPath = path.join(__dirname, '../../../build/img/marchio_unipi_orizz_pant541.png')
         if (fs.existsSync(rightLogoPath)) {
             doc.image(rightLogoPath, pageWidth - margin - 120, currentY, { height: 40 })
         }
