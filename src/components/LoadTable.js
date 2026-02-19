@@ -12,7 +12,7 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
     const query = engine.useIndex(path, filter.filter)
     const navigate = useNavigate()
     const navigateTo = useCallback((obj) => navigate(
-        viewUrl(obj), {replace: false}), [navigate, viewUrl])
+        viewUrl(obj), {replace: false, state: { fromApp: true } }), [navigate, viewUrl])
     const scrollRef = useRef(null)
     const [selectedIds, setSelectedIds] = useState([])
     columns ||= []

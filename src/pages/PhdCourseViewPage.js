@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { Button, ButtonGroup, Card, Container } from 'react-bootstrap'
 
 import { ObjectProvider, useObject } from '../components/ObjectProvider'
@@ -11,6 +11,7 @@ import LessonsEditor from '../components/LessonsEditor'
 const PhdCourseView = ({ Model }) => {
     const obj = useObject()
     const navigate = useNavigate()
+    const location = useLocation()
 
     const schema = Model.schema.fields
 
@@ -57,13 +58,17 @@ const PhdCourseView = ({ Model }) => {
                     <LessonsEditor lessons={obj.lessons} showBookingIdColumn={true} />
                 </Container>
                 <ButtonGroup>
-                    <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
+                    <Button key='edit' className="btn-warning" onClick={() => navigate('edit', { 
+                        state: { fromApp: location.state?.fromApp }
+                    })}>
                         modifica
                     </Button>
                     <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('__new__')}?clone=${obj._id}`)}>
                         duplica
                     </Button>
-                    <Button key='index' className="btn btn-secondary" onClick={() => navigate(-1)}>
+                    <Button key='index' className="btn btn-secondary" onClick={() => 
+                        location.state?.fromApp ? navigate(-1) : navigate(Model.indexUrl())
+                    }>
                         torna all'elenco
                     </Button>
                 </ButtonGroup>

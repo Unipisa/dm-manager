@@ -1,4 +1,4 @@
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 
 import ModelEdit from '../components/ModelEdit'
 
@@ -9,6 +9,8 @@ export default function ModelEditPage({ Model }) {
     const id = params.id
     const clone_id = searchParams.get('clone')
     const isNew = id === '__new__'
+    const location = useLocation()
+    const fromApp = location.state?.fromApp
 
     return <ModelEdit 
         Model={Model} 
@@ -28,7 +30,7 @@ export default function ModelEditPage({ Model }) {
             }
         }}
         onCancel={() => navigate(-1)}
-        onDelete={() => navigate(-2)}
+        onDelete={() => fromApp ? navigate(-2) : navigate(Model.indexUrl())}
     />
 }
 
