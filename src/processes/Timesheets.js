@@ -134,6 +134,10 @@ export default function ManageTimesheets() {
                         {timesheet.fiscalCode || '---'}
                     </p>
                     <p>
+                        <strong>Coordinatore:</strong>{' '}
+                        {timesheet.projectCoordinator?.firstName} {timesheet.projectCoordinator?.lastName}
+                    </p>
+                    <p>
                         <strong>Beneficiario:</strong>{' '}
                         {timesheet.beneficiary || '---'}
                     </p>
@@ -152,7 +156,7 @@ export default function ManageTimesheets() {
                     </p>
                     {grants.length > 0 && (
                         <p>
-                            <strong>Grant/Progetti:</strong>{' '}
+                            <strong>Grant:</strong>{' '}
                             {grants.map(g => g.name || g.identifier || g._id).join(', ')}
                         </p>
                     )}

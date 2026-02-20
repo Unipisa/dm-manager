@@ -164,7 +164,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     })
     currentY = Math.max(doc.y, beneficiaryY + lineHeight)
 
-    doc.font(boldFont).text('Head of Dept:', rightColX, currentY)
+    doc.font(boldFont).text('Chair of Dept:', rightColX, currentY)
     doc.font(regularFont).text(
         `${timesheet.headOfDepartment.firstName} ${timesheet.headOfDepartment.lastName}`, 
         rightColX + 65, currentY,
@@ -275,7 +275,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         total: 0,
     }
 
-    const NON_WORKING_TYPES = ['weekend', 'public-holiday', 'sick-leave', 'annual-holiday', 'other-absence']
+    const NON_WORKING_TYPES = ['sick-leave', 'annual-holiday', 'other-absence']
 
     for (const day of monthData.days) {
         const isNonWorking = NON_WORKING_TYPES.includes(day.dayType)
@@ -290,12 +290,15 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         }
         doc.fillColor('#000000')
 
-        // Day number
+        // Day number with day of week
         doc.rect(xPos, yPos, colWidths.day, rowHeight).stroke()
-        doc.text(day.day.toString(), xPos + 2, yPos + 3, { 
-            width: colWidths.day - 4, 
+        const dayOfWeekLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        const dayOfWeek = dayOfWeekLabels[new Date(day.date).getDay()]
+        doc.fontSize(6).text(`${day.day} ${dayOfWeek}`, xPos + 1, yPos + 2, { 
+            width: colWidths.day - 2, 
             align: 'center' 
         })
+        doc.fontSize(7)
         xPos += colWidths.day
 
         // Type
@@ -483,24 +486,51 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
     // Signatures section
     doc.fontSize(9).font(regularFont)
-    const sigWidth = (pageWidth - 3 * margin) / 2
 
-    // Employee signature
-    doc.font(boldFont).text(`Employee:`, margin, yPos)
-    doc.font(regularFont).text(`${timesheet.employee.firstName} ${timesheet.employee.lastName}`, 
-        margin, yPos + 14, { width: sigWidth })
-    
-    doc.text('Date: _______________________________', margin, yPos + 35)
-    doc.text('Signature: _______________________________', margin, yPos + 55)
+    // Check if employee is also coordinator
+    const isEmployeeCoordinator = timesheet.projectCoordinator && 
+        timesheet.employee._id.toString() === timesheet.projectCoordinator._id.toString()
+
+    const numSignatures = isEmployeeCoordinator ? 2 : 3
+    const sigWidth = (pageWidth - (numSignatures + 1) * margin) / numSignatures
+
+    let sigX = margin
+
+    // Employee signature (or Employee & Coordinator if same person)
+    doc.font(boldFont).text(
+        isEmployeeCoordinator ? 'Employee and Coordinator:' : 'Employee:', 
+        sigX, yPos
+    )
+    doc.font(regularFont).text(
+        `${timesheet.employee.firstName} ${timesheet.employee.lastName}`, 
+        sigX, yPos + 14, { width: sigWidth }
+    )
+    doc.text('Date: ___________________', sigX, yPos + 35)
+    doc.text('Signature: ___________________', sigX, yPos + 55)
+
+    sigX += sigWidth + margin
+
+    // Project Coordinator signature (only if different from employee)
+    if (!isEmployeeCoordinator && timesheet.projectCoordinator) {
+        doc.font(boldFont).text('Coordinator:', sigX, yPos)
+        doc.font(regularFont).text(
+            `${timesheet.projectCoordinator.firstName} ${timesheet.projectCoordinator.lastName}`, 
+            sigX, yPos + 14, { width: sigWidth }
+        )
+        doc.text('Date: ___________________', sigX, yPos + 35)
+        doc.text('Signature: ___________________', sigX, yPos + 55)
+        
+        sigX += sigWidth + margin
+    }
 
     // Head of Department signature
-    const rightX = margin + sigWidth + margin
-    doc.font(boldFont).text(`Head of Department:`, rightX, yPos)
-    doc.font(regularFont).text(`${timesheet.headOfDepartment.firstName} ${timesheet.headOfDepartment.lastName}`, 
-        rightX, yPos + 14, { width: sigWidth })
-    
-    doc.text('Date: _______________________________', rightX, yPos + 35)
-    doc.text('Signature: _______________________________', rightX, yPos + 55)
+    doc.font(boldFont).text('Chair of Department:', sigX, yPos)
+    doc.font(regularFont).text(
+        `${timesheet.headOfDepartment.firstName} ${timesheet.headOfDepartment.lastName}`, 
+        sigX, yPos + 14, { width: sigWidth }
+    )
+    doc.text('Date: ___________________', sigX, yPos + 35)
+    doc.text('Signature: ___________________', sigX, yPos + 55)
 
     // Finalize PDF
     doc.end()

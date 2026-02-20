@@ -16,7 +16,7 @@ const DAY_TYPE_LABELS = {
 
 const EMPLOYEE_SELECTABLE_TYPES = ['weekday', 'sick-leave', 'annual-holiday', 'other-absence']
 
-const NON_WORKING_TYPES = ['weekend', 'public-holiday', 'sick-leave', 'annual-holiday', 'other-absence']
+const NON_WORKING_TYPES = ['sick-leave', 'annual-holiday', 'other-absence']
 
 export default function EditTimesheetMonth() {
     const { timesheetId, year, month } = useParams()

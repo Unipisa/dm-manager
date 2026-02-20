@@ -192,6 +192,10 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                     {obj.fiscalCode || '---'}
                 </p>
                 <p>
+                    <strong className="align-top">Coordinatore: </strong>
+                    <ModelFieldOutput field="employee" schema={schema.projectCoordinator} value={obj.projectCoordinator} />
+                </p>
+                <p>
                     <strong className="align-top">Beneficiario: </strong>
                     {obj.beneficiary || '---'}
                 </p>
@@ -216,7 +220,7 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                     <ModelFieldOutput field="endDate" schema={schema.endDate} value={obj.endDate} />
                 </p>
                 <p>
-                    <strong className="align-top">Grants: </strong>
+                    <strong className="align-top">Grant: </strong>
                     <ModelFieldOutput field="grants" schema={schema.grants} value={obj.grants} />
                 </p>
 
