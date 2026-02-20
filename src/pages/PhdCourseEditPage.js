@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom'
+import { useParams, useSearchParams, useNavigate, useLocation } from 'react-router-dom'
 import { Button, ButtonGroup, Card, Container, Form } from 'react-bootstrap'
 
 import { useEngine } from '../Engine'
@@ -150,6 +150,8 @@ export default function PhdCourseEditPage({ Model }) {
     const [searchParams] = useSearchParams()
     const clone_id = searchParams.get('clone')
     const navigate = useNavigate()
+    const location = useLocation()
+    const fromApp = location.state?.fromApp
     
     const create = id === '__new__'
     const [modifiedObj, setModifiedObj] = useState(null)
@@ -242,7 +244,7 @@ export default function PhdCourseEditPage({ Model }) {
     const deletePhdCourse = async () => {
         await engineDeleteObj(originalObj)
         engine.addWarningMessage(`Corso di Dottorato ${Model.describe(originalObj)} eliminato`)
-        navigate(-2)
+        fromApp ? navigate(-2) : navigate(Model.indexUrl())
     }
 
     return (

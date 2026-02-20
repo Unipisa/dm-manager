@@ -1,5 +1,5 @@
 import { Button, ButtonGroup, Card } from 'react-bootstrap'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 import { ModelOutputs } from './ModelOutput'
 import { useObject } from './ObjectProvider'
@@ -7,10 +7,13 @@ import Timestamps from './Timestamps'
 
 export default function ModelView({ Model, buttons, key }) {
     buttons ??= ['edit', 'clone', 'index']
+    const location = useLocation()
 
     const buttonComponents = {
         edit: () => (
-            <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
+            <Button key='edit' className="btn-warning" onClick={() => navigate('edit', { 
+                state: { fromApp: location.state?.fromApp }
+            })}>
                 modifica
             </Button>
         ),
@@ -20,7 +23,9 @@ export default function ModelView({ Model, buttons, key }) {
             </Button>
         ),
         index: () => (
-            <Button key='index' className="btn btn-secondary" onClick={() => navigate(-1)}>
+            <Button key='index' className="btn btn-secondary" onClick={() => 
+                location.state?.fromApp ? navigate(-1) : navigate(Model.indexUrl())
+            }>
                 torna all'elenco
             </Button>
         ),
