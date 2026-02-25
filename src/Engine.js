@@ -1,7 +1,7 @@
 import moment from 'moment'
 import { useState, createContext, useContext } from 'react'
 import { useQuery, useQueryClient, useMutation } from 'react-query'
-import { useLocationState } from 'react-router-use-location-state'
+import { useSearchParams } from 'react-router-dom'
 
 import api from './api'
 import Models from './models/Models'
@@ -20,9 +20,9 @@ function new_user(json) {
     }
 
     /**
-     * 
-     * @param {*} process 
-     * @returns true if user has the admin role or has a role 
+     *
+     * @param {*} process
+     * @returns true if user has the admin role or has a role
      * which is process or a subpath of process
      */
     user.hasProcessPermission = (process) => {
@@ -41,7 +41,7 @@ function new_user(json) {
 export const EngineContext = createContext('dm-manager')
 
 export const EngineProvider = EngineContext.Provider
-  
+
 export function useEngine() {
     return useContext(EngineContext)
 }
@@ -91,7 +91,7 @@ export function useCreateEngine() {
         addMessage,
 
         addErrorMessage: (message) => addMessage(message, 'error'),
-        
+
         addInfoMessage: (message) => addMessage(message, 'info'),
 
         addWarningMessage: (message) => addMessage(message, 'warning'),
@@ -99,14 +99,16 @@ export function useCreateEngine() {
         messages: state.messages,
 
         clearMessages: () => {
-            setState( s => ({
+            setState(s => ({
                 ...s,
-                messages: []}))},
+                messages: []
+            }))
+        },
 
         connect: async () => {
             try {
                 const config = await api.get('/config')
-                let { user, person, roles, staffs} = await api.post('/login')
+                let { user, person, roles, staffs } = await api.post('/login')
 
                 if (user != null) {
                     user.roles = roles
@@ -118,13 +120,13 @@ export function useCreateEngine() {
                 const ServerModels = (await api.get('/api/v0/Models'))
 
                 Object.values(Models).forEach(Model => {
-                    Model.schema = ServerModels[Model.ModelName]    
+                    Model.schema = ServerModels[Model.ModelName]
                 })
 
-                setState(s => ({...s, config, user, Models}))
+                setState(s => ({ ...s, config, user, Models }))
 
                 return config
-            } catch(err) {
+            } catch (err) {
                 console.error(err)
                 return null
             }
@@ -141,13 +143,13 @@ export function useCreateEngine() {
              * if username and password are provided use credentials
              * otherwise check for existing session
              */
-            let { user } = await api.post('/login/password', {username, password})
+            let { user } = await api.post('/login/password', { username, password })
             // console.log(`user: ${JSON.stringify(user)}`)
             if (user !== null) {
                 user = new_user(user)
             }
 
-            setState(s => ({...s, user}))
+            setState(s => ({ ...s, user }))
         },
 
         start_oauth2: async () => {
@@ -160,7 +162,7 @@ export function useCreateEngine() {
 
         logout: async () => {
             await api.post("/logout")
-            setState(s => ({...s, user: null}))
+            setState(s => ({ ...s, user: null }))
             return true
         },
 
@@ -170,21 +172,21 @@ export function useCreateEngine() {
 
         impersonate_role: async (role) => {
             let user = new_user(await api.post("/impersonate", { role }))
-            setState(s => ({...s, user}))
+            setState(s => ({ ...s, user }))
         },
 
-        useIndex: (path, filter={}) => {
+        useIndex: (path, filter = {}) => {
             filter = Object.fromEntries(Object.entries(filter).map(
                 ([key, val]) => {
                     if (val instanceof Date) val = val.toISOString()
                     return [key, val]
                 }
-            )) 
-            const query = useQuery([path, filter], 
+            ))
+            const query = useQuery([path, filter],
                 () => api.get(`/api/v0/${path}`, filter), {
-                    keepPreviousData: true,
-                    onError: (err) => addMessage(err.message, 'error'),
-                })
+                keepPreviousData: true,
+                onError: (err) => addMessage(err.message, 'error'),
+            })
             return query
         },
 
@@ -192,8 +194,8 @@ export function useCreateEngine() {
             const pathArray = id === undefined ? [path] : [path, id]
             const url = id === undefined ? `/api/v0/${path}` : `/api/v0/${path}/${id}`
             return useQuery(
-                pathArray, 
-                () => api.get(url), 
+                pathArray,
+                () => api.get(url),
                 {
                     enabled: id !== null,
                     onError: (err) => addMessage(err.message, 'error'),
@@ -209,8 +211,8 @@ export function useCreateEngine() {
             return async (object) => {
                 try {
                     const res = await mutation.mutateAsync(object)
-                    return res 
-                } catch(err) {
+                    return res
+                } catch (err) {
                     addMessage(err.message, 'error')
                     throw err
                 }
@@ -224,30 +226,30 @@ export function useCreateEngine() {
                     if (payload._id) url += `/${payload._id}`
                     return api.patch(url, payload)
                 }, {
-                    onSuccess: () => {
-                        queryClient.invalidateQueries([path])
-                    }
-                })
+                onSuccess: () => {
+                    queryClient.invalidateQueries([path])
+                }
+            })
             return async (payload) => {
                 try {
                     const res = await mutation.mutateAsync(payload)
                     // await queryClient.invalidateQueries([path])
                     return res
-                } catch(err) {
+                } catch (err) {
                     addMessage(err.message, 'error')
                     throw err
                 }
             }
         },
 
-        useDelete: (path) => { 
-            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`),{
+        useDelete: (path) => {
+            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`), {
                 onSuccess: () => {
                     queryClient.invalidateQueries([path])
                     /**
-                     * sembra che l'invalidazione 
+                     * sembra che l'invalidazione
                      * causi una richiesta all'oggetto
-                     * e quindi, giustamente, un errore 404 
+                     * e quindi, giustamente, un errore 404
                      * sulla console
                      */
                 }
@@ -256,7 +258,7 @@ export function useCreateEngine() {
                 try {
                     const res = await mutation.mutateAsync(object)
                     return res
-                } catch(err) {
+                } catch (err) {
                     addMessage(err.message, 'error')
                     throw err
                 }
@@ -270,10 +272,10 @@ export function useCreateEngine() {
                 const data = []
                 for (const info of related) {
                     const url = `/api/v0/${info.url}`
-                    const result = await api.get(url, {[info.field]: _id})
+                    const result = await api.get(url, { [info.field]: _id })
                     data.push({
                         ...info,
-                        data: result.data 
+                        data: result.data
                     })
                 }
 
@@ -283,9 +285,40 @@ export function useCreateEngine() {
     }
 }
 
+/**
+ * Replacement for react-router-use-location-state:
+ * stores `filter` in the URL query string as `?filter=<json>`.
+ * Supports setFilter(value) and setFilter(prev => next) like useState.
+ */
+function encodeFilter(obj) {
+    return encodeURIComponent(JSON.stringify(obj))
+}
+
+function decodeFilter(str, fallback) {
+    if (!str) return fallback
+    try {
+        return JSON.parse(decodeURIComponent(str))
+    } catch {
+        return fallback
+    }
+}
+
 export function useQueryFilter(initial) {
-    const [filter, setFilter] = useLocationState('filter', initial)
-    
+    const [searchParams, setSearchParams] = useSearchParams()
+
+    const filter = decodeFilter(searchParams.get('filter'), initial)
+
+    const setFilter = (next) => {
+        const nextValue = (typeof next === 'function') ? next(filter) : next
+
+        const sp = new URLSearchParams(searchParams)
+        if (nextValue == null) sp.delete('filter')
+        else sp.set('filter', encodeFilter(nextValue))
+
+        // replace avoids creating a new browser history entry for every tweak
+        setSearchParams(sp, { replace: true })
+    }
+
     function sortIcon(field) {
         const sort = filter._sort
         if (sort) {
@@ -313,7 +346,7 @@ export function useQueryFilter(initial) {
     function extendLimit() {
         setFilter(filter => ({
             ...filter,
-            _limit: 10* filter._limit
+            _limit: 10 * filter._limit
         }))
     }
 
@@ -323,7 +356,7 @@ export function useQueryFilter(initial) {
         header: (field) => ({
             sortIcon: sortIcon(field),
             onClick: () => onClick(field),
-            }),
+        }),
         sortIcon,
         onClick,
         extendLimit,
@@ -350,7 +383,6 @@ export function myDatetimeFormat(date) {
     if (date > maxDate) return '---'
     return moment(date).format('D.M.YYYY, H:mm')
 }
-
 
 export function notNullStartDate(date) {
     if (date === null) return minDate
