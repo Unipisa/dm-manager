@@ -20,7 +20,7 @@ jobs:
     - name: Build Js bundle
       run: npm run build
     - name: Build DM Widgets
-      run: cd widgets && npm ci --omit=dev && npm run build && cd ..
+      run: cd widgets && npm ci && npm run build && cd ..
 #    - name: Start MongoDB
 #      uses: supercharge/mongodb-github-action@1.8.0
 #      with:
