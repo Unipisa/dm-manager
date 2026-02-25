@@ -46,7 +46,7 @@ async function setupSMTPAccount() {
 
 async function sendEmail(recipients, cc, subject, body) {  
     const info = await transporter.sendMail({
-        from: 'noreply@manage.dm.unipi.it',
+        from: config.FROM_ADDRESS,
         to: recipients.join(", "),
         cc: cc.join(", "),
         subject,

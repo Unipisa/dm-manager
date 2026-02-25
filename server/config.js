@@ -17,6 +17,7 @@ class Options {
 
         const options = {
             SMTP_HOST: undefined,
+            FROM_ADDRESS: 'noreply@cs.dm.unipi.it',
             STATIC_FILES_PATH: (process.env.NODE_ENV === 'production' ? 'build' : 'public'),
             SESSION_SECRET: randomUUID(),
             JWT_SECRET: randomUUID(),
