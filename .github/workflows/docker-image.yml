@@ -16,11 +16,11 @@ jobs:
       with:
         node-version: 20
     - name: install node packages
-      run: npm ci
+      run: npm ci --omit=dev
     - name: Build Js bundle
       run: npm run build
     - name: Build DM Widgets
-      run: cd widgets && npm ci && npm run build && cd ..
+      run: cd widgets && npm ci --omit=dev && npm run build && cd ..
 #    - name: Start MongoDB
 #      uses: supercharge/mongodb-github-action@1.8.0
 #      with:
