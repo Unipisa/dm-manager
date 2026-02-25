@@ -15,8 +15,8 @@ async function canAccessTimesheet(req, timesheet) {
         return true
     }
     // Employee can only access their own
-    if (req.person?._id && timesheet.employee.equals(req.person._id)) {
-        return true
+    if (req.person?._id) {
+        return timesheet.employee._id.toString() === req.person._id.toString()
     }
     return false
 }
