@@ -1,4 +1,4 @@
-FROM node:23-slim
+FROM node:24-slim
 # Before building the docker image, you need to build the server 
 # and the widgets packages:
 #
