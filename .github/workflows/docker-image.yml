@@ -54,9 +54,3 @@ jobs:
         context: .
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-    - name: Trigger update on Watchtower
-      if: ${{ github.event_name != 'pull_request' }}
-      run: |
-          curl -H "Authorization: Bearer ${{ secrets.WATCHTOWER_TOKEN }}" https://watchtower.delta.cs.dm.unipi.it/v1/update
-
-
