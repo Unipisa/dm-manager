@@ -385,7 +385,7 @@ export default function EditTimesheetMonth() {
 
                     <Form.Group className="mt-4">
                         <Form.Label>
-                            <strong>Breve descrizione delle attività svolte nel mese</strong>
+                            <strong>(Opzionale) Breve descrizione delle attività svolte nel mese</strong>
                         </Form.Label>
                         <Form.Control
                             as="textarea"
