@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18-slim
 # Before building the docker image, you need to build the server 
 # and the widgets packages:
 #
@@ -19,7 +19,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # If you are building your code for production
-RUN npm ci --only=production
+RUN npm ci --omit=dev
 
 # Bundle app source
 COPY build ./build
