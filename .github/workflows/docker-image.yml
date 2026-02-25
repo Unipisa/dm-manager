@@ -16,7 +16,7 @@ jobs:
       with:
         node-version: 20
     - name: install node packages
-      run: npm ci
+      run: npm ci --omit=dev
     - name: Build Js bundle
       run: npm run build
     - name: Build DM Widgets
