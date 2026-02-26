@@ -164,10 +164,34 @@ class Controller {
                             localField: field,
                             foreignField: "_id",
                             as: field,
-                            pipeline: [{ $project: {
-                                identifier: 1,
-                                name: 1,
-                            }}],
+                            pipeline: [
+                                { $project: {
+                                    identifier: 1,
+                                    name: 1,
+                                    startDate: 1,
+                                    endDate: 1,
+                                    localCoordinator: 1,
+                                }},
+                                { $lookup: {
+                                    from: "people",
+                                    localField: "localCoordinator",
+                                    foreignField: "_id",
+                                    as: "localCoordinator",
+                                    pipeline: [
+                                        { $project: {
+                                            firstName: 1,
+                                            lastName: 1,
+                                            email: 1,
+                                            affiliations: 1,
+                                        }},
+                                        { $sort: { lastName: 1 } }
+                                    ]
+                                }},
+                                { $unwind: {
+                                    path: "$localCoordinator",
+                                    preserveNullAndEmptyArrays: true
+                                }}
+                            ],
                         }},
                     )
                     if (single) unwind(field)

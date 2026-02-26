@@ -54,6 +54,14 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         'July', 'August', 'September', 'October', 'November', 'December'
     ]
 
+    const monthStart = new Date(year, month - 1, 1)
+    const monthEnd = new Date(year, month, 0)
+    const activeGrants = timesheet.grants?.filter(grant => {
+        const grantStart = new Date(grant.startDate)
+        const grantEnd = new Date(grant.endDate)
+        return grantStart <= monthEnd && grantEnd >= monthStart
+    }) || []
+
     // Page dimensions
     const pageWidth = 595.28  // A4 width in points
     const pageHeight = 841.89 // A4 height in points
@@ -103,7 +111,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
     // Count lines needed
     const basicInfoLines = 3 // Employee, Fiscal Code, Role
-    const grantsLines = timesheet.grants?.length || 0
+    const grantsLines = activeGrants?.length || 0
     const rightColLines = 2 // Beneficiary, Head of Dept
 
     const lineHeight = 15
@@ -141,13 +149,21 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     currentY += lineHeight
 
     // Grants section
-    if (timesheet.grants && timesheet.grants.length > 0) {
+    if (activeGrants.length > 0) {
         currentY += 5
         doc.font(boldFont).text('Grants:', leftColX, currentY)
         currentY += 12
         doc.font(regularFont).fontSize(8)
-        for (const grant of timesheet.grants) {
-            const grantText = `• ${grant.name || grant.identifier} (${grant.identifier}${grant.projectType ? ', ' + grant.projectType : ''})`
+        for (const grant of activeGrants) {
+            // Only show if identifier exists
+            const identifier = grant.identifier || ''
+            const name = grant.name || 'Unnamed Grant'
+            const projectType = grant.projectType ? `, ${grant.projectType}` : ''
+            
+            const grantText = identifier 
+                ? `• ${name} (${identifier}${projectType})`
+                : `• ${name}${projectType}`
+            
             doc.text(grantText, leftColX + 5, currentY, { width: boxWidth - 25 })
             currentY += grantLineHeight
         }
@@ -182,7 +198,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     }
 
     // Calculate dynamic column widths for grants and activities
-    const numGrants = timesheet.grants?.length || 0
+    const numGrants = activeGrants.length
     const fixedCols = 4 // Research/Admin, Teaching, Institutional, Other
     const totalCols = numGrants + fixedCols + 1 // +1 for Total
     const remainingWidth = pageWidth - 2 * margin - colWidths.day - colWidths.type
@@ -217,13 +233,26 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     xPos += colWidths.type
 
     // Grant headers
-    for (const grant of timesheet.grants || []) {
+    for (const grant of activeGrants) {
         doc.fillColor(headerColor).rect(xPos, tableTop, activityColWidth, headerHeight_table).fill()
         doc.strokeColor('#000000').rect(xPos, tableTop, activityColWidth, headerHeight_table).stroke()
-        const shortName = grant.identifier || grant.name?.substring(0, 10) || 'Grant'
-        doc.fontSize(6).fillColor('#FFFFFF').text(shortName, xPos + 1, tableTop + 10, { 
+        
+        let shortName = grant.identifier || grant.name?.substring(0, 17) + '...' || 'Grant'
+        
+        // Truncate if too long - split at space if exists
+        if (shortName.length > 20) {
+            const spaceIndex = shortName.indexOf(' ')
+            if (spaceIndex > 0 && spaceIndex < 20) {
+                shortName = shortName.substring(0, spaceIndex)
+            } else {
+                shortName = shortName.substring(0, 17) + '...'
+            }
+        }
+        
+        doc.fontSize(6).fillColor('#FFFFFF').text(shortName, xPos + 1, tableTop + 8, { 
             width: activityColWidth - 2, 
-            align: 'center'
+            align: 'center',
+            valign: 'center'
         })
         doc.fontSize(7)
         xPos += activityColWidth
@@ -313,7 +342,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         let dayTotal = 0
 
         // Grant hours
-        for (let i = 0; i < (timesheet.grants?.length || 0); i++) {
+        for (let i = 0; i < (activeGrants?.length || 0); i++) {
             const hours = day.grantHours?.[i]?.hours || 0
             doc.rect(xPos, yPos, activityColWidth, rowHeight).stroke()
             if (!isNonWorking) {
@@ -487,50 +516,51 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     // Signatures section
     doc.fontSize(9).font(regularFont)
 
-    // Check if employee is also coordinator
-    const isEmployeeCoordinator = timesheet.projectCoordinator && 
-        timesheet.employee._id.toString() === timesheet.projectCoordinator._id.toString()
+    const signatures = []
+    const seenSignatureIds = new Set()
 
-    const numSignatures = isEmployeeCoordinator ? 2 : 3
+    // Add employee
+    signatures.push({
+        label: 'Employee:',
+        name: `${timesheet.employee.firstName} ${timesheet.employee.lastName}`
+    })
+    seenSignatureIds.add(timesheet.employee._id.toString())
+
+    // Add grant coordinators (only unique ones, excluding employee)
+    for (const grant of activeGrants) {
+        if (grant.localCoordinator && grant.localCoordinator._id) {
+            const coordId = grant.localCoordinator._id.toString()
+            if (!seenSignatureIds.has(coordId)) {
+                seenSignatureIds.add(coordId)
+                signatures.push({
+                    label: 'Grant Coordinator:',
+                    name: `${grant.localCoordinator.firstName} ${grant.localCoordinator.lastName}`
+                })
+            }
+        }
+    }
+
+    // Add head of department
+    signatures.push({
+        label: 'Chair of Department:',
+        name: `${timesheet.headOfDepartment.firstName} ${timesheet.headOfDepartment.lastName}`
+    })
+
+    // Calculate signature widths
+    const numSignatures = signatures.length
     const sigWidth = (pageWidth - (numSignatures + 1) * margin) / numSignatures
 
     let sigX = margin
 
-    // Employee signature (or Employee & Coordinator if same person)
-    doc.font(boldFont).text(
-        isEmployeeCoordinator ? 'Employee and Coordinator:' : 'Employee:', 
-        sigX, yPos
-    )
-    doc.font(regularFont).text(
-        `${timesheet.employee.firstName} ${timesheet.employee.lastName}`, 
-        sigX, yPos + 14, { width: sigWidth }
-    )
-    doc.text('Date: ___________________', sigX, yPos + 35)
-    doc.text('Signature: ___________________', sigX, yPos + 55)
-
-    sigX += sigWidth + margin
-
-    // Project Coordinator signature (only if different from employee)
-    if (!isEmployeeCoordinator && timesheet.projectCoordinator) {
-        doc.font(boldFont).text('Coordinator:', sigX, yPos)
-        doc.font(regularFont).text(
-            `${timesheet.projectCoordinator.firstName} ${timesheet.projectCoordinator.lastName}`, 
-            sigX, yPos + 14, { width: sigWidth }
-        )
+    // Render all signatures
+    for (const signature of signatures) {
+        doc.font(boldFont).text(signature.label, sigX, yPos)
+        doc.font(regularFont).text(signature.name, sigX, yPos + 14, { width: sigWidth })
         doc.text('Date: ___________________', sigX, yPos + 35)
         doc.text('Signature: ___________________', sigX, yPos + 55)
         
         sigX += sigWidth + margin
     }
-
-    // Head of Department signature
-    doc.font(boldFont).text('Chair of Department:', sigX, yPos)
-    doc.font(regularFont).text(
-        `${timesheet.headOfDepartment.firstName} ${timesheet.headOfDepartment.lastName}`, 
-        sigX, yPos + 14, { width: sigWidth }
-    )
-    doc.text('Date: ___________________', sigX, yPos + 35)
-    doc.text('Signature: ___________________', sigX, yPos + 55)
 
     // Finalize PDF
     doc.end()

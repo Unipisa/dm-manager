@@ -61,6 +61,14 @@ export default function EditTimesheetMonth() {
 
     const roleActivityLabel = timesheet.role === 'research' ? 'Research' : 'Admin'
 
+    const monthStart = new Date(year, month - 1, 1)
+    const monthEnd = new Date(year, month, 0)
+    const activeGrants = timesheet.grants?.filter(grant => {
+        const grantStart = new Date(grant.startDate)
+        const grantEnd = new Date(grant.endDate)
+        return grantStart <= monthEnd && grantEnd >= monthStart
+    }) || []
+
     const isDayInEmploymentPeriod = (dayDate) => {
         const start = new Date(timesheet.startDate)
         const end = new Date(timesheet.endDate)
@@ -129,7 +137,7 @@ export default function EditTimesheetMonth() {
 
     // Column totals
     const columnTotals = {
-        grantHours: timesheet.grants?.map((_, grantIdx) =>
+        grantHours: activeGrants.map((_, grantIdx) =>
             modifiedDays.reduce((sum, day) => {
                 if (NON_WORKING_TYPES.includes(day.dayType)) return sum
                 return sum + (day.grantHours?.[grantIdx]?.hours || 0)
@@ -196,6 +204,24 @@ export default function EditTimesheetMonth() {
                     <div className="mb-3 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '6px' }}>
                         <p className="mb-2"><strong>Legenda colonne:</strong></p>
                         <div style={{ fontSize: '0.85em' }}>
+                            {/* Grants */}
+                            {activeGrants && activeGrants.length > 0 && (
+                                <div className="mb-2">
+                                    <p className="mb-1"><strong>Grants:</strong></p>
+                                    {activeGrants.map((grant, idx) => (
+                                        <p key={idx} className="mb-1 ms-3">
+                                            • {grant.identifier
+                                                ? <>
+                                                    <strong>{grant.identifier}</strong>: {grant.name}
+                                                </>
+                                                : grant.name
+                                            }
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
+                            
+                            {/* Activities */}
                             <div className="row">
                                 <div className="col-md-6">
                                     <p className="mb-1">
@@ -226,7 +252,7 @@ export default function EditTimesheetMonth() {
                             <tr>
                                 <th style={{ minWidth: '90px' }}>Giorno</th>
                                 <th style={{ minWidth: '140px' }}>Tipo</th>
-                                {timesheet.grants?.map((grant, idx) => (
+                                {activeGrants?.map((grant, idx) => (
                                     <th key={`grant-${idx}`} style={{ minWidth: '80px' }}>
                                         {grant.identifier || grant.name || `Grant ${idx + 1}`}
                                     </th>
@@ -281,22 +307,29 @@ export default function EditTimesheetMonth() {
                                             )}
                                         </td>
 
-                                        {timesheet.grants?.map((grant, grantIdx) => (
-                                            <td key={`day-${dayIndex}-grant-${grantIdx}`}>
-                                                {!isNonWorking && !isOutOfPeriod ? (
-                                                    <Form.Control
-                                                        type="number"
-                                                        size="sm"
-                                                        min="0"
-                                                        max="24"
-                                                        step="0.5"
-                                                        value={day.grantHours?.[grantIdx]?.hours || 0}
-                                                        disabled={isLocked}
-                                                        onChange={(e) => updateHours(dayIndex, 'grant', grantIdx, e.target.value)}
-                                                    />
-                                                ) : null}
-                                            </td>
-                                        ))}
+                                        {activeGrants?.map((grant, grantIdx) => {
+                                            // Check if this grant is active for this day
+                                            const grantStart = new Date(grant.startDate)
+                                            const grantEnd = new Date(grant.endDate)
+                                            const isGrantActive = dayDate >= grantStart && dayDate <= grantEnd
+                                            
+                                            return (
+                                                <td key={`day-${dayIndex}-grant-${grantIdx}`}>
+                                                    {!isNonWorking && !isOutOfPeriod && isGrantActive ? (
+                                                        <Form.Control
+                                                            type="number"
+                                                            size="sm"
+                                                            min="0"
+                                                            max="24"
+                                                            step="0.5"
+                                                            value={day.grantHours?.[grantIdx]?.hours || 0}
+                                                            disabled={isLocked}
+                                                            onChange={(e) => updateHours(dayIndex, 'grant', grantIdx, e.target.value)}
+                                                        />
+                                                    ) : null}
+                                                </td>
+                                            )
+                                        })}
 
                                         <td>
                                             {!isNonWorking && !isOutOfPeriod ? (
