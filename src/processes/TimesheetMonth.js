@@ -248,7 +248,7 @@ export default function EditTimesheetMonth() {
                     </div>
 
                     <Table bordered hover size="sm">
-                        <thead className="table-light">
+                        <thead className="table-light" style={{ position: 'sticky', top: 0, zIndex: 1 }}>
                             <tr>
                                 <th style={{ minWidth: '90px' }}>Giorno</th>
                                 <th style={{ minWidth: '140px' }}>Tipo</th>
