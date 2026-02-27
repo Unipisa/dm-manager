@@ -21,7 +21,6 @@ const getMonthHours = (monthData) => {
     
     for (const day of monthData.days) {
         for (const gh of day.grantHours || []) {
-            console.log(gh)
             const id = gh.grant
             result.grantHours[id] = (result.grantHours[id] || 0) + (gh.hours || 0)
         }
@@ -183,7 +182,7 @@ export default function ManageTimesheets() {
                                     <th>Anno</th>
                                     {grants.map((g, idx) => (
                                         <th key={idx} title={g.name}>
-                                            {g.identifier || g.name || `Grant ${idx + 1}`}
+                                            {g.name || `Grant ${idx + 1}`}
                                         </th>
                                     ))}
                                     <th title={roleActivityLabel}>{roleActivityLabel}</th>
