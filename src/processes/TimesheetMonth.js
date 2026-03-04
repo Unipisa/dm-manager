@@ -27,6 +27,8 @@ export default function EditTimesheetMonth() {
     const [modifiedDays, setModifiedDays] = useState(null)
     const [activityDescription, setActivityDescription] = useState('')
     const [hasChanges, setHasChanges] = useState(false)
+    const [selectedCells, setSelectedCells] = useState(new Set())
+    const [lastSelected, setLastSelected] = useState(null)
 
     const apiUrl = `/api/v0/process/timesheets/${timesheetId}/${year}/${month}`
 
@@ -109,6 +111,86 @@ export default function EditTimesheetMonth() {
         }
         setModifiedDays(newDays)
         setHasChanges(true)
+    }
+
+    const handleCellClick = (dayIndex, field, grantIdx, event) => {
+        const cellKey = `${dayIndex}-${field}-${grantIdx ?? 'none'}`
+        
+        if (event.ctrlKey || event.metaKey) {
+            // Ctrl/Cmd: toggle selection
+            const newSelected = new Set(selectedCells)
+            if (newSelected.has(cellKey)) {
+                newSelected.delete(cellKey)
+            } else {
+                newSelected.add(cellKey)
+            }
+            setSelectedCells(newSelected)
+            setLastSelected(cellKey)
+        } else if (event.shiftKey && lastSelected) {
+            // Shift: select range
+            const newSelected = new Set(selectedCells)
+            const [lastDay, lastField, lastGrant] = lastSelected.split('-')
+            const startDay = Math.min(parseInt(lastDay), dayIndex)
+            const endDay = Math.max(parseInt(lastDay), dayIndex)
+            
+            // Simple range: same field/grant column
+            if (field === lastField && String(grantIdx ?? 'none') === lastGrant) {
+                for (let i = startDay; i <= endDay; i++) {
+                    newSelected.add(`${i}-${field}-${grantIdx ?? 'none'}`)
+                }
+            }
+            setSelectedCells(newSelected)
+        } else {
+            // Normal click: clear selection
+            setSelectedCells(new Set([cellKey]))
+            setLastSelected(cellKey)
+        }
+    }
+
+    const handleKeyDown = (event, dayIndex, field, grantIdx) => {
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            // Focus next row, same column
+            const nextRow = dayIndex + 1
+            if (nextRow < modifiedDays.length) {
+                const nextInput = document.querySelector(
+                    `input[data-cell="${nextRow}-${field}-${grantIdx ?? 'none'}"]`
+                )
+                if (nextInput) nextInput.focus()
+            }
+        }
+    }
+
+    const updateMultipleCells = (dayIndex, field, grantIndex, value) => {
+        const cellKey = `${dayIndex}-${field}-${grantIndex ?? 'none'}`
+        
+        if (selectedCells.size > 1 && selectedCells.has(cellKey)) {
+            // Update all selected cells with same value
+            const newDays = [...modifiedDays]
+            let numValue = parseFloat(value)
+            if (isNaN(numValue)) numValue = 0
+            numValue = roundToHalf(numValue)
+            
+            selectedCells.forEach(key => {
+                const [dIdx, f, gIdx] = key.split('-')
+                const dayIdx = parseInt(dIdx)
+                const grantIdx = gIdx === 'none' ? null : parseInt(gIdx)
+                
+                if (f === 'grant' && grantIdx !== null) {
+                    if (newDays[dayIdx].grantHours[grantIdx]) {
+                        newDays[dayIdx].grantHours[grantIdx].hours = numValue
+                    }
+                } else if (f !== 'grant') {
+                    newDays[dayIdx][f] = numValue
+                }
+            })
+            
+            setModifiedDays(newDays)
+            setHasChanges(true)
+        } else {
+            // Normal single cell update
+            updateHours(dayIndex, field, grantIndex, value)
+        }
     }
 
     const handleSave = async () => {
@@ -324,7 +406,15 @@ export default function EditTimesheetMonth() {
                                                             step="0.5"
                                                             value={day.grantHours?.[grantIdx]?.hours || 0}
                                                             disabled={isLocked}
-                                                            onChange={(e) => updateHours(dayIndex, 'grant', grantIdx, e.target.value)}
+                                                            onFocus={(e) => e.target.select()}
+                                                            data-cell={`${dayIndex}-grant-${grantIdx}`}
+                                                            onClick={(e) => handleCellClick(dayIndex, 'grant', grantIdx, e)}
+                                                            onKeyDown={(e) => handleKeyDown(e, dayIndex, 'grant', grantIdx)}
+                                                            onInput={(e) => updateMultipleCells(dayIndex, 'grant', grantIdx, e.target.value)}
+                                                            onWheel={(e) => e.target.blur()}
+                                                            style={{
+                                                                backgroundColor: selectedCells.has(`${dayIndex}-grant-${grantIdx}`) ? '#e3f2fd' : 'white'
+                                                            }}
                                                         />
                                                     ) : null}
                                                 </td>
@@ -341,7 +431,15 @@ export default function EditTimesheetMonth() {
                                                     step="0.5"
                                                     value={day.roleHours || 0}
                                                     disabled={isLocked}
-                                                    onChange={(e) => updateHours(dayIndex, 'roleHours', null, e.target.value)}
+                                                    onFocus={(e) => e.target.select()}
+                                                    data-cell={`${dayIndex}-roleHours-none`}
+                                                    onClick={(e) => handleCellClick(dayIndex, 'roleHours', null, e)}
+                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'roleHours', null)}
+                                                    onInput={(e) => updateMultipleCells(dayIndex, 'roleHours', null, e.target.value)}
+                                                    onWheel={(e) => e.target.blur()}
+                                                    style={{
+                                                        backgroundColor: selectedCells.has(`${dayIndex}-roleHours-none`) ? '#e3f2fd' : 'white'
+                                                    }}
                                                 />
                                             ) : null}
                                         </td>
@@ -356,7 +454,15 @@ export default function EditTimesheetMonth() {
                                                     step="0.5"
                                                     value={day.teachingHours || 0}
                                                     disabled={isLocked}
-                                                    onChange={(e) => updateHours(dayIndex, 'teachingHours', null, e.target.value)}
+                                                    onFocus={(e) => e.target.select()}
+                                                    data-cell={`${dayIndex}-teachingHours-none`}
+                                                    onClick={(e) => handleCellClick(dayIndex, 'teachingHours', null, e)}
+                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'teachingHours', null)}
+                                                    onInput={(e) => updateMultipleCells(dayIndex, 'teachingHours', null, e.target.value)}
+                                                    onWheel={(e) => e.target.blur()}
+                                                    style={{
+                                                        backgroundColor: selectedCells.has(`${dayIndex}-teachingHours-none`) ? '#e3f2fd' : 'white'
+                                                    }}
                                                 />
                                             ) : null}
                                         </td>
@@ -371,7 +477,15 @@ export default function EditTimesheetMonth() {
                                                     step="0.5"
                                                     value={day.institutionalHours || 0}
                                                     disabled={isLocked}
-                                                    onChange={(e) => updateHours(dayIndex, 'institutionalHours', null, e.target.value)}
+                                                    onFocus={(e) => e.target.select()}
+                                                    data-cell={`${dayIndex}-institutionalHours-none`}
+                                                    onClick={(e) => handleCellClick(dayIndex, 'institutionalHours', null, e)}
+                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'institutionalHours', null)}
+                                                    onInput={(e) => updateMultipleCells(dayIndex, 'institutionalHours', null, e.target.value)}
+                                                    onWheel={(e) => e.target.blur()}
+                                                    style={{
+                                                        backgroundColor: selectedCells.has(`${dayIndex}-institutionalHours-none`) ? '#e3f2fd' : 'white'
+                                                    }}
                                                 />
                                             ) : null}
                                         </td>
@@ -386,7 +500,15 @@ export default function EditTimesheetMonth() {
                                                     step="0.5"
                                                     value={day.otherHours || 0}
                                                     disabled={isLocked}
-                                                    onChange={(e) => updateHours(dayIndex, 'otherHours', null, e.target.value)}
+                                                    onFocus={(e) => e.target.select()}
+                                                    data-cell={`${dayIndex}-otherHours-none`}
+                                                    onClick={(e) => handleCellClick(dayIndex, 'otherHours', null, e)}
+                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'otherHours', null)}
+                                                    onInput={(e) => updateMultipleCells(dayIndex, 'otherHours', null, e.target.value)}
+                                                    onWheel={(e) => e.target.blur()}
+                                                    style={{
+                                                        backgroundColor: selectedCells.has(`${dayIndex}-otherHours-none`) ? '#e3f2fd' : 'white'
+                                                    }}
                                                 />
                                             ) : null}
                                         </td>
