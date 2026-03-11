@@ -10,6 +10,102 @@ import { ModelFieldOutput } from '../components/ModelOutput'
 import { useEngine } from '../Engine'
 import { uploadNewAttachment } from '../components/Input'
 
+const YearlySummary = ({ timesheet }) => {
+    const grants = timesheet.grants || []
+    const roleActivityLabel = timesheet.role === 'research' ? 'Research activities' : 'Administrative activities'
+
+    const yearlyData = {}
+    for (const monthData of timesheet.months || []) {
+        const { year } = monthData
+        if (!yearlyData[year]) {
+            yearlyData[year] = { grantHours: {}, roleHours: 0, teachingHours: 0, institutionalHours: 0, otherHours: 0, total: 0 }
+        }
+        const y = yearlyData[year]
+        for (const day of monthData.days || []) {
+            for (const gh of day.grantHours || []) {
+                y.grantHours[gh.grant] = (y.grantHours[gh.grant] || 0) + (gh.hours || 0)
+            }
+            y.roleHours += day.roleHours || 0
+            y.teachingHours += day.teachingHours || 0
+            y.institutionalHours += day.institutionalHours || 0
+            y.otherHours += day.otherHours || 0
+        }
+        y.total = Object.values(y.grantHours).reduce((s, v) => s + v, 0)
+            + y.roleHours + y.teachingHours + y.institutionalHours + y.otherHours
+    }
+
+    const years = Object.keys(yearlyData).sort()
+
+    const grandTotal = { grantHours: {}, roleHours: 0, teachingHours: 0, institutionalHours: 0, otherHours: 0, total: 0 }
+    for (const y of Object.values(yearlyData)) {
+        for (const [gid, hrs] of Object.entries(y.grantHours)) {
+            grandTotal.grantHours[gid] = (grandTotal.grantHours[gid] || 0) + hrs
+        }
+        grandTotal.roleHours += y.roleHours
+        grandTotal.teachingHours += y.teachingHours
+        grandTotal.institutionalHours += y.institutionalHours
+        grandTotal.otherHours += y.otherHours
+        grandTotal.total += y.total
+    }
+
+    if (years.length === 0) return null
+
+    return (
+        <div className="my-4" style={{ overflowX: 'auto' }}>
+            <h4>
+                Riepilogo – Totale ore:{' '}
+                <span className="badge bg-primary">{grandTotal.total}h</span>
+            </h4>
+            <Table bordered hover size="sm">
+                <thead className="table-light">
+                    <tr>
+                        <th>Anno</th>
+                        {grants.map((g, idx) => (
+                            <th key={idx} title={g.name}>{g.name || `Grant ${idx + 1}`}</th>
+                        ))}
+                        <th title={roleActivityLabel}>{roleActivityLabel}</th>
+                        <th>Teaching activities</th>
+                        <th>Institutional activities</th>
+                        <th>Other activities</th>
+                        <th><strong>Totale</strong></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {years.map(year => {
+                        const y = yearlyData[year]
+                        return (
+                            <tr key={year}>
+                                <td><strong>{year}</strong></td>
+                                {grants.map((g, idx) => (
+                                    <td key={idx}>{y.grantHours[g._id] || 0}h</td>
+                                ))}
+                                <td>{y.roleHours}h</td>
+                                <td>{y.teachingHours}h</td>
+                                <td>{y.institutionalHours}h</td>
+                                <td>{y.otherHours}h</td>
+                                <td><strong>{y.total}h</strong></td>
+                            </tr>
+                        )
+                    })}
+                </tbody>
+                <tfoot className="table-light">
+                    <tr>
+                        <td><strong>Totale</strong></td>
+                        {grants.map((g, idx) => (
+                            <td key={idx}><strong>{grandTotal.grantHours[g._id] || 0}h</strong></td>
+                        ))}
+                        <td><strong>{grandTotal.roleHours}h</strong></td>
+                        <td><strong>{grandTotal.teachingHours}h</strong></td>
+                        <td><strong>{grandTotal.institutionalHours}h</strong></td>
+                        <td><strong>{grandTotal.otherHours}h</strong></td>
+                        <td><strong>{grandTotal.total}h</strong></td>
+                    </tr>
+                </tfoot>
+            </Table>
+        </div>
+    )
+}
+
 const MonthSummary = ({ timesheet, refreshTimesheet }) => {
     const engine = useEngine()
     const [uploadingMonth, setUploadingMonth] = useState(null)
@@ -220,6 +316,8 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                     <ModelFieldOutput field="grants" schema={schema.grants} value={obj.grants} />
                 </p>
 
+                <YearlySummary timesheet={obj} />
+                
                 <MonthSummary timesheet={obj} refreshTimesheet={refreshTimesheet} />
 
                 <ButtonGroup>
