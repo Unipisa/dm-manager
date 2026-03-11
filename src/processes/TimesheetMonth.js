@@ -15,20 +15,35 @@ const DAY_TYPE_LABELS = {
 }
 
 const EMPLOYEE_SELECTABLE_TYPES = ['weekday', 'sick-leave', 'annual-holiday', 'other-absence']
-
 const NON_WORKING_TYPES = ['sick-leave', 'annual-holiday', 'other-absence']
+
+// Build a cell key from dayIndex, field, and an optional grant ID
+// For non-grant fields, grantId should be null/undefined → stored as 'none'
+// For grant fields, grantId should be the grant._id string
+const makeCellKey = (dayIndex, field, grantId) =>
+    `${dayIndex}-${field}-${grantId ?? 'none'}`
+
+// Parse a cell key back into its parts
+const parseCellKey = (key) => {
+    const [dayIdx, field, grantId] = key.split('-')
+    return {
+        dayIdx: parseInt(dayIdx),
+        field,
+        grantId: grantId === 'none' ? null : grantId,
+    }
+}
 
 export default function EditTimesheetMonth() {
     const { timesheetId, year, month } = useParams()
     const navigate = useNavigate()
     const engine = useEngine()
     const queryClient = useQueryClient()
-    
+
     const [modifiedDays, setModifiedDays] = useState(null)
     const [activityDescription, setActivityDescription] = useState('')
     const [hasChanges, setHasChanges] = useState(false)
     const [selectedCells, setSelectedCells] = useState(new Set())
-    const [lastSelected, setLastSelected] = useState(null)
+    const [lastSelectedKey, setLastSelectedKey] = useState(null)
 
     const apiUrl = `/api/v0/process/timesheets/${timesheetId}/${year}/${month}`
 
@@ -65,6 +80,7 @@ export default function EditTimesheetMonth() {
 
     const monthStart = new Date(year, month - 1, 1)
     const monthEnd = new Date(year, month, 0)
+
     const activeGrants = timesheet.grants?.filter(grant => {
         const grantStart = new Date(grant.startDate)
         const grantEnd = new Date(grant.endDate)
@@ -77,24 +93,24 @@ export default function EditTimesheetMonth() {
         return dayDate >= start && dayDate <= end
     }
 
-    // Round to nearest 0.5
-    const roundToHalf = (value) => {
-        return Math.round(value * 2) / 2
+    const roundToHalf = (value) => Math.round(value * 2) / 2
+
+    // Apply a numeric value to a single day entry, by field name or grant ID
+    const applyValueToDay = (day, field, grantId, numValue) => {
+        if (field === 'grant') {
+            const entry = day.grantHours.find(gh => gh.grant === grantId)
+            if (entry) entry.hours = numValue
+        } else {
+            day[field] = numValue
+        }
     }
 
-    const updateHours = (dayIndex, field, grantIndex, value) => {
+    const updateHours = (dayIndex, field, grantId, value) => {
         const newDays = [...modifiedDays]
         let numValue = parseFloat(value)
         if (isNaN(numValue)) numValue = 0
         numValue = roundToHalf(numValue)
-        
-        if (field === 'grant') {
-            if (newDays[dayIndex].grantHours[grantIndex]) {
-                newDays[dayIndex].grantHours[grantIndex].hours = numValue
-            }
-        } else {
-            newDays[dayIndex][field] = numValue
-        }
+        applyValueToDay(newDays[dayIndex], field, grantId, numValue)
         setModifiedDays(newDays)
         setHasChanges(true)
     }
@@ -113,11 +129,11 @@ export default function EditTimesheetMonth() {
         setHasChanges(true)
     }
 
-    const handleCellClick = (dayIndex, field, grantIdx, event) => {
-        const cellKey = `${dayIndex}-${field}-${grantIdx ?? 'none'}`
-        
+    // All cell keys use grant._id (or 'none') — never a positional index
+    const handleCellClick = (dayIndex, field, grantId, event) => {
+        const cellKey = makeCellKey(dayIndex, field, grantId)
+
         if (event.ctrlKey || event.metaKey) {
-            // Ctrl/Cmd: toggle selection
             const newSelected = new Set(selectedCells)
             if (newSelected.has(cellKey)) {
                 newSelected.delete(cellKey)
@@ -125,77 +141,62 @@ export default function EditTimesheetMonth() {
                 newSelected.add(cellKey)
             }
             setSelectedCells(newSelected)
-            setLastSelected(cellKey)
-        } else if (event.shiftKey && lastSelected) {
-            // Shift: select range
+            setLastSelectedKey(cellKey)
+        } else if (event.shiftKey && lastSelectedKey) {
             const newSelected = new Set(selectedCells)
-            const [lastDay, lastField, lastGrant] = lastSelected.split('-')
-            const startDay = Math.min(parseInt(lastDay), dayIndex)
-            const endDay = Math.max(parseInt(lastDay), dayIndex)
-            
-            // Simple range: same field/grant column
-            if (field === lastField && String(grantIdx ?? 'none') === lastGrant) {
+            const { dayIdx: lastDay, field: lastField, grantId: lastGrantId } = parseCellKey(lastSelectedKey)
+            // Only range-select within the same column (same field + same grantId)
+            if (field === lastField && grantId === lastGrantId) {
+                const startDay = Math.min(lastDay, dayIndex)
+                const endDay = Math.max(lastDay, dayIndex)
                 for (let i = startDay; i <= endDay; i++) {
-                    newSelected.add(`${i}-${field}-${grantIdx ?? 'none'}`)
+                    newSelected.add(makeCellKey(i, field, grantId))
                 }
             }
             setSelectedCells(newSelected)
         } else {
-            // Normal click: clear selection
             setSelectedCells(new Set([cellKey]))
-            setLastSelected(cellKey)
+            setLastSelectedKey(cellKey)
         }
     }
 
-    const handleKeyDown = (event, dayIndex, field, grantIdx) => {
+    const handleKeyDown = (event, dayIndex, field, grantId) => {
         if (event.key === 'Enter') {
             event.preventDefault()
-            // Focus next row, same column
             const nextRow = dayIndex + 1
             if (nextRow < modifiedDays.length) {
                 const nextInput = document.querySelector(
-                    `input[data-cell="${nextRow}-${field}-${grantIdx ?? 'none'}"]`
+                    `input[data-cell="${makeCellKey(nextRow, field, grantId)}"]`
                 )
                 if (nextInput) nextInput.focus()
             }
         }
     }
 
-    const updateMultipleCells = (dayIndex, field, grantIndex, value) => {
-        const cellKey = `${dayIndex}-${field}-${grantIndex ?? 'none'}`
-        
+    const updateMultipleCells = (dayIndex, field, grantId, value) => {
+        const cellKey = makeCellKey(dayIndex, field, grantId)
+
         if (selectedCells.size > 1 && selectedCells.has(cellKey)) {
-            // Update all selected cells with same value
             const newDays = [...modifiedDays]
             let numValue = parseFloat(value)
             if (isNaN(numValue)) numValue = 0
             numValue = roundToHalf(numValue)
-            
+
             selectedCells.forEach(key => {
-                const [dIdx, f, gIdx] = key.split('-')
-                const dayIdx = parseInt(dIdx)
-                const grantIdx = gIdx === 'none' ? null : parseInt(gIdx)
-                
-                if (f === 'grant' && grantIdx !== null) {
-                    if (newDays[dayIdx].grantHours[grantIdx]) {
-                        newDays[dayIdx].grantHours[grantIdx].hours = numValue
-                    }
-                } else if (f !== 'grant') {
-                    newDays[dayIdx][f] = numValue
-                }
+                const { dayIdx, field: f, grantId: gId } = parseCellKey(key)
+                applyValueToDay(newDays[dayIdx], f, gId, numValue)
             })
-            
+
             setModifiedDays(newDays)
             setHasChanges(true)
         } else {
-            // Normal single cell update
-            updateHours(dayIndex, field, grantIndex, value)
+            updateHours(dayIndex, field, grantId, value)
         }
     }
 
     const handleSave = async () => {
         try {
-            await api.patch(apiUrl, { 
+            await api.patch(apiUrl, {
                 days: modifiedDays,
                 activityDescription,
             })
@@ -213,18 +214,18 @@ export default function EditTimesheetMonth() {
     const getDayTotal = (day) => {
         if (NON_WORKING_TYPES.includes(day.dayType)) return null
         const grantTotal = day.grantHours?.reduce((sum, gh) => sum + (gh.hours || 0), 0) || 0
-        return grantTotal + (day.roleHours || 0) + (day.teachingHours || 0) 
+        return grantTotal + (day.roleHours || 0) + (day.teachingHours || 0)
             + (day.institutionalHours || 0) + (day.otherHours || 0)
     }
 
-    // Column totals
     const columnTotals = {
-        grantHours: activeGrants.map((_, grantIdx) =>
+        grantHours: activeGrants.map(grant =>
             modifiedDays.reduce((sum, day) => {
                 if (NON_WORKING_TYPES.includes(day.dayType)) return sum
-                return sum + (day.grantHours?.[grantIdx]?.hours || 0)
+                const gh = day.grantHours?.find(g => g.grant === grant._id)
+                return sum + (gh?.hours || 0)
             }, 0)
-        ) || [],
+        ),
         roleHours: modifiedDays.reduce((sum, day) => {
             if (NON_WORKING_TYPES.includes(day.dayType)) return sum
             return sum + (day.roleHours || 0)
@@ -242,13 +243,33 @@ export default function EditTimesheetMonth() {
             return sum + (day.otherHours || 0)
         }, 0),
     }
+
     const grandTotal = columnTotals.grantHours.reduce((s, h) => s + h, 0)
-        + columnTotals.roleHours + columnTotals.teachingHours 
+        + columnTotals.roleHours + columnTotals.teachingHours
         + columnTotals.institutionalHours + columnTotals.otherHours
 
     const dayOfWeekLabels = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab']
-
     const formatHours = (hours) => hours.toFixed(1).replace('.', ',')
+
+    // Shared props factory to avoid repetition for non-grant fields
+    const makeFieldInputProps = (dayIndex, field, value) => ({
+        type: 'number',
+        size: 'sm',
+        min: '0',
+        max: '24',
+        step: '0.5',
+        value,
+        disabled: isLocked,
+        onFocus: (e) => e.target.select(),
+        'data-cell': makeCellKey(dayIndex, field, null),
+        onClick: (e) => handleCellClick(dayIndex, field, null, e),
+        onKeyDown: (e) => handleKeyDown(e, dayIndex, field, null),
+        onInput: (e) => updateMultipleCells(dayIndex, field, null, e.target.value),
+        onWheel: (e) => e.target.blur(),
+        style: {
+            backgroundColor: selectedCells.has(makeCellKey(dayIndex, field, null)) ? '#e3f2fd' : 'white'
+        }
+    })
 
     return (
         <>
@@ -258,9 +279,7 @@ export default function EditTimesheetMonth() {
 
             <Card className="shadow mt-3 mb-3">
                 <Card.Body className="py-2">
-                    <p className="mb-1">
-                        <strong>📋 Istruzioni:</strong>
-                    </p>
+                    <p className="mb-1"><strong>📋 Istruzioni:</strong></p>
                     <ul className="mb-0" style={{ fontSize: '0.9em' }}>
                         <li>Inserire le ore lavorate per ogni giorno del mese nelle colonne appropriate</li>
                         <li>Le ore vengono automaticamente arrotondate a incrementi di 0,5 (es. 3,8 diventa 4,0)</li>
@@ -286,44 +305,33 @@ export default function EditTimesheetMonth() {
                     <div className="mb-3 p-3" style={{ backgroundColor: '#f8f9fa', borderRadius: '6px' }}>
                         <p className="mb-2"><strong>Legenda colonne:</strong></p>
                         <div style={{ fontSize: '0.85em' }}>
-                            {/* Grants */}
-                            {activeGrants && activeGrants.length > 0 && (
+                            {activeGrants.length > 0 && (
                                 <div className="mb-2">
                                     <p className="mb-1"><strong>Grants:</strong></p>
                                     {activeGrants.map((grant, idx) => (
                                         <p key={idx} className="mb-1 ms-3">
                                             • {grant.identifier
-                                                ? <>
-                                                    <strong>{grant.identifier}</strong>: {grant.name}
-                                                </>
+                                                ? <><strong>{grant.identifier}</strong>: {grant.name}</>
                                                 : grant.name
                                             }
                                         </p>
                                     ))}
                                 </div>
                             )}
-                            
-                            {/* Activities */}
                             <div className="row">
                                 <div className="col-md-6">
                                     <p className="mb-1">
-                                        • <strong>{roleActivityLabel}</strong>: {' '}
+                                        • <strong>{roleActivityLabel}</strong>:{' '}
                                         {timesheet.role === 'research'
                                             ? 'Attività di ricerca istituzionale'
                                             : 'Attività amministrativa ordinaria'
                                         }
                                     </p>
-                                    <p className="mb-1">
-                                        • <strong>Teaching</strong>: Ore di didattica (frontale e non)
-                                    </p>
+                                    <p className="mb-1">• <strong>Teaching</strong>: Ore di didattica (frontale e non)</p>
                                 </div>
                                 <div className="col-md-6">
-                                    <p className="mb-1">
-                                        • <strong>Institutional</strong>: Consigli, commissioni, ecc.
-                                    </p>
-                                    <p className="mb-1">
-                                        • <strong>Other</strong>: Altre attività non classificate
-                                    </p>
+                                    <p className="mb-1">• <strong>Institutional</strong>: Consigli, commissioni, ecc.</p>
+                                    <p className="mb-1">• <strong>Other</strong>: Altre attività non classificate</p>
                                 </div>
                             </div>
                         </div>
@@ -334,7 +342,7 @@ export default function EditTimesheetMonth() {
                             <tr>
                                 <th style={{ minWidth: '90px' }}>Giorno</th>
                                 <th style={{ minWidth: '140px' }}>Tipo</th>
-                                {activeGrants?.map((grant, idx) => (
+                                {activeGrants.map((grant, idx) => (
                                     <th key={`grant-${idx}`} style={{ minWidth: '80px' }}>
                                         {grant.identifier || grant.name || `Grant ${idx + 1}`}
                                     </th>
@@ -347,7 +355,7 @@ export default function EditTimesheetMonth() {
                             </tr>
                         </thead>
                         <tbody>
-                            {modifiedDays?.map((day, dayIndex) => {
+                            {modifiedDays.map((day, dayIndex) => {
                                 const dayDate = new Date(day.date)
                                 const dayOfWeek = dayOfWeekLabels[dayDate.getDay()]
                                 const isNonWorking = NON_WORKING_TYPES.includes(day.dayType)
@@ -365,11 +373,10 @@ export default function EditTimesheetMonth() {
 
                                         <td>
                                             {isFixed || isOutOfPeriod ? (
-                                                <span className="badge" 
-                                                      style={{ 
-                                                          backgroundColor: day.dayType === 'public-holiday' ? '#ffc107' : '#6c757d',
-                                                          color: day.dayType === 'public-holiday' ? '#000' : '#fff'
-                                                      }}>
+                                                <span className="badge" style={{
+                                                    backgroundColor: day.dayType === 'public-holiday' ? '#ffc107' : '#6c757d',
+                                                    color: day.dayType === 'public-holiday' ? '#000' : '#fff'
+                                                }}>
                                                     {DAY_TYPE_LABELS[day.dayType]}
                                                 </span>
                                             ) : (
@@ -389,14 +396,15 @@ export default function EditTimesheetMonth() {
                                             )}
                                         </td>
 
-                                        {activeGrants?.map((grant, grantIdx) => {
-                                            // Check if this grant is active for this day
+                                        {activeGrants.map((grant) => {
                                             const grantStart = new Date(grant.startDate)
                                             const grantEnd = new Date(grant.endDate)
                                             const isGrantActive = dayDate >= grantStart && dayDate <= grantEnd
-                                            
+                                            const cellKey = makeCellKey(dayIndex, 'grant', grant._id)
+                                            const grantHours = day.grantHours?.find(gh => gh.grant === grant._id)?.hours || 0
+
                                             return (
-                                                <td key={`day-${dayIndex}-grant-${grantIdx}`}>
+                                                <td key={`day-${dayIndex}-grant-${grant._id}`}>
                                                     {!isNonWorking && !isOutOfPeriod && isGrantActive ? (
                                                         <Form.Control
                                                             type="number"
@@ -404,16 +412,16 @@ export default function EditTimesheetMonth() {
                                                             min="0"
                                                             max="24"
                                                             step="0.5"
-                                                            value={day.grantHours?.[grantIdx]?.hours || 0}
+                                                            value={grantHours}
                                                             disabled={isLocked}
                                                             onFocus={(e) => e.target.select()}
-                                                            data-cell={`${dayIndex}-grant-${grantIdx}`}
-                                                            onClick={(e) => handleCellClick(dayIndex, 'grant', grantIdx, e)}
-                                                            onKeyDown={(e) => handleKeyDown(e, dayIndex, 'grant', grantIdx)}
-                                                            onInput={(e) => updateMultipleCells(dayIndex, 'grant', grantIdx, e.target.value)}
+                                                            data-cell={cellKey}
+                                                            onClick={(e) => handleCellClick(dayIndex, 'grant', grant._id, e)}
+                                                            onKeyDown={(e) => handleKeyDown(e, dayIndex, 'grant', grant._id)}
+                                                            onInput={(e) => updateMultipleCells(dayIndex, 'grant', grant._id, e.target.value)}
                                                             onWheel={(e) => e.target.blur()}
                                                             style={{
-                                                                backgroundColor: selectedCells.has(`${dayIndex}-grant-${grantIdx}`) ? '#e3f2fd' : 'white'
+                                                                backgroundColor: selectedCells.has(cellKey) ? '#e3f2fd' : 'white'
                                                             }}
                                                         />
                                                     ) : null}
@@ -422,102 +430,30 @@ export default function EditTimesheetMonth() {
                                         })}
 
                                         <td>
-                                            {!isNonWorking && !isOutOfPeriod ? (
-                                                <Form.Control
-                                                    type="number"
-                                                    size="sm"
-                                                    min="0"
-                                                    max="24"
-                                                    step="0.5"
-                                                    value={day.roleHours || 0}
-                                                    disabled={isLocked}
-                                                    onFocus={(e) => e.target.select()}
-                                                    data-cell={`${dayIndex}-roleHours-none`}
-                                                    onClick={(e) => handleCellClick(dayIndex, 'roleHours', null, e)}
-                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'roleHours', null)}
-                                                    onInput={(e) => updateMultipleCells(dayIndex, 'roleHours', null, e.target.value)}
-                                                    onWheel={(e) => e.target.blur()}
-                                                    style={{
-                                                        backgroundColor: selectedCells.has(`${dayIndex}-roleHours-none`) ? '#e3f2fd' : 'white'
-                                                    }}
-                                                />
-                                            ) : null}
+                                            {!isNonWorking && !isOutOfPeriod
+                                                ? <Form.Control {...makeFieldInputProps(dayIndex, 'roleHours', day.roleHours || 0)} />
+                                                : null}
+                                        </td>
+                                        <td>
+                                            {!isNonWorking && !isOutOfPeriod
+                                                ? <Form.Control {...makeFieldInputProps(dayIndex, 'teachingHours', day.teachingHours || 0)} />
+                                                : null}
+                                        </td>
+                                        <td>
+                                            {!isNonWorking && !isOutOfPeriod
+                                                ? <Form.Control {...makeFieldInputProps(dayIndex, 'institutionalHours', day.institutionalHours || 0)} />
+                                                : null}
+                                        </td>
+                                        <td>
+                                            {!isNonWorking && !isOutOfPeriod
+                                                ? <Form.Control {...makeFieldInputProps(dayIndex, 'otherHours', day.otherHours || 0)} />
+                                                : null}
                                         </td>
 
                                         <td>
-                                            {!isNonWorking && !isOutOfPeriod ? (
-                                                <Form.Control
-                                                    type="number"
-                                                    size="sm"
-                                                    min="0"
-                                                    max="24"
-                                                    step="0.5"
-                                                    value={day.teachingHours || 0}
-                                                    disabled={isLocked}
-                                                    onFocus={(e) => e.target.select()}
-                                                    data-cell={`${dayIndex}-teachingHours-none`}
-                                                    onClick={(e) => handleCellClick(dayIndex, 'teachingHours', null, e)}
-                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'teachingHours', null)}
-                                                    onInput={(e) => updateMultipleCells(dayIndex, 'teachingHours', null, e.target.value)}
-                                                    onWheel={(e) => e.target.blur()}
-                                                    style={{
-                                                        backgroundColor: selectedCells.has(`${dayIndex}-teachingHours-none`) ? '#e3f2fd' : 'white'
-                                                    }}
-                                                />
-                                            ) : null}
-                                        </td>
-
-                                        <td>
-                                            {!isNonWorking && !isOutOfPeriod ? (
-                                                <Form.Control
-                                                    type="number"
-                                                    size="sm"
-                                                    min="0"
-                                                    max="24"
-                                                    step="0.5"
-                                                    value={day.institutionalHours || 0}
-                                                    disabled={isLocked}
-                                                    onFocus={(e) => e.target.select()}
-                                                    data-cell={`${dayIndex}-institutionalHours-none`}
-                                                    onClick={(e) => handleCellClick(dayIndex, 'institutionalHours', null, e)}
-                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'institutionalHours', null)}
-                                                    onInput={(e) => updateMultipleCells(dayIndex, 'institutionalHours', null, e.target.value)}
-                                                    onWheel={(e) => e.target.blur()}
-                                                    style={{
-                                                        backgroundColor: selectedCells.has(`${dayIndex}-institutionalHours-none`) ? '#e3f2fd' : 'white'
-                                                    }}
-                                                />
-                                            ) : null}
-                                        </td>
-
-                                        <td>
-                                            {!isNonWorking && !isOutOfPeriod ? (
-                                                <Form.Control
-                                                    type="number"
-                                                    size="sm"
-                                                    min="0"
-                                                    max="24"
-                                                    step="0.5"
-                                                    value={day.otherHours || 0}
-                                                    disabled={isLocked}
-                                                    onFocus={(e) => e.target.select()}
-                                                    data-cell={`${dayIndex}-otherHours-none`}
-                                                    onClick={(e) => handleCellClick(dayIndex, 'otherHours', null, e)}
-                                                    onKeyDown={(e) => handleKeyDown(e, dayIndex, 'otherHours', null)}
-                                                    onInput={(e) => updateMultipleCells(dayIndex, 'otherHours', null, e.target.value)}
-                                                    onWheel={(e) => e.target.blur()}
-                                                    style={{
-                                                        backgroundColor: selectedCells.has(`${dayIndex}-otherHours-none`) ? '#e3f2fd' : 'white'
-                                                    }}
-                                                />
-                                            ) : null}
-                                        </td>
-
-                                        <td>
-                                            {dayTotal !== null 
+                                            {dayTotal !== null
                                                 ? <strong>{formatHours(dayTotal)}</strong>
-                                                : null
-                                            }
+                                                : null}
                                         </td>
                                     </tr>
                                 )

@@ -81,7 +81,6 @@ class TimesheetController extends Controller {
             if (!timesheet) {
                 return res.status(404).send({ error: 'Timesheet not found' })
             }
-            
             const monthData = timesheet.months.find(m => 
                 m.year === parseInt(year) && m.month === parseInt(month)
             )
@@ -109,7 +108,6 @@ class TimesheetController extends Controller {
             if (!timesheet) {
                 return res.status(404).send({ error: 'Timesheet not found' })
             }
-            
             const monthData = timesheet.months.find(m => 
                 m.year === parseInt(year) && m.month === parseInt(month)
             )
@@ -124,7 +122,6 @@ class TimesheetController extends Controller {
             if (!uploadId) {
                 return res.status(400).send({ error: 'No PDF upload ID provided' })
             }
-            
             // Delete old PDF if exists
             if (monthData.signedPdf) {
                 const Upload = require('../models/Upload')
@@ -200,13 +197,10 @@ class TimesheetController extends Controller {
     }
 
     // Update existing months preserving data (used on edit)
-    updateMonths(existingMonths, oldStart, oldEnd, newStart, newEnd, oldGrants, newGrants) {
-        // Figure out which grant IDs were added/removed
-        const oldGrantIds = oldGrants.map(g => g._id)
-        const newGrantIds = newGrants.map(g => g._id)
-        const addedGrants = newGrantIds.filter(id => !oldGrantIds.includes(id))
-        const removedGrants = oldGrantIds.filter(id => !newGrantIds.includes(id))
-        const grantsChanged = addedGrants.length > 0 || removedGrants.length > 0
+updateMonths(existingMonths, newStart, newEnd, oldGrantIds, newGrantIds) {
+    const addedGrants   = newGrantIds.filter(id => !oldGrantIds.includes(id))
+    const removedGrants = oldGrantIds.filter(id => !newGrantIds.includes(id))
+    const grantsChanged = addedGrants.length > 0 || removedGrants.length > 0
 
         // Build a map of existing months for easy lookup: "year-month" -> monthData
         const existingMap = {}
@@ -232,7 +226,6 @@ class TimesheetController extends Controller {
                 for (const d of existing.days) {
                     existingDaysMap[d.day] = d
                 }
-
                 const days = []
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(year, month - 1, day)
@@ -244,7 +237,7 @@ class TimesheetController extends Controller {
                             if (grantsChanged) {
                                 // Remove deleted grants
                                 existingDay.grantHours = existingDay.grantHours.filter(
-                                    gh => !removedGrants.includes(gh._id)
+                                    gh => !removedGrants.includes(gh.grant.toString())
                                 )
                                 // Add new grants
                                 for (const grantId of addedGrants) {
@@ -255,7 +248,7 @@ class TimesheetController extends Controller {
                             days.push(existingDay)
                         } else {
                             // Day is new (date range extended) - create fresh
-                            days.push(this.createDayEntry(date, newGrants))
+                            days.push(this.createDayEntry(date, newGrantsIds))
                         }
                     }
                     // Days outside new range are simply not included (deleted)
@@ -303,37 +296,36 @@ class TimesheetController extends Controller {
 
     async patch(req, res, id) {
         const existing = await Timesheet.findById(id)
-        
-        if (!existing) {
-            return res.status(404).send({ error: 'Timesheet not found' })
-        }
-        
-        // Check if dates or grants changed
+        if (!existing) return res.status(404).send({ error: 'Timesheet not found' })
+
         const startDate = req.body.startDate ?? existing.startDate
         const endDate   = req.body.endDate   ?? existing.endDate
-        const grants    = req.body.grants    ?? existing.grants
 
         if (startDate && endDate) {
             const oldStart = existing.startDate
             const oldEnd   = existing.endDate
             const newStart = new Date(startDate)
             const newEnd   = new Date(endDate)
-            
-            const datesChanged = oldStart.getTime() !== newStart.getTime() || 
-                                 oldEnd.getTime() !== newEnd.getTime()
-            const grantsChanged = JSON.stringify(grants) !== JSON.stringify(existing.grants)
+
+            // Normalize both to plain string ID arrays
+            const oldGrantIds = existing.grants.map(g => g.toString())
+            const newGrantIds = (req.body.grants ?? existing.grants).map(g => (g._id ?? g).toString())
+
+            const datesChanged = oldStart.getTime() !== newStart.getTime() ||
+                                oldEnd.getTime()   !== newEnd.getTime()
+            const grantsChanged = JSON.stringify([...oldGrantIds].sort()) !== 
+                                JSON.stringify([...newGrantIds].sort())
 
             if (datesChanged || grantsChanged) {
                 req.body.months = this.updateMonths(
                     existing.months,
-                    oldStart, oldEnd,
                     newStart, newEnd,
-                    existing.grants,
-                    grants
+                    oldGrantIds,
+                    newGrantIds  
                 )
             }
         }
-        
+
         return super.patch(req, res, id)
     }
 }
