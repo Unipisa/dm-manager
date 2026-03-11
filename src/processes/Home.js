@@ -82,7 +82,7 @@ export default function Home() {
                     </Card.Body>
                 </Card>
             </div> }
-            { user.person &&  
+            { user.hasProcessPermission('/process/visitsList') &&
             <div className="col-lg-6 p-3">
                 <Card className="shadow">
                     <Card.Header>                    
@@ -248,7 +248,7 @@ export function ProcessDropdown() {
         <NavDropdown.Item key="visits" as={NavLink} to="/process/visits">
             Gestione Visitatori
         </NavDropdown.Item>)
-    if (user.person) items.push(
+    if (user.hasProcessPermission('/process/visitsList')) items.push(
         <NavDropdown.Item key="visitsList" as={NavLink} to="/process/visitsList">
             Elenco Visitatori
         </NavDropdown.Item>)
