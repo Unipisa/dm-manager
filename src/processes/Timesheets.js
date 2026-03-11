@@ -21,7 +21,7 @@ const getMonthHours = (monthData) => {
     
     for (const day of monthData.days) {
         for (const gh of day.grantHours || []) {
-            const id = gh.grant?.toString() || gh.grant
+            const id = gh.grant
             result.grantHours[id] = (result.grantHours[id] || 0) + (gh.hours || 0)
         }
         result.roleHours += day.roleHours || 0
@@ -77,7 +77,9 @@ export default function ManageTimesheets() {
 
     // Compute yearly summary
     const years = [...new Set(timesheet.months?.map(m => m.year) || [])].sort()
-    const grants = timesheet.grants || []
+    const grants = [...(timesheet.grants || [])].sort((a, b) => 
+        (a.name || '').localeCompare(b.name || '')
+    ) || []
 
     // yearlyData[year] = { grantHours: {grantId: hours}, roleHours, teachingHours, institutionalHours, otherHours, total }
     const yearlyData = {}
@@ -134,10 +136,6 @@ export default function ManageTimesheets() {
                         {timesheet.fiscalCode || '---'}
                     </p>
                     <p>
-                        <strong>Coordinatore:</strong>{' '}
-                        {timesheet.projectCoordinator?.firstName} {timesheet.projectCoordinator?.lastName}
-                    </p>
-                    <p>
                         <strong>Beneficiario:</strong>{' '}
                         {timesheet.beneficiary || '---'}
                     </p>
@@ -184,7 +182,7 @@ export default function ManageTimesheets() {
                                     <th>Anno</th>
                                     {grants.map((g, idx) => (
                                         <th key={idx} title={g.name}>
-                                            {g.identifier || g.name || `Grant ${idx + 1}`}
+                                            {g.name || `Grant ${idx + 1}`}
                                         </th>
                                     ))}
                                     <th title={roleActivityLabel}>{roleActivityLabel}</th>

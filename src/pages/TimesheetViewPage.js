@@ -192,10 +192,6 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                     {obj.fiscalCode || '---'}
                 </p>
                 <p>
-                    <strong className="align-top">Coordinatore: </strong>
-                    <ModelFieldOutput field="employee" schema={schema.projectCoordinator} value={obj.projectCoordinator} />
-                </p>
-                <p>
                     <strong className="align-top">Beneficiario: </strong>
                     {obj.beneficiary || '---'}
                 </p>
@@ -229,6 +225,9 @@ const TimesheetView = ({ Model, refreshTimesheet }) => {
                 <ButtonGroup>
                     <Button key='edit' className="btn-warning" onClick={() => navigate('edit')}>
                         modifica
+                    </Button>
+                    <Button key='clone' className="btn-primary" onClick={() => navigate(`${Model.editUrl('__new__')}?clone=${obj._id}`)}>
+                        duplica
                     </Button>
                     <Button key='index' className="btn btn-secondary" onClick={() => navigate(-1)}>
                         torna all'elenco

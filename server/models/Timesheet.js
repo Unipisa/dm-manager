@@ -88,17 +88,11 @@ const timesheetSchema = new Schema({
         label: 'Codice fiscale', 
         help: 'il codice fiscale del soggetto che lavora al progetto' 
     },
-    projectCoordinator: { 
-        type: ObjectId, 
-        ref: 'Person', 
-        label: 'Coordinatore', 
-        required: true, 
-        help: 'il coordinatore del progetto (inserirlo anche se è uguale al dipendente)'
-    },
     beneficiary: { 
         type: String, 
-        label: 'Beneficiario', 
-        help: 'es. UNIPI - Dipartimento di Matematica' 
+        label: 'Beneficiario',
+        default: 'Università di Pisa - Dipartimento di Matematica',
+        help: 'es. Università di Pisa - Dipartimento di Matematica' 
     },
     headOfDepartment: { 
         type: ObjectId, 
