@@ -1,10 +1,11 @@
-import { Button, Card, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card, OverlayTrigger, Tooltip, Form, Alert } from 'react-bootstrap'
 import { useState } from "react"
 
 import { myDateFormat, useEngine } from "../Engine"
 import Loading from "../components/Loading"
 import { ModelFieldInput } from "../components/ModelInput"
 import { ModelFieldOutput } from "../components/ModelOutput"
+import api from "../api"
 
 export function FieldOutput({ Model, obj, field, label, editable }) {
     const [edit, setEdit] = useState(false)
@@ -45,6 +46,92 @@ export function FieldOutput({ Model, obj, field, label, editable }) {
     </div>
 }
 
+function ChangePasswordForm() {
+    const [currentPassword, setCurrentPassword] = useState('')
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [message, setMessage] = useState(null)
+    const [error, setError] = useState(null)
+
+    async function handleSubmit(e) {
+        e.preventDefault()
+        setError(null)
+        setMessage(null)
+
+        if (newPassword !== confirmPassword) {
+            setError("Le password non coincidono")
+            return
+        }
+
+        if (newPassword.length < 6) {
+            setError("La nuova password deve essere di almeno 6 caratteri")
+            return
+        }
+
+        setLoading(true)
+        try {
+            const result = await api.post('/api/v0/profile/changePassword', {
+                currentPassword,
+                newPassword
+            })
+            setMessage(result.message || "Password modificata con successo")
+            setCurrentPassword('')
+            setNewPassword('')
+            setConfirmPassword('')
+        } catch (err) {
+            setError(err.message || "Errore durante il cambio password")
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <Form onSubmit={handleSubmit}>
+            {error && <Alert variant="danger" onClose={() => setError(null)} dismissible>{error}</Alert>}
+            {message && <Alert variant="success" onClose={() => setMessage(null)} dismissible>{message}</Alert>}
+            
+            <Form.Group className="mb-3">
+                <Form.Label>Password attuale</Form.Label>
+                <Form.Control
+                    type="password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    required
+                />
+            </Form.Group>
+            
+            <Form.Group className="mb-3">
+                <Form.Label>Nuova password</Form.Label>
+                <Form.Control
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={8}
+                />
+                <Form.Text className="text-muted">
+                    Minimo 6 caratteri
+                </Form.Text>
+            </Form.Group>
+            
+            <Form.Group className="mb-3">
+                <Form.Label>Conferma nuova password</Form.Label>
+                <Form.Control
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                />
+            </Form.Group>
+            
+            <Button type="submit" variant="primary" disabled={loading}>
+                {loading ? 'Salvataggio...' : 'Cambia password'}
+            </Button>
+        </Form>
+    )
+}
+
 const adminEmail = 'help@dm.unipi.it'
 
 const AdminEmail = function () {
@@ -61,6 +148,7 @@ export default function Profile() {
     const getVisits = engine.useGet("profile/visit")
     const getGrants = engine.useGet("profile/grant")
     const getTheses = engine.useGet("profile/thesis")
+    const getHasLocalPassword = engine.useGet("profile/hasLocalPassword")
 
     const User = engine.Models.User
     const Person = engine.Models.Person
@@ -94,6 +182,17 @@ export default function Profile() {
             </Card.Footer>
         </Card>)
         : <Loading />}
+
+        {getHasLocalPassword.isSuccess && getHasLocalPassword.data.hasLocalPassword && (
+            <Card className="mt-2">
+                <Card.Header>
+                    <h3>Cambia password locale</h3>
+                </Card.Header>
+                <Card.Body>
+                    <ChangePasswordForm />
+                </Card.Body>
+            </Card>
+        )}
 
         {getPeople.isSuccess 
             ? getPeople.data.data.map(person => <Card key={person._id} className="mt-2">

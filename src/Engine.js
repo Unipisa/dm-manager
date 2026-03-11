@@ -170,6 +170,8 @@ export function useCreateEngine() {
 
         user: state.user,
 
+        api,
+
         impersonate_role: async (role) => {
             let user = new_user(await api.post("/impersonate", { role }))
             setState(s => ({ ...s, user }))

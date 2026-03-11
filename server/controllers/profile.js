@@ -206,4 +206,59 @@ module.exports = function profile(router, path) {
             res.status(400).send({error: error.message})
         }
     })
+
+    // Check if user has local password (hash field exists)
+    router.get(`${path}/hasLocalPassword`, async (req, res) => {
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+        
+        try {
+            // Need to fetch from DB to see hash field (it's stripped from toObject)
+            const dbUser = await User.findById(user._id).select('hash')
+            const hasLocalPassword = !!(dbUser && dbUser.hash)
+            res.send({ hasLocalPassword })
+        } catch(error) {
+            console.error(error)
+            res.status(400).send({error: error.message})
+        }
+    })
+
+    // Change local password
+    router.post(`${path}/changePassword`, async (req, res) => {
+        const user = req.user || null
+        if (!user) return res.status(401).send({error: "Not authenticated"})
+
+        const { currentPassword, newPassword } = req.body
+
+        if (!currentPassword || !newPassword) {
+            return res.status(400).send({error: "Devi inserire la password attuale e la nuova password"})
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).send({error: "La nuova password deve essere di almeno 6 caratteri"})
+        }
+
+        try {
+            const dbUser = await User.findById(user._id)
+            if (!dbUser || !dbUser.hash) {
+                return res.status(400).send({error: "Questo utente non ha una password locale"})
+            }
+
+            // Verify current password using passport-local-mongoose authenticate method
+            const { user: authenticatedUser, error } = await dbUser.authenticate(currentPassword)
+            
+            if (error || !authenticatedUser) {
+                return res.status(400).send({error: "La password attuale non è corretta"})
+            }
+
+            // Set new password
+            await dbUser.setPassword(newPassword)
+            await dbUser.save()
+
+            res.send({ success: true, message: "Password modificata con successo" })
+        } catch(error) {
+            console.error(error)
+            res.status(400).send({error: error.message})
+        }
+    })
 }
