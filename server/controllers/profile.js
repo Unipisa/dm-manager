@@ -239,7 +239,7 @@ module.exports = function profile(router, path) {
         }
 
         try {
-            const dbUser = await User.findById(user._id)
+            const dbUser = await User.findById(user._id).select('+hash')
             if (!dbUser || !dbUser.hash) {
                 return res.status(400).send({error: "Questo utente non ha una password locale"})
             }
