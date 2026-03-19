@@ -268,7 +268,7 @@ updateMonths(existingMonths, newStart, newEnd, oldGrantIds, newGrantIds) {
                 for (let day = 1; day <= daysInMonth; day++) {
                     const date = new Date(year, month - 1, day)
                     if (date >= newStart && date <= newEnd) {
-                        days.push(this.createDayEntry(date, newGrants))
+                        days.push(this.createDayEntry(date, newGrantIds))
                     }
                 }
                 months.push({ year, month, locked: false, days })
