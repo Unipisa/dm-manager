@@ -248,7 +248,7 @@ updateMonths(existingMonths, newStart, newEnd, oldGrantIds, newGrantIds) {
                             days.push(existingDay)
                         } else {
                             // Day is new (date range extended) - create fresh
-                            days.push(this.createDayEntry(date, newGrantsIds))
+                            days.push(this.createDayEntry(date, newGrantIds))
                         }
                     }
                     // Days outside new range are simply not included (deleted)
