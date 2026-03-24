@@ -110,8 +110,9 @@ export function isEnglish(defaultValue = false) {
     if (defaultValue === true || defaultValue === "true") {
         return true;
     }
-    const wpml = getCookie('wp-wpml_current_language');
-    return wpml === 'en';
+    const lang = document.documentElement.lang;
+    //if (!lang) return true; // default to English if no lang attribute
+    return lang.startsWith('en');
 }
 
 export function getDMURL(path) {
