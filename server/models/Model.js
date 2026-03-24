@@ -63,7 +63,7 @@ const groupCodes = [
     'giunta-dipartimento',
     'paritetica-cds', 
     'paritetica-dipartimento',
-    'personale-ta',
+    'personale-ta', 'bilancio', 'didattica', 'ricerca',
     'riesame-dottorato-matematica', 
 ]
 
