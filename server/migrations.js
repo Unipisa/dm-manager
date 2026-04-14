@@ -15,109 +15,6 @@
  * più allo stato del database
  */
 
-const { default: axios } = require('axios')
-const he = require('he')
-const assert = require('assert')
-const jsdom = require('jsdom')
-const { ObjectId } = require('mongodb')
-
-async function findPerson(people, firstName, lastName, affiliazione) {
-    let p = await people.findOne({ firstName, lastName })
-    if (p === null) {
-        p = await people.insertOne({ 
-            firstName, 
-            lastName, 
-            affiliation: affiliazione || "Università di Pisa",
-            notes: `creato da migrazione\n***fix affiliation: ${affiliazione}\n`,
-        })
-        console.log(`Nuova persona creata: ${firstName} ${lastName}`)
-        return p.insertedId
-    } else {
-        console.log(`Persona trovata: ${firstName} ${lastName} ${p._id}`)
-        return p._id
-    }
-}
-
-async function findPerson2(people, fullName, affiliazione) {
-    const names = fullName.split(' ').filter(n => n !== '')
-    let p = null
-    if (names.length === 2) {
-        return await findPerson(people, names[0], names[1], affiliazione)
-    } else if (names.length ===3 && ['de','di','da','dal','del'].includes(names[1].toLowerCase())) {
-        return await findPerson(people, names[0], `${names[1]} ${names[2]}`)
-    } else {
-        // find people where firstName + lastName equals fullName        
-        p = await people.aggregate([
-            {   $project: {
-                    _id: 1,
-                    firstName: 1,
-                    lastName: 1,
-                    fullName: { $concat: ['$firstName', ' ', '$lastName'] }
-                },                    
-            },
-            { $match: { fullName } },
-        ]).toArray()
-        if (p.length === 1) {
-            console.log(`found ${fullName} as ${p[0].firstName}+${p[0].lastName}`)
-            return p[0]._id
-        } else {
-            return findPerson(people, fullName, '')
-        }
-    }
-}
-
-function parseHTML(html) {
-    const dom = new jsdom.JSDOM(html, 'text/html')
-    const doc = dom.window.document
-    let out = parseElement(doc.body).trim()
-    out = out.replace('\n\n\n', '\n\n')
-    out = out.replace('\n\n\n', '\n\n')
-    out = out.replace('\n\n\n', '\n\n')
-    return out            
-}
-
-function parseElement(el) {
-    const nodeName = el.nodeName.toLowerCase()
-    if (nodeName === '#text') return el.textContent
-    const children = [...el.childNodes].map((child, i) => 
-        parseElement(child)).join('')
-    switch (nodeName) {
-        case 'body':
-            return children
-        case 'h4':
-            return `#### ${children}`
-        case 'h3':
-            return `### ${children}`
-        case 'h2':
-            return `## ${children}`
-        case 'h1':
-            return `# ${children}`
-        case 'p':
-            return `${children}\n`
-        case 'br':
-            return `\n\n`
-        case 'em':
-        case 'i':
-            return `*${children}*`
-        case 'a':
-            return `[${children}](${el.href})`
-        case 'strong':
-        case 'b':
-            return `**${children}**`
-        case 'ul':
-        case 'ol':
-            return `${children}\n`
-        case 'li':
-            return `* ${children}\n`
-        case 'pre':
-            return `\`\`\`\n${children}\n\`\`\`\n`
-        case 'img':
-            return `![${el.alt}](${el.src})`
-        default: 
-            console.log(`unexpected node ${nodeName}`)
-            return children
-    }
-}
 
 const migrations = { 
     D20221112_migration_test: async (db) => {
@@ -448,21 +345,6 @@ const migrations = {
             await seminars.updateOne({ _id: seminar._id }, 
                 { $set: { oldAbstract: seminar.abstract } })
             }
-        return true
-    },
-
-    D20231028_convert_html_to_markdown_1: async function(db) {
-        const seminars = db.collection('eventseminars')
-        const conferences = db.collection('eventconferences')
-    
-        for(const seminar of await seminars.find({}).toArray()) {
-            const abstract = seminar.oldAbstract
-            if (!abstract) continue
-            const parsed = parseHTML(abstract)
-            await seminars.updateOne({ _id: seminar._id },
-                { $set: { abstract: parsed } })
-            }
-        
         return true
     },
 
