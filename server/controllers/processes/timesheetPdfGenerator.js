@@ -115,7 +115,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     const rightColLines = 2 // Beneficiary, Head of Dept
 
     const lineHeight = 15
-    const grantLineHeight = 10
+    const grantLineHeight = 18
     const paddingBottom = 10
 
     const leftColHeight = basicInfoLines * lineHeight + (grantsLines > 0 ? 15 + grantsLines * grantLineHeight : 0)
@@ -165,7 +165,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
                 : `• ${name}${projectType}`
             
             doc.text(grantText, leftColX + 5, currentY, { width: boxWidth - 25 })
-            currentY += grantLineHeight
+            currentY = doc.y + 2 
         }
         doc.fontSize(9)
     }
