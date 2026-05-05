@@ -343,7 +343,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
         // Grant hours
         for (let i = 0; i < (activeGrants?.length || 0); i++) {
-            const hours = day.grantHours?.[i]?.hours || 0
+            const hours = day.grantHours?.find(g => g.grant === activeGrants[i]._id.toString())?.hours || 0
             doc.rect(xPos, yPos, activityColWidth, rowHeight).stroke()
             if (!isNonWorking) {
                 doc.text(formatHours(hours), xPos + 1, yPos + 3, { 
