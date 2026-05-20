@@ -566,8 +566,11 @@ class Controller {
 
     async index (req, res) {
         //console.log(`*** INDEX ${req.path} ${JSON.stringify(req.query)}`)
-        return this.performQuery(req.query, res,
-            {queryPipeline: this.indexPipeline.length ? this.indexPipeline : this.queryPipeline})
+        const full = req.query._full === '1'
+        const query = { ...req.query }
+        delete query._full
+        return this.performQuery(query, res,
+            {queryPipeline: this.indexPipeline.length && !full ? this.indexPipeline : this.queryPipeline})
     }
 
     async put(req, res) {

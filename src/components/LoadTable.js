@@ -1,10 +1,129 @@
 import { useCallback, useRef, useState } from 'react'
 import { Table, Button } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { CSVLink } from "react-csv"
 
 import { useEngine, myDateFormat, useQueryFilter } from '../Engine'
 import Loading from './Loading'
+
+// ------------------------------------------------------------
+// CSV helpers
+// ------------------------------------------------------------
+ 
+/**
+ * Recursively flattens a nested object into dot-notation keys.
+ * Example: { person: { firstName: 'A', lastName: 'B' } }
+ *       => { 'person.firstName': 'A', 'person.lastName': 'B' }
+ *
+ * Arrays of primitives are joined with ', '.
+ * Arrays of objects are flattened with index suffix: speakers.0.lastName, etc.
+ */
+function flattenObject(obj, prefix = '', result = {}) {
+    if (obj === null || obj === undefined) {
+        result[prefix] = ''
+        return result
+    }
+    if (typeof obj !== 'object') {
+        result[prefix] = obj
+        return result
+    }
+    if (Array.isArray(obj)) {
+        if (obj.length === 0) {
+            result[prefix] = ''
+        } else if (typeof obj[0] !== 'object') {
+            // primitive array → join
+            result[prefix] = obj.join(', ')
+        } else {
+            // object array → flatten each element with index
+            obj.forEach((item, i) => {
+                flattenObject(item, prefix ? `${prefix}.${i}` : String(i), result)
+            })
+        }
+        return result
+    }
+    // plain object
+    for (const [key, val] of Object.entries(obj)) {
+        const newKey = prefix ? `${prefix}.${key}` : key
+        flattenObject(val, newKey, result)
+    }
+    return result
+}
+ 
+/**
+ * Given an array of raw mongo documents, returns:
+ *   { headers: [{label, key}, ...], rows: [{...}, ...] }
+ *
+ * If `csvHeaders` is provided (array of key strings), only those columns
+ * are included (in that order); otherwise all flattened keys are used.
+ *
+ * Internal mongo/system fields are always stripped.
+ */
+const STRIP_KEYS = new Set(['__v', 'createdBy', 'updatedBy'])
+const STRIP_PREFIX = ['_'] // strip keys starting with _ except explicit overrides
+ 
+function buildCsvData(data, csvHeaders) {
+    if (!data || data.length === 0) return { headers: [], rows: [] }
+ 
+    // Flatten all rows
+    const flatRows = data.map(obj => flattenObject(obj))
+ 
+    let keys
+    if (csvHeaders && csvHeaders.length > 0) {
+        keys = csvHeaders
+    } else {
+        // Collect all keys from all rows, preserving insertion order
+        const keySet = new Set()
+        for (const row of flatRows) {
+            for (const k of Object.keys(row)) {
+                if (STRIP_KEYS.has(k)) continue
+                if (STRIP_PREFIX.some(p => k.startsWith(p))) continue
+                keySet.add(k)
+            }
+        }
+        keys = [...keySet]
+    }
+ 
+    const headers = keys.map(k => ({ label: k, key: k }))
+    const rows = flatRows.map(flat => {
+        const row = {}
+        for (const k of keys) {
+            const val = flat[k]
+            // format dates
+            if (typeof val === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(val)) {
+                row[k] = myDateFormat(val)
+            } else if (val === null || val === undefined) {
+                row[k] = ''
+            } else {
+                row[k] = val
+            }
+        }
+        return row
+    })
+ 
+    return { headers, rows }
+}
+ 
+/**
+ * Convert array-of-objects to CSV string and trigger browser download.
+ */
+function downloadCsv(headers, rows, filename = 'export.csv') {
+    const escape = val => {
+        const s = String(val ?? '')
+        if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+            return `"${s.replace(/"/g, '""')}"`
+        }
+        return s
+    }
+    const headerLine = headers.map(h => escape(h.label)).join(',')
+    const bodyLines = rows.map(row => headers.map(h => escape(row[h.key])).join(','))
+    const csv = [headerLine, ...bodyLines].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = filename
+    a.click()
+    URL.revokeObjectURL(url)
+}
 
 export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, addButton, columns, csvHeaders, Filters}) {    
     const engine = useEngine()
@@ -15,31 +134,44 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         viewUrl(obj), {replace: false, state: { fromApp: true } }), [navigate, viewUrl])
     const scrollRef = useRef(null)
     const [selectedIds, setSelectedIds] = useState([])
+    const [csvLoading, setCsvLoading] = useState(false)
+ 
     columns ||= []
     if (Array.isArray(columns)) {
         columns = Object.fromEntries(columns.map(key => [key, key]))
     }
-    // convert strings to objects with label
     columns = Object.fromEntries(Object.entries(columns).map((
-        [key, label]) => (typeof label === 'string') 
-            ? [key, {label}]
-            : [key, label]))
-    csvHeaders ||= fieldsInfo ? computeCsvHeaders(fieldsInfo): undefined
-    /*
-     * infite loop!
-    useEffect(() => {
-        const observer = new IntersectionObserver(() => {
-            console.log(`Intersection observer fired`)
-            if (!query.isSuccess) return
-            if (query.data.data.length >= query.data.total) return
-            if (filter._limit >= query.data.total) return
-            console.log(`extendLimit (${query.data.data.length} / ${query.data.total})`)
-            filter.extendLimit()
-        })
-        if (scrollRef.current) observer.observe(scrollRef.current)
-        //return () => observer.unobserve(scrollRef.current)
-    }, [scrollRef])
-    */
+        [key, label]) => (typeof label === 'string')
+        ? [key, { label }]
+        : [key, label]))
+ 
+    // ----------------------------------------------------------
+    // CSV export: fetch ALL data from the full queryPipeline
+    // (not the indexPipeline), then flatten and download.
+    // ----------------------------------------------------------
+    async function handleCsvExport() {
+        setCsvLoading(true)
+        try {
+            // Build query params: same active filters but no limit,
+            // and no _sort (server default). We send _limit=0 to get all records.
+            const exportFilter = { ...filter.filter, _limit: 0, _full: 1 }
+            // Remove pagination-only keys that aren't filters
+            delete exportFilter._sort
+ 
+            const data = await engine.api.get(`/api/v0/${path}`, exportFilter)
+            const allRows = data?.data ?? []
+ 
+            const { headers, rows } = buildCsvData(allRows, csvHeaders)
+ 
+            // derive a nice filename from the path
+            const filename = path.replace(/\//g, '_') + '.csv'
+            downloadCsv(headers, rows, filename)
+        } catch (err) {
+            engine.addErrorMessage(`Errore esportazione CSV: ${err.message}`)
+        } finally {
+            setCsvLoading(false)
+        }
+    }
 
     if (query.isLoading) return <Loading />
     if (!query.isSuccess) return null
@@ -96,8 +228,14 @@ export default function LoadTable({path, defaultFilter, viewUrl, fieldsInfo, add
         <div>
             <div className="d-flex mb-4">
                 <input onChange={updateFilter} value={filter.filter._search} className="mx-1 form-control" placeholder="Search..."></input>
-                <CSVLink className="btn btn-primary mx-1" data={data} filename="form.csv" target="_blank" headers={csvHeaders}>CSV</CSVLink>
-                { addButton }
+                <button
+                    className="btn btn-primary mx-1"
+                    onClick={handleCsvExport}
+                    disabled={csvLoading}
+                >
+                    {csvLoading ? 'Esportazione…' : 'CSV'}
+                </button>
+                {addButton}
             </div>
             <div style={query.isFetched ? {} : fetchingStyle}>
             { Filters && 
