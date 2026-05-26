@@ -170,7 +170,7 @@ router.patch('/:id', async (req, res) => {
     // remove fields that user cannot change
     delete payload._id
     delete payload.createdBy
-    delete payload.referencePeople
+    //delete payload.referencePeople
     payload.updatedBy = req.user._id
 
     const visit = await Visit.findOneAndUpdate(
