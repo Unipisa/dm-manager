@@ -54,3 +54,9 @@ jobs:
         context: .
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+
+    - name: Notify Omicron CI
+      if: github.event_name != 'pull_request' && github.ref == 'refs/heads/develop'
+      run: |
+        curl -X POST "https://ci.omicron.dm.unipi.it/update?api_key=${{ secrets.OMICRON_CI_API_KEY }}" -fsS
+
