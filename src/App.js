@@ -31,8 +31,6 @@ import ProcessVisitsList from './processes/VisitsList'
 import ProcessRoomAssignmentsList from './processes/RoomAssignmentsList'
 import ManageRoomLabels from './processes/RoomLabels'
 import SanityCheck from './processes/SanityCheck'
-import ProcessUrls from './processes/Urls'
-import ProcessUrl from './processes/Url'
 import ChangeRoom from './processes/ChangeRoom'
 import AddCourse from './processes/Course'
 import ManageCourses from './processes/Courses'
@@ -131,9 +129,6 @@ function Internal() {
 
             <Route path="/process/sanityCheck" element={<SanityCheck/>}/>
             <Route path="/process/changeRoom" element={<ChangeRoom/>}/>
-
-            <Route path="/process/my/urls" element={<ProcessUrls/>}/>
-            <Route path="/process/my/urls/:id" element={<ProcessUrl/>}/>
             
             <Route path="/process/my/courses" element={<ManageCourses variant="my/"/>}/>
             <Route path="/process/courses/add" element={<AddCourse variant="my/"/>}/>

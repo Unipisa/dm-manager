@@ -149,25 +149,7 @@ export default function Home() {
                 </Card.Body>
             </Card>
             </div>
-            }
-            {
-                user.hasProcessPermission('/process/my/urls') && 
-                <div className='col-lg-6 p-3'>
-                    <Card className="shadow">
-                        <Card.Header>
-                            <div className="d-flex flex-row justify-content-between">
-                                <strong>Alias Pagine Web</strong>
-                                <a href="/process/my/urls"><button className="btn btn-sm btn-primary stretched-link">Inizia</button></a>
-                            </div>
-                        </Card.Header>
-                        <Card.Body>
-                            <ul>
-                                <li>Gestisci gli alias delle pagine web personali</li>
-                            </ul>
-                        </Card.Body>
-                    </Card>
-                </div>
-            }
+            }            
             { user.hasProcessPermission('/process/my/courses') && user.person &&
             // il ruolo '/process/my/courses' viene assegnato al volo
             // vedi: server/server.js
@@ -263,11 +245,7 @@ export function ProcessDropdown() {
     if (user.hasProcessPermission('/process/roomAssignmentsList')) items.push(
         <NavDropdown.Item key="roomAssignmentsList" as={NavLink} to="/process/roomAssignmentsList">
             Assegnazioni Stanze
-        </NavDropdown.Item>)
-    if (user.hasProcessPermission('/process/my/urls')) items.push(
-        <NavDropdown.Item key="urls" as={NavLink} to="/process/my/urls">
-            Alias Pagine Web
-        </NavDropdown.Item>)
+        </NavDropdown.Item>)    
     if (user.hasProcessPermission('/process/courses')) items.push(
         <NavDropdown.Item key="courses" as={NavLink} to="/process/courses">
             Corsi di Dottorato

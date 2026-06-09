@@ -13,7 +13,6 @@ import Group from './Group'
 import Form from './Form'
 import Log from './Log'
 import Thesis from './Thesis'
-import Url from './Url'
 import Document from './Document'
 import Upload from './Upload'
 import Timesheet from './Timesheet'
@@ -27,7 +26,6 @@ const Models = {
     Token: new Token(),
     User: new User(),
     Log: new Log(),
-    Url: new Url(),
 
     // personale:
     Person: new Person(),
