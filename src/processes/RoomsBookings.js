@@ -74,22 +74,15 @@ export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime, proc
     // Filter rooms to only include area_id 4 or 8 and exclude room_id 48 (Postazione videochiamate)
     // area_id 4 = Sala Riunioni, Aula Seminari Ex-Albergo, Aula Seminari, Sala Riunioni Piano Terra, Saletta Riunioni
     // area_id 8 = Aula Magna
-    const availableRooms = allAvailableRooms.filter(room => 
+    const availableRooms = allAvailableRooms.filter(room =>
       (room.area_id === 4 || room.area_id === 8) && room.id !== 48
     )
-    
-    // Check if the requested room is in the available rooms list
+
     const isRoomAvailable = availableRooms.some(room => room.id === mrbsRoomId)
-    
-    let conflictingBooking = null
-    if (!isRoomAvailable) {
-      // If room is not available, we could try to get more details
-      // For now, we'll just indicate it's not available
-    }
-    
+
     return {
       available: isRoomAvailable,
-      conflictingBooking,
+      conflictingBooking: null,
       availableRooms
     }
   } catch (error) {
@@ -98,33 +91,76 @@ export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime, proc
   }
 }
 
+/**
+ * Determines which time intervals need to be checked for availability when
+ * modifying an existing booking. Only the *newly occupied* time is checked,
+ * since the room is already held for the original interval.
+ *
+ * Returns an array of {start, end} intervals to check (may be empty if the
+ * new window is fully contained within the old one).
+ */
+const getIntervalsToCheck = (newStart, newEnd, oldStart, oldEnd) => {
+  const intervals = []
+
+  const windowsOverlap = newStart < oldEnd && newEnd > oldStart
+
+  if (!windowsOverlap) {
+    // No overlap at all — check the entire new window
+    intervals.push({ start: newStart, end: newEnd })
+  } else {
+    // New head: the part of the new window before the old one starts
+    if (newStart < oldStart) {
+      intervals.push({ start: newStart, end: oldStart })
+    }
+
+    // New tail: the part of the new window after the old one ends
+    if (newEnd > oldEnd) {
+      intervals.push({ start: oldEnd, end: newEnd })
+    }
+    
+    // If newStart >= oldStart && newEnd <= oldEnd the booking was shortened
+    // or unchanged → no new intervals need checking.
+  }
+
+  return intervals
+}
+
+/** De-duplicates a list of room objects by id. */
+const dedupeRooms = (rooms) => {
+  const seen = new Set()
+  return rooms.filter(room => {
+    if (seen.has(room.id)) return false
+    seen.add(room.id)
+    return true
+  })
+}
+
 export const handleRoomBooking = async (eventData, process) => {
   const { conferenceRoom, startDatetime, duration, title, mrbsBookingID, organizers } = eventData
-  
-  // Check if the conference room has an mrbsRoomID
+
   if (!conferenceRoom?.mrbsRoomID) {
     return { type: 'external_room' }
   }
-  
+
   const startTime = new Date(startDatetime)
-  const endTime = new Date(startTime.getTime() + duration * 60000) // duration in minutes
-  
+  const endTime = new Date(startTime.getTime() + duration * 60000)
+
   const formatTime = (date) => date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
   const formatDate = (date) => date.toLocaleDateString('it-IT')
-  
-  // Check if this room requires approval (Aula Magna = room 33)
+
   const requiresApproval = conferenceRoom.mrbsRoomID === 33
 
-  // Check for existing booking first
+  // ------------------------------------------------------------------
+  // 1. Fetch existing booking (if any)
+  // ------------------------------------------------------------------
   let existingBooking = null
   let hasBookingChanged = false
-  
+
   if (mrbsBookingID) {
     try {
       const bookingResponse = await getBookingDetails(mrbsBookingID, process)
       if (bookingResponse) {
         existingBooking = bookingResponse
-        
         hasBookingChanged =
           Math.floor(startTime.getTime() / 1000) !== parseInt(existingBooking.start_time) ||
           Math.floor(endTime.getTime() / 1000) !== parseInt(existingBooking.end_time) ||
@@ -136,97 +172,65 @@ export const handleRoomBooking = async (eventData, process) => {
   }
 
   try {
-    let checkStart = startTime
-    let checkEnd = endTime
+    // ------------------------------------------------------------------
+    // 2. Determine which intervals actually need an availability check.
+    //    For a brand-new booking the full window is checked.
+    //    For an existing booking only the newly added time is checked.
+    // ------------------------------------------------------------------
+    let intervalsToCheck = []
     let skipCheck = false
 
     if (existingBooking) {
       const oldStart = new Date(existingBooking.start_time * 1000)
-      const oldEnd = new Date(existingBooking.end_time * 1000)
+      const oldEnd   = new Date(existingBooking.end_time   * 1000)
 
-      // booking moved later → only check the new tail (oldEnd → newEnd)
-      if (startTime >= oldStart && endTime > oldEnd) {
-        checkStart = oldEnd
-      }
-      // booking moved earlier → only check the new head (newStart → oldStart)
-      else if (startTime < oldStart && endTime <= oldEnd) {
-        checkEnd = oldStart
-      }
-      // booking extended both ways → check both new ends separately
-      else if (startTime < oldStart && endTime > oldEnd) {
-        const firstCheck = await checkRoomAvailability(conferenceRoom.mrbsRoomID, startTime, oldStart, process)
-        const secondCheck = await checkRoomAvailability(conferenceRoom.mrbsRoomID, oldEnd, endTime, process)
-        const availableRoomNames = [
-          ...(firstCheck.availableRooms || []),
-          ...(secondCheck.availableRooms || [])
-        ].map(r => r.name).join(', ') || ''
-        const isRoomActuallyAvailable = firstCheck.available && secondCheck.available
-
-        if (isRoomActuallyAvailable) {
-          return {
-            type: 'available',
-            message: `"${conferenceRoom.name}" è disponibile per il periodo selezionato.`,
-            warning: `"${conferenceRoom.name}" è disponibile sulla piattaforma Rooms.`,
-            roomData: {
-              room_id: conferenceRoom.mrbsRoomID,
-              start_time: startTime,
-              end_time: endTime,
-              name: title,
-              organizers: organizers || []
-            },
-            availableRoomNames: availableRoomNames ? `${availableRoomNames}.` : undefined
-          }
-        } else {
-          return {
-            type: 'unavailable',
-            message: `"${conferenceRoom.name}" non è disponibile per l'intero periodo selezionato.`,
-            warning: `"${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato.`,
-            availableRooms: [...(firstCheck.availableRooms || []), ...(secondCheck.availableRooms || [])],
-            availableRoomNames: `${availableRoomNames}.`
-          }
-        }
-      }
-      // booking shortened or unchanged → skip availability check
-      else if (startTime >= oldStart && endTime <= oldEnd) {
-        skipCheck = true
-      }
+      intervalsToCheck = getIntervalsToCheck(startTime, endTime, oldStart, oldEnd)
+      skipCheck = intervalsToCheck.length === 0
+    } else {
+      intervalsToCheck = [{ start: startTime, end: endTime }]
     }
 
-    let availability = { available: true, availableRooms: [] }
+    // ------------------------------------------------------------------
+    // 3. Run availability checks for each interval and merge results.
+    // ------------------------------------------------------------------
+    let isRoomAvailable = true
+    let allAvailableRooms = []
 
     if (!skipCheck) {
-      availability = await checkRoomAvailability(
-        conferenceRoom.mrbsRoomID,
-        checkStart,
-        checkEnd,
-        process
+      const results = await Promise.all(
+        intervalsToCheck.map(({ start, end }) =>
+          checkRoomAvailability(conferenceRoom.mrbsRoomID, start, end, process)
+        )
       )
+
+      isRoomAvailable = results.every(r => r.available)
+      allAvailableRooms = dedupeRooms(results.flatMap(r => r.availableRooms || []))
     }
 
-    const availableRoomNames = availability.availableRooms?.map(room => room.name).join(', ') || ''
-    const isRoomActuallyAvailable = skipCheck || availability.available || (existingBooking && hasBookingChanged === false)
-    
+    const availableRoomNames = allAvailableRooms.map(room => room.name).join(', ')
+
+    // ------------------------------------------------------------------
+    // 4. Build and return the result object.
+    // ------------------------------------------------------------------
+    const isRoomActuallyAvailable = skipCheck || isRoomAvailable
+
     if (isRoomActuallyAvailable) {
       let message, warning
-      
+
       if (existingBooking && hasBookingChanged) {
         const approvalSuffix = requiresApproval ? ' La prenotazione richiederà approvazione.' : ''
         message = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile per il periodo selezionato quindi anche la prenotazione sulla piattaforma Rooms verrà aggiornata.${approvalSuffix}`
         warning = `Hai cambiato i dettagli dell'evento. L'aula "${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.${approvalSuffix}`
       } else if (existingBooking && !hasBookingChanged) {
         const startTimeFormatted = formatTime(new Date(parseInt(existingBooking.start_time) * 1000))
-        const endTimeFormatted = formatTime(new Date(parseInt(existingBooking.end_time) * 1000))
-        const dateFormatted = formatDate(new Date(parseInt(existingBooking.start_time) * 1000))
-        
+        const endTimeFormatted   = formatTime(new Date(parseInt(existingBooking.end_time)   * 1000))
+        const dateFormatted      = formatDate(new Date(parseInt(existingBooking.start_time) * 1000))
+
         let approvalStatus = ''
         if (requiresApproval) {
-          if (existingBooking.awaiting_approval) {
-            approvalStatus = ' (in attesa di approvazione)'
-          } else {
-            approvalStatus = ' (approvata)'
-          }
+          approvalStatus = existingBooking.awaiting_approval ? ' (in attesa di approvazione)' : ' (approvata)'
         }
-        
+
         message = "No changes"
         warning = `C'è già una prenotazione sulla piattaforma Rooms associata a questo evento dal titolo "${existingBooking.name}" per il giorno ${dateFormatted} dalle ore ${startTimeFormatted} alle ${endTimeFormatted}${approvalStatus}.${availableRoomNames ? ` Le aule disponibili per il periodo selezionato sono: ${availableRoomNames}` : ''}`
       } else {
@@ -234,7 +238,7 @@ export const handleRoomBooking = async (eventData, process) => {
         message = `"${conferenceRoom.name}" è disponibile per il periodo selezionato. Vuoi effettuare la prenotazione sulla piattaforma Rooms?${approvalSuffix}`
         warning = `"${conferenceRoom.name}" è disponibile sulla piattaforma Rooms per il periodo selezionato.${approvalSuffix}`
       }
-      
+
       return {
         type: 'available',
         message,
@@ -250,8 +254,9 @@ export const handleRoomBooking = async (eventData, process) => {
       }
     }
 
+    // Room not available
     let message, warning
-    
+
     if (existingBooking && hasBookingChanged) {
       const approvalNote = requiresApproval ? ' (questa aula richiede approvazione)' : ''
       message = `Hai cambiato i dettagli dell'evento ma l'aula "${conferenceRoom.name}" non è disponibile per il periodo selezionato${approvalNote}. Se salvi la prenotazione sulla piattaforma Rooms verrà cancellata. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
@@ -261,14 +266,15 @@ export const handleRoomBooking = async (eventData, process) => {
       message = `"${conferenceRoom.name}" non è disponibile per il periodo selezionato${approvalNote}. Le aule disponibili per quel periodo sono: ${availableRoomNames}. Vuoi tornare indietro e cambiare l'aula o vuoi salvare senza effettuare la prenotazione su Rooms?`
       warning = `"${conferenceRoom.name}" non è disponibile sulla piattaforma Rooms per il periodo selezionato${approvalNote}. Le aule disponibili sono: ${availableRoomNames}.`
     }
-    
+
     return {
       type: 'unavailable',
       message,
       warning,
-      availableRooms: availability.availableRooms,
+      availableRooms: allAvailableRooms,
       availableRoomNames: `${availableRoomNames}.`
     }
+
   } catch (error) {
     return {
       type: 'error',
@@ -281,23 +287,23 @@ export const handleRoomBooking = async (eventData, process) => {
 
 export const getRoomBookingStatus = (roomBookingResult, mrbsBookingID) => {
   if (!roomBookingResult) return ''
-  
+
   switch (roomBookingResult.type) {
     case 'external_room':
       return 'Aula esterna - non disponibile su Rooms'
-    
+
     case 'available':
       if (roomBookingResult.message === "No changes") {
         return mrbsBookingID ? 'Prenotazione esistente valida' : 'Disponibile per prenotazione'
       }
       return 'Disponibile per prenotazione'
-    
+
     case 'unavailable':
       return 'Non disponibile - conflitto orario'
-    
+
     case 'error':
       return 'Errore nel controllo disponibilità'
-    
+
     default:
       return ''
   }
@@ -308,7 +314,7 @@ export const createRoomBooking = async (roomData, process) => {
     const organizersNames = roomData.organizers && roomData.organizers.length > 0
       ? roomData.organizers.map(org => `${org.firstName} ${org.lastName}`).join(', ')
       : 'Unknown'
-    
+
     const description = `Booked through the API via Manage by ${organizersNames}`
 
     const booking = await createBooking(roomData, description, process)

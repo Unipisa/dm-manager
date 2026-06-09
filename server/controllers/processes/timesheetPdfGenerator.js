@@ -115,7 +115,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
     const rightColLines = 2 // Beneficiary, Head of Dept
 
     const lineHeight = 15
-    const grantLineHeight = 10
+    const grantLineHeight = 18
     const paddingBottom = 10
 
     const leftColHeight = basicInfoLines * lineHeight + (grantsLines > 0 ? 15 + grantsLines * grantLineHeight : 0)
@@ -165,7 +165,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
                 : `• ${name}${projectType}`
             
             doc.text(grantText, leftColX + 5, currentY, { width: boxWidth - 25 })
-            currentY += grantLineHeight
+            currentY = doc.y + 2 
         }
         doc.fontSize(9)
     }
@@ -343,7 +343,7 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
         // Grant hours
         for (let i = 0; i < (activeGrants?.length || 0); i++) {
-            const hours = day.grantHours?.[i]?.hours || 0
+            const hours = day.grantHours?.find(g => g.grant.toString() === activeGrants[i]._id.toString())?.hours || 0
             doc.rect(xPos, yPos, activityColWidth, rowHeight).stroke()
             if (!isNonWorking) {
                 doc.text(formatHours(hours), xPos + 1, yPos + 3, { 
