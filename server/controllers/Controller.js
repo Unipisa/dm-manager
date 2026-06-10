@@ -534,7 +534,7 @@ class Controller {
         }
         try {
             const pipeline = [
-                {$match: {_id: ObjectId(id)}},
+                {$match: {_id: new ObjectId(id)}},
                 ...this.queryPipeline
             ]
             // console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)

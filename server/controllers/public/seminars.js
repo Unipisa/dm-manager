@@ -45,11 +45,11 @@ async function seminarsQuery(req) {
     }
 
     if (req.query.category) {
-        match["category"] = { $in: [ObjectId(req.query.category)] }
+        match["category"] = { $in: [new ObjectId(req.query.category)] }
     }
 
     if (req.query.grant) {
-        match["grant"] = ObjectId(req.query.grant)
+        match["grant"] = new ObjectId(req.query.grant)
     }
 
     if (req.query.externalid) {

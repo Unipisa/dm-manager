@@ -48,7 +48,25 @@ function setup_passport() {
   }
 }
 
+function requestLogger(req, res, next) {
+  const startedAt = Date.now()
+  const started = new Date().toISOString()
+
+  console.log(`[${started}] --> ${req.method} ${req.originalUrl}`)
+
+  res.on('finish', () => {
+    const elapsed = Date.now() - startedAt
+    console.log(`[${new Date().toISOString()}] <-- ${req.method} ${req.originalUrl} ${res.statusCode} ${elapsed}ms`)
+  })
+
+  next()
+}
+
 function setup_routes(app) {
+
+  if (process.env.NODE_ENV !== 'production') {
+    app.use(requestLogger)
+  }
 
   app.use(cors(
     {
@@ -57,7 +75,9 @@ function setup_routes(app) {
       credentials: true // Needed for the client to handle session
     }))
   
-  app.use(morgan('tiny')) // access log
+  if (process.env.NODE_ENV === 'production') {
+    app.use(morgan('tiny')) // access log
+  }
   
   const test_filename = `${config.STATIC_FILES_PATH}/manifest.json`
   if (!fs.existsSync(test_filename)) {
