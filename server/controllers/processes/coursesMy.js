@@ -144,7 +144,7 @@ router.post('/', async (req, res) => {
 })
 
 router.patch('/:id', async (req, res) => {
-    console.log(`PATCH coursesMy ${req.params.id}`)
+    // console.log(`PATCH coursesMy ${req.params.id}`)
     const payload = {...req.body}
     assert(req.user._id)
     const person = req.person

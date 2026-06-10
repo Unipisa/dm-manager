@@ -16,7 +16,8 @@ const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
 const migrations = require('./migrations')
-const MongoStore = require('connect-mongo')
+const MongoStoreModule = require('connect-mongo')
+const MongoStore = MongoStoreModule.default || MongoStoreModule.MongoStore || MongoStoreModule
 const crypto = require('crypto')
 const {setupDatabase, create_admin_user, create_secret_token} = require('./database')
 const { UNSAFE_RouteContext } = require('react-router')
@@ -163,7 +164,7 @@ function setup_routes(app) {
         tok = await Token.findOne({ token })
         req.roles = tok.roles || []
         req.log_who = tok.name || tok.token
-        console.log('Roles: ', req.roles)
+        // console.log('Roles: ', req.roles)
       }
       catch (err) {
         res.status(401)
@@ -202,7 +203,7 @@ function setup_routes(app) {
     }),
     function(req, res) {
       const user = req.user.toObject()
-      console.log(`login ${user.username} roles: ${user.roles}`)
+      // console.log(`login ${user.username} roles: ${user.roles}`)
       res.send({ user })
     })
   
@@ -269,7 +270,7 @@ function setup_routes(app) {
             res.send({error: err.message})
             console.error(err)
           } else {
-            console.log(`user disguised as ${role}`)
+            // console.log(`user disguised as ${role}`)
             req.user = result
             res.send(req.user.toObject())
           }
@@ -286,12 +287,12 @@ function setup_routes(app) {
   
 
   app.get('/hello', (req, res) => {
-    console.log(`params: ${JSON.stringify(req.params)}`)
-    console.log(`query: ${JSON.stringify(req.query)}`)
-    console.log(`body: ${JSON.stringify(req.body)}`)
-    console.log(`session: ${JSON.stringify(req.session)}`)
-    console.log(`user: ${JSON.stringify(req.user)}`)
-    console.log(`isAuthenticated: ${req.isAuthenticated()}`)
+    // console.log(`params: ${JSON.stringify(req.params)}`)
+    // console.log(`query: ${JSON.stringify(req.query)}`)
+    // console.log(`body: ${JSON.stringify(req.body)}`)
+    // console.log(`session: ${JSON.stringify(req.session)}`)
+    // console.log(`user: ${JSON.stringify(req.user)}`)
+    // console.log(`isAuthenticated: ${req.isAuthenticated()}`)
     res.send('Hello World!')
   })
   

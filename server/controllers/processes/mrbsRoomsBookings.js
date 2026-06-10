@@ -24,7 +24,7 @@ module.exports = (router) => {
                         null,
                         { headers }
                     )
-                    console.log('[QUERY] Response:', response.data)
+                    // console.log('[QUERY] Response:', response.data)
                 break
                 
                 case 'book':
@@ -45,7 +45,7 @@ module.exports = (router) => {
                             }
                         }
                     )
-                    console.log('[BOOK] Response:', response.data)
+                    // console.log('[BOOK] Response:', response.data)
                 break
 
                 case 'details':

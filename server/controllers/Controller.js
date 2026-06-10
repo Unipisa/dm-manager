@@ -515,7 +515,7 @@ class Controller {
             [{ total, data }] = result;
         }
             
-        console.log(`${data.length} / ${total} items collected`);
+        // console.log(`${data.length} / ${total} items collected`);
 
         return res.send({
             data,
@@ -537,7 +537,7 @@ class Controller {
                 {$match: {_id: ObjectId(id)}},
                 ...this.queryPipeline
             ]
-            console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
+            // console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
             
             let obj = await this.Model.aggregate(pipeline)
             obj = await this.aggregatePostProcess(obj)
@@ -553,7 +553,7 @@ class Controller {
         } catch(error) {
             console.warn(error)
 
-            console.log(`invalid _id: ${id}`)
+            // console.log(`invalid _id: ${id}`)
             res.status(404).send({error: `invalid id ${id}`})
         }
     }
@@ -609,7 +609,7 @@ class Controller {
             await was.save()
             res.send(was)
         } catch(error) {
-            console.log(`error: ${error.message}}`)
+            // console.log(`error: ${error.message}}`)
             console.error(error)
             res.status(400).send({error: error.message})
         }

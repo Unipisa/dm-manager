@@ -1,4 +1,3 @@
-const url = require('url')
 require('dotenv').config() // read environment variabiles from .env
 const { randomUUID } = require('crypto')
 const { execSync } = require('child_process')
@@ -53,11 +52,11 @@ class Options {
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
         })
-        this.VERSION = require('../package.json').version
-        const parsedUrl = url.parse(this.MONGO_URI)
+        this.VERSION = require('./package.json').version
+        const parsedUrl = new URL(this.MONGO_URI)
 
         this.MONGO_HOST = parsedUrl.hostname
-        this.MONGO_PORT = parseInt(parsedUrl.port)
+        this.MONGO_PORT = parsedUrl.port ? parseInt(parsedUrl.port) : undefined
         const pathname = parsedUrl.pathname
         this.MONGO_DB = pathname.split('/')[1]
         this.API_PATH = '/api/v0'

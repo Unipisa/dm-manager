@@ -2,8 +2,9 @@ FROM node:26-slim
 # Before building the docker image, you need to build the server 
 # and the widgets packages:
 #
-# $ npm run build
-# $ cd widgets
+# $ cd frontend
+# % npm run build
+# $ cd ../widgets
 # $ npm run build
 # $ cd ..
 #
@@ -13,18 +14,13 @@ FROM node:26-slim
 # Create app directory
 WORKDIR /app
 
-# Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
-COPY package*.json ./
-
-# If you are building your code for production
-RUN npm ci --omit=dev
-
 # Bundle app source
-COPY build ./build
+COPY frontend/build ./build
 COPY server ./server
+RUN  rm -rf /app/server/node_modules
 COPY entrypoint.sh ./
+
+RUN cd server && npm ci --omit=dev
 
 # Copy the dmwidgets script inside the assets folder
 COPY widgets/dist/dmwidgets.js ./build/static/

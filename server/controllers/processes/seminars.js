@@ -69,7 +69,7 @@ Gli amministratori possono visualizzare il seminario su Manage al seguente link:
             preserveNullAndEmptyArrays: true,
         }}
     ]
-    console.log(JSON.stringify(pipeline, null, 2))
+    // console.log(JSON.stringify(pipeline, null, 2))
     const visits = await Visit.aggregate(pipeline)
 
     visits.map(async (v) => {
@@ -105,7 +105,7 @@ router.get('/', async (req, res) => {
         }},
         ...controller.queryPipeline,
     ]
-    console.log(JSON.stringify({seminar_pipeline: pipeline}, null, 2))
+    // console.log(JSON.stringify({seminar_pipeline: pipeline}, null, 2))
     const data = await EventSeminar.aggregate(pipeline)
 
     return res.send({
