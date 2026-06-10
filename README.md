@@ -1,10 +1,5 @@
 ## development
 
-Install the packages with 
- ```
- npm ci
- ```
-
 Use two terminals for backend and frontend. 
 
 For the backend you have to start a mongodb instance once. You can use 
@@ -22,19 +17,19 @@ export ADMIN_PASSWORD=secret
 
 Then start the server:
 ```
-cd server && npm start
+cd server && npm ci && npm start
 ```
 
 Finally, in another terminal, start the frontend:
 ```
-cd frontend && npm start
+cd frontend && npm ci && npm start
 ```
 
 The server should be available at [http://localhost:3000](http://localhost:3000).
 
 To test the notification service you should also start the background worker. In yet another terminal:
 ```
-npm run worker
+cd server && npm run worker
 ```
 
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
