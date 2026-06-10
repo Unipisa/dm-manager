@@ -15,10 +15,8 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: 26
-    - name: install node packages
-      run: npm ci --omit=dev
-    - name: Build Js bundle
-      run: npm run build
+    - name: Build Frontend Js bundle
+      run: cd frontend && npm ci --omit=dev && npm run build
     - name: Build DM Widgets
       run: cd widgets && npm ci && npm run build && cd ..
 #    - name: Start MongoDB
@@ -28,7 +26,7 @@ jobs:
 #    - name: Run tests
 #      run: npm test
     - name: Extract version number
-      run: echo VERSION=$( node -e 'console.log(require("./package.json").version)' ) >> $GITHUB_ENV
+      run: echo VERSION=$( node -e 'console.log(require("./frontend/package.json").version)' ) >> $GITHUB_ENV
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v5
