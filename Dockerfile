@@ -24,7 +24,6 @@ RUN cd server && npm ci --omit=dev
 
 # Copy the dmwidgets script inside the assets folder
 COPY widgets/dist/dmwidgets.js ./build/static/
-COPY widgets/dist/dmwidgets.js.LICENSE.txt ./build/static/
 
 EXPOSE 8000
 
