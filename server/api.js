@@ -138,7 +138,7 @@ router.get('/public/unimap/:matricola', unimapQuery)
 
 router.use('/process', processes)
 
-router.use('*', async (req, res) => {
+router.use(/.*/, async (req, res) => {
     res.status(404).json({error: 'invalid path'})
 })
 
