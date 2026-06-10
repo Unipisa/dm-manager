@@ -1,5 +1,7 @@
 import React from 'react';
-import DatePicker from 'react-datepicker';
+import * as DatePickerModule from 'react-datepicker';
+
+const DatePicker = DatePickerModule.default?.default || DatePickerModule.default || DatePickerModule;
 
 // codice preso da https://github.com/Hacker0x01/react-datepicker/issues/1787#issuecomment-770313939
 
