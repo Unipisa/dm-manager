@@ -1,11 +1,13 @@
 import {useState,useRef} from 'react'
 import {Table, Button, ButtonGroup} from 'react-bootstrap'
-import ReactToPrint from 'react-to-print'
+import * as ReactToPrintModule from 'react-to-print'
 import { useQuery, useQueryClient } from 'react-query'
 import { myDateFormat } from '../Engine'
 
 import {useEngine} from '../Engine'
 import api from '../api'
+
+const ReactToPrint = ReactToPrintModule.default?.default || ReactToPrintModule.default || ReactToPrintModule.ReactToPrint || ReactToPrintModule;
 
 function Display({roomLabel, onSave}) {
     const namesRef = useRef(null)

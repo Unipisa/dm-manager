@@ -1,9 +1,11 @@
 import {useState,useRef} from 'react'
 import {Table, Button, Badge, ButtonGroup} from 'react-bootstrap'
-import ReactToPrint from 'react-to-print'
+import * as ReactToPrintModule from 'react-to-print'
 
 import {useEngine} from '../Engine'
 import Loading from '../components/Loading'
+
+const ReactToPrint = ReactToPrintModule.default?.default || ReactToPrintModule.default || ReactToPrintModule.ReactToPrint || ReactToPrintModule;
 
 function Display({roomLabel, onSave}) {
     const namesRef = useRef(null)
