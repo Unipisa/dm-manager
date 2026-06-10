@@ -22,12 +22,12 @@ export ADMIN_PASSWORD=secret
 
 Then start the server:
 ```
-npm run server
+cd server && npm start
 ```
 
 Finally, in another terminal, start the frontend:
 ```
-npm start
+cd frontend && npm start
 ```
 
 The server should be available at [http://localhost:3000](http://localhost:3000).
@@ -49,8 +49,9 @@ npm run command
 
 Build
 ```
-npm run build
-STATIC_FILES_PATH=build node server/server.js
+cd server && npm run build
+cd frontend && npm run build
+STATIC_FILES_PATH=frontend/build node server/server.js
 ```
 
 Build docker image:
