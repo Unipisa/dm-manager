@@ -30,8 +30,6 @@
 
   </head>
   <body>
-    <script src="./dmwidgets.js"></script>
-
     <div class="container">
 
     <nav class="px-4 pt-4">
@@ -130,7 +128,9 @@
 
     </div>
 
-    <script>
+    <script type="module">
+        import { dmwidgets } from './index.js';
+
         async function loader() {
             dmwidgets.localDevelopment = true
 
