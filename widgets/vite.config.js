@@ -5,7 +5,7 @@ import path from 'path'
 
 const rootDir = path.resolve(__dirname, 'src')
 const distDir = path.resolve(__dirname, 'public')
-const serverPublicDir = path.resolve(__dirname, '../server/public')
+const serverPublicDir = path.resolve(__dirname, '../server/public/static')
 const productionEnv = JSON.stringify('production')
 
 function getInlineCssScript(css) {
@@ -52,7 +52,7 @@ function copyWidgetScriptToServerPublic() {
   if (!fs.existsSync(jsPath)) return
 
   fs.mkdirSync(serverPublicDir, { recursive: true })
-  fs.copyFileSync(jsPath, path.join(serverPublicDir, 'static', 'dmwidgets.js'))
+  fs.copyFileSync(jsPath, path.join(serverPublicDir, 'dmwidgets.js'))
   console.log(`Copied ${jsPath} to ${serverPublicDir}`)
 }
 
