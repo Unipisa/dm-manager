@@ -301,7 +301,8 @@ export function ObjectInput({ placeholder, apiPrefix, render, new_object, objCod
     function handleClose() {
         // Add a new person with the given data
         console.log(`Creating new object (${objCode})`, newObject)
-        api.put(`/api/v0/${api_prefix}/${objCode}`, newObject).then(data => {      
+        const base = api_prefix ? `/api/v0/${api_prefix}/${objCode}` : `/api/v0/${objCode}`
+        api.put(base, newObject).then(data => {      
             console.log("New object created", data)
             console.log("value", value)
             if (multiple) {
@@ -342,7 +343,8 @@ export function ObjectInput({ placeholder, apiPrefix, render, new_object, objCod
 
     const handleSearch = (query) => {
         setIsLoading(true)
-        api.get(`/api/v0/${api_prefix}/${objCode}/search`, {q: query}).then((data) => {
+        const base = api_prefix ? `/api/v0/${api_prefix}/${objCode}` : `/api/v0/${objCode}`
+        api.get(`${base}/search`, {q: query}).then((data) => {
             const searchoptions = data["data"].map(x => {
                 return {...x}
             })

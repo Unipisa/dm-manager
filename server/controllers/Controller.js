@@ -620,7 +620,7 @@ class Controller {
         try {
             const obj = await this.Model.findById(id)
             await log(req, obj.toObject(), {})
-            obj.delete()
+            await this.Model.findByIdAndDelete(id)
             res.send({})
         } catch(err) {
             console.error(err)
