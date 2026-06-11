@@ -59,6 +59,7 @@ function FormDataView() {
             path={`${Form.code}/${form._id}/data`}
             columns={columns}
             csvHeaders={csvHeaders}
+            fieldsInfo={Form.schema.fields}
         />
     </>
 }
