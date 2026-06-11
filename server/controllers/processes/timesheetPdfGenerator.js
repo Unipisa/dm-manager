@@ -155,14 +155,20 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
         currentY += 12
         doc.font(regularFont).fontSize(8)
         for (const grant of activeGrants) {
-            // Only show if identifier exists
             const identifier = grant.identifier || ''
             const name = grant.name || 'Unnamed Grant'
-            const projectType = grant.projectType ? `, ${grant.projectType}` : ''
-            
-            const grantText = identifier 
-                ? `• ${name} (${identifier}${projectType})`
-                : `• ${name}${projectType}`
+            const cup = grant.CUP || ''
+
+            let grantText
+            if (!identifier && !cup) {
+                grantText = `• ${name}`
+            } else if (identifier && !cup) {
+                grantText = `• ${name} (${identifier})`
+            } else if (!identifier && cup) {
+                grantText = `• ${name} (CUP ${cup})`
+            } else {
+                grantText = `• ${name} (${identifier}, CUP ${cup})`
+            }
             
             doc.text(grantText, leftColX + 5, currentY, { width: boxWidth - 25 })
             currentY = doc.y + 2 
