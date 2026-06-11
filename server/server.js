@@ -296,10 +296,20 @@ function setup_routes(app) {
   })
   
   // all unhandled requests are sent to the react application
-  app.get(/.*/, function(req, res) {
-    res.sendFile(`${config.STATIC_FILES_PATH}/index.html`, { 
-      root: `${__dirname}/../` })
-  })
+  const index_file_path = `${config.STATIC_FILES_PATH}/index.html`
+  const has_index_file = fs.existsSync(index_file_path)
+  if (!has_index_file) {
+    console.error(`The index.html for the frontend application is missing. Make sure to build the frontend and set the correct STATIC_FILES_PATH in the configuration.`)
+    console.error(`Expected index.html at: ${index_file_path}`)
+  }
+  else {
+    const index_file_content = fs.readFileSync(index_file_path, 'utf8')
+    console.log(`Loaded index.html from: ${index_file_path}`)
+
+    app.get(/.*/, function(req, res) {
+      res.send(index_file_content)
+    })
+  }
   
   // gestisci errori
   app.use((err, req, res, next) => {

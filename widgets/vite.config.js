@@ -6,16 +6,8 @@ import path from 'path'
 const rootDir = path.resolve(__dirname, 'src')
 const distDir = path.resolve(__dirname, 'dist')
 
-function inlineCssAndCopyStatic() {
-  return {
-    name: 'dmwidgets-build-assets',
-    generateBundle(_, bundle) {
-      const cssFiles = Object.entries(bundle).filter(([, asset]) => asset.type === 'asset' && asset.fileName.endsWith('.css'))
-      const jsChunk = Object.values(bundle).find((asset) => asset.type === 'chunk' && asset.fileName === 'dmwidgets.js')
-
-      if (jsChunk && cssFiles.length > 0) {
-        const css = cssFiles.map(([, asset]) => asset.source).join('\n')
-        jsChunk.code = `(() => {
+function getInlineCssScript(css) {
+  return `(() => {
   if (!document.getElementById('dmwidgets-styles')) {
     const style = document.createElement('style');
     style.id = 'dmwidgets-styles';
@@ -23,30 +15,58 @@ function inlineCssAndCopyStatic() {
     document.head.appendChild(style);
   }
 })();
-${jsChunk.code}`
+`
+}
+
+async function minifyCss(css) {
+  const { code } = await transformWithEsbuild(css, 'dmwidgets.css', {
+    loader: 'css',
+    minify: true,
+    legalComments: 'none',
+  })
+
+  return code
+}
+
+async function minifyScriptFile(filePath) {
+  if (!fs.existsSync(filePath)) return
+
+  const js = fs.readFileSync(filePath, 'utf8')
+  const { code } = await transformWithEsbuild(js, filePath, {
+    loader: 'js',
+    minify: true,
+    target: 'es2018',
+    legalComments: 'none',
+  })
+
+  fs.writeFileSync(filePath, code)
+}
+
+function inlineCssAndCopyStatic() {
+  return {
+    name: 'dmwidgets-build-assets',
+    async generateBundle(_, bundle) {
+      const cssFiles = Object.entries(bundle).filter(([, asset]) => asset.type === 'asset' && asset.fileName.endsWith('.css'))
+      const jsChunk = Object.values(bundle).find((asset) => asset.type === 'chunk' && asset.fileName === 'dmwidgets.js')
+
+      if (jsChunk && cssFiles.length > 0) {
+        const css = await minifyCss(cssFiles.map(([, asset]) => asset.source).join('\n'))
+        jsChunk.code = `${getInlineCssScript(css)}${jsChunk.code}`
 
         for (const [fileName] of cssFiles) {
           delete bundle[fileName]
         }
       }
     },
-    closeBundle() {
+    async closeBundle() {
       const cssPath = path.join(distDir, 'style.css')
       const jsPath = path.join(distDir, 'dmwidgets.js')
 
       if (fs.existsSync(cssPath) && fs.existsSync(jsPath)) {
-        const css = fs.readFileSync(cssPath, 'utf8')
+        const css = await minifyCss(fs.readFileSync(cssPath, 'utf8'))
         const js = fs.readFileSync(jsPath, 'utf8')
 
-        fs.writeFileSync(jsPath, `(() => {
-  if (!document.getElementById('dmwidgets-styles')) {
-    const style = document.createElement('style');
-    style.id = 'dmwidgets-styles';
-    style.textContent = ${JSON.stringify(css)};
-    document.head.appendChild(style);
-  }
-})();
-${js}`)
+        fs.writeFileSync(jsPath, `${getInlineCssScript(css)}${js}`)
         fs.unlinkSync(cssPath)
       }
 
@@ -58,6 +78,7 @@ ${js}`)
         .replace("import { dmwidgets } from './index.js';\n", '')
 
       fs.writeFileSync(path.join(distDir, 'index.html'), galleryHtml)
+      await minifyScriptFile(jsPath)
     },
   }
 }
