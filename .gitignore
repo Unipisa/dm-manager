@@ -6,6 +6,7 @@ server/.env
 server/public/assets
 server/public/index.html
 server/public/dmwidgets.js
+server/public/static
 
 frontend/public
 widgets/public

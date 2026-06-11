@@ -4,20 +4,6 @@ import path from 'path';
 import fs from 'fs';
 
 const publicDir = path.resolve(__dirname, 'public');
-const serverPublicDir = path.resolve(__dirname, '../server/public');
-
-function copyPublicToServerPublic() {
-  return {
-    name: 'copy-public-to-server-public',
-    closeBundle() {
-      if (!fs.existsSync(publicDir)) return;
-
-      fs.mkdirSync(serverPublicDir, { recursive: true });
-      fs.cpSync(publicDir, serverPublicDir, { recursive: true, force: true });
-      console.log(`Copied ${publicDir} to ${serverPublicDir}`);
-    },
-  };
-}
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -26,7 +12,6 @@ export default defineConfig({
     react({
       jsxRuntime: 'automatic',
     }),
-    copyPublicToServerPublic(),
   ],
   server: {
     port: 3000,
