@@ -5,6 +5,7 @@ import path from 'path'
 
 const rootDir = path.resolve(__dirname, 'src')
 const distDir = path.resolve(__dirname, 'dist')
+const productionEnv = JSON.stringify('production')
 
 function getInlineCssScript(css) {
   return `(() => {
@@ -36,6 +37,9 @@ async function minifyScriptFile(filePath) {
     loader: 'js',
     minify: true,
     target: 'es2018',
+    define: {
+      'process.env.NODE_ENV': productionEnv,
+    },
     legalComments: 'none',
   })
 
@@ -100,6 +104,9 @@ function treatJsAsJsx() {
 
 export default defineConfig({
   root: rootDir,
+  define: {
+    'process.env.NODE_ENV': productionEnv,
+  },
   plugins: [
     treatJsAsJsx(),
     react(),
