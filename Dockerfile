@@ -15,11 +15,11 @@ FROM node:26-slim
 WORKDIR /app
 
 # Bundle app source
-COPY server ./server
-RUN  rm -rf /app/server/node_modules
+COPY server .
+RUN  rm -rf /app/node_modules
 COPY entrypoint.sh ./
 
-RUN cd server && npm ci --omit=dev
+RUN npm ci --omit=dev
 
 EXPOSE 8000
 

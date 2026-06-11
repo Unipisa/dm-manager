@@ -1,7 +1,7 @@
 .PHONY: docker server frontend widgets
 
 docker: server frontend widgets
-	docker build . -t dm-manager
+	docker build . -t harbor.cs.dm.unipi.it/dm-manager/dm-manager
 
 server: frontend widgets
 	npm --prefix server ci --omit=dev

@@ -14,14 +14,14 @@ if [ $1 = "server" ]; then
     mkdir -p /uploads
     mkdir -p /uploads/private
 
-    node /app/server/run-server.js
+    node /app/run-server.js
     exit 0
 fi
 
 if [ $1 = "worker" ]; then
     shift
     echo "entrypoint: starting worker"
-    node /app/server/worker.js
+    node /app/worker.js
     exit 0
 fi
 
