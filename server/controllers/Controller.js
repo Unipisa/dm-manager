@@ -171,6 +171,7 @@ class Controller {
                                     startDate: 1,
                                     endDate: 1,
                                     localCoordinator: 1,
+                                    CUP: 1,
                                 }},
                                 { $lookup: {
                                     from: "people",
