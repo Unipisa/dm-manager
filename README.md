@@ -44,9 +44,8 @@ npm run command
 
 Build
 ```
-cd server && npm run build
-cd frontend && npm run build
-STATIC_FILES_PATH=frontend/build node server/server.js
+make
+node server/server.js
 ```
 
 Build docker image:

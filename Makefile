@@ -18,7 +18,6 @@ widgets:
 	npm --prefix widgets run build
 
 clean:
-	rm -rf server/public/img
 	rm -rf server/public/font
 	rm -f server/public/index.html
 	rm -rf server/public/static
