@@ -29,7 +29,6 @@
     "mongoose-schema-jsonschema": "^4.0.1",
     "morgan": "^1.11.0",
     "node-cron": "^4.2.1",
-    "node-fetch": "^3.3.2",
     "nodemailer": "^8.0.11",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",

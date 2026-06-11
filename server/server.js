@@ -153,8 +153,6 @@ function setup_routes(app) {
       function add_role(role) {
         if (!req.roles.includes(role)) req.roles.push(role)
       }
-
-      // console.log(`sending user ${JSON.stringify({...user}, null, 2)}`)
     }
 
     // se c'è un token usa i roles del token
