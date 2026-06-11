@@ -8,7 +8,7 @@ const Log = require('./models/Log')
   
 class UnipiAuthStrategy extends OAuth2Strategy {
   constructor(options) {
-    super({...options, scope: "openid"}, (accessToken, refreshToken, params, profile, cb) => {
+    super({...options, scope: "openid"}, async (accessToken, refreshToken, params, profile, cb) => {
       console.log(`oauth2 verify: accessToken ${accessToken} refreshToken: ${refreshToken} profile: ${profile} params: ${params}`)
       console.log(`params: ${JSON.stringify(params)}`)
       console.log(`profile: ${JSON.stringify(profile)}`)
@@ -29,13 +29,13 @@ class UnipiAuthStrategy extends OAuth2Strategy {
         })
       }
     
-      if (! username) {
-        log_function("no username passwd to UnipiAuthStrategy")
-        return cb("invalid username")
-      }
+      try {
+        if (! username) {
+          await log_function("no username passwd to UnipiAuthStrategy")
+          return cb("invalid username")
+        }
 
-      return User.findOne({ username: username }, async function (err, user) {
-        if (err) return cb(err)
+        const user = await User.findOne({ username: username })
         const people = await Person.aggregate([{
           $match: { 
             $or: [
@@ -56,12 +56,12 @@ class UnipiAuthStrategy extends OAuth2Strategy {
             } else if (people.length === 0) {
               await log_function(`user ${username} has no persons associated`)
               notify('admin', 'oauth', `user ${username} has no person associated`)
-              return cb(err, null)
+              return cb(null, null)
             } else {
-              return cb(err, null)
+              return cb(null, null)
             }
           }
-          return cb(err, user)
+          return cb(null, user)
         } else { // no user found
           if (people.length === 1) {
             const person = people[0]
@@ -73,13 +73,15 @@ class UnipiAuthStrategy extends OAuth2Strategy {
               person: person._id,
             })
             await user.save()
-            return cb(err, user)
+            return cb(null, user)
           } else {
             await log_function(`user ${username} has no person associated`)
-            return cb(err, null)
+            return cb(null, null)
           }
         }
-      })
+      } catch (err) {
+        return cb(err)
+      }
     })
   }
   
