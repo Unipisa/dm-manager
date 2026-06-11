@@ -4,7 +4,8 @@ import fs from 'fs'
 import path from 'path'
 
 const rootDir = path.resolve(__dirname, 'src')
-const distDir = path.resolve(__dirname, 'dist')
+const distDir = path.resolve(__dirname, 'public')
+const serverPublicDir = path.resolve(__dirname, '../server/public')
 const productionEnv = JSON.stringify('production')
 
 function getInlineCssScript(css) {
@@ -46,6 +47,15 @@ async function minifyScriptFile(filePath) {
   fs.writeFileSync(filePath, code)
 }
 
+function copyWidgetScriptToServerPublic() {
+  const jsPath = path.join(distDir, 'dmwidgets.js')
+  if (!fs.existsSync(jsPath)) return
+
+  fs.mkdirSync(serverPublicDir, { recursive: true })
+  fs.copyFileSync(jsPath, path.join(serverPublicDir, 'static', 'dmwidgets.js'))
+  console.log(`Copied ${jsPath} to ${serverPublicDir}`)
+}
+
 function inlineCssAndCopyStatic() {
   return {
     name: 'dmwidgets-build-assets',
@@ -83,6 +93,7 @@ function inlineCssAndCopyStatic() {
 
       fs.writeFileSync(path.join(distDir, 'index.html'), galleryHtml)
       await minifyScriptFile(jsPath)
+      copyWidgetScriptToServerPublic()
     },
   }
 }

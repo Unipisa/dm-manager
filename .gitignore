@@ -3,6 +3,13 @@
 server/.dotenv
 server/.env
 
+server/public/assets
+server/public/index.html
+server/public/dmwidgets.js
+
+frontend/public
+widgets/public
+
 /logs
 /uploads
 

@@ -3,18 +3,48 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import fs from 'fs';
 
+const publicDir = path.resolve(__dirname, 'public');
+const serverPublicDir = path.resolve(__dirname, '../server/public');
+
+function copyPublicToServerPublic() {
+  return {
+    name: 'copy-public-to-server-public',
+    closeBundle() {
+      if (!fs.existsSync(publicDir)) return;
+
+      fs.mkdirSync(serverPublicDir, { recursive: true });
+      fs.cpSync(publicDir, serverPublicDir, { recursive: true, force: true });
+      console.log(`Copied ${publicDir} to ${serverPublicDir}`);
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
+  publicDir: false,
   plugins: [
     react({
       jsxRuntime: 'automatic',
     }),
+    copyPublicToServerPublic(),
   ],
   server: {
     port: 3000,
     strictPort: false,
     proxy: {
       '/api': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/img': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/font': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
+      '/assets': {
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
@@ -30,10 +60,15 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
+      '/favicon.ico': {
+        target: 'http://localhost:8000',
+        changeOrigin: true,
+      },
     },
   },
   build: {
-    outDir: 'build',
+    chunkSizeWarningLimit: 2000,
+    outDir: 'public',
     sourcemap: process.env.GENERATE_SOURCEMAP !== 'false',
   },
   resolve: {

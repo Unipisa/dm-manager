@@ -12,8 +12,6 @@
   "author": "Leonardo Robol <leonardo.robol@unipi.it>",
   "license": "MIT",
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.2.1",
-    "vite": "^5.0.8"
   },
   "browserslist": [
     "> 0.05%, not dead"
@@ -28,6 +26,8 @@
     "react-query": "^3.39.3",
     "rehype-katex": "^7.0.0",
     "remark-gfm": "^4.0.1",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.4.21"
   }
 }
