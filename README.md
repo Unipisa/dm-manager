@@ -1,7 +1,5 @@
 ## development
 
-Use two terminals for backend and frontend. 
-
 For the backend you have to start a mongodb instance once. You can use 
 docker:
 
@@ -15,17 +13,20 @@ export ADMIN_USER=admin
 export ADMIN_PASSWORD=secret
 ```
 
-Then start the server:
+Install dependencies once:
 ```
-cd server && npm ci && npm start
-```
-
-Finally, in another terminal, start the frontend:
-```
-cd frontend && npm ci && npm start
+npm --prefix server ci
+npm --prefix frontend ci
 ```
 
-The server should be available at [http://localhost:3000](http://localhost:3000).
+Then start the backend and frontend together:
+```
+./dev.sh
+```
+
+The frontend should be available at [http://localhost:3000](http://localhost:3000).
+
+If you prefer separate terminals, start the backend with `npm --prefix server start` and the frontend with `npm --prefix frontend start`.
 
 To test the notification service you should also start the background worker. In yet another terminal:
 ```
