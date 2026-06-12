@@ -12,7 +12,7 @@ frontend/public
 widgets/public
 
 /logs
-/uploads
+server/uploads
 
 # custom
 /database
