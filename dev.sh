@@ -73,7 +73,10 @@ echo "Starting backend on http://localhost:8000"
 echo "Starting frontend on http://localhost:3000"
 echo "Press Ctrl-C to stop both."
 
-npm --prefix "$ROOT_DIR/server" start &
+(
+  cd "$ROOT_DIR/server"
+  npm start
+) &
 pids+=("$!")
 
 npm --prefix "$ROOT_DIR/frontend" start &

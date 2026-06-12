@@ -39,7 +39,7 @@ class Options {
             TOKEN_SECRET: null,
             BASE_URL: "http://localhost:3000",
             SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
-            UPLOAD_DIRECTORY: __dirname + '/../uploads',
+            UPLOAD_DIRECTORY: __dirname + '/uploads',
             WORKER_NOTIFICATION_INTERVAL: '300000', // 5 minutes
             UNIPI_API_URL: "https://api.unipi.it:443/",
             UNIPI_TOKEN: "",

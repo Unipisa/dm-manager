@@ -102,7 +102,7 @@ class UploadController {
                 await fs.writeFile(config.UPLOAD_DIRECTORY + "/" + upload._id, filedata)
             } catch (err) {
                 // console.log(err)
-                await upload.remove()
+                await Upload.findByIdAndDelete(upload._id)
                 res.status(400)
                 res.send({ error: "Failed writing the file to disk"})
                 return
