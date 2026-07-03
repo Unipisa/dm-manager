@@ -60,6 +60,7 @@ const groupCodes = [
     'consiglio-cds', 
     'consiglio-dipartimento', 
     'direttore', 'vicedirettore',
+    'referente-aq',
     'giunta-dipartimento',
     'paritetica-cds', 
     'paritetica-dipartimento',
