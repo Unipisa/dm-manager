@@ -124,8 +124,8 @@ router.delete('/:id', async (req, res) => {
         const user_is_organizer = req.person && organizers.find(o => o._id.equals(req.person._id))
 
         if (user_is_creator || user_is_organizer) {
-            await seminar.delete()
             await log(req, seminar, {})
+            await EventSeminar.findByIdAndDelete(req.params.id)
             res.json({})
         }
         else {

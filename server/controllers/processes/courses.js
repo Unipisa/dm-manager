@@ -40,9 +40,8 @@ router.get('/', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     try {
         const course = await EventPhdCourse.findById(new ObjectId(req.params.id))
-    
-        await course.delete()
         await log(req, course, {})
+        await EventPhdCourse.findByIdAndDelete(req.params.id)
         res.json({})
     } catch(error) {
         res.status(400).json({
