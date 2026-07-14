@@ -62,8 +62,8 @@ router.delete('/:id', async (req, res) => {
         
         if (!course) return res.status(404).json({ error: "Course not found or not authorized" })
 
-        await course.delete()
         await log(req, course, {})
+        await EventPhdCourse.findByIdAndDelete(req.params.id)
         return res.json({})
     } catch(error) {
         res.status(400).json({ error: error.message })
@@ -144,7 +144,7 @@ router.post('/', async (req, res) => {
 })
 
 router.patch('/:id', async (req, res) => {
-    console.log(`PATCH coursesMy ${req.params.id}`)
+    // console.log(`PATCH coursesMy ${req.params.id}`)
     const payload = {...req.body}
     assert(req.user._id)
     const person = req.person

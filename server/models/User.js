@@ -1,5 +1,6 @@
 const { Schema, model } = require('./Model')
-const passportLocalMongoose = require('passport-local-mongoose')
+const passportLocalMongooseModule = require('passport-local-mongoose')
+const passportLocalMongoose = passportLocalMongooseModule.default || passportLocalMongooseModule
 
 const userSchema = new Schema({
     firstName: {type: String, label: 'nome'},

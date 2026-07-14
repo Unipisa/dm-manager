@@ -79,9 +79,9 @@ router.delete('/:id', async (req, res) => {
         const user_is_creator = req.user.equals(conference.createdBy)
 
         if (user_is_creator || user_is_organizer) {
-            await conference.delete()
-            await log(req, conference, {})
-            res.json({})
+                await log(req, conference, {})
+                await EventConference.findByIdAndDelete(req.params.id)
+                res.json({})
         } else {
             res.status(401).json({
                 error: "Cannot delete conferences created by other users or not in the organizers list"

@@ -39,7 +39,7 @@ async function conferencesQuery(req) {
     }
 
     if (req.query.grants) {
-        match["grants"] = ObjectId(req.query.grants)
+        match["grants"] = new ObjectId(req.query.grants)
     }
 
     if (req.query.ssd) {

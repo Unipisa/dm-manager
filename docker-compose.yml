@@ -1,20 +1,41 @@
-version: "3.3"
-
-# This docker-compose configuration file is used to run 
-# all the external services which are required for the 
-# application to run locally.
-#
-# At the moment, the only external service is MongoDB.
-#
-# If you want to run the entire application in docker,
-# look instead at the configuration file
-#
-#  docker-compose-production.yml
-#
-# which will run both the application and the external services
-# in docker containers.
-
 services:
+  dm-manager:
+    image: harbor.cs.dm.unipi.it/dm-manager/dm-manager
+    entrypoint: ["./entrypoint.sh", "server"]
+    restart: unless-stopped
+    volumes:
+      - ./logs:/logs
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
+      # STATIC_FILES_PATH: "public"
+      # ADMIN_USER: "admin"
+      # ADMIN_PASSWORD: "secret"
+      # SESSION_SECRET: "1234567890"
+      # JWT_SECRET: "1234567890"
+      # CORS_ORIGIN: "http://localhost:3000"
+      # PORT: "8000"
+      OAUTH2_AUTHORIZE_URL: "https://iam.unipi.it/oauth2/authorize"
+      OAUTH2_TOKEN_URL: "https://iam.unipi.it/oauth2/token"
+      OAUTH2_USERINFO_URL: "https://iam.unipi.it/oauth2/userinfo"
+      OAUTH2_LOGOUT_URL: "https://iam.unipi.it/oidc/logout"
+      # OAUTH2_CLIENT_ID: 1234567890
+      # OAUTH2_CLIENT_SECRET: "1234567890"
+      # OAUTH2_USERNAME_FIELD: "email"
+      # REACT_APP_SERVER_URL: ""
+    ports:
+      - 8000:8000
+    networks:
+      - backend
+
+  worker:
+    image: harbor.cs.dm.unipi.it/dm-manager/dm-manager
+    entrypoint: ["./entrypoint.sh", "worker"]
+    restart: unless-stopped
+    environment:
+      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
+    networks:
+      - backend
+
   mongodb:
     image: mongo:6
     environment:
@@ -22,18 +43,12 @@ services:
       - PGID=1000
     volumes:
       - ./database:/data/db
+    # In production, avoid exposing the 27017 port to the host.
     ports:
-      - 127.0.0.1:27017:27017
+      - 27017:27017
+    networks:
+      - backend
     restart: unless-stopped
 
-#  worker:
-#    image: robol/dm-worker
-#    environment:
-#      MONGO_URI: "mongodb://mongodb:27017/dm-manager"
-
-#  nginx:
-#    image: nginx
-#    volumes:
-#      - ./nginx.conf:/etc/nginx/nginx.conf
-#    ports:
-#      - "8080:80"
+networks:
+  backend:

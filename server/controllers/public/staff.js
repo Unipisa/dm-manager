@@ -88,7 +88,7 @@ async function staffQuery(req) {
         }
     }
     if (staffs.length > 1) {
-        console.log(JSON.stringify({staffs}))
+        // console.log(JSON.stringify({staffs}))
         return {
             error: 'multiple matches'
         }

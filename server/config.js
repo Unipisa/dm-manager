@@ -1,4 +1,3 @@
-const url = require('url')
 require('dotenv').config() // read environment variabiles from .env
 const { randomUUID } = require('crypto')
 const { execSync } = require('child_process')
@@ -18,7 +17,7 @@ class Options {
         const options = {
             SMTP_HOST: undefined,
             FROM_ADDRESS: 'noreply@cs.dm.unipi.it',
-            STATIC_FILES_PATH: (process.env.NODE_ENV === 'production' ? 'build' : 'public'),
+            STATIC_FILES_PATH: 'public',
             SESSION_SECRET: randomUUID(),
             JWT_SECRET: randomUUID(),
             // CORS_ORIGIN: "http://localhost:3000", // comma separated URLS
@@ -40,7 +39,7 @@ class Options {
             TOKEN_SECRET: null,
             BASE_URL: "http://localhost:3000",
             SERVER_NAME: GIT_BRANCH ? `dm-manager [${GIT_BRANCH}]`: 'dm-manager',
-            UPLOAD_DIRECTORY: __dirname + '/../uploads',
+            UPLOAD_DIRECTORY: __dirname + '/uploads',
             WORKER_NOTIFICATION_INTERVAL: '300000', // 5 minutes
             UNIPI_API_URL: "https://api.unipi.it:443/",
             UNIPI_TOKEN: "",
@@ -53,11 +52,11 @@ class Options {
         Object.entries(options).forEach(([key, val]) => {
             this[key] = process.env[key] || val
         })
-        this.VERSION = require('../package.json').version
-        const parsedUrl = url.parse(this.MONGO_URI)
+        this.VERSION = require('./package.json').version
+        const parsedUrl = new URL(this.MONGO_URI)
 
         this.MONGO_HOST = parsedUrl.hostname
-        this.MONGO_PORT = parseInt(parsedUrl.port)
+        this.MONGO_PORT = parsedUrl.port ? parseInt(parsedUrl.port) : undefined
         const pathname = parsedUrl.pathname
         this.MONGO_DB = pathname.split('/')[1]
         this.API_PATH = '/api/v0'

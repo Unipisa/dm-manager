@@ -1,12 +1,5 @@
 ## development
 
-Install the packages with 
- ```
- npm ci
- ```
-
-Use two terminals for backend and frontend. 
-
 For the backend you have to start a mongodb instance once. You can use 
 docker:
 
@@ -20,21 +13,24 @@ export ADMIN_USER=admin
 export ADMIN_PASSWORD=secret
 ```
 
-Then start the server:
+Install dependencies once:
 ```
-npm run server
-```
-
-Finally, in another terminal, start the frontend:
-```
-npm start
+npm --prefix server ci
+npm --prefix frontend ci
 ```
 
-The server should be available at [http://localhost:3000](http://localhost:3000).
+Then start the backend and frontend together:
+```
+./dev.sh
+```
+
+The frontend should be available at [http://localhost:3000](http://localhost:3000).
+
+If you prefer separate terminals, start the backend with `npm --prefix server start` and the frontend with `npm --prefix frontend start`.
 
 To test the notification service you should also start the background worker. In yet another terminal:
 ```
-npm run worker
+cd server && npm run worker
 ```
 
 Configuration is being read from `.env` and by environment variables. See `server/config.js` to see a list of available configuration variables.
@@ -49,8 +45,8 @@ npm run command
 
 Build
 ```
-npm run build
-STATIC_FILES_PATH=build node server/server.js
+make
+node server/server.js
 ```
 
 Build docker image:

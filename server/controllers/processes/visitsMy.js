@@ -93,7 +93,7 @@ router.delete('/:id', async (req, res) => {
 
     const seminars = await EventSeminar.aggregate(seminarsPipeline)
     for (const seminar of seminars) {
-        console.log(`deleting seminar ${seminar._id}`)
+        // console.log(`deleting seminar ${seminar._id}`)
         await EventSeminar.deleteOne({ _id: seminar._id })
         await log(req, seminar, {})
     }
@@ -160,7 +160,7 @@ router.put('/', async (req, res) => {
 })
 
 router.patch('/:id', async (req, res) => {
-    console.log(`PATCH visitsMy ${req.params.id}`)
+    // console.log(`PATCH visitsMy ${req.params.id}`)
     const payload = {...req.body}
 
     assert(req.user._id)

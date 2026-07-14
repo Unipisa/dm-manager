@@ -42,7 +42,7 @@ async function getFormAndCheckAccess(req, res) {
         }
         return obj
     } catch(error) {
-        console.log(`invalid _id: ${id}`)
+        // console.log(`invalid _id: ${id}`)
         res.status(400).send({error: `invalid id ${id}`})
         return null
     }

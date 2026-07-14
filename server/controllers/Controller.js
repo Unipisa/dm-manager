@@ -171,6 +171,7 @@ class Controller {
                                     startDate: 1,
                                     endDate: 1,
                                     localCoordinator: 1,
+                                    CUP: 1,
                                 }},
                                 { $lookup: {
                                     from: "people",
@@ -515,7 +516,7 @@ class Controller {
             [{ total, data }] = result;
         }
             
-        console.log(`${data.length} / ${total} items collected`);
+        // console.log(`${data.length} / ${total} items collected`);
 
         return res.send({
             data,
@@ -534,10 +535,10 @@ class Controller {
         }
         try {
             const pipeline = [
-                {$match: {_id: ObjectId(id)}},
+                {$match: {_id: new ObjectId(id)}},
                 ...this.queryPipeline
             ]
-            console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
+            // console.log(`executing GET pipeline on ${this.path}: ${JSON.stringify(pipeline)}`)
             
             let obj = await this.Model.aggregate(pipeline)
             obj = await this.aggregatePostProcess(obj)
@@ -553,7 +554,7 @@ class Controller {
         } catch(error) {
             console.warn(error)
 
-            console.log(`invalid _id: ${id}`)
+            // console.log(`invalid _id: ${id}`)
             res.status(404).send({error: `invalid id ${id}`})
         }
     }
@@ -609,7 +610,7 @@ class Controller {
             await was.save()
             res.send(was)
         } catch(error) {
-            console.log(`error: ${error.message}}`)
+            // console.log(`error: ${error.message}}`)
             console.error(error)
             res.status(400).send({error: error.message})
         }
@@ -620,7 +621,7 @@ class Controller {
         try {
             const obj = await this.Model.findById(id)
             await log(req, obj.toObject(), {})
-            obj.delete()
+            await this.Model.findByIdAndDelete(id)
             res.send({})
         } catch(err) {
             console.error(err)

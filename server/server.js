@@ -16,7 +16,8 @@ const config = require('./config')
 const UnipiAuthStrategy = require('./unipiAuth')
 const api = require('./api')
 const migrations = require('./migrations')
-const MongoStore = require('connect-mongo')
+const MongoStoreModule = require('connect-mongo')
+const MongoStore = MongoStoreModule.default || MongoStoreModule.MongoStore || MongoStoreModule
 const crypto = require('crypto')
 const {setupDatabase, create_admin_user, create_secret_token} = require('./database')
 const { UNSAFE_RouteContext } = require('react-router')
@@ -56,7 +57,8 @@ function setup_routes(app) {
       credentials: true // Needed for the client to handle session
     }))
   
-  app.use(morgan('tiny')) // access log
+  // Use the standard access log format of Apache, for compatibility
+  app.use(morgan('combined'))
   
   const test_filename = `${config.STATIC_FILES_PATH}/manifest.json`
   if (!fs.existsSync(test_filename)) {
@@ -129,7 +131,6 @@ function setup_routes(app) {
               add_role('/process/seminars')
               add_role('/process/conferences')
               add_role('/process/visitsList')
-              add_role('/process/my/urls')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
             'Assegnista', 'Dottorando in Matematica', 'Dottorando in HPSC',
@@ -152,8 +153,6 @@ function setup_routes(app) {
       function add_role(role) {
         if (!req.roles.includes(role)) req.roles.push(role)
       }
-
-      // console.log(`sending user ${JSON.stringify({...user}, null, 2)}`)
     }
 
     // se c'è un token usa i roles del token
@@ -164,7 +163,7 @@ function setup_routes(app) {
         tok = await Token.findOne({ token })
         req.roles = tok.roles || []
         req.log_who = tok.name || tok.token
-        console.log('Roles: ', req.roles)
+        // console.log('Roles: ', req.roles)
       }
       catch (err) {
         res.status(401)
@@ -203,7 +202,7 @@ function setup_routes(app) {
     }),
     function(req, res) {
       const user = req.user.toObject()
-      console.log(`login ${user.username} roles: ${user.roles}`)
+      // console.log(`login ${user.username} roles: ${user.roles}`)
       res.send({ user })
     })
   
@@ -270,7 +269,7 @@ function setup_routes(app) {
             res.send({error: err.message})
             console.error(err)
           } else {
-            console.log(`user disguised as ${role}`)
+            // console.log(`user disguised as ${role}`)
             req.user = result
             res.send(req.user.toObject())
           }
@@ -287,20 +286,30 @@ function setup_routes(app) {
   
 
   app.get('/hello', (req, res) => {
-    console.log(`params: ${JSON.stringify(req.params)}`)
-    console.log(`query: ${JSON.stringify(req.query)}`)
-    console.log(`body: ${JSON.stringify(req.body)}`)
-    console.log(`session: ${JSON.stringify(req.session)}`)
-    console.log(`user: ${JSON.stringify(req.user)}`)
-    console.log(`isAuthenticated: ${req.isAuthenticated()}`)
+    // console.log(`params: ${JSON.stringify(req.params)}`)
+    // console.log(`query: ${JSON.stringify(req.query)}`)
+    // console.log(`body: ${JSON.stringify(req.body)}`)
+    // console.log(`session: ${JSON.stringify(req.session)}`)
+    // console.log(`user: ${JSON.stringify(req.user)}`)
+    // console.log(`isAuthenticated: ${req.isAuthenticated()}`)
     res.send('Hello World!')
   })
   
   // all unhandled requests are sent to the react application
-  app.get('*', function(req, res) {
-    res.sendFile(`${config.STATIC_FILES_PATH}/index.html`, { 
-      root: `${__dirname}/../` })
-  })
+  const index_file_path = `${config.STATIC_FILES_PATH}/index.html`
+  const has_index_file = fs.existsSync(index_file_path)
+  if (!has_index_file) {
+    console.error(`The index.html for the frontend application is missing. Make sure to build the frontend and set the correct STATIC_FILES_PATH in the configuration.`)
+    console.error(`Expected index.html at: ${index_file_path}`)
+  }
+  else {
+    const index_file_content = fs.readFileSync(index_file_path, 'utf8')
+    console.log(`Loaded index.html from: ${index_file_path}`)
+
+    app.get(/.*/, function(req, res) {
+      res.send(index_file_content)
+    })
+  }
   
   // gestisci errori
   app.use((err, req, res, next) => {

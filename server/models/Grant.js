@@ -13,6 +13,7 @@ const {
 const schema = new Schema({
     name: {type: String, label: 'nome'},
     identifier: {type: String, label: 'identificativo'}, 
+    CUP: {type: String, label: 'CUP'}, 
     projectType: {type: String, label: 'tipo progetto'},
     funds: {
         type: String,

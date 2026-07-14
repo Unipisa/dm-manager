@@ -19,7 +19,6 @@ const changeRoom = require('./controllers/processes/changeRoom')
 const roomsQuery = require('./controllers/public/rooms.js')
 const personQuery = require('./controllers/public/person.js')
 const unimapQuery = require('./controllers/public/unimap.js')
-const urlsQuery = require('./controllers/public/urls.js')
 
 const router = express.Router()
 
@@ -47,7 +46,6 @@ let ModelSchemas = {}
     require('./controllers/EventSeminarController'),
     require('./controllers/EventConferenceController'),
     require('./controllers/EventPhdCourseController'),
-    require('./controllers/UrlController.js'),
     require('./controllers/DocumentController.js'),
     require('./controllers/TimesheetController.js'),
 ].forEach(Controller => {
@@ -133,10 +131,6 @@ router.get('/public/person/:id', personQuery)
 
 router.get('/public/unimap/:matricola', unimapQuery)
 
-router.get('/public/urls', async (req, res) => {
-    res.json(await urlsQuery(req))
-})
-
 // async (req, res) => {
 //     res.json(await personQuery(req))
 // })
@@ -144,7 +138,7 @@ router.get('/public/urls', async (req, res) => {
 
 router.use('/process', processes)
 
-router.use('*', async (req, res) => {
+router.use(/.*/, async (req, res) => {
     res.status(404).json({error: 'invalid path'})
 })
 

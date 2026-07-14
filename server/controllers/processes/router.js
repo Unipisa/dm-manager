@@ -26,8 +26,6 @@ router.use('/changeRoom', require('./changeRoom'))
 
 router.use('/sanityCheck', require('./sanityCheck'))
 
-router.use('/my/urls', require('./urls'))
-
 router.use('/courses', require('./courses'))
 
 router.use('/my/courses', require('./coursesMy'))
