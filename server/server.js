@@ -122,7 +122,7 @@ function setup_routes(app) {
           // anche la descrizione in fondo alle pagine dei relativi
           // processi
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Contrattista di ricerca', 'Incaricato post-doc', 'Collaboratore di ricerca',
+            'Assegnista', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
             'Dottorando in Matematica', 'Dottorando in HPSC',
             'Professore Emerito',
             'Collaboratore',
@@ -134,7 +134,7 @@ function setup_routes(app) {
               add_role('/process/visitsList')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Contrattista di ricerca', 'Incaricato post-doc', 'Collaboratore di ricerca',
+            'Assegnista', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
             'Dottorando in Matematica', 'Dottorando in HPSC',
             'Professore Emerito',
             'Collaboratore',
@@ -143,7 +143,7 @@ function setup_routes(app) {
               add_role('/process/my/visits')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'PTA', 'Assegnista', 'Contrattista di ricerca', 'Incaricato post-doc', 'Collaboratore di ricerca',
+            'PTA', 'Assegnista', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
             ].includes(staff.qualification)) {
               add_role('/process/my/courses')
               add_role('/process/timesheets')

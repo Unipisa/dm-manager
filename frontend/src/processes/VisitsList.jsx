@@ -12,7 +12,7 @@ export default function ProcessVisitsList() {
         con permesso <i>/process/visitsList</i>. Tale permesso è automatico 
         per gli utenti che hanno una delle seguenti qualifiche interne al dipartimento:
         'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-        'Assegnista', 'Contrattista di ricerca', 'Incaricato post-doc', 'Collaboratore di ricerca', 
+        'Assegnista', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
         'Dottorando in Matematica', 'Dottorando in HPSC',
         'Professore Emerito',
         'Collaboratore',
