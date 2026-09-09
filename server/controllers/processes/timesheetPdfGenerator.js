@@ -72,13 +72,13 @@ async function generateTimesheetPDF(timesheet, monthData, year, month, res) {
 
     try {
         // Left logo (matematica)
-        const leftLogoPath = path.join(__dirname, '../../../build/img/matematica_dx_blu.png')
+        const leftLogoPath = path.join(__dirname, '../../public/img/matematica_dx_blu.png')
         if (fs.existsSync(leftLogoPath)) {
             doc.image(leftLogoPath, margin, currentY, { height: 40 })
         }
 
         // Right logo (UNIPI)
-        const rightLogoPath = path.join(__dirname, '../../../build/img/marchio_unipi_orizz_pant541.png')
+        const rightLogoPath = path.join(__dirname, '../../public/img/marchio_unipi_orizz_pant541.png')
         if (fs.existsSync(rightLogoPath)) {
             doc.image(rightLogoPath, pageWidth - margin - 120, currentY, { height: 40 })
         }
