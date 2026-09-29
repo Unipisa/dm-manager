@@ -80,7 +80,7 @@ export function HomeEventList({ default_entries = 3, show_excerpt = true, en = f
         )
     );
     
-    const colloquia_list = filterEventsByCategory(data, 'Colloquium').slice(0,numberOfEntries).map(
+    const colloquia_list = filterEventsByCategory(data, 'colloquium').slice(0,numberOfEntries).map(
         (colloquium) => (
           <EventBox event={colloquium} key={colloquium._id} show_excerpt={show_excerpt} en={en}></EventBox>
         )
@@ -142,9 +142,11 @@ export function HomeEventList({ default_entries = 3, show_excerpt = true, en = f
 function filterEventsByType(events, type) {
     return events.filter((event) => event.type === type);
 }
-  
-function filterEventsByCategory(events, category) {
-    return events.filter((event) => event.category?.name === category);
+
+function filterEventsByCategory(events, label) {
+    return events.some ? events.filter((event) =>
+        event.category?.some((cat) => cat.label === label)
+    ) : [];
 }
 
 function EventBox({ event, show_excerpt, en }) {    
