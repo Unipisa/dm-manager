@@ -27,7 +27,8 @@ function RoomAssignments() {
 
     if (!assignmentsQuery.isSuccess) return <Loading />
     const assignments = assignmentsQuery.data.data
-    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const now = new Date()
+    const today = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()))
 
     const filteredAssignments = assignments.filter(assignment => {
         const start = notNullStartDate(assignment.startDate)
