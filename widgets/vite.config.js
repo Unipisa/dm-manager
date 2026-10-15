@@ -49,6 +49,7 @@ async function minifyScriptFile(filePath) {
 function inlineCssAndCopyStatic() {
   return {
     name: 'dmwidgets-build-assets',
+    apply: 'build',
     async generateBundle(_, bundle) {
       const cssFiles = Object.entries(bundle).filter(([, asset]) => asset.type === 'asset' && asset.fileName.endsWith('.css'))
       const jsChunk = Object.values(bundle).find((asset) => asset.type === 'chunk' && asset.fileName === 'dmwidgets.js')
@@ -104,9 +105,6 @@ function treatJsAsJsx() {
 
 export default defineConfig({
   root: rootDir,
-  define: {
-    'process.env.NODE_ENV': productionEnv,
-  },
   plugins: [
     treatJsAsJsx(),
     react(),
@@ -114,6 +112,7 @@ export default defineConfig({
   ],
   server: {
     port: 8001,
+    open: true,
     strictPort: false,
     proxy: {
       '/api': {

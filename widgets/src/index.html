@@ -136,15 +136,28 @@
 
             //const seminar_id = (await (await fetch(dmwidgets.getManageURL('public/seminars'))).json()).data[0]._id
             const seminar_id = "6891a3a72af272afa738e430"
-            const conference_id = (await (await fetch(dmwidgets.getManageURL('public/conferences'))).json()).data[0]._id
             const grant_id = "67506189b40dceadc365f8cf"
 
             dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {
                 id: seminar_id
             })
-            dmwidgets.loadComponent(document.getElementById("conference"), "Conference", {
-                id: conference_id
-            })
+            // A missing conference must not prevent the other previews from loading.
+            const conferenceTarget = document.getElementById("conference")
+            fetch(dmwidgets.getManageURL('public/conferences', '_limit=1'))
+                .then(response => {
+                    if (!response.ok) throw new Error('Could not load conferences')
+                    return response.json()
+                })
+                .then(({ data }) => {
+                    if (!data?.length) {
+                        conferenceTarget.textContent = 'No conferences available in the local database.'
+                        return
+                    }
+                    dmwidgets.loadComponent(conferenceTarget, "Conference", { id: data[0]._id })
+                })
+                .catch(() => {
+                    conferenceTarget.textContent = 'Could not load conferences. Check that the backend is running on localhost:8000.'
+                })
             dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {
                 //from: '2022-01-01',
                 //_sort: 'startDateTime',
@@ -176,7 +189,7 @@
               default_entries: 5,
             })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
-                person_id: '66471d4ef38d44852c3310e9',
+                person_id: '63822bbf7942943d6350d692',
             })
             dmwidgets.loadComponent(document.getElementById("courselist"), "CourseList", { 
                 from: '2021-01-01',

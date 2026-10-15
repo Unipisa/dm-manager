@@ -41,6 +41,26 @@ You can use the `command` module to clear session or show migrations. Check the 
 npm run command
 ```
 
+## Widgets gallery
+
+The widgets have their own development server. With MongoDB and the backend
+running (see above; `npm --prefix server start` from the repository root), open
+another terminal and run:
+
+```sh
+cd widgets
+npm ci                  # First setup, or after dependencies change
+npm start
+```
+
+This opens the gallery at [http://localhost:8001](http://localhost:8001).
+
+From the repository root, you can also use `npm --prefix widgets start`.
+
+To build the embeddable widgets, run `npm --prefix widgets run build` from the
+repository root. The generated bundle is `widgets/public/dmwidgets.js`, with a
+gallery page at `widgets/public/index.html`. Use `npm start` for local previews.
+
 ## deployment
 
 Build
