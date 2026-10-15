@@ -84,7 +84,7 @@ async function personQuery(req, res) {
             }
         },
         projectFields({
-            firstName: 1, lastName: 1, affiliations: { _id: 1, name: 1 }, gender: 1, email: 1, phone: 1, personalPage: 1, 
+            firstName: 1, lastName: 1, affiliations: { _id: 1, name: 1 }, gender: 1, email: 1, phone: 1, personalPage: 1, cv: 1,
             google_scholar: 1, orcid: 1, mathscinet: 1, arxiv_orcid: 1, photoUrl: 1, about_it: 1, about_en: 1,
             staffs: { qualification: 1, SSD: 1, matricola: 1, isInternal: 1 },
             roomAssignments: { room: 1, startDate: 1, endDate: 1, roomDetails: { building: 1, floor: 1, number: 1, code: 1 } },

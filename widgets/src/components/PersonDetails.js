@@ -98,10 +98,18 @@ function PersonBlock({data, en}) {
                         <p className="my-1">
                             <i className="fas fa-link mr-2"></i>
                             <a href={data.personalPage}>{en ? "Personal web page" : "Pagina web personale"}</a>
-                            <br />
-                            <span className="small text-muted">
-                                {en ? "(The CV is available on this webpage)" : "(Il CV è disponibile a questa pagina web)"}
-                            </span>
+                            {!data.cv && <>
+                                <br />
+                                <span className="small text-muted">
+                                    {en ? "(The CV is available on this webpage)" : "(Il CV è disponibile a questa pagina web)"}
+                                </span>
+                            </>}
+                        </p>
+                    )}
+                    {data.cv && (
+                        <p className="my-1">
+                            <i className="fas fa-file-pdf mr-2" aria-hidden="true"></i>
+                            <a href={data.cv} target="_blank" rel="noopener noreferrer">Curriculum vitae (PDF)</a>
                         </p>
                     )}
                 </div>
