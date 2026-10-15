@@ -84,6 +84,12 @@ class UploadController {
                 return
             }
 
+            if (data.mimetype === 'application/pdf' && !filedata.subarray(0, 5).equals(Buffer.from('%PDF-'))) {
+                res.status(400)
+                res.send({ error: "Invalid PDF file" })
+                return
+            }
+
             if (!data.filename) {
                 res.status(400)
                 res.send({ error: "Invalid or missing filename" })

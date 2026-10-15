@@ -104,21 +104,30 @@ async function uploadFiles(files, _private, engine, urlOnly) {
   return results;
 }
 
-export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false, onCancel = () => {}) {
+export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false, onCancel = () => {}, accept) {
     const input = document.createElement('input')   
     input.type = 'file'
     input.multiple = multiple
+    if (accept) input.accept = accept
     let fileSelected = false 
     input.onchange = async e => {
         if (!e.target.files || e.target.files.length === 0) {
             return
         }
         fileSelected = true 
-        const newUploads = await uploadFiles(e.target.files, _private, engine, urlOnly)
-        if (multiple)
-            setValue(newUploads)
-        else
-            setValue(newUploads[0])
+        if (accept && Array.from(e.target.files).some(file => file.type !== accept)) {
+            engine.addMessage(`Selezionare un file di tipo ${accept}`, 'error')
+            return
+        }
+        try {
+            const newUploads = await uploadFiles(e.target.files, _private, engine, urlOnly)
+            if (multiple)
+                setValue(newUploads)
+            else
+                setValue(newUploads[0])
+        } catch {
+            // uploadFiles already displays the upload error.
+        }
     }
     window.addEventListener(
         'focus',
@@ -172,11 +181,11 @@ export function PrivateAttachmentInput({ value, setValue }) {
     return <AttachmentInput value={value} setValue={setValue} _private={true} />
 }
 
-export function AttachmentInput({ value, setValue, image, _private }) {
+export function AttachmentInput({ value, setValue, image, _private, accept }) {
     // const [uploading, setUploading] = useState(false)
     const id = useInputId()
     const engine = useEngine()
-    const getNewAttachment = () => uploadNewAttachment(setValue, _private, engine, true)
+    const getNewAttachment = () => uploadNewAttachment(setValue, _private, engine, true, false, undefined, accept)
 
     return <div className="form-row">
         <div className="d-inline-block col-sm-10">
@@ -187,6 +196,7 @@ export function AttachmentInput({ value, setValue, image, _private }) {
                 className="form-control"
                 id={ id } 
                 value={ value || "" } 
+                readOnly={!!accept}
                 onChange={ (evt) => {setValue(evt.target.value)} }
             />
         </div>
@@ -194,6 +204,9 @@ export function AttachmentInput({ value, setValue, image, _private }) {
         <button type="button" onClick={getNewAttachment} className="w-100 btn btn-primary">
             Upload
         </button>
+        {accept && value && <button type="button" onClick={() => setValue('')} className="w-100 btn btn-danger mt-1">
+            Rimuovi
+        </button>}
     </div>
     </div>
 }

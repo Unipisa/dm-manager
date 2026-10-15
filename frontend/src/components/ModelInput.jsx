@@ -31,6 +31,7 @@ export function ModelFieldInput({ schema, value, setValue }) {
                     setValue={setValue} 
                     options={options}
                     multiple={multiple}
+                    accept={schema.accept}
                 />
     }
 

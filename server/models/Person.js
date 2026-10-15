@@ -26,6 +26,7 @@ const personSchema = new Schema({
     google_scholar: {type: String, label: 'google_scholar', can_edit_in_profile: true, href: 'https://scholar.google.com/citations?user={}'},
     mathscinet: {type: String, label: 'mathscinet', can_edit_in_profile: true, href: 'https://mathscinet.ams.org/mathscinet/MRAuthorID/{}'},
     photoUrl: {type: String, label: 'foto', widget: 'image', can_edit_in_profile: true},
+    cv: {type: String, label: 'CV', widget: 'attachment', accept: 'application/pdf', can_edit_in_profile: true},
     genealogyId: {type: String, label: 'math genealogy id', can_edit_in_profile: true, href: 'https://genealogy.math.ndsu.nodak.edu/id.php?id={}'},
     about_it: {type: String, label: 'about (it)', help: 'versione italiana del testo pubblico che la persona scrive di se stesso. Viene pubblicato sulla pagina web.', widget: 'text', can_edit_in_profile: true},
     about_en: {type: String, label: 'about (en)', help: 'versione inglese del testo pubblico che la persona scrive di se stesso. Viene pubblicato sulla pagina web.', widget: 'text', can_edit_in_profile: true},    

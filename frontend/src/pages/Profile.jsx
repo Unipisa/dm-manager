@@ -213,6 +213,7 @@ export default function Profile() {
                         google_scholar: "Google-scholar",
                         mathscinet: "Mathscinet",
                         photoUrl: "Foto",
+                        cv: "CV",
                         about_it: "informazioni opzionali (in italiano) da pubblicare nella propria scheda personale",
                         about_en: "informazioni opzionali (in inglese) da pubblicare nella propria scheda personale",
                     }).map(([field, label]) => 

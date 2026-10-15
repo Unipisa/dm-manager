@@ -6,6 +6,7 @@ const assert = require('assert')
 const fieldOptionsMapping = {
     label: 'label',
     widget: 'widget',
+    accept: 'accept',
     hidden: 'hidden',
     can_sort: 'can_sort',
     can_filter: 'can_filter',
