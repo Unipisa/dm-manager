@@ -8,6 +8,7 @@ import { DateInput, NumberInput, PersonInput, SelectInput, StringInput, TextInpu
 import Loading from '../components/Loading'
 import { ModelHeading } from '../components/ModelHeading'
 import LessonsEditor, { LessonFormFields } from '../components/LessonsEditor'
+import CourseActivationStatus from '../components/CourseActivationStatus'
 
 import moment from 'moment'
 
@@ -166,8 +167,11 @@ export default function PhdCourseEditPage({ Model }) {
     useEffect(() => {
         if (clone_id) {
             if (cloneStatus === "success") {
-                delete cloneData._id
-                setModifiedObj(cloneData)
+                const { _id, ...clonedCourse } = cloneData
+                setModifiedObj({
+                    ...clonedCourse,
+                    activationStatus: clonedCourse.activationStatus == null ? null : 'pending',
+                })
             }
         } else {
             if (status === "success") {
@@ -333,6 +337,18 @@ export default function PhdCourseEditPage({ Model }) {
                                 />
                             </div>
                             <div className="col-sm-2"></div>
+                        </Form.Group>
+                        <Form.Group className="row my-2">
+                            <Form.Label className="col-sm-2 col-form-label" htmlFor="activationStatus" style={{textAlign: "right"}}>
+                                Attivazione
+                            </Form.Label>
+                            <div className="col-sm-10">
+                                <CourseActivationStatus
+                                    id="activationStatus"
+                                    value={modifiedObj.activationStatus}
+                                    setValue={value => setModifiedObj(obj => ({ ...obj, activationStatus: value }))}
+                                />
+                            </div>
                         </Form.Group>
                         <Form.Group className="row my-2">
                             <Form.Label className="col-sm-2 col-form-label" htmlFor={"start-date"} style={{textAlign: "right"}}>

@@ -33,6 +33,12 @@ const eventPhdCourseSchema = new Schema({
     },
     startDate,
     endDate,
+    activationStatus: {
+        type: String,
+        label: 'Attivazione',
+        enum: [null, 'pending', 'confirmed'],
+        default: null,
+    },
     lecturers: [{ type: ObjectId, label: 'Docente/i', ref: 'Person', default: [], required: true }],
     lessons: [lessonSchema],
     

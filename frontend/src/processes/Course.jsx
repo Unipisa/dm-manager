@@ -11,6 +11,7 @@ import 'katex/dist/katex.min.css'
 import { formatDate } from '../components/DatetimeInput'
 import { InputRow, DateInput, NumberInput, SelectInput, StringInput, TextInput } from '../components/Input'
 import LessonsEditor, { LessonFormFields } from '../components/LessonsEditor'
+import CourseActivationStatus, { formatActivationStatus } from '../components/CourseActivationStatus'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
 import { setter, useEngine } from '../Engine'
@@ -30,6 +31,7 @@ export default function Course({variant}) {
             description: "",
             phd: "",
             courseType: null,
+            activationStatus: null,
             startDate: null,
             endDate: null,
             lecturers: null,
@@ -475,6 +477,14 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                             />
                         </div>
                     </InputRow>
+                    <InputRow label="Attivazione" className="my-3">
+                        <div>
+                            <CourseActivationStatus
+                                value={data.activationStatus}
+                                setValue={setter(setData, 'activationStatus')}
+                            />
+                        </div>
+                    </InputRow>
                     <InputRow className="my-3" label="Descrizione">
                         <div className="d-flex align-items-start">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="description-tooltip">
@@ -500,6 +510,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                 data fine: <b>{data.endDate}</b><br/>
                 phd: <b>{data.phd}</b><br/>
                 courseType: <b>{data.courseType}</b><br/>
+                attivazione: <b>{formatActivationStatus(data.activationStatus)}</b><br/>
                 descrizione: <b>{data.description}</b><br/>
                 creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
                 {/* Display lessons in read-only mode */}

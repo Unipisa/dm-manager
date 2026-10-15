@@ -7,6 +7,7 @@ import Timestamps from '../components/Timestamps'
 import { ModelHeading } from '../components/ModelHeading'
 import { ModelFieldOutput } from '../components/ModelOutput'
 import LessonsEditor from '../components/LessonsEditor'
+import { formatActivationStatus } from '../components/CourseActivationStatus'
 
 const PhdCourseView = ({ Model }) => {
     const obj = useObject()
@@ -40,6 +41,10 @@ const PhdCourseView = ({ Model }) => {
                 <p>
                     <strong className="align-top">Tipo: </strong>
                     <ModelFieldOutput key="courseType" field="courseType" schema={schema.courseType} value={obj.courseType} />
+                </p>
+                <p>
+                    <strong className="align-top">Attivazione: </strong>
+                    {formatActivationStatus(obj.activationStatus)}
                 </p>
                 <p>
                     <strong className="align-top">Docente/i: </strong>
