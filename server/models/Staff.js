@@ -15,7 +15,8 @@ const staffSchema = new Schema({
     qualification: {type: String, label: 'qualifica', 
         enum: [
             'PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Dottorando in Matematica', 'Dottorando in HPSC',
+            'Assegnista', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
+            'Dottorando in Matematica', 'Dottorando in HPSC',
             'PTA', 
             'Professore Emerito',
             'Collaboratore',

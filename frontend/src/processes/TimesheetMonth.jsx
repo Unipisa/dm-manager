@@ -16,6 +16,8 @@ const DAY_TYPE_LABELS = {
 
 const EMPLOYEE_SELECTABLE_TYPES = ['weekday', 'sick-leave', 'annual-holiday', 'other-absence']
 const NON_WORKING_TYPES = ['sick-leave', 'annual-holiday', 'other-absence']
+const MAX_DESCRIPTION_LINES = 5
+const CHARS_PER_LINE = 110
 
 // Build a cell key from dayIndex, field, and an optional grant ID
 // For non-grant fields, grantId should be null/undefined → stored as 'none'
@@ -31,6 +33,31 @@ const parseCellKey = (key) => {
         field,
         grantId: grantId === 'none' ? null : grantId,
     }
+}
+
+const countEffectiveLines = (text) => {
+    return text.split('\n').reduce((total, line) => {
+        return total + Math.max(1, Math.ceil(line.length / CHARS_PER_LINE))
+    }, 0)
+}
+
+const truncateToLines = (text, maxLines, charsPerLine) => {
+    const rawLines = text.split('\n')
+    let remaining = maxLines
+    const result = []
+
+    for (const line of rawLines) {
+        const linesNeeded = Math.max(1, Math.ceil(line.length / charsPerLine))
+        if (linesNeeded <= remaining) {
+            result.push(line)
+            remaining -= linesNeeded
+        } else {
+            result.push(line.slice(0, remaining * charsPerLine))
+            remaining = 0
+            break
+        }
+    }
+    return result.join('\n')
 }
 
 export default function EditTimesheetMonth() {
@@ -210,6 +237,12 @@ export default function EditTimesheetMonth() {
     }
 
     const handleCancel = () => navigate(-1)
+
+    const handleDescriptionChange = (e) => {
+        const limited = truncateToLines(e.target.value, MAX_DESCRIPTION_LINES, CHARS_PER_LINE)
+        setActivityDescription(limited)
+        setHasChanges(true)
+    }
 
     const getDayTotal = (day) => {
         if (NON_WORKING_TYPES.includes(day.dayType)) return null
@@ -484,11 +517,11 @@ export default function EditTimesheetMonth() {
                             value={activityDescription}
                             disabled={isLocked}
                             placeholder="Inserire una breve descrizione delle attività svolte nel mese..."
-                            onChange={(e) => {
-                                setActivityDescription(e.target.value)
-                                setHasChanges(true)
-                            }}
+                            onChange={handleDescriptionChange}
                         />
+                        <Form.Text muted>
+                            {countEffectiveLines(activityDescription)}/{MAX_DESCRIPTION_LINES} righe (stima)
+                        </Form.Text>
                     </Form.Group>
 
                     <div className="mt-4 d-flex justify-content-end gap-2">
