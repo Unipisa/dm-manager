@@ -177,6 +177,7 @@ export function getRoleLabel(role, english, feminine) {
         'RTT': ['Ricercatore a tempo determinato in tenure track (RTT)', 'Ricercatrice a tempo determinato in tenure track (RTT)', 'Tenure-Track Assistant Professor', 'Tenure-Track Assistant Professor'],
         'RIC': ['Ricercatore a tempo indeterminato', 'Ricercatrice a tempo indeterminato', 'Tenured Assistant Professor', 'Tenured Assistant Professor'],
         'Assegnista': ['Assegnista', 'Assegnista', 'Postdoctoral Fellow', 'Postdoctoral Fellow'],
+        'Tecnologo': ['Tecnologo', 'Tecnologa', 'Technologist', 'Technologist'],
         'Titolare di contratto di ricerca': ['Titolare di contratto di ricerca', 'Titolare di contratto di ricerca', 'Research Contract Holder', 'Research Contract Holder'], 
         'Titolare di incarico post-doc': ['Titolare di incarico post-doc', 'Titolare di incarico post-doc', 'Postdoctoral Researcher', 'Postdoctoral Researcher'], 
         'Titolare di incarico di ricerca': ['Titolare di incarico di ricerca', 'Titolare di incarico di ricerca', 'Research Associate', 'Research Associate'],

@@ -47,6 +47,7 @@ function StaffsFilters({ filter }) {
         'RTT', 
         'RIC', 
         'Assegnista',
+        'Tecnologo',
         'Titolare di contratto di ricerca',
         'Titolare di incarico post-doc',
         'Titolare di incarico di ricerca',
