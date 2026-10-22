@@ -9,7 +9,7 @@ import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import 'katex/dist/katex.min.css'
 
-import { ConferenceRoomInput, GrantInput, InputRow, DateInput, MultipleSelectInput, InstitutionInput, BooleanInput, StringInput, TextInput } from '../components/Input'
+import { ConferenceRoomInput, GrantInput, ImageInput, InputRow, DateInput, MultipleSelectInput, InstitutionInput, BooleanInput, StringInput, TextInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
 import { setter, useEngine } from '../Engine'
@@ -29,6 +29,7 @@ export default function Conference() {
             institution: null,
             isOutreach: null,
             grants: null, 
+            flyerUrl: "",
             description: "",
         }
 
@@ -202,13 +203,23 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                             <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
                         </div>
                     </InputRow>
+                    <InputRow className="my-3" label="Locandina" >
+                        <OverlayTrigger placement="left" overlay={<Tooltip id="flyer-tooltip">
+                                Caricare un'immagine PNG o JPEG. 
+                                La locandina sarà pubblica e verrà mostrata prima della descrizione.</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                            </OverlayTrigger>   
+                        <ImageInput value={data.flyerUrl} setValue={setter(setData,'flyerUrl')} accept="image/png,image/jpeg" />
+                    </InputRow>
                     <InputRow className="my-3" label="Descrizione">
                         <div className="d-flex align-items-start">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                            <OverlayTrigger placement="left" overlay={<Tooltip id="description-tooltip">
                                 Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
                                 che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
                                 <br />
                                 L'anteprima della descrizione verrà mostrata più sotto mentre scrivi.
+                                Se la locandina contiene già tutte le informazioni, probabilmente non serve aggiungere una descrizione. 
+                                Il testo resta utile per accessibilità e ricerca.
                                 </Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
@@ -231,6 +242,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                 istituzione: <b>{data.institution}</b><br/>
                 terza missione: <b>{data.isOutreach}</b><br/>
                 grant: <b>{(data.grants && data.grants.map(g => g.name).join(', ')) || '---'}</b><br/>
+                {data.flyerUrl && <><img src={data.flyerUrl} alt={`Locandina: ${data.title}`} style={{maxWidth: '100%', height: 'auto'}} /><br/></>}
                 descrizione: <b>{data.description}</b><br/>
                 creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
             </>}

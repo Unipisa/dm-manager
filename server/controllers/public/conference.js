@@ -36,6 +36,7 @@ async function conferenceQuery(req) {
                 name: 1, 
                 identifier: 1,
             }, 
+            flyerUrl: 1,
             description: 1, 
             conferenceRoom: {
                 _id: 1, 

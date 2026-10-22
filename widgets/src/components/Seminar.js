@@ -31,6 +31,7 @@ export function Seminar({ id }) {
 
     return <div>
             <SeminarTitle seminar={data}></SeminarTitle>
+            {data.flyerUrl && <p><img src={data.flyerUrl} alt={`${isEnglish() ? 'Flyer' : 'Locandina'}: ${data.title}`} style={{maxWidth: '100%', height: 'auto'}} /></p>}
             <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
         </div>
 }

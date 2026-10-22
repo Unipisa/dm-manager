@@ -115,7 +115,7 @@ export function uploadNewAttachment(setValue, _private, engine, urlOnly, multipl
             return
         }
         fileSelected = true 
-        if (accept && Array.from(e.target.files).some(file => file.type !== accept)) {
+        if (accept && Array.from(e.target.files).some(file => !accept.split(',').map(type => type.trim()).includes(file.type))) {
             engine.addMessage(`Selezionare un file di tipo ${accept}`, 'error')
             return
         }
@@ -211,10 +211,10 @@ export function AttachmentInput({ value, setValue, image, _private, accept }) {
     </div>
 }
 
-export function ImageInput({ value, setValue }) {
+export function ImageInput({ value, setValue, accept }) {
     const id = useInputId()
 
-    return <AttachmentInput id={id} value={value} setValue={setValue} image={true} />
+    return <AttachmentInput id={id} value={value} setValue={setValue} image={true} accept={accept} />
 }
 
 export function NumberInput({ value, setValue }) {

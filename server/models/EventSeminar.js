@@ -18,6 +18,7 @@ const eventSeminarSchema = new Schema({
     duration: { type: Number, label: 'Durata (in minuti)', default: 60 },
     category: [{ type: ObjectId, label: 'Ciclo di Seminari', ref: 'SeminarCategory', can_sort: ['name'] }],
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
+    flyerUrl: { type: String, label: 'Locandina', widget: 'image', accept: 'image/png,image/jpeg' },
     abstract: { type: String, label: "Abstract", widget: 'text' },
     // 09/04/2025: hiding as not used anymore, CDP
     //externalid: { type: String, label: "External ID" },

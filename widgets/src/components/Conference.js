@@ -38,6 +38,7 @@ export function Conference({ id }) {
 
     return <div>
         <ConferenceTitle conference={data}></ConferenceTitle>
+        {data.flyerUrl && <p><img src={data.flyerUrl} alt={`${isEnglish() ? 'Flyer' : 'Locandina'}: ${data.title}`} style={{maxWidth: '100%', height: 'auto'}} /></p>}
         <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
             {data.description}
         </Markdown>

@@ -13,7 +13,7 @@ import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 import 'katex/dist/katex.min.css'
 import {SelectPeopleBlock} from './SelectPeopleBlock'
-import { ConferenceRoomInput, GrantInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
+import { ConferenceRoomInput, GrantInput, ImageInput, InputRow, NumberInput, SeminarCategoryInput, StringInput, TextInput } from '../components/Input'
 import { DatetimeInput } from '../components/DatetimeInput'
 import { PrefixProvider } from './PrefixProvider'
 import Loading from '../components/Loading'
@@ -35,6 +35,7 @@ export default function Seminar() {
             duration: 60,
             conferenceRoom: null,
             category: [],
+            flyerUrl: "",
             abstract: "",
             grants: null, 
             externalid: "",
@@ -298,6 +299,14 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                             <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
                         </div>
                     </InputRow>
+                    <InputRow className="my-3" label="Locandina">
+                        <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
+                                Caricare un'immagine PNG o JPEG. 
+                                La locandina sarà pubblica e verrà mostrata prima dell'abstract.</Tooltip>}>
+                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
+                        </OverlayTrigger>   
+                        <ImageInput value={data.flyerUrl} setValue={setter(setData,'flyerUrl')} accept="image/png,image/jpeg" />
+                    </InputRow>
                     <InputRow className="my-3" label="Abstract">
                         <div className="d-flex align-items-start">
                             <OverlayTrigger placement="left" overlay={<Tooltip id="abstract-tooltip">
@@ -305,6 +314,9 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                                 che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
                                 <br />
                                 L'anteprima dell'abstract verrà mostrata più sotto mentre scrivi.
+                                <br />
+                                Se la locandina contiene già tutte le informazioni, probabilmente non serve aggiungere un abstract. 
+                                Il testo resta utile per accessibilità e ricerca.
                                 </Tooltip>}>
                                 <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
                             </OverlayTrigger>   
@@ -326,6 +338,7 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                 durata: <b>{data.duration}</b><br/>
                 aula: <b>{data.conferenceRoom && data.conferenceRoom.name}</b><br/>
                 grant: <b>{(data.grants && data.grants.map(g => g.name).join(', ')) || '---'}</b><br/>
+                {data.flyerUrl && <><img src={data.flyerUrl} alt={`Locandina: ${data.title}`} style={{maxWidth: '100%', height: 'auto'}} /><br/></>}
                 abstract: <b>{data.abstract}</b><br/>
                 creato da: <b>{data.createdBy?.username || data.createdBy?.email || '???'}</b><br/>
             </>}
