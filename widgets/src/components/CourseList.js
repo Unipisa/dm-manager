@@ -9,7 +9,7 @@ import Accordion from './Accordion';
 import { Loading } from './Loading'
 import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL, isEnglish } from '../utils'
 
-export function CourseList({ from, to, phd, showActivationFilter = false }) {
+export function CourseList({ from, to, phd, show_activation_filter = false }) {
     const [confirmedOnly, setConfirmedOnly] = useState(false);
     if (from === undefined || to === undefined) {
         return <div>Please specify both 'from' and 'to' in order to show the list of courses</div>;
@@ -41,7 +41,7 @@ export function CourseList({ from, to, phd, showActivationFilter = false }) {
     const noDate = new Date(`${fromYear}-09-01`);
 
     for (const course of data) {
-        if (showActivationFilter && confirmedOnly && course?.activationStatus !== 'confirmed') {
+        if (show_activation_filter && confirmedOnly && course?.activationStatus !== 'confirmed') {
             continue;
         }
         if (course && course.startDate) {
@@ -143,10 +143,10 @@ export function CourseList({ from, to, phd, showActivationFilter = false }) {
 
     return (
         <>
-            <p>{showActivationFilter
+            <p>{show_activation_filter
                 ? `The catalogue of Ph.D. courses for the academic year ${fromYear}-${toYear} is below:`
                 : `The list of Ph.D. courses that will be taught during the academic year ${fromYear}-${toYear} is below:`}</p>
-            {showActivationFilter && (
+            {show_activation_filter && (
                 <div className="btn-group mb-3" role="group" aria-label="Course activation filter">
                     <button type="button" className={`btn ${!confirmedOnly ? 'btn-primary' : 'btn-outline-primary'}`}
                         aria-pressed={!confirmedOnly} onClick={() => setConfirmedOnly(false)}>
@@ -158,7 +158,7 @@ export function CourseList({ from, to, phd, showActivationFilter = false }) {
                     </button>
                 </div>
             )}
-            {showActivationFilter && confirmedOnly &&
+            {show_activation_filter && confirmedOnly &&
                 noDateCourses.length + fallCourses.length + springCourses.length === 0 && (
                     <p role="status">No active courses are available for this academic year.</p>
                 )}
