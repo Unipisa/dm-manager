@@ -22,9 +22,8 @@ const schema = new Schema({
     timestamps: true // adds fields: createdAt, updatedAt
 })
 
-schema.pre('save', function(next) {
+schema.pre('save', function() {
     this.code = `${this.building}${this.floor}:${this.number}`
-    next()
 })
 
 const Room = model('Room', schema)
