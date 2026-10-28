@@ -29,9 +29,8 @@ export function InputRow({ label, modified, help, children, className}) {
             <InputIdContext.Provider value={id}>
                 { children }
             </InputIdContext.Provider>
+            {help && <div className="form-text">{help}</div>}
         </div>
-        <div className="col-sm-2"></div>
-        <div className="col-sm-10 form-text">{help}</div>
     </Form.Group>
 }
 
@@ -522,16 +521,19 @@ export function SelectInput({ options, value, setValue, displayFunction }) {
     </select>
 }
 
-export function BooleanInput({ value, setValue }) {
+export function BooleanInput({ value, setValue, label }) {
     const id = useInputId()
 
-    return <input 
-        className="form-check-input col-sm-10"
-        type='checkbox' 
-        id={ id } 
-        checked={ !!value } 
-        onChange={ (evt) => {setValue(!!evt.target.checked)} }
-    />                 
+    return <div className="col-form-label pb-0">
+        <Form.Check
+            className="mb-0"
+            type="checkbox"
+            id={id}
+            label={label}
+            checked={!!value}
+            onChange={evt => setValue(evt.target.checked)}
+        />
+    </div>
 }
 
 export function MultipleSelectInput({ options, value, setValue }) {

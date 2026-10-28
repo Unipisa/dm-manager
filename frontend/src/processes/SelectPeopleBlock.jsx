@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Modal } from 'react-bootstrap'
-import { Card, Form, Table, Button, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Card, Form, Table, Button } from 'react-bootstrap'
 import { InputRow, StringInput, EmailInput, InstitutionInput } from '../components/Input'
 import { useQuery } from 'react-query'
 import api from '../api'
@@ -72,15 +72,13 @@ export function SelectPersonBlock({ title, person, setPerson, onFocus, done, pre
                         <InputRow label="Email">
                             <EmailInput value={email} setValue={setEmail} />
                         </InputRow>
-                        <InputRow label="Affiliazione">
-                            <div className="d-flex align-items-center">
-                                <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                    È possibile scegliere più di un'affiliazione selezionandone una alla volta, 
-                                    oppure selezionare "N/A" per nessuna affiliazione</Tooltip>}>
-                                    <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                                </OverlayTrigger>
-                                <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
-                            </div>
+                        <InputRow label="Affiliazione"
+                            help={<>
+                                È possibile scegliere più di un'affiliazione selezionandone una alla volta,
+                                oppure selezionare "N/A" per nessuna affiliazione
+                            </>}
+                        >
+                            <InstitutionInput value={affiliations} setValue={setAffiliations} multiple={true} />
                         </InputRow>
                     </Form>
                     <PersonSuggestions query={{lastName, firstName, email, affiliation: (affiliations?.length ? affiliations[0]._id : '')}} onClick={clickPerson} prefix={prefix}/>

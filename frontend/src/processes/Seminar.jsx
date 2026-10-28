@@ -1,4 +1,4 @@
-import { Button, Card, Form, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card, Form, Modal } from 'react-bootstrap'
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
@@ -242,31 +242,27 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                             prefix="process/seminars"
                         /> 
                     </InputRow>
-                    <InputRow label="Organizzatori" className="my-3">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="organizers-tooltip">
-                                Se il seminario è gestito da più persone, inserisci tutti gli organizzatori
-                                così che tutti possano vedere i dati e fare modifiche</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>  
-                            <SelectPeopleBlock
+                    <InputRow label="Organizzatori" className="my-3"
+                        help={<>
+                            Se il seminario è gestito da più persone, inserisci tutti gli organizzatori
+                            così che tutti possano vedere i dati e fare modifiche
+                        </>}
+                    >
+                        <SelectPeopleBlock
                             people={data.organizers || []} setPeople={people => setData(data => ({...data,organizers: people}))}
                             prefix="process/seminars"
-                            />
-                        </div>
+                        />
                     </InputRow>
                     <InputRow label="Titolo" className="my-3">
                         <StringInput value={data.title} setValue={setter(setData,'title')} />
                     </InputRow>
-                    <InputRow label="Ciclo di seminari" className="my-3">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="cycle-tooltip">
-                                Si prega di selezionare tra uno dei cicli di seminari presenti nella lista. 
-                                Se il ciclo di seminari che cerchi è assente, si prega di contattare <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a></Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>                
-                            <SeminarCategoryInput multiple={true} value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
-                        </div>
+                    <InputRow label="Ciclo di seminari" className="my-3"
+                        help={<>
+                            Si prega di selezionare tra uno dei cicli di seminari presenti nella lista.
+                            Se il ciclo di seminari che cerchi è assente, si prega di contattare <a href="mailto:help@dm.unipi.it">help@dm.unipi.it</a>
+                        </>}
+                    >
+                        <SeminarCategoryInput multiple={true} value={data.category} setValue={setter(setData,'category')} disableCreation={true}/>
                     </InputRow>
                     <InputRow label="Data e ora" className="my-3">
                         <DatetimeInput value={data.startDatetime} setValue={setter(setData,'startDatetime')}/>
@@ -274,54 +270,47 @@ export function SeminarDetailsBlock({ onCompleted, data, setData, change, active
                     <InputRow className="my-3" label="Durata (in minuti)">
                         <NumberInput value={data.duration} setValue={setter(setData,'duration')}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Aula">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="room-tooltip">
-                                Per effettuare la prenotazione su <a href="https://rooms.dm.unipi.it/">Rooms</a> si prega di seguire le istruzioni
-                                che appaiono dopo aver premuto il tasto 'Salva'</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
-                        </div>
+                    <InputRow className="my-3" label="Aula"
+                        help={<>
+                            Per effettuare la prenotazione su <a href="https://rooms.dm.unipi.it/">Rooms</a> si prega di seguire le istruzioni
+                            che appaiono dopo aver premuto il tasto 'Salva'
+                        </>}
+                    >
+                        <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
                         {roomWarning && (
                             <div className="text-muted small mt-1" style={{ fontSize: '0.875rem' }}>
                                 {roomWarning}
                             </div>
                         )}
                     </InputRow>
-                    <InputRow className="my-3" label="Grant">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
-                                cercando tramite il nome del grant oppure il cognome del PI (nazionale)</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
-                        </div>
+                    <InputRow className="my-3" label="Grant"
+                        help={<>
+                            Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
+                            cercando tramite il nome del grant oppure il cognome del PI (nazionale)
+                        </>}
+                    >
+                        <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Locandina">
-                        <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Caricare un'immagine PNG o JPEG. 
-                                La locandina sarà pubblica e verrà mostrata prima dell'abstract.</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                        </OverlayTrigger>   
+                    <InputRow className="my-3" label="Locandina"
+                        help={<>
+                            Caricare un'immagine PNG o JPEG.
+                            La locandina sarà pubblica e verrà mostrata prima dell'abstract.
+                        </>}
+                    >
                         <ImageInput value={data.flyerUrl} setValue={setter(setData,'flyerUrl')} accept="image/png,image/jpeg" />
                     </InputRow>
-                    <InputRow className="my-3" label="Abstract">
-                        <div className="d-flex align-items-start">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="abstract-tooltip">
-                                Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
-                                che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
-                                <br />
-                                L'anteprima dell'abstract verrà mostrata più sotto mentre scrivi.
-                                <br />
-                                Se la locandina contiene già tutte le informazioni, probabilmente non serve aggiungere un abstract. 
-                                Il testo resta utile per accessibilità e ricerca.
-                                </Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
-                        </div>
+                    <InputRow className="my-3" label="Abstract"
+                        help={<>
+                            Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule)
+                            che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
+                            <br />
+                            L'anteprima dell'abstract verrà mostrata più sotto mentre scrivi.
+                            <br />
+                            Se la locandina contiene già tutte le informazioni, probabilmente non serve aggiungere un abstract.
+                            Il testo resta utile per accessibilità e ricerca.
+                        </>}
+                    >
+                        <TextInput value={data.abstract} setValue={setter(setData,'abstract')}/>
                     </InputRow>
                 </Form>
                 {error && <div className="alert alert-danger">{error}</div>}

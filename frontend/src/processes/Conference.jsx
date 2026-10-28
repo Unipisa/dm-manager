@@ -1,4 +1,4 @@
-import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card, Form } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
@@ -151,80 +151,67 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                             options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09"]}
                         />
                     </InputRow>
-                    <InputRow className="my-3" label="Sito web">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="url-tooltip">
-                                Se il convegno ha un sito web dedicato, inserirlo qui
-                                e indirizzare gli utenti a esso nella descrizione.
-                                Per inserire un link il formato è [descrizione](url)</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <StringInput value={data.url} setValue={setter(setData,'url')} disableCreation={true}/>
-                        </div>
+                    <InputRow className="my-3" label="Sito web"
+                        help={<>
+                            Se il convegno ha un sito web dedicato, inserirlo qui
+                            e indirizzare gli utenti a esso nella descrizione.
+                            Per inserire un link il formato è [descrizione](url)
+                        </>}
+                    >
+                        <StringInput value={data.url} setValue={setter(setData,'url')} disableCreation={true}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Aula">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Per la prenotazione di un'aula in Dipartimento si può procedere autonomamente
-                                usando <a href="https://rooms.dm.unipi.it/">Rooms</a>,
-                                oppure ci si può rivolgere alla segreteria</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
-                        </div>
+                    <InputRow className="my-3" label="Aula"
+                        help={<>
+                            Per la prenotazione di un'aula in Dipartimento si può procedere autonomamente
+                            usando <a href="https://rooms.dm.unipi.it/">Rooms</a>,
+                            oppure ci si può rivolgere alla segreteria
+                        </>}
+                    >
+                        <ConferenceRoomInput value={data.conferenceRoom} setValue={setter(setData,'conferenceRoom')} disableCreation={true}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Istituzione (solo se diversa da unipi)">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="institutions-tooltip">
-                                Se il convegno non si svolge al Dipartimento, selezionare un'istituzione
-                                e lasciare vuota l'aula</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <InstitutionInput value={data.institution} setValue={setter(setData,'institution')}/>
-                        </div>
+                    <InputRow className="my-3" label="Istituzione (solo se diversa da unipi)"
+                        help={<>
+                            Se il convegno non si svolge al Dipartimento, selezionare un'istituzione
+                            e lasciare vuota l'aula
+                        </>}
+                    >
+                        <InstitutionInput value={data.institution} setValue={setter(setData,'institution')}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Terza missione">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="third-mission-tooltip">
-                                Se il convegno fa parte di un'iniziativa di Terza missione
-                                selezionare la casella</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <BooleanInput value={data.isOutreach} setValue={setter(setData,'isOutreach')}/>
-                        </div>
+                    <InputRow className="my-3" label="Terza missione"
+                        help={<>
+                            Se il convegno fa parte di un'iniziativa di Terza missione
+                            selezionare la casella
+                        </>}
+                    >
+                        <BooleanInput value={data.isOutreach} setValue={setter(setData,'isOutreach')}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Grant">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                                Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
-                                cercando tramite il nome del grant oppure il cognome del PI (nazionale)</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
-                        </div>
+                    <InputRow className="my-3" label="Grant"
+                        help={<>
+                            Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
+                            cercando tramite il nome del grant oppure il cognome del PI (nazionale)
+                        </>}
+                    >
+                        <GrantInput multiple={true} value={data.grants || []} setValue={setter(setData,'grants')}/>
                     </InputRow>
-                    <InputRow className="my-3" label="Locandina" >
-                        <OverlayTrigger placement="left" overlay={<Tooltip id="flyer-tooltip">
-                                Caricare un'immagine PNG o JPEG. 
-                                La locandina sarà pubblica e verrà mostrata prima della descrizione.</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
+                    <InputRow className="my-3" label="Locandina"
+                        help={<>
+                            Caricare un'immagine PNG o JPEG.
+                            La locandina sarà pubblica e verrà mostrata prima della descrizione.
+                        </>}
+                    >
                         <ImageInput value={data.flyerUrl} setValue={setter(setData,'flyerUrl')} accept="image/png,image/jpeg" />
                     </InputRow>
-                    <InputRow className="my-3" label="Descrizione">
-                        <div className="d-flex align-items-start">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="description-tooltip">
-                                Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
-                                che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
-                                <br />
-                                L'anteprima della descrizione verrà mostrata più sotto mentre scrivi.
-                                Se la locandina contiene già tutte le informazioni, probabilmente non serve aggiungere una descrizione. 
-                                Il testo resta utile per accessibilità e ricerca.
-                                </Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <TextInput value={data.description} setValue={setter(setData,'description')}/>
-                        </div>
+                    <InputRow className="my-3" label="Descrizione"
+                        help={<>
+                            Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule)
+                            che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
+                            <br />
+                            L'anteprima della descrizione verrà mostrata più sotto mentre scrivi.
+                            Se la locandina contiene già tutte le informazioni, probabilmente non serve aggiungere una descrizione.
+                            Il testo resta utile per accessibilità e ricerca.
+                        </>}
+                    >
+                        <TextInput value={data.description} setValue={setter(setData,'description')}/>
                     </InputRow>
                 </Form>
                 {error && <div className="alert alert-danger">{error}</div>}

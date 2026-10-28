@@ -1,4 +1,4 @@
-import { Button, Card, Form, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card, Form, Modal } from 'react-bootstrap'
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import api from '../api'
@@ -461,21 +461,19 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                             options={["Matematica", "HPSC"]}
                         />
                     </InputRow>
-                    <InputRow label="Tipo" className="my-3">
-                        <div className="d-flex align-items-center">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="course-type-tooltip">
-                                Questo campo è necessario solo per i corsi del dottorato in HPSC</Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>
-                            <SelectInput 
-                                value={data.courseType ?? ""} 
-                                setValue={(val) => {
-                                    const normalizedValue = val === "" ? null : val;
-                                    setter(setData, "courseType")(normalizedValue);
-                                }} 
-                                 options={["", "Foundational", "Methodological", "Thematic"]}
-                            />
-                        </div>
+                    <InputRow label="Tipo" className="my-3"
+                        help={<>
+                            Questo campo è necessario solo per i corsi del dottorato in HPSC
+                        </>}
+                    >
+                        <SelectInput
+                            value={data.courseType ?? ""}
+                            setValue={(val) => {
+                                const normalizedValue = val === "" ? null : val;
+                                setter(setData, "courseType")(normalizedValue);
+                            }}
+                             options={["", "Foundational", "Methodological", "Thematic"]}
+                        />
                     </InputRow>
                     <InputRow label="Attivazione" className="my-3">
                         <div>
@@ -485,18 +483,15 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                             />
                         </div>
                     </InputRow>
-                    <InputRow className="my-3" label="Descrizione">
-                        <div className="d-flex align-items-start">
-                            <OverlayTrigger placement="left" overlay={<Tooltip id="description-tooltip">
-                                Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule) 
-                                che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
-                                <br />
-                                L'anteprima della descrizione verrà mostrata più sotto mentre scrivi.
-                                </Tooltip>}>
-                                <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                            </OverlayTrigger>   
-                            <TextInput value={data.description} setValue={setter(setData,'description')}/>
-                        </div>
+                    <InputRow className="my-3" label="Descrizione"
+                        help={<>
+                            Si ricorda che potete scrivere sia in LaTex (utilizzando $ per le formule)
+                            che in Markdown <a href="https://www.markdownguide.org/">https://www.markdownguide.org/</a>
+                            <br />
+                            L'anteprima della descrizione verrà mostrata più sotto mentre scrivi.
+                        </>}
+                    >
+                        <TextInput value={data.description} setValue={setter(setData,'description')}/>
                     </InputRow>
                 </Form>
                 {error && <div className="alert alert-danger">{error}</div>}

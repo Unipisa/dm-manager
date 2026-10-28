@@ -1,10 +1,10 @@
-import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Button, Card, Form } from 'react-bootstrap'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
 
 import { SelectPersonBlock, SelectPeopleBlock } from './SelectPeopleBlock'
-import { GrantInput, InputRow, DateInput, StringInput, TextInput, SelectInput } from '../components/Input'
+import { GrantInput, InputRow, DateInput, StringInput, TextInput, SelectInput, BooleanInput } from '../components/Input'
 import { PrefixProvider } from './PrefixProvider'
 import api from '../api'
 import Loading from '../components/Loading'
@@ -278,18 +278,16 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
                     prefix={`process/${variant}visits`}
                 />
             </InputRow>
-            <InputRow label="Referenti" className="my-3">
-                <div className="d-flex align-items-center">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se la visita è gestita da più persone, inserisci tutti i referenti
-                        così che tutti possano vedere i dati e fare modifiche</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>
-                    <SelectPeopleBlock
-                        people={data.referencePeople || []} setPeople={setReferencePeople}
-                        prefix={`process/${variant}visits`}
-                    />
-                </div>
+            <InputRow label="Referenti" className="my-3"
+                help={<>
+                    Se la visita è gestita da più persone, inserisci tutti i referenti
+                    così che tutti possano vedere i dati e fare modifiche
+                </>}
+            >
+                <SelectPeopleBlock
+                    people={data.referencePeople || []} setPeople={setReferencePeople}
+                    prefix={`process/${variant}visits`}
+                />
             </InputRow>
             <InputRow label="Data arrivo" className="my-3">
                 <DateInput value={data.startDate} setValue={startDateSetter}/>
@@ -297,88 +295,78 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
             <InputRow label="Data partenza" className="my-3">
             <DateInput value={data.endDate} setValue={endDateSetter} defaultDate={data.startDate}/>
             </InputRow>    
-            <InputRow label="Tema collaborazione" className="my-3" l>
-                <div className="d-flex align-items-start">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Indicare il tema della collaborazione da inserire nella lettera di incarico che Francesca dovrà scrivere. 
-                        Se il tema non è ancora definito inserire 'TBA' e aggiungere successivamente.</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>
-                    <StringInput value={data.collaborationTheme} setValue={setter(setData, "collaborationTheme")}/>
-                </div>
+            <InputRow label="Tema collaborazione" className="my-3" l
+                help={<>
+                    Indicare il tema della collaborazione da inserire nella lettera di incarico che Francesca dovrà scrivere.
+                    Se il tema non è ancora definito inserire 'TBA' e aggiungere successivamente.
+                </>}
+            >
+                <StringInput value={data.collaborationTheme} setValue={setter(setData, "collaborationTheme")}/>
             </InputRow>
             <InputRow label="SSD" className="my-3">
                 <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
             </InputRow>
-            <InputRow className="my-3" label="Grants">
-                <div className="d-flex align-items-center">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
-                        cercando tramite il nome del grant oppure il cognome del PI (nazionale)</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>
-                    <GrantInput multiple={true} value={data.grants} setValue={setter(setData, 'grants')} disableCreation={true}/>
-                </div>
+            <InputRow className="my-3" label="Grants"
+                help={<>
+                    Se utilizzate uno dei grant afferenti al Dipartimento, si prega di inserirlo
+                    cercando tramite il nome del grant oppure il cognome del PI (nazionale)
+                </>}
+            >
+                <GrantInput multiple={true} value={data.grants} setValue={setter(setData, 'grants')} disableCreation={true}/>
             </InputRow>
-            <InputRow className="my-3" label="Fondi di Ateneo">
-                <div className="d-flex align-items-center">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se utilizzate i vostri fondi di Ateneo per la visita, si prega di spuntare la corrispondente casella</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>
-                    <input type="checkbox" checked={data.universityFunded} onChange={e => setData({...data, universityFunded: e.target.checked})} style={{marginRight: '5px'}}/>
-                    {} Visita su fondi di Ateneo
-                </div>
+            <InputRow className="my-3" label="Fondi di Ateneo"
+                help={<>
+                    Se utilizzate i vostri fondi di Ateneo per la visita, si prega di spuntare la corrispondente casella
+                </>}
+            >
+                <BooleanInput
+                    label="Visita su fondi di Ateneo"
+                    value={data.universityFunded}
+                    setValue={setter(setData, 'universityFunded')}
+                />
             </InputRow>
-            <InputRow className="my-3" label="Prenotazione albergo">
-                <div className="d-flex align-items-center">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Le prenotazioni di alberghi per visitatori singoli devono essere fatte indipendentemente dal visitatore. 
-                        Si ricorda che le spese di pernottamento verranno rimborsate per un massimo di €180 a notte</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>
-                    <SelectInput value={data.requireHotel || "non richiesto"} setValue={setter(setData, "requireHotel")} options={["non richiesto", "prenotazione indipendente"]}/>
-                </div>
+            <InputRow className="my-3" label="Prenotazione albergo"
+                help={<>
+                    Le prenotazioni di alberghi per visitatori singoli devono essere fatte indipendentemente dal visitatore.
+                    Si ricorda che le spese di pernottamento verranno rimborsate per un massimo di €180 a notte
+                </>}
+            >
+                <SelectInput value={data.requireHotel || "non richiesto"} setValue={setter(setData, "requireHotel")} options={["non richiesto", "prenotazione indipendente"]}/>
             </InputRow>
-            <InputRow className="my-3" label="Ufficio in Dipartimento">
-                <div className="d-flex align-items-center">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se volete che venga assegnata una postazione in un ufficio in Dipartimento, si prega di spuntare la corrispondente casella</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>                
-                    <input type="checkbox" checked={data.requireRoom} onChange={e => setData({...data, requireRoom: e.target.checked})} style={{marginRight: '5px'}}/>
-                    {} Richiedi un ufficio in Dipartimento
-                </div>
+            <InputRow className="my-3" label="Ufficio in Dipartimento"
+                help={<>
+                    Se volete che venga assegnata una postazione in un ufficio in Dipartimento, si prega di spuntare la corrispondente casella
+                </>}
+            >
+                <BooleanInput
+                    label="Richiedi un ufficio in Dipartimento"
+                    value={data.requireRoom}
+                    setValue={setter(setData, 'requireRoom')}
+                />
             </InputRow>
-            <InputRow className="my-3" label="Seminario">
-                <div className="d-flex align-items-center">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                        Se un seminario per lo speaker nel periodo della visita è stato già inserito apparirà sotto</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>  
-                    <input 
-                        type="checkbox" 
-                        checked={data.requireSeminar} 
-                        onChange={e => {
-                            const newData = {...data, requireSeminar: e.target.checked}
-                            setData(newData)
-                            if (e.target.checked && newData.startDate && newData.endDate && newData.person?._id) {
-                                fetchSeminars(newData)
-                            }
-                        }} 
-                        style={{marginRight: '5px'}}
-                    />
-                    {} È previsto un seminario
-                </div>
+            <InputRow className="my-3" label="Seminario"
+                help={<>
+                    Se un seminario per lo speaker nel periodo della visita è stato già inserito apparirà sotto
+                </>}
+            >
+                <BooleanInput
+                    label="È previsto un seminario"
+                    value={data.requireSeminar}
+                    setValue={requireSeminar => {
+                        const newData = {...data, requireSeminar}
+                        setData(newData)
+                        if (requireSeminar && newData.startDate && newData.endDate && newData.person?._id) {
+                            fetchSeminars(newData)
+                        }
+                    }}
+                />
             </InputRow>
-            <InputRow className="my-3" label="Note">
-                <div className="d-flex align-items-start">
-                    <OverlayTrigger placement="left" overlay={<Tooltip id="grants-tooltip">
-                    Si consiglia di utilizzare le note per scrivere tutte le info rilevanti per Francesca</Tooltip>}>
-                        <Button size="sm" style={{ marginRight: '10px' }}>?</Button>
-                    </OverlayTrigger>
-                    <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
-                </div>
+            <InputRow className="my-3" label="Note"
+                help={<>
+                    Si consiglia di utilizzare le note per scrivere tutte le info rilevanti per Francesca
+                </>}
+            >
+                <TextInput value={data.notes} setValue={setter(setData, "notes")}/>
             </InputRow>
         </Form>
         <div className="d-flex flex-row justify-content-end">
