@@ -10,6 +10,7 @@
     "katex": "^0.17.0",
     "luxon": "^3.4.4",
     "moment": "^2.29.4",
+    "pdfjs-dist": "6.4.299",
     "react": "^18.2.0",
     "react-bootstrap": "^2.5.0",
     "react-bootstrap-icons": "^1.10.3",

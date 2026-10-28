@@ -195,11 +195,11 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                     </InputRow>
                     <InputRow className="my-3" label="Locandina"
                         help={<>
-                            Caricare un'immagine PNG o JPEG.
+                            Caricare un file PNG, JPG o PDF (massimo 10 MB per i PDF).
                             La locandina sarà pubblica e verrà mostrata prima della descrizione.
                         </>}
                     >
-                        <ImageInput value={data.flyerUrl} setValue={setter(setData,'flyerUrl')} accept="image/png,image/jpeg" />
+                        <ImageInput value={data.flyerUrl} setValue={setter(setData,'flyerUrl')} accept="image/png,image/jpeg,application/pdf" />
                     </InputRow>
                     <InputRow className="my-3" label="Descrizione"
                         help={<>

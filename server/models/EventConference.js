@@ -21,7 +21,7 @@ const eventConferenceSchema = new Schema({
     institution: { type: ObjectId, label: 'Istituzione (solo se diversa da unipi)', ref: 'Institution' },
     isOutreach: { type: Boolean, label: 'Terza missione', widget: 'checkbox' },
     grants: [{type: ObjectId, label: 'grants', ref: 'Grant'}],
-    flyerUrl: { type: String, label: 'Locandina', widget: 'image', accept: 'image/png,image/jpeg' },
+    flyerUrl: { type: String, label: 'Locandina', widget: 'image', accept: 'image/png,image/jpeg,application/pdf' },
     description: { type: String, label: 'Descrizione', widget: 'text'},
     createdBy,
     updatedBy,

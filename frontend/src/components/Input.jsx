@@ -68,8 +68,12 @@ export function EmailInput({ value, setValue }) {
     }
 }
 
-async function uploadFiles(files, _private, engine, urlOnly) {
-    const readFile = (file) => {
+async function uploadFiles(files, _private, engine, urlOnly, convertPdfToPng = false) {
+    const readFile = async (file) => {
+        if (convertPdfToPng && file.type === 'application/pdf') {
+            const { pdfToPng } = await import('../pdfToPng')
+            file = await pdfToPng(file)
+        }
         return new Promise((resolve, reject) => {
         const reader = new FileReader();
 
@@ -84,8 +88,7 @@ async function uploadFiles(files, _private, engine, urlOnly) {
                 const upload_data = await api.post('/api/v0/upload', data)
                 resolve(urlOnly ? upload_data.url : upload_data.upload)
             } catch (err) {
-                engine.addMessage(err.message, 'error')
-                reject(err.message)
+                reject(err)
             }
         }
         reader.onerror = () => reject(reader.error);
@@ -96,14 +99,19 @@ async function uploadFiles(files, _private, engine, urlOnly) {
   const results = [];
 
   for (const file of files) {
-    const content = await readFile(file);
-    results.push(content);
+    try {
+        const content = await readFile(file);
+        results.push(content);
+    } catch (error) {
+        engine.addMessage(error.message || 'Impossibile caricare il file.', 'error')
+        throw error
+    }
   }
 
   return results;
 }
 
-export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false, onCancel = () => {}, accept) {
+export function uploadNewAttachment(setValue, _private, engine, urlOnly, multiple=false, onCancel = () => {}, accept, convertPdfToPng = false, onUploading = () => {}) {
     const input = document.createElement('input')   
     input.type = 'file'
     input.multiple = multiple
@@ -118,14 +126,17 @@ export function uploadNewAttachment(setValue, _private, engine, urlOnly, multipl
             engine.addMessage(`Selezionare un file di tipo ${accept}`, 'error')
             return
         }
+        onUploading(true)
         try {
-            const newUploads = await uploadFiles(e.target.files, _private, engine, urlOnly)
+            const newUploads = await uploadFiles(e.target.files, _private, engine, urlOnly, convertPdfToPng)
             if (multiple)
                 setValue(newUploads)
             else
                 setValue(newUploads[0])
         } catch {
             // uploadFiles already displays the upload error.
+        } finally {
+            onUploading(false)
         }
     }
     window.addEventListener(
@@ -181,10 +192,10 @@ export function PrivateAttachmentInput({ value, setValue }) {
 }
 
 export function AttachmentInput({ value, setValue, image, _private, accept }) {
-    // const [uploading, setUploading] = useState(false)
+    const [uploading, setUploading] = useState(false)
     const id = useInputId()
     const engine = useEngine()
-    const getNewAttachment = () => uploadNewAttachment(setValue, _private, engine, true, false, undefined, accept)
+    const getNewAttachment = () => uploadNewAttachment(setValue, _private, engine, true, false, undefined, accept, image && accept?.includes('application/pdf'), setUploading)
 
     return <div className="form-row">
         <div className="d-inline-block col-sm-10">
@@ -200,10 +211,10 @@ export function AttachmentInput({ value, setValue, image, _private, accept }) {
             />
         </div>
     <div className="ps-2 d-inline-block col-sm-2 d-inline-block">
-        <button type="button" onClick={getNewAttachment} className="w-100 btn btn-primary">
-            Upload
+        <button type="button" onClick={getNewAttachment} disabled={uploading} className="w-100 btn btn-primary">
+            {uploading ? 'Caricamento…' : 'Upload'}
         </button>
-        {accept && value && <button type="button" onClick={() => setValue('')} className="w-100 btn btn-danger mt-1">
+        {accept && value && <button type="button" onClick={() => setValue('')} disabled={uploading} className="w-100 btn btn-danger mt-1">
             Rimuovi
         </button>}
     </div>
