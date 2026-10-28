@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { useParams, useNavigate, useBlocker } from 'react-router-dom'
 import { useQuery, useQueryClient } from 'react-query'
-import { Card, Table, Button, Form, Alert } from 'react-bootstrap'
+import { Card, Table, Button, Form, Alert, Modal } from 'react-bootstrap'
 import { useEngine } from '../Engine'
 import api from '../api'
 
@@ -18,6 +18,14 @@ const EMPLOYEE_SELECTABLE_TYPES = ['weekday', 'sick-leave', 'annual-holiday', 'o
 const NON_WORKING_TYPES = ['sick-leave', 'annual-holiday', 'other-absence']
 const MAX_DESCRIPTION_LINES = 5
 const CHARS_PER_LINE = 110
+const HOUR_FIELDS = ['roleHours', 'teachingHours', 'institutionalHours', 'otherHours']
+const MODIFIED_BACKGROUND = '#fff3cd'
+
+const getDayValue = (day, field, grantId) => {
+    if (field === 'grant') return day?.grantHours?.find(gh => gh.grant === grantId)?.hours || 0
+    if (field === 'dayType') return day?.dayType
+    return day?.[field] || 0
+}
 
 // Build a cell key from dayIndex, field, and an optional grant ID
 // For non-grant fields, grantId should be null/undefined → stored as 'none'
@@ -61,16 +69,43 @@ const truncateToLines = (text, maxLines, charsPerLine) => {
 }
 
 export default function EditTimesheetMonth() {
-    const { timesheetId, year, month } = useParams()
+    const params = useParams()
+    return <TimesheetMonth key={`${params.timesheetId}/${params.year}/${params.month}`} {...params} />
+}
+
+function TimesheetMonth({ timesheetId, year, month }) {
     const navigate = useNavigate()
     const engine = useEngine()
     const queryClient = useQueryClient()
 
     const [modifiedDays, setModifiedDays] = useState(null)
     const [activityDescription, setActivityDescription] = useState('')
-    const [hasChanges, setHasChanges] = useState(false)
+    const [savedMonth, setSavedMonth] = useState(null)
+    const [isSaving, setIsSaving] = useState(false)
     const [selectedCells, setSelectedCells] = useState(new Set())
     const [lastSelectedKey, setLastSelectedKey] = useState(null)
+    const modifiedCells = new Set()
+    if (savedMonth && modifiedDays) {
+        modifiedDays.forEach((day, dayIndex) => {
+            const savedDay = savedMonth.days[dayIndex]
+            for (const field of ['dayType', ...HOUR_FIELDS]) {
+                if (getDayValue(day, field) !== getDayValue(savedDay, field)) {
+                    modifiedCells.add(makeCellKey(dayIndex, field))
+                }
+            }
+            for (const entry of day.grantHours || []) {
+                if (getDayValue(day, 'grant', entry.grant) !== getDayValue(savedDay, 'grant', entry.grant)) {
+                    modifiedCells.add(makeCellKey(dayIndex, 'grant', entry.grant))
+                }
+            }
+        })
+    }
+    const descriptionHasChanges = savedMonth !== null
+        && activityDescription !== (savedMonth.activityDescription || '')
+    const hasChanges = modifiedCells.size > 0 || descriptionHasChanges
+    const hasUnsavedChanges = useRef(false)
+    hasUnsavedChanges.current = hasChanges
+    const blocker = useBlocker(() => hasUnsavedChanges.current)
 
     const apiUrl = `/api/v0/process/timesheets/${timesheetId}/${year}/${month}`
 
@@ -83,13 +118,25 @@ export default function EditTimesheetMonth() {
     )
 
     useEffect(() => {
+        // Background refetches must not overwrite the user's unsaved edits.
+        if (hasUnsavedChanges.current) return
         if (data?.month?.days) {
+            setSavedMonth(data.month)
             setModifiedDays(JSON.parse(JSON.stringify(data.month.days)))
-        }
-        if (data?.month?.activityDescription !== undefined) {
             setActivityDescription(data.month.activityDescription || '')
         }
     }, [data])
+
+    useEffect(() => {
+        if (!hasChanges) return
+        const handleBeforeUnload = (event) => {
+            if (!hasUnsavedChanges.current) return
+            event.preventDefault()
+            event.returnValue = ''
+        }
+        window.addEventListener('beforeunload', handleBeforeUnload)
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload)
+    }, [hasChanges])
 
     if (isLoading) return <div>Loading...</div>
     if (error) return <div>Error: {error.message}</div>
@@ -139,7 +186,6 @@ export default function EditTimesheetMonth() {
         numValue = roundToHalf(numValue)
         applyValueToDay(newDays[dayIndex], field, grantId, numValue)
         setModifiedDays(newDays)
-        setHasChanges(true)
     }
 
     const updateDayType = (dayIndex, newType) => {
@@ -153,7 +199,6 @@ export default function EditTimesheetMonth() {
             newDays[dayIndex].otherHours = 0
         }
         setModifiedDays(newDays)
-        setHasChanges(true)
     }
 
     // All cell keys use grant._id (or 'none') — never a positional index
@@ -215,13 +260,13 @@ export default function EditTimesheetMonth() {
             })
 
             setModifiedDays(newDays)
-            setHasChanges(true)
         } else {
             updateHours(dayIndex, field, grantId, value)
         }
     }
 
     const handleSave = async () => {
+        setIsSaving(true)
         try {
             await api.patch(apiUrl, {
                 days: modifiedDays,
@@ -229,10 +274,14 @@ export default function EditTimesheetMonth() {
             })
             engine.addInfoMessage('Ore salvate con successo')
             queryClient.invalidateQueries(['process', 'timesheets'])
-            setHasChanges(false)
+            // Clear synchronously: navigate runs before React renders the state update.
+            hasUnsavedChanges.current = false
+            setSavedMonth({ days: JSON.parse(JSON.stringify(modifiedDays)), activityDescription })
             navigate(-1)
         } catch (error) {
             engine.addErrorMessage(`Errore nel salvataggio: ${error.message}`)
+        } finally {
+            setIsSaving(false)
         }
     }
 
@@ -241,7 +290,6 @@ export default function EditTimesheetMonth() {
     const handleDescriptionChange = (e) => {
         const limited = truncateToLines(e.target.value, MAX_DESCRIPTION_LINES, CHARS_PER_LINE)
         setActivityDescription(limited)
-        setHasChanges(true)
     }
 
     const getDayTotal = (day) => {
@@ -284,6 +332,17 @@ export default function EditTimesheetMonth() {
     const dayOfWeekLabels = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab']
     const formatHours = (hours) => hours.toFixed(1).replace('.', ',')
 
+    const getCellStyle = (dayIndex, field, grantId) => {
+        const key = makeCellKey(dayIndex, field, grantId)
+        const isModified = modifiedCells.has(key)
+        const isSelected = selectedCells.has(key)
+        return {
+            backgroundColor: isModified ? MODIFIED_BACKGROUND : isSelected ? '#e3f2fd' : 'white',
+            // Keep the selection visible even when a modified cell is yellow.
+            boxShadow: isModified && isSelected ? 'inset 0 0 0 2px #90caf9' : undefined,
+        }
+    }
+
     // Shared props factory to avoid repetition for non-grant fields
     const makeFieldInputProps = (dayIndex, field, value) => ({
         type: 'number',
@@ -292,20 +351,34 @@ export default function EditTimesheetMonth() {
         max: '24',
         step: '0.5',
         value,
-        disabled: isLocked,
+        disabled: isLocked || isSaving,
         onFocus: (e) => e.target.select(),
         'data-cell': makeCellKey(dayIndex, field, null),
         onClick: (e) => handleCellClick(dayIndex, field, null, e),
         onKeyDown: (e) => handleKeyDown(e, dayIndex, field, null),
         onInput: (e) => updateMultipleCells(dayIndex, field, null, e.target.value),
         onWheel: (e) => e.target.blur(),
-        style: {
-            backgroundColor: selectedCells.has(makeCellKey(dayIndex, field, null)) ? '#e3f2fd' : 'white'
-        }
+        style: getCellStyle(dayIndex, field)
     })
 
     return (
         <>
+            <Modal show={blocker.state === 'blocked'} onHide={() => blocker.reset?.()} centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Modifiche non salvate</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Hai modifiche non salvate nel timesheet. Vuoi abbandonare la pagina e perderle?
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => blocker.reset()}>
+                        Rimani sulla pagina
+                    </Button>
+                    <Button variant="danger" onClick={() => blocker.proceed()}>
+                        Esci senza salvare
+                    </Button>
+                </Modal.Footer>
+            </Modal>
             <h1 className="text-primary pb-0">
                 {monthNames[parseInt(month) - 1]} {year}
             </h1>
@@ -319,6 +392,7 @@ export default function EditTimesheetMonth() {
                         <li>Usare il menu "Tipo" per segnare giorni di malattia, ferie o altre assenze</li>
                         <li>Weekend e festività sono già contrassegnati e non possono essere modificati</li>
                         <li>(Opzionale) Completare la descrizione delle attività prima di salvare</li>
+                        <li>I campi con sfondo giallo contengono modifiche non salvate</li>
                     </ul>
                 </Card.Body>
             </Card>
@@ -416,9 +490,9 @@ export default function EditTimesheetMonth() {
                                                 <Form.Select
                                                     size="sm"
                                                     value={day.dayType}
-                                                    disabled={isLocked}
+                                                    disabled={isLocked || isSaving}
                                                     onChange={(e) => updateDayType(dayIndex, e.target.value)}
-                                                    style={{ fontSize: '0.8em' }}
+                                                    style={{ ...getCellStyle(dayIndex, 'dayType'), fontSize: '0.8em' }}
                                                 >
                                                     {EMPLOYEE_SELECTABLE_TYPES.map(type => (
                                                         <option key={type} value={type}>
@@ -446,16 +520,14 @@ export default function EditTimesheetMonth() {
                                                             max="24"
                                                             step="0.5"
                                                             value={grantHours}
-                                                            disabled={isLocked}
+                                                            disabled={isLocked || isSaving}
                                                             onFocus={(e) => e.target.select()}
                                                             data-cell={cellKey}
                                                             onClick={(e) => handleCellClick(dayIndex, 'grant', grant._id, e)}
                                                             onKeyDown={(e) => handleKeyDown(e, dayIndex, 'grant', grant._id)}
                                                             onInput={(e) => updateMultipleCells(dayIndex, 'grant', grant._id, e.target.value)}
                                                             onWheel={(e) => e.target.blur()}
-                                                            style={{
-                                                                backgroundColor: selectedCells.has(cellKey) ? '#e3f2fd' : 'white'
-                                                            }}
+                                                            style={getCellStyle(dayIndex, 'grant', grant._id)}
                                                         />
                                                     ) : null}
                                                 </td>
@@ -515,9 +587,10 @@ export default function EditTimesheetMonth() {
                             as="textarea"
                             rows={3}
                             value={activityDescription}
-                            disabled={isLocked}
+                            disabled={isLocked || isSaving}
                             placeholder="Inserire una breve descrizione delle attività svolte nel mese..."
                             onChange={handleDescriptionChange}
+                            style={{ backgroundColor: descriptionHasChanges ? MODIFIED_BACKGROUND : 'white' }}
                         />
                         <Form.Text muted>
                             {countEffectiveLines(activityDescription)}/{MAX_DESCRIPTION_LINES} righe (stima)
@@ -525,12 +598,12 @@ export default function EditTimesheetMonth() {
                     </Form.Group>
 
                     <div className="mt-4 d-flex justify-content-end gap-2">
-                        <Button variant="secondary" onClick={handleCancel}>
+                        <Button variant="secondary" onClick={handleCancel} disabled={isSaving}>
                             Annulla
                         </Button>
                         <Button
                             variant="primary"
-                            disabled={!hasChanges || isLocked}
+                            disabled={!hasChanges || isLocked || isSaving}
                             onClick={handleSave}>
                             Salva Modifiche
                         </Button>

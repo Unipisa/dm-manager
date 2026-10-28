@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 
 import './App.css'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Routes, Route } from 'react-router-dom'
 import axios from 'axios'
 
 import {useCreateEngine, EngineProvider} from './Engine'
@@ -82,7 +82,6 @@ function Internal() {
   
   if (! engine.loggedIn && !isPublicRoute()) {
     return <EngineProvider value={engine}>
-      <BrowserRouter>
         <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
         <Container fluid>
           <Routes>  
@@ -90,12 +89,10 @@ function Internal() {
             <Route path="*" element={<LoginPage engine={engine} />} />
           </Routes>
         </Container>
-      </BrowserRouter>    
     </EngineProvider>
   }
 
   return <EngineProvider value={engine}>
-    <BrowserRouter>
       {engine.loggedIn && <Header/>}
       <Messages messages={ engine.messages } acknowledge={ () => engine.clearMessages() } />
       <Container fluid className="pt-5 p-lg-5 main-container">
@@ -151,12 +148,14 @@ function Internal() {
           <Route path="*" element={engine.loggedIn ? <NotFound /> : <LoginPage engine={engine} />} />
      </Routes>
     </Container>
-  </BrowserRouter>    
  </EngineProvider>
 }  
 
+// A data router allows forms to block internal navigation with useBlocker.
+const router = createBrowserRouter([{ path: '*', element: <Internal /> }])
+
 export default function App() {
   return <QueryClientProvider client={queryClient}>
-    <Internal />
+    <RouterProvider router={router} />
   </QueryClientProvider>    
 }
