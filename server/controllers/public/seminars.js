@@ -121,6 +121,7 @@ async function seminarsQuery(req) {
             category: 1,
             duration: 1,
             speakers: 1,
+            flyerUrl: 1,
             abstract: 1,
             externalid: 1
         }},

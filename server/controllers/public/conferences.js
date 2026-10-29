@@ -100,6 +100,7 @@ async function conferencesQuery(req) {
                 _id: 1,
                 name: 1
             },
+            flyerUrl: 1,
             description: 1,
             url: 1
         }}
