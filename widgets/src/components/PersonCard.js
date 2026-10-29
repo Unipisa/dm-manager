@@ -25,6 +25,10 @@ export function PersonCard({ person_id, badge }) {
         return <div>Nessun dato</div>;
     }
 
+    return <PersonCardContent person={data} badge={badge} />;
+}
+
+export function PersonCardContent({ person: data, badge }) {
     const internal = data.staffs?.[0]?.isInternal;
     const prefix = isEnglish() ? 'en/' : '';
     const name = internal

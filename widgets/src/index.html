@@ -90,6 +90,11 @@
                  aria-selected="false">PersonCard</a>
           </li>
           <li class="nav-item">
+              <a class="nav-link" href="#groupcards" id="groupcards-label" data-toggle="tab"
+                 data-target="#groupcards-tab" type="button" role="tab" aria-controls="groupcards"
+                 aria-selected="false">GroupCards</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="#courselist" id="courselist-label" data-toggle="tab" 
                data-target="#courselist-tab" type="button" role="tab" aria-controls="courselist" 
                aria-selected="false">CourseList</a>
@@ -125,6 +130,7 @@
           <div class="tab-pane fade p-3" id="homevisitlist-tab"><div id="homevisitlist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="personcard-tab"><div class="row" id="personcard"></div></div>
+          <div class="tab-pane fade p-3" id="groupcards-tab"><div id="groupcards"></div></div>
           <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
           <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
           <div class="tab-pane fade p-3" id="thesislist-tab"><div id="thesislist"></div></div>
@@ -200,6 +206,9 @@
             dmwidgets.loadComponent(document.getElementById('personcard'), "PersonCard", {
                 person_id: '63822bbf7942943d6350d692',
                 badge: 'Example badge',
+            })
+            dmwidgets.loadComponent(document.getElementById('groupcards'), "GroupCards", {
+                group_id: '69e873bd1fe35a92793f027c',
             })
             dmwidgets.loadComponent(document.getElementById("courselist"), "CourseList", { 
                 from: '2024-01-01',

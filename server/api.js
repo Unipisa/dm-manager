@@ -18,6 +18,7 @@ const processes = require('./controllers/processes/router.js')
 const changeRoom = require('./controllers/processes/changeRoom')
 const roomsQuery = require('./controllers/public/rooms.js')
 const personQuery = require('./controllers/public/person.js')
+const groupQuery = require('./controllers/public/group.js')
 const unimapQuery = require('./controllers/public/unimap.js')
 
 const router = express.Router()
@@ -128,6 +129,7 @@ router.get('/public/theses', async (req, res) => {
 })
 
 router.get('/public/person/:id', personQuery)
+router.get('/public/group/:id', groupQuery)
 
 router.get('/public/unimap/:matricola', unimapQuery)
 
