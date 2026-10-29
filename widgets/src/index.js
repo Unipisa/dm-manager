@@ -10,6 +10,7 @@ import { HomeEventList } from './components/HomeEventList';
 import { HomeGrantList } from './components/HomeGrantList';
 import { HomeVisitList } from './components/HomeVisitList';
 import { PersonDetails } from './components/PersonDetails';
+import { PersonCard } from './components/PersonCard';
 import { CourseList } from './components/CourseList';
 import { Grant } from './components/Grant';
 import { ThesisList } from './components/ThesisList';
@@ -58,6 +59,9 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
             break;
         case 'PersonDetails':
             element = <PersonDetails {...props}></PersonDetails>
+            break;
+        case 'PersonCard':
+            element = <PersonCard {...props}></PersonCard>
             break;
         case 'CourseList':
             element = <CourseList {...props}></CourseList>
