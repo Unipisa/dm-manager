@@ -122,7 +122,7 @@ function setup_routes(app) {
           // anche la descrizione in fondo alle pagine dei relativi
           // processi
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
+            'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca', 'Titolare di borsa di ricerca',
             'Dottorando in Matematica', 'Dottorando in HPSC',
             'Professore Emerito',
             'Collaboratore',
@@ -134,7 +134,7 @@ function setup_routes(app) {
               add_role('/process/visitsList')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
+            'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca', 'Titolare di borsa di ricerca',
             'Dottorando in Matematica', 'Dottorando in HPSC',
             'Professore Emerito',
             'Collaboratore',
@@ -143,7 +143,7 @@ function setup_routes(app) {
               add_role('/process/my/visits')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
-            'PTA', 'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca',
+            'PTA', 'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca', 'Titolare di borsa di ricerca',
             ].includes(staff.qualification)) {
               add_role('/process/my/courses')
               add_role('/process/timesheets')

@@ -181,6 +181,7 @@ export function getRoleLabel(role, english, feminine) {
         'Titolare di contratto di ricerca': ['Titolare di contratto di ricerca', 'Titolare di contratto di ricerca', 'Research Contract Holder', 'Research Contract Holder'], 
         'Titolare di incarico post-doc': ['Titolare di incarico post-doc', 'Titolare di incarico post-doc', 'Postdoctoral Researcher', 'Postdoctoral Researcher'], 
         'Titolare di incarico di ricerca': ['Titolare di incarico di ricerca', 'Titolare di incarico di ricerca', 'Research Associate', 'Research Associate'],
+        'Titolare di borsa di ricerca': ['Titolare di borsa di ricerca', 'Titolare di borsa di ricerca', 'Research Fellowship Holder', 'Research Fellowship Holder'],
         'Dottorando in Matematica': ['Dottorando in Matematica', 'Dottoranda in Matematica', 'Ph.D. Student in Mathematics', 'Ph.D. Student in Mathematics'],
         'Dottorando in HPSC': ['Dottorando in HPSC', 'Dottoranda in HPSC', 'Ph.D. Student in HPSC', 'Ph.D. Student in HPSC'],
         'PTA': ['Personale Tecnico Amministrativo', 'Personale Tecnico Amministrativo', 'Administrative Staff', 'Administrative Staff'],
