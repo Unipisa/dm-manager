@@ -26,6 +26,7 @@ function convertLocalToUTCDate(date) {
 export default function UTCDatePicker({ startDate, endDate, selected, onChange, ...props }) {
   return (
     <DatePicker
+      autoComplete="off"
       startDate={convertUTCToLocalDate(startDate)}
       endDate={convertUTCToLocalDate(endDate)}
       selected={convertUTCToLocalDate(selected)}
