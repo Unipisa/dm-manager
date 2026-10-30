@@ -51,6 +51,7 @@ function StaffsFilters({ filter }) {
         'Titolare di contratto di ricerca',
         'Titolare di incarico post-doc',
         'Titolare di incarico di ricerca',
+        'Titolare di borsa di ricerca',
         'Dottorando in Matematica', 
         'Dottorando in HPSC', 
         'PTA', 
