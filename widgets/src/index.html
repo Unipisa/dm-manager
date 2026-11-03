@@ -80,6 +80,11 @@
                aria-selected="false">HomeVisitList</a>
           </li>
           <li class="nav-item">
+              <a class="nav-link" href="#visitlist" id="visitlist-label" data-toggle="tab"
+                 data-target="#visitlist-tab" type="button" role="tab" aria-controls="visitlist"
+                 aria-selected="false">VisitList</a>
+          </li>
+          <li class="nav-item">
               <a class="nav-link" href="#persondetails" id="persondetails-label" data-toggle="tab" 
                  data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails" 
                  aria-selected="false">PersonDetails</a>
@@ -128,6 +133,7 @@
           <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
           <div class="tab-pane fade p-3" id="homegrantlist-tab"><div id="homegrantlist"></div></div>
           <div class="tab-pane fade p-3" id="homevisitlist-tab"><div id="homevisitlist"></div></div>
+          <div class="tab-pane fade p-3" id="visitlist-tab"><div id="visitlist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="personcard-tab"><div class="row" id="personcard"></div></div>
           <div class="tab-pane fade p-3" id="groupcards-tab"><div id="groupcards"></div></div>
@@ -200,6 +206,12 @@
             dmwidgets.loadComponent(document.getElementById('homevisitlist'), "HomeVisitList", {
               default_entries: 5,
             })
+            dmwidgets.loadComponent(document.getElementById('visitlist'), "VisitList", {
+                fields: 'person.firstName,person.lastName,affiliations,roomAssignment.room.building,roomAssignment.room.floor,roomAssignment.room.number,startDate,endDate',
+                table: 'First Name,Last Name, Affiliation, Building, Floor, Office, From, To',
+                sort_field: 'person',
+                filter: 'past',
+            })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
                 person_id: '63822bbf7942943d6350d692',
             })
@@ -220,7 +232,7 @@
                 grant_id: grant_id
             })
             dmwidgets.loadComponent(document.getElementById("thesislist"), "ThesisList", {
-                institution: '6644ab27871112d444fbbc2f',
+                institution: '641b8b0b840928dc5b8da2e3',
                 exclude_qualification: 'Dottorando Esterno'
             })
         }
