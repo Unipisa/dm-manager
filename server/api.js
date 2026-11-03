@@ -4,6 +4,7 @@ const config = require('./config')
 const profile = require('./controllers/profile')
 const conferenceQuery = require('./controllers/public/conference')
 const staffQuery = require('./controllers/public/staff')
+const staffListQuery = require('./controllers/public/staff-list')
 const visitsQuery = require('./controllers/public/visits')
 const visitListQuery = require('./controllers/public/visit-list')
 const seminarsQuery = require('./controllers/public/seminars')
@@ -80,6 +81,8 @@ profile(router, "/profile")
 router.get('/public/staff', async (req, res) => {
     res.send(await staffQuery(req))
 })
+
+router.get('/public/staff-list', staffListQuery)
 
 router.get('/public/visits', async (req, res) => {
     res.send(await visitsQuery(req))

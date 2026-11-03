@@ -85,6 +85,11 @@
                  aria-selected="false">VisitList</a>
           </li>
           <li class="nav-item">
+              <a class="nav-link" href="#stafflist" id="stafflist-label" data-toggle="tab"
+                 data-target="#stafflist-tab" type="button" role="tab" aria-controls="stafflist"
+                 aria-selected="false">StaffList</a>
+          </li>
+          <li class="nav-item">
               <a class="nav-link" href="#persondetails" id="persondetails-label" data-toggle="tab" 
                  data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails" 
                  aria-selected="false">PersonDetails</a>
@@ -144,6 +149,7 @@
           <div class="tab-pane fade p-3" id="homegrantlist-tab"><div id="homegrantlist"></div></div>
           <div class="tab-pane fade p-3" id="homevisitlist-tab"><div id="homevisitlist"></div></div>
           <div class="tab-pane fade p-3" id="visitlist-tab"><div id="visitlist"></div></div>
+          <div class="tab-pane fade p-3" id="stafflist-tab"><div id="stafflist"></div></div>
           <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
           <div class="tab-pane fade p-3" id="personcard-tab"><div class="row" id="personcard"></div></div>
           <div class="tab-pane fade p-3" id="groupcards-tab"><div id="groupcards"></div></div>
@@ -229,6 +235,13 @@
             })
             dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
                 person_id: '63822bbf7942943d6350d692',
+            })
+            dmwidgets.loadComponent(document.getElementById('stafflist'), "StaffList", {
+                fields: 'person.firstName,person.lastName,qualification,SSD_name,roomAssignment.room.building,roomAssignment.room.floor,roomAssignment.room.number,person.email',
+                table: 'Nome,Cognome,Qualifica,Gruppo di ricerca,Edificio,Piano,Stanza,Email',
+                tableen: 'First Name,Last Name,Qualification,Research Group,Building,Floor,Office,Email',
+                sort_field: 'person',
+                filter: 'current',
             })
             dmwidgets.loadComponent(document.getElementById('personcard'), "PersonCard", {
                 person_id: '63822bbf7942943d6350d692',
