@@ -116,6 +116,7 @@ router.get('/public/grant/:id', async (req, res) => {
 })
 
 router.get('/public/grants', async (req, res) => {
+    if (req.query._format === 'shortcode') return grantsQuery(req, res)
     res.send(await grantsQuery(req))
 })
 

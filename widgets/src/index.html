@@ -110,6 +110,11 @@
                aria-selected="false">Grant</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="#grantlist" id="grantlist-label" data-toggle="tab"
+               data-target="#grantlist-tab" type="button" role="tab" aria-controls="grantlist"
+               aria-selected="false">GrantList</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="#thesislist" id="thesis-label" data-toggle="tab" 
                data-target="#thesislist-tab" type="button" role="tab" aria-controls="grant" 
                aria-selected="false">ThesisList</a>
@@ -144,6 +149,7 @@
           <div class="tab-pane fade p-3" id="groupcards-tab"><div id="groupcards"></div></div>
           <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
           <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
+          <div class="tab-pane fade p-3" id="grantlist-tab"><div id="grantlist"></div></div>
           <div class="tab-pane fade p-3" id="thesislist-tab"><div id="thesislist"></div></div>
           <div class="tab-pane fade p-3" id="thesistable-tab">
             <h5>Table</h5><div id="thesistable"></div>
@@ -239,6 +245,10 @@
             })
             dmwidgets.loadComponent(document.getElementById("grant"), "Grant", {
                 grant_id: grant_id
+            })
+            dmwidgets.loadComponent(document.getElementById('grantlist'), "GrantList", {
+                sort_field: 'startDate',
+                filter: 'current',
             })
             dmwidgets.loadComponent(document.getElementById("thesislist"), "ThesisList", {
                 institution: '641b8b0b840928dc5b8da2e3',

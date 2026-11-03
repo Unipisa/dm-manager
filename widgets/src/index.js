@@ -15,6 +15,7 @@ import { PersonCard } from './components/PersonCard';
 import { GroupCards } from './components/GroupCards';
 import { CourseList } from './components/CourseList';
 import { Grant } from './components/Grant';
+import { GrantList } from './components/GrantList';
 import { ThesisList } from './components/ThesisList';
 import { getManageURL } from './utils'
 
@@ -76,6 +77,9 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
             break;
         case 'Grant':
             element = <Grant {...props}></Grant>
+            break;
+        case 'GrantList':
+            element = <GrantList {...props}></GrantList>
             break;
         case 'ThesisList':
             element = <ThesisList {...props}></ThesisList>
