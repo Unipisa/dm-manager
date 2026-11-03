@@ -5,8 +5,20 @@ import { getManageURL, getDMURL } from '../utils'
 import { Loading } from './Loading';
 import Accordion from './Accordion';
 import './styles.css';
+import { ThesisTable } from './ThesisTable';
 
-export function ThesisList({ year, ssd, institution, qualification, exclude_qualification, _sort, _limit  }) {
+export function ThesisList(props) {
+    const shortcodeOptions = [
+        'fields', 'table', 'tableen', 'sort_field', 'filter', 'list_mode',
+        'date_format', 'no_data_message', 'no_data_message_en',
+    ];
+    if (shortcodeOptions.some(option => Object.prototype.hasOwnProperty.call(props, option))) {
+        return <ThesisTable {...props} />;
+    }
+    return <YearlyThesisList {...props} />;
+}
+
+function YearlyThesisList({ year, ssd, institution, qualification, exclude_qualification, _sort, _limit }) {
 
     const filter = { year, ssd, _sort, _limit }
 

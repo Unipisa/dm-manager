@@ -128,6 +128,7 @@ router.get('/public/rooms', async (req, res) => {
 })
 
 router.get('/public/theses', async (req, res) => {
+    if (req.query._format === 'shortcode') return thesesQuery(req, res)
     res.json(await thesesQuery(req))
 })
 

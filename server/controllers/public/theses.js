@@ -1,9 +1,18 @@
-const ObjectId = require('mongoose').Types.ObjectId
 const Thesis = require('../../models/Thesis')
+const Controller = require('../Controller')
 
 const { createSortAndLimitFilters } = require('./common-filters')
 
-async function thesesQuery(req) {
+const shortcodeController = new Controller()
+shortcodeController.Model = Thesis
+shortcodeController.path = 'public/theses'
+shortcodeController.fields = Object.fromEntries([
+    'person', 'title', 'advisors', 'date', 'institutions', 'fileUrl', 'SSD',
+].map(field => [field, Thesis._schema_info.properties[field]]))
+shortcodeController.searchFields = ['title', 'person.lastName', 'person.firstName', 'institutions.name']
+
+async function thesesQuery(req, res) {
+    const shortcode = req.query._format === 'shortcode'
     var match = {}
     
     if (req.query.year !== undefined) {
@@ -22,7 +31,7 @@ async function thesesQuery(req) {
         match["SSD"] = req.query.ssd
     }
 
-    const sort_and_limit = createSortAndLimitFilters(req)
+    const sort_and_limit = shortcode ? [] : createSortAndLimitFilters(req)
 
     const pipeline = [
         { $match: match },
@@ -77,6 +86,7 @@ async function thesesQuery(req) {
                                         { $lte: ["$startDate", "$$NOW"] } ]}
                                 ]},
                         }},
+                        ...(shortcode ? [{ $project: { _id: 0, qualification: 1, isInternal: 1 } }] : []),
                     ]
                 }},
                 {$project: {
@@ -90,7 +100,8 @@ async function thesesQuery(req) {
                     staff: {
                         qualification: 1,
                         isInternal: 1
-                    }
+                    },
+                    ...(shortcode ? { staffs: '$staff' } : {}),
                 }}
             ]
         }},
@@ -100,6 +111,14 @@ async function thesesQuery(req) {
             localField: 'institutions',
             as: 'institutions'
         }},
+        // Older records may contain the singular affiliation used in PHP list mode.
+        ...(shortcode ? [
+            { $lookup: {
+                from: 'institutions', localField: 'affiliation', foreignField: '_id', as: 'affiliation',
+                pipeline: [{ $project: { name: 1 } }],
+            } },
+            { $unwind: { path: '$affiliation', preserveNullAndEmptyArrays: true } },
+        ] : []),
         ...sort_and_limit,
         { $project: {
             _id: 1, 
@@ -108,6 +127,7 @@ async function thesesQuery(req) {
                 _id: 1,
                 firstName: 1,
                 lastName: 1,
+                ...(shortcode ? { genealogyId: 1, email: 1, phone: 1 } : {}),
                 staff: {
                     qualification: 1,
                     isInternal: 1
@@ -119,9 +139,17 @@ async function thesesQuery(req) {
                 _id: 1,
                 name: 1
             },
-            SSD: 1
+            SSD: 1,
+            ...(shortcode ? { affiliation: { name: 1 }, fileUrl: 1 } : {}),
         }}
     ]
+
+    if (shortcode) {
+        const { _format, ...query } = req.query
+        return shortcodeController.performQuery({ _sort: 'person', ...query }, res, {
+            queryPipeline: pipeline.slice(1),
+        })
+    }
 
     const theses = await Thesis.aggregate(pipeline)
 
