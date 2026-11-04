@@ -120,11 +120,11 @@ function PersonBlock({data, en}) {
 
 function Duties({data, en}) {
     const memberOfOne = data.groups
-        .filter(group => group.memberCount === 1 && !group.name.startsWith("MAT/"))
+        .filter(group => group.memberCount === 1 && !/^(MAT\/|MATH-)/.test(group.name))
         .sort((a, b) => a.name.localeCompare(b.name));
 
     const memberOfMultiple = data.groups
-        .filter(group => group.memberCount > 1 && !group.name.startsWith("MAT/"))
+        .filter(group => group.memberCount > 1 && !/^(MAT\/|MATH-)/.test(group.name))
         .sort((a, b) => {
             if (a.chair === data._id && b.chair !== data._id) return -1;
             if (a.chair !== data._id && b.chair === data._id) return 1;

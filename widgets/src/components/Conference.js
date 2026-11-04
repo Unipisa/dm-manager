@@ -7,7 +7,7 @@ import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
 
-import { formatDateInterval, getManageURL, getNewSSD, getResearchGroupLabel, getDMURL, isEnglish } from '../utils'
+import { formatDateInterval, getManageURL, getResearchGroupLabel, getDMURL, isEnglish } from '../utils'
 import { useQuery } from 'react-query'
 
 export function Conference({ id }) {

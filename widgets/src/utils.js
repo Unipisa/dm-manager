@@ -133,42 +133,6 @@ export function getDMURL(path) {
     }
 }
 
-export function getNewSSD(SSD) {
-    var newSSD = ""
-
-    switch (SSD) {
-        case "MAT/01":
-            newSSD = "MATH-01/A"
-            break;
-        case "MAT/02":
-            newSSD = "MATH-02/A"
-            break;
-        case "MAT/03":
-            newSSD = "MATH-02/B"
-            break;
-        case "MAT/04":
-            newSSD = "MATH-01/B"
-            break;
-        case "MAT/05":
-            newSSD = "MATH-03/A"
-            break;
-        case "MAT/06":
-            newSSD = "MATH-03/B"
-            break;
-        case "MAT/07":
-            newSSD = "MATH-04/A"
-            break;
-        case "MAT/08":
-            newSSD = "MATH-05/A"
-            break;
-        case "MAT/09":
-            newSSD = "MATH-06/A"
-            break;
-    }
-    
-    return newSSD || ""
-}
-
 export function getRoleLabel(role, english, feminine) {
     const ROLES = {
         'PO': ['Professore Ordinario', 'Professoressa Ordinaria', 'Full Professor', 'Full Professor'],
@@ -202,22 +166,24 @@ export function getRoleLabel(role, english, feminine) {
 
 export function getResearchGroupLabel(SSD, en) {
     switch (SSD) {
-        case 'MAT/01':
+        case 'MATH-01/A':
           return en ? 'Mathematical Logic' : 'Logica Matematica'
-        case 'MAT/02':
+        case 'MATH-02/A':
           return 'Algebra'
-        case 'MAT/03':
+        case 'MATH-02/B':
           return en ? 'Geometry' : 'Geometria'
-        case 'MAT/04':
+        case 'MATH-01/B':
           return en ? 'Mathematics Education and History of Mathematics' : 'Didattica della Matematica e Storia della Matematica'
-        case 'MAT/05':
+        case 'MATH-03/A':
           return en ? 'Mathematical Analysis' : 'Analisi Matematica'
-        case 'MAT/06':
+        case 'MATH-03/B':
           return en ? 'Probability and Mathematical Statistics' : 'Probabilità e Statistica Matematica'
-        case 'MAT/07':
+        case 'MATH-04/A':
           return en ? 'Mathematical Physics' : 'Fisica Matematica'
-        case 'MAT/08':
+        case 'MATH-05/A':
           return en ? 'Numerical Analysis' : 'Analisi Numerica'
+        case 'MATH-06/A':
+          return en ? 'Operations Research' : 'Ricerca Operativa'
         default:
           return SSD
     }

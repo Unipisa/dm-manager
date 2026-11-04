@@ -266,6 +266,7 @@ function VisitDetailsBlock({data, setData, active, done, edit, variant, fetchSem
 }
 
 function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) {
+    const ssdOptions = useEngine().Models.Visit.schema.fields.SSD.enum
     return <>
         <Form autoComplete="off">
             <InputRow label="Visitatore" className="my-3">
@@ -304,7 +305,7 @@ function ActiveVisitDetailsBlock({data, setData, done, variant, fetchSeminars}) 
                 <StringInput value={data.collaborationTheme} setValue={setter(setData, "collaborationTheme")}/>
             </InputRow>
             <InputRow label="SSD" className="my-3">
-                <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""]}/>
+                <SelectInput value={data.SSD} setValue={setter(setData, "SSD")} options={ssdOptions}/>
             </InputRow>
             <InputRow className="my-3" label="Grants"
                 help={<>

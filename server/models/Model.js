@@ -23,17 +23,21 @@ const { Schema } = mongoose
 const { ObjectId } = Schema.Types
 
 // common fields...
+const ssdCodes = [
+    'MATH-01/A', 'MATH-02/A', 'MATH-02/B', 'MATH-01/B', 'MATH-03/A',
+    'MATH-03/B', 'MATH-04/A', 'MATH-05/A', 'MATH-06/A',
+]
 const SSD = {
     type: String,
     label: 'SSD',
-    enum: ["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09",""],
+    enum: [...ssdCodes, ""],
     default: "",
 }
 
 const multipleSSDs = {
     type: [String],
     label: 'SSD',
-    enum: ["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09"], 
+    enum: ssdCodes,
     default: [],
     can_filter: true,
 }

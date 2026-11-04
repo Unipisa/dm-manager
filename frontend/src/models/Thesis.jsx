@@ -1,5 +1,6 @@
 import Model from './Model'
 import { useState } from 'react'
+import { useEngine } from '../Engine'
 
 export default class Thesis extends Model {
     constructor() {
@@ -37,7 +38,7 @@ function ThesesFilters({filter}) {
     const currentYear = new Date().getFullYear()
     const startYear = 1987
     const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => currentYear - i)
-    const ssdOptions = ['MAT/01', 'MAT/02', 'MAT/03', 'MAT/04', 'MAT/05', 'MAT/06', 'MAT/07', 'MAT/08']
+    const ssdOptions = useEngine().Models.Thesis.schema.fields.SSD.enum.filter(Boolean)
 
     return <>
         <select

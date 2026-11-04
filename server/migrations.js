@@ -522,7 +522,9 @@ const migrations = {
         } 
         
         return true
-    }
+    },
+
+    D20261104_ssd_math_codes: require('./migrations/ssd-math-codes'),
 }
 
 async function migrate(db, options) {

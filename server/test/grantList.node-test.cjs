@@ -83,9 +83,9 @@ test('existing grant queries retain date range/SSD filters and response shape', 
     let pipeline
     const data = [{ name: 'Mock grant' }]
     t.mock.method(Grant, 'aggregate', async stages => { pipeline = stages; return data })
-    const result = await grantsQuery({ query: { from: '2025-01-01', to: '2025-12-31', ssd: 'MAT/01', _limit: '3' } })
+    const result = await grantsQuery({ query: { from: '2025-01-01', to: '2025-12-31', ssd: 'MATH-01/A', _limit: '3' } })
     assert.equal(result.data, data)
-    assert.equal(pipeline[0].$match.SSD, 'MAT/01')
+    assert.equal(pipeline[0].$match.SSD, 'MATH-01/A')
     assert.equal(pipeline[0].$match.endDate.$gte.toISOString(), '2025-01-01T00:00:00.000Z')
     assert.equal(pipeline[0].$match.startDate.$lte.toISOString(), '2025-12-31T00:00:00.000Z')
     assert.ok(pipeline.some(stage => stage.$limit === 3))
@@ -94,7 +94,7 @@ test('existing grant queries retain date range/SSD filters and response shape', 
 })
 
 const grant = () => ({
-    _id: 'grant', name: 'Example project', projectType: 'PRIN', SSD: ['MAT/01', 'MAT/03'], funds: 'National',
+    _id: 'grant', name: 'Example project', projectType: 'PRIN', SSD: ['MATH-01/A', 'MATH-02/B'], funds: 'National',
     startDate: '2025-01-15', endDate: '2026-12-20',
     pi: { _id: 'internal', firstName: 'Internal', lastName: 'Person', staffs: [{ isInternal: true }] },
     localCoordinator: { _id: 'external', firstName: 'External', lastName: 'Person', staffs: [{ isInternal: false }, { isInternal: true }] },
@@ -104,7 +104,7 @@ test('list preserves classes, project/person links, labels, external emphasis an
     document.documentElement.lang = 'it-IT'
     queryResult = { data: [grant()] }
     const html = render({})
-    for (const text of ['<ul>', 'class="mb-2 currentmat/01, mat/03 National"', '/research/grant-details/?grant_id=grant', 'Example project', '(PRIN)', 'Principal Investigator', '/en/scheda-personale/?person_id=internal', 'Coordinator of the Research Unit', '<em>External Person</em>', 'Project period', '15.01.2025', '20.12.2026']) assert.ok(html.includes(text), text)
+    for (const text of ['<ul>', 'class="mb-2 currentmath-01/a, math-02/b National"', '/research/grant-details/?grant_id=grant', 'Example project', '(PRIN)', 'Principal Investigator', '/en/scheda-personale/?person_id=internal', 'Coordinator of the Research Unit', '<em>External Person</em>', 'Project period', '15.01.2025', '20.12.2026']) assert.ok(html.includes(text), text)
     assert.ok(!html.includes('person_id=external'))
 })
 

@@ -71,9 +71,9 @@ test('existing theses query preserves year/SSD filters and original response sha
     let pipeline
     const data = [{ title: 'Mock thesis' }]
     t.mock.method(Thesis, 'aggregate', async stages => { pipeline = stages; return data })
-    const result = await thesesQuery({ query: { year: '2025', ssd: 'MAT/01', _sort: 'date', _limit: '3' } })
+    const result = await thesesQuery({ query: { year: '2025', ssd: 'MATH-01/A', _sort: 'date', _limit: '3' } })
     assert.equal(result.data, data)
-    assert.equal(pipeline[0].$match.SSD, 'MAT/01')
+    assert.equal(pipeline[0].$match.SSD, 'MATH-01/A')
     assert.equal(pipeline[0].$match.date.$gte.toISOString(), '2025-01-01T00:00:00.000Z')
     assert.ok(pipeline.some(stage => stage.$limit === 3))
     assert.ok(!pipeline.some(stage => stage.$facet))

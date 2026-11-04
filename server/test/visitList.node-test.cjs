@@ -114,13 +114,13 @@ test('example columns render visit affiliations, localized rooms, and PHP dates'
 })
 
 test('contact links, person links, affiliation lists and both SSD representations render', () => {
-    const row = { person: { _id: 'person', email: 'example@example.org', phone: '+39000', affiliations: [{ name: 'One' }, { name: 'Two' }] }, SSD: ['MAT/01', 'MAT/03'] }
+    const row = { person: { _id: 'person', email: 'example@example.org', phone: '+39000', affiliations: [{ name: 'One' }, { name: 'Two' }] }, SSD: ['MATH-01/A', 'MATH-02/B'] }
     queryResult = { data: [row] }
     document.documentElement.lang = 'en-US'
     const props = { fields: 'person.email,person.phone,person._id,person.affiliations,SSD_name' }
     let html = render(props)
     for (const text of ['mailto:example@example.org', 'tel:+39000', '/en/scheda-personale/?person_id=person', 'One, Two', 'Mathematical Logic, Geometry', 'd-none d-lg-inline']) assert.ok(html.includes(text))
-    row.SSD = 'MAT/05'
+    row.SSD = 'MATH-03/A'
     assert.ok(render(props).includes('Mathematical Analysis'))
 })
 

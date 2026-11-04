@@ -68,13 +68,13 @@ test('staff list includes all dates by default and sorts by surname, with public
 test('staff list applies current, qualification, SSD and internal filters and requested sorting', async t => {
     let pipeline
     t.mock.method(Staff, 'aggregate', async stages => { pipeline = stages; return [] })
-    const query = Object.fromEntries(new URLSearchParams(getShortcodeQuery('current,qualification=PO,SSD=MAT/01,isInternal=1', '-qualification')))
+    const query = Object.fromEntries(new URLSearchParams(getShortcodeQuery('current,qualification=PO,SSD=MATH-01/A,isInternal=1', '-qualification')))
     await staffListQuery({ query }, response())
     const matches = pipeline.filter(stage => stage.$match).map(stage => stage.$match)
     assert.ok(matches.some(match => match.$or?.some(condition => condition.startDate?.$lte instanceof Date)))
     assert.ok(matches.some(match => match.$or?.some(condition => condition.endDate?.$gte instanceof Date)))
     assert.ok(matches.some(match => match.qualification === 'PO'))
-    assert.ok(matches.some(match => match.SSD === 'MAT/01'))
+    assert.ok(matches.some(match => match.SSD === 'MATH-01/A'))
     assert.ok(matches.some(match => match.isInternal === true))
     assert.deepEqual(pipeline.find(stage => stage.$sort).$sort, { qualification: -1 })
 })
@@ -97,7 +97,7 @@ test('existing staff endpoint remains a single-person email lookup', async t => 
 
 test('staff widget uses shared table formatting, localized headings and the staff-list API', async () => {
     queryResult = { data: [{
-        _id: 'staff', qualification: 'PO', isInternal: true, SSD: ['MAT/01', 'MAT/03'],
+        _id: 'staff', qualification: 'PO', isInternal: true, SSD: ['MATH-01/A', 'MATH-02/B'],
         person: { _id: 'person', firstName: 'Example', lastName: 'Person', email: 'example@example.org', affiliations: [{ name: 'Institution' }] },
         roomAssignment: { room: { building: 'B', floor: '1', number: '101' } }, startDate: '2025-01-15',
     }] }

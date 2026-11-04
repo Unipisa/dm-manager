@@ -101,6 +101,7 @@ export function ConferenceBody({ conference, forbidden }) {
 }
 
 export function ConferenceDetailsBlock({ onCompleted, data, setData, change, active, error }) {
+    const ssdOptions = useEngine().Models.EventConference.schema.fields.SSD.enum
     const user = useEngine().user
     const isAdmin = user.roles && user.roles.includes('admin')
 
@@ -148,7 +149,7 @@ export function ConferenceDetailsBlock({ onCompleted, data, setData, change, act
                         <MultipleSelectInput 
                             value={data.SSD} 
                             setValue={setter(setData, "SSD")} 
-                            options={["MAT/01", "MAT/02", "MAT/03", "MAT/04", "MAT/05", "MAT/06", "MAT/07", "MAT/08", "MAT/09"]}
+                            options={ssdOptions}
                         />
                     </InputRow>
                     <InputRow className="my-3" label="Sito web"
