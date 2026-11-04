@@ -4,6 +4,7 @@ import { Card, Form, Table, Button, OverlayTrigger, Tooltip } from 'react-bootst
 import { InputRow, StringInput, EmailInput, InstitutionInput } from '../components/Input'
 import { useQuery } from 'react-query'
 import api from '../api'
+import { apiPath, joinPath } from '../apiPath'
 
 export function SelectPeopleBlock({ people, setPeople, prefix}) {
     return <div>
@@ -196,7 +197,7 @@ export function SelectPersonBlock({ title, person, setPerson, onFocus, done, pre
     }
 
     async function createNew() {
-        const res = await api.post(`/api/v0/${prefix}/person`, {
+        const res = await api.post(apiPath(prefix, 'person'), {
             lastName,
             firstName,
             email,
@@ -216,7 +217,7 @@ export function SelectPersonBlock({ title, person, setPerson, onFocus, done, pre
         const patch = diff();
         console.log(`patch: ${JSON.stringify(patch)}`)
         if (patch) {
-            await api.patch(`/api/v0/${prefix}/person/${person._id}`, patch)
+            await api.patch(apiPath(prefix, 'person', person._id), patch)
             setPerson({...person, lastName, firstName, email, affiliations})
         }
         setMode('display')
@@ -249,7 +250,7 @@ export function SelectPersonBlock({ title, person, setPerson, onFocus, done, pre
 }
 
 function PersonSuggestions({query, onClick, prefix}) {
-    const {isLoading, error, data} = useQuery([...`${prefix}/person`.split('/'), query])
+    const {isLoading, error, data} = useQuery([...joinPath(prefix, 'person').split('/'), query])
 
     if (error) return "Error: " + error.message
     if (!isLoading && data.data.length === 0) return null

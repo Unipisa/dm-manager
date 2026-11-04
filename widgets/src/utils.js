@@ -69,6 +69,7 @@ export function truncateTextByWords(text, maxWords) {
 }
 
 export function getManageURL(path, query) {
+    path = path.split('/').filter(segment => segment !== '').join('/')
     if (query === undefined) {
         query = ""
     }

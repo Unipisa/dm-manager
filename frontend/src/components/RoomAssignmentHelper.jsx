@@ -3,6 +3,7 @@ import { Button } from 'react-bootstrap'
 
 import { myDateFormat, useEngine, minDate, maxDate, notNullEndDate, notNullStartDate } from '../Engine'
 import Loading from './Loading'
+import { joinPath } from '../apiPath'
 import { usePrefix } from '../processes/PrefixProvider'
 
 function RoomListing({rooms, createAssignment}) {
@@ -59,11 +60,11 @@ export default function RoomAssignmentHelper({ person, startDate, endDate, onCha
         endDate__gte_or_null: startDate.toISOString(),
         startDate__lte_or_null: endDate.toISOString()
     }
-    const assignmentsQuery = useIndex(`${prefix}/roomAssignment`, filter)
-    const roomsQuery = useIndex(`${prefix}/room`, {})
-    const putRoomAssignment = usePut(`${prefix}/roomAssignment`)
-    const patchRoomAssignment = usePatch(`${prefix}/roomAssignment`)
-    const deleteRoomAssignment = useDelete(`${prefix}/roomAssignment`)
+    const assignmentsQuery = useIndex(joinPath(prefix, 'roomAssignment'), filter)
+    const roomsQuery = useIndex(joinPath(prefix, 'room'), {})
+    const putRoomAssignment = usePut(joinPath(prefix, 'roomAssignment'))
+    const patchRoomAssignment = usePatch(joinPath(prefix, 'roomAssignment'))
+    const deleteRoomAssignment = useDelete(joinPath(prefix, 'roomAssignment'))
     if (!(assignmentsQuery.isSuccess && roomsQuery.isSuccess)) return <Loading />
     const rooms = roomsQuery.data.data
     const assignments = assignmentsQuery.data.data

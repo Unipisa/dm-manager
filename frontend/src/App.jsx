@@ -4,6 +4,7 @@ import 'react-bootstrap-typeahead/css/Typeahead.css';
 import './App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import axios from 'axios'
+import { apiPath } from './apiPath'
 
 import {useCreateEngine, EngineProvider} from './Engine'
 import Connecting from './components/Connecting'
@@ -38,7 +39,7 @@ import Document from './processes/Document'
 import ManageTimesheets from './processes/Timesheets'
 import EditTimesheetMonth from './processes/TimesheetMonth'
 
-const BASE_URL = process.env.REACT_APP_SERVER_URL || ""
+const BASE_URL = (process.env.REACT_APP_SERVER_URL || "").replace(/\/+$/, '')
 
 console.log("dm-manager (app starting)")
 
@@ -46,16 +47,16 @@ const queryClient = new QueryClient({
   defaultOptions: {
       queries: {
           queryFn: async ({queryKey}) => {
-              let url = BASE_URL + '/api/v0'
+              const path = []
               let params = {}
               for (const key of queryKey) {
                   if (typeof key === 'object') {
                       params = key
                       break
                   }
-                  url += '/' + key
+                  path.push(key)
               }
-              const out = await axios.get(url, {params})
+              const out = await axios.get(BASE_URL + apiPath(...path), {params})
               return out.data
           },
         keepPreviousData: true,

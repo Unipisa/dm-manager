@@ -4,6 +4,7 @@ import { useQuery, useQueryClient, useMutation } from 'react-query'
 import { useSearchParams } from 'react-router-dom'
 
 import api from './api'
+import { apiPath } from './apiPath'
 import Models from './models/Models'
 
 function new_user(json) {
@@ -185,7 +186,7 @@ export function useCreateEngine() {
                 }
             ))
             const query = useQuery([path, filter],
-                () => api.get(`/api/v0/${path}`, filter), {
+                () => api.get(apiPath(path), filter), {
                 keepPreviousData: true,
                 onError: (err) => addMessage(err.message, 'error'),
             })
@@ -194,7 +195,7 @@ export function useCreateEngine() {
 
         useGet: (path, id) => {
             const pathArray = id === undefined ? [path] : [path, id]
-            const url = id === undefined ? `/api/v0/${path}` : `/api/v0/${path}/${id}`
+            const url = id === undefined ? apiPath(path) : apiPath(path, id)
             return useQuery(
                 pathArray,
                 () => api.get(url),
@@ -205,7 +206,7 @@ export function useCreateEngine() {
         },
 
         usePut: (path) => {
-            const mutation = useMutation(payload => api.put(`/api/v0/${path}/`, payload), {
+            const mutation = useMutation(payload => api.put(apiPath(path), payload), {
                 onSuccess: () => {
                     queryClient.invalidateQueries([path])
                 }
@@ -224,8 +225,7 @@ export function useCreateEngine() {
         usePatch: (path) => {
             const mutation = useMutation(
                 payload => {
-                    let url = `/api/v0/${path}`
-                    if (payload._id) url += `/${payload._id}`
+                    const url = apiPath(path, payload._id || undefined)
                     return api.patch(url, payload)
                 }, {
                 onSuccess: () => {
@@ -245,7 +245,7 @@ export function useCreateEngine() {
         },
 
         useDelete: (path) => {
-            const mutation = useMutation(async (object) => api.del(`/api/v0/${path}/${object._id}`), {
+            const mutation = useMutation(async (object) => api.del(apiPath(path, object._id)), {
                 onSuccess: () => {
                     queryClient.invalidateQueries([path])
                     /**
@@ -273,7 +273,7 @@ export function useCreateEngine() {
             return useQuery(path, async () => {
                 const data = []
                 for (const info of related) {
-                    const url = `/api/v0/${info.url}`
+                    const url = apiPath(info.url)
                     const result = await api.get(url, { [info.field]: _id })
                     data.push({
                         ...info,
