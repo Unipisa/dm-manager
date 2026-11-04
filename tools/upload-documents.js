@@ -16,7 +16,7 @@ async function makeRequest(root_url, method, endpoint, token, data) {
     }
 
     // console.log(`  -> Making request to ${root_url}${endpoint} with method ${method}`);
-    const res = await fetch(`${root_url}${endpoint}`, opts);
+    const res = await fetch(`${root_url.replace(/\/+$/, '')}${endpoint}`, opts);
 
     if (! res.ok) {
         const r = await res.json()
