@@ -1,3 +1,126 @@
+.dm-event-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.dm-event-list .dm-event-list-item {
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid #dbe4ec;
+    border-left: 3px solid #003c71;
+    border-radius: 0;
+    background-color: transparent;
+    overflow-wrap: anywhere;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .dm-event-list .dm-event-list-item:hover {
+        background-color: #f5f8fb;
+    }
+}
+
+.dm-event-list .dm-event-list-item > .entry-title {
+    margin-top: 0;
+}
+
+.dm-event-list .dm-event-list-item > :last-child {
+    margin-bottom: 0;
+}
+
+.dm-event-list .dm-event-list-type {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #dbe4ec;
+    color: #003c71;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.dm-event-list .dm-event-speakers {
+    margin: 0.5rem 0;
+    color: #003c71;
+    font-size: 1rem;
+}
+
+.dm-event-list .dm-event-meta {
+    margin: 0.75rem 0;
+}
+
+.dm-event-list .dm-event-list-excerpt {
+    color: #53616d;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+/* Markdown blocks may have explicit typography from the Department theme. */
+.dm-event-list .dm-event-list-excerpt :is(p, li, blockquote, h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.dm-event-list .dm-event-list-excerpt > :last-child {
+    margin-bottom: 0;
+}
+
+.dm-event-detail > .entry-title {
+    margin: 0 0 0.75rem;
+}
+
+.dm-event-detail .dm-event-speakers {
+    margin: 0 0 1rem;
+    color: #003c71;
+    font-size: 1.125rem;
+}
+
+.dm-event-detail .dm-event-meta {
+    margin: 1rem 0 1.5rem;
+    padding: 1rem;
+    border-left: 3px solid #003c71;
+    border-radius: 0;
+    background-color: #f5f5f5;
+}
+
+.dm-event-detail .dm-event-meta-items,
+.dm-event-list .dm-event-meta-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+}
+
+.dm-event-detail .dm-event-meta-item,
+.dm-event-list .dm-event-meta-item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+}
+
+.dm-event-detail .dm-event-meta-item > [aria-hidden="true"],
+.dm-event-list .dm-event-meta-item > [aria-hidden="true"] {
+    flex-shrink: 0;
+    color: #003c71;
+}
+
+.dm-event-detail .dm-event-flyer {
+    margin: 1.5rem 0;
+}
+
+.dm-event-detail .dm-event-flyer img {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: min(100%, 420px);
+    max-height: 600px;
+    margin: 0 auto;
+}
+
 .styled-table {
     border-collapse: collapse;
     margin: 20px auto;

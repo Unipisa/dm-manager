@@ -1,44 +1,18 @@
 import React from 'react'
 import axios from 'axios'
-import { truncateText, getManageURL, getDMURL, isEnglish } from '../utils'
-import { SeminarTitle } from './Seminar'
-import { Loading } from './Loading'
-
-import Markdown from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
-import remarkGfm from 'remark-gfm'
 import { useQuery } from 'react-query'
+import { getManageURL } from '../utils'
+import { Loading } from './Loading'
+import { EventListContent } from './EventListContent'
 
-export function SeminarList({ from, to, category, grant, _sort, _limit }) {
+export function SeminarList({ from, to, category, grant, _sort, _limit, en = false }) {
     const filter = { from, to, category, grant, _sort, _limit }
-
-    const { isLoading, error, data } = useQuery([ 'seminars', filter ], async () => {
-        const res = await axios.get(getManageURL("public/seminars"), { params: filter })
-        return res.data.data
+    const { isLoading, error, data } = useQuery(['seminars', filter], async () => {
+        const response = await axios.get(getManageURL('public/seminars'), { params: filter })
+        return response.data?.data || []
     })
 
-    if (isLoading || error) {
-        return <Loading widget="Lista dei seminari" error={error}></Loading>
-    }
+    if (isLoading || error) return <Loading widget="Lista dei seminari" error={error} />
 
-    var events_block = []
-    for (var i = 0; i < data.length; i++) {
-        const e = data[i];
-        if (typeof(e) != 'undefined') {
-            const en = isEnglish();
-            const link = getDMURL(en ? `seminar?id=${e._id}` : `seminario?id=${e._id}`)
-            events_block.push(
-                <div key={e._id}>
-                    <SeminarTitle seminar={e} href={link}></SeminarTitle>
-                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
-                    <hr className="my-4"></hr>
-                </div>
-            );
-        }
-    }
-
-    return <>
-        {events_block}
-    </>
+    return <EventListContent events={data} type="seminar" en={en} />
 }

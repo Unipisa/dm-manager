@@ -43,10 +43,10 @@ const thesisTableOptions = [...tableOptions, ['list_mode', 'Render a plain list 
 // behavior where the public route supports filters the widget does not expose.
 export const widgets = [
     {
-        id: 'eventlist', component: 'EventList', props: { _limit: 2 },
+        id: 'eventlist', component: 'EventList', props: { _limit: 2, en: true },
         routes: ['public/conferences', 'public/seminars'],
         filters: [...dateRange,
-            ['grants', 'API · Grant ID; applies to conferences only. The seminars endpoint expects singular grant, which EventList does not expose.'],
+            ['grants', 'API · Single grant ID; filters both conferences and seminars. Sent as grants to conferences and grant to seminars.'],
             ['_limit', 'API · Limit per endpoint, not the combined result.'],
         ],
         options: [['en', 'Force English labels (boolean).']],
@@ -54,9 +54,10 @@ export const widgets = [
     },
     {
         id: 'seminarlist', component: 'SeminarList',
-        props: { from: '2021-01-01', _sort: 'startDatetime', _limit: 10 },
+        props: { from: '2021-01-01', _sort: 'startDatetime', _limit: 10, en: true },
         routes: ['public/seminars'],
         filters: [...dateRange, ['category', 'API · Seminar category ID.'], ['grant', 'API · Grant ID.'], ...sortAndLimit],
+        options: [['en', 'Force English labels (boolean).']],
         notes: 'The route also accepts externalid, but SeminarList does not expose it as a prop.',
     },
     {
@@ -65,10 +66,11 @@ export const widgets = [
     },
     {
         id: 'conferencelist', component: 'ConferenceList',
-        props: { from: '2021-01-01', _limit: 50, is_outreach: true },
+        props: { from: '2021-01-01', _limit: 50, is_outreach: true, en: true },
         routes: ['public/conferences'],
         filters: [...dateRange, ['grants', 'API · Grant ID.'], ['ssd', 'API · Research area code (case-sensitive value).'],
             ['is_outreach', 'API · true or false; omit to include both.'], ...sortAndLimit],
+        options: [['en', 'Force English labels (boolean).']],
     },
     {
         id: 'conference', component: 'Conference', props: {},

@@ -1,89 +1,55 @@
-import React from 'react';
+import React from 'react'
 import axios from 'axios'
 import { Loading } from './Loading'
-
-import Markdown from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
-import remarkGfm from 'remark-gfm'
-
+import { EventHeading, EventMetadata, EventDescription, EventFlyer, getEventRoom } from './EventContent'
 import { formatDate, formatTime, formatPersonName, getDMURL, getManageURL, isEnglish } from '../utils'
 import { useQuery } from 'react-query'
+import './styles.css'
 
 export function Seminar({ id }) {
-    const { isLoading, error, data } = useQuery([ 'seminar', id ], async () => {
-        if (id !== null) {
-            const res = await axios.get(getManageURL('public/seminar/' + id))
-            const seminar = res.data.data[0]
-            if (! seminar) {
-                throw new Error("Impossibile trovare il seminario")
-            }
-            return seminar
-        }
-        else {
-            throw new Error('Impossibile trovare il seminario richiesto')
-        }
+    const { isLoading, error, data } = useQuery(['seminar', id], async () => {
+        if (id === null) throw new Error('Impossibile trovare il seminario richiesto')
+
+        const response = await axios.get(getManageURL('public/seminar/' + id))
+        const seminar = response.data.data[0]
+        if (!seminar) throw new Error('Impossibile trovare il seminario')
+
+        return seminar
     })
 
-    if (isLoading || error) {
-        return <Loading widget="Descrizione seminario" error={error}></Loading>
-    }
+    if (isLoading || error) return <Loading widget="Descrizione seminario" error={error} />
 
-    return <div>
-            <SeminarTitle seminar={data}></SeminarTitle>
-            {data.flyerUrl && <p><img src={data.flyerUrl} alt={`${isEnglish() ? 'Flyer' : 'Locandina'}: ${data.title}`} style={{maxWidth: '100%', height: 'auto'}} /></p>}
-            <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{data.abstract}</Markdown>
-        </div>
+    return <div className="dm-event-detail">
+        <SeminarTitle seminar={data} />
+        <EventFlyer url={data.flyerUrl} title={data.title} />
+        <EventDescription>{data.abstract}</EventDescription>
+    </div>
 }
 
-export function SeminarTitle({ seminar, href }) {
-    const en = isEnglish();
-
-    var endDatetime = new Date(seminar.startDatetime)
+export function SeminarTitle({ seminar, href, en: forceEnglish = false, typeLabel }) {
+    const en = isEnglish(forceEnglish)
+    const endDatetime = new Date(seminar.startDatetime)
     endDatetime.setMinutes(endDatetime.getMinutes() + seminar.duration)
 
-    var category_tags = [ <a href={getDMURL(en ? "seminars" : "prossimi-seminari")} key="seminars-category">Seminars</a> ]
-    if (seminar.category !== undefined && seminar.category.length > 0) {
-        seminar.category.forEach(cat => {
-            const link = getDMURL(en ? "seminars/?category=" + cat._id : "prossimi-seminari/?category=" + cat._id)
-            category_tags.push(<span key={cat._id}>, <a href={link}>{cat.name}</a></span>)
-        })
-    }
+    const speakers = (seminar.speakers || []).map(formatPersonName).join(', ')
+    const thesisDefense = seminar.category?.some(category => category.label === 'phd-thesis-defense')
+    const title = thesisDefense ? `Ph.D. Thesis Defense: ${seminar.title}` : seminar.title
+    const categories = [
+        <a href={getDMURL(en ? 'seminars' : 'prossimi-seminari')} key="seminars-category">Seminars</a>,
+        ...(seminar.category || []).map(category => (
+            <span key={category._id}>, <a href={getDMURL(`${en ? 'seminars' : 'prossimi-seminari'}/?category=${category._id}`)}>{category.name}</a></span>
+        )),
+    ]
+    const room = getEventRoom({ room: seminar.conferenceRoom, en })
 
-    const speakers = seminar.speakers.map(speaker => formatPersonName(speaker)).join(", ")
-
-    var title_block = <>{seminar.title} &ndash; {speakers}</>
-
-    if (seminar.category?.some(cat => cat.label === 'phd-thesis-defense')) {
-        title_block = <>Ph.D. Thesis Defense: {title_block}</>
-    }
-
-    if (href !== undefined) {
-        title_block = <a href={href}>
-            {title_block}
-        </a>
-    }
-
-    let room = seminar.conferenceRoom?.name || null;
-    if (seminar.conferenceRoom?.name && seminar.conferenceRoom?.room) {
-        const roomUrl = en
-            ? getDMURL(`/map?sel=${seminar.conferenceRoom.room}`)
-            : getDMURL(`/mappa?sel=${seminar.conferenceRoom.room}`);
-        room = <a href={roomUrl}>{seminar.conferenceRoom.name}</a>;
-    }
-    
     return <>
-    <h3 className="title entry-title">{title_block}</h3>
-    <p>
-        <small>
-            <span className="far fa-calendar"></span> {formatDate(seminar.startDatetime)}
-            <span className="mx-1"></span>
-            <span className="far fa-clock"></span> {formatTime(seminar.startDatetime)}  &mdash; {formatTime(endDatetime)}
-            <span className="mx-1"></span>
-            <span className="fas fa-map-marker-alt"></span> {room}
-            <span className="mx-1"></span>
-            <i className='fa fa-tags'></i> {category_tags}
-        </small>
-    </p></>
+        <EventHeading title={title} href={href} typeLabel={typeLabel} />
+        {speakers && <p className="dm-event-speakers">{speakers}</p>}
+        <EventMetadata items={[
+            { icon: 'far fa-calendar', content: <span>{formatDate(seminar.startDatetime, en ? 'en-US' : 'it-IT')}</span> },
+            { icon: 'far fa-clock', content: <span>{formatTime(seminar.startDatetime)} &mdash; {formatTime(endDatetime)}</span> },
+            { icon: 'fas fa-map-marker-alt', content: room },
+            { icon: 'fa fa-tags', content: <span>{categories}</span> },
+        ]} />
+    </>
 }
-

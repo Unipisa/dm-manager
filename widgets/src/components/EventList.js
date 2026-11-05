@@ -1,84 +1,30 @@
 import React from 'react'
 import axios from 'axios'
-import { truncateText, getManageURL, getDMURL, isEnglish } from '../utils'
-import { ConferenceTitle } from './Conference'
-import { SeminarTitle } from './Seminar'
-import { Loading } from './Loading'
-
-import Markdown from 'react-markdown'
-import rehypeKatex from 'rehype-katex'
-import remarkMath from 'remark-math'
-import remarkGfm from 'remark-gfm'
 import { useQuery } from 'react-query'
+import { getManageURL } from '../utils'
+import { Loading } from './Loading'
+import { EventListContent } from './EventListContent'
 
 export function EventList({ from, to, grants, _limit, en = false }) {
     const filter = { from, to, grants, _limit }
+    const { isLoading, error, data } = useQuery(['events', filter], async () => {
+        // The two public APIs use different names for the same grant filter.
+        const [conferences, seminars] = await Promise.all([
+            axios.get(getManageURL('public/conferences'), {
+                params: { ...filter, _sort: 'startDate' },
+            }),
+            axios.get(getManageURL('public/seminars'), {
+                params: { from, to, grant: grants, _limit, _sort: 'startDatetime' },
+            }),
+        ])
 
-    const { isLoading, error, data } = useQuery([ 'events', filter ], async () => {
-        var events = []
-
-        const conf = await axios.get(getManageURL("public/conferences"), { params: { ...filter, _sort: "startDate" } })
-        if (conf.data) {
-            const ec = conf.data.data              
-            const ec_label =  ec.map(x => { 
-                return {...x, type: 'conference'}
-            })
-            events.push(...ec_label)
-        }
-
-        const sem = await axios.get(getManageURL("public/seminars"), { params: { ...filter, _sort: "startDatetime" } })
-        if (sem.data) {
-            const es = sem.data.data
-            const es_label = es.map(x => { 
-                return {...x, type: 'seminar'}
-            })
-            events.push(...es_label)
-        }
-
-        events.sort((a, b) => {
-            const dateA = a.startDatetime ? a.startDatetime : a.startDate
-            const dateB = b.startDatetime ? b.startDatetime : b.startDate
-            return new Date(dateA) - new Date(dateB)
-        })
-
-        return events
+        return [
+            ...(conferences.data?.data || []).map(event => ({ ...event, type: 'conference' })),
+            ...(seminars.data?.data || []).map(event => ({ ...event, type: 'seminar' })),
+        ].sort((a, b) => new Date(a.startDatetime || a.startDate) - new Date(b.startDatetime || b.startDate))
     })
 
-    if (isLoading || error) {
-        return <Loading widget="Lista degli eventi" error={error}></Loading>
-    }
+    if (isLoading || error) return <Loading widget="Lista degli eventi" error={error} />
 
-    var events_block = []
-    for (var i = 0; i < data.length; i++) {
-        const e = data[i]
-
-        if (e.type == 'seminar') {
-            const e = data[i]
-            const link = getDMURL(isEnglish(en) ? `seminar?id=${e._id}` : `seminario?id=${e._id}`)
-    
-            events_block.push(
-                <div key={e._id}>
-                    <SeminarTitle seminar={e} href={link}></SeminarTitle>
-                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{truncateText(e.abstract, 200)}</Markdown>
-                    <hr className="my-4"></hr>
-                </div>
-            )
-        }
-        else {
-            const link = getDMURL(isEnglish(en) ? `conference?id=${e._id}` : `conferenza?id=${e._id}`)
-            events_block.push(
-                <div key={e._id}>
-                    <ConferenceTitle conference={e} href={link}></ConferenceTitle>
-                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{truncateText(e.notes, 200)}</Markdown>
-                    <hr className="my-4"></hr>
-                </div>
-            )
-        }
-
-        
-    }
-
-    return <>
-        {events_block}
-    </>
+    return <EventListContent events={data} en={en} />
 }
