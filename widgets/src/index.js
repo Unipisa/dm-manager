@@ -14,6 +14,7 @@ import { StaffList } from './components/StaffList';
 import { PersonDetails } from './components/PersonDetails';
 import { PersonCard } from './components/PersonCard';
 import { GroupCards } from './components/GroupCards';
+import { PeopleCards } from './components/PeopleCards';
 import { CourseList } from './components/CourseList';
 import { Grant } from './components/Grant';
 import { GrantList } from './components/GrantList';
@@ -69,6 +70,9 @@ dmwidgets.loadComponent = (target, name, props = {}) => {
             break;
         case 'PersonDetails':
             element = <PersonDetails {...props}></PersonDetails>
+            break;
+        case 'PeopleCards':
+            element = <PeopleCards {...props} />
             break;
         case 'PersonCard':
             element = <PersonCard {...props}></PersonCard>

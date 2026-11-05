@@ -5,7 +5,7 @@ import { Loading } from './Loading';
 import { PersonCardContent } from './PersonCard';
 import { getManageURL, isEnglish } from '../utils';
 
-export function GroupCards({ group_id, isinternal }) {
+export function GroupCards({ group_id, is_internal }) {
     const { isLoading, error, data } = useQuery(['group', group_id], async () => {
         if (!group_id) {
             throw new Error('Id non può essere vuota');
@@ -28,8 +28,8 @@ export function GroupCards({ group_id, isinternal }) {
 
     const memberFilter = person => {
         const internal = !!person.staffs?.[0]?.isInternal;
-        if (isinternal === '1' || isinternal === 1) return internal;
-        if (isinternal === '0' || isinternal === 0) return !internal;
+        if ([true, 1, '1'].includes(is_internal)) return internal;
+        if ([false, 0, '0'].includes(is_internal)) return !internal;
         return true;
     };
     const en = isEnglish();
@@ -45,7 +45,7 @@ export function GroupCards({ group_id, isinternal }) {
     }).filter(memberFilter);
 
     return (
-        <div className="d-flex row justify-content-between px-2 pb-4">
+        <div className="dm-people-cards">
             {data.chair && memberFilter(data.chair) && (
                 <PersonCardContent person={data.chair} badge={roleTitle(data.chair_title)} />
             )}

@@ -4,6 +4,7 @@ import axios from 'axios';
 import Accordion from './Accordion';
 import { Loading } from './Loading';
 import { formatDateInterval, getManageURL, getResearchGroupLabel, getRoleLabel, getRoomDetails, isEnglish } from '../utils';
+import './styles.css';
 
 export function PersonDetails({ person_id }) {
     const { isLoading, error, data } = useQuery(['person', person_id], async () => {
@@ -38,8 +39,10 @@ export function PersonDetails({ person_id }) {
             {(data.about_en || data.about_it) && (
                 <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
             )}
-            <Duties data={data} en={en}/>
-            <UnimapData data={data} en={en}/>
+            <div className="dm-person-details-accordions">
+                <Duties data={data} en={en}/>
+                <UnimapData data={data} en={en}/>
+            </div>
         </div>
     );
 }
@@ -69,7 +72,7 @@ function PersonBlock({data, en}) {
                     )}
                     {roomDetails && roomDetails.length > 0 && (
                         <div className="d-flex justify-left">
-                            <div><i className="fas fa-address-card mr-2"></i></div>
+                            <div><i className="fas fa-door-open mr-2" aria-hidden="true"></i></div>
                             <div>
                                 {roomDetails.map((details, index) => (
                                     <div key={index}>

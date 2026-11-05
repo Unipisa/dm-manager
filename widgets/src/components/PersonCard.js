@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import axios from 'axios';
 import { Loading } from './Loading';
 import { getManageURL, isEnglish } from '../utils';
+import './styles.css';
 
 export function PersonCard({ person_id, badge }) {
     const { isLoading, error, data } = useQuery(['person', person_id], async () => {
@@ -25,39 +26,33 @@ export function PersonCard({ person_id, badge }) {
         return <div>Nessun dato</div>;
     }
 
-    return <PersonCardContent person={data} badge={badge} />;
+    return <div className="dm-people-cards"><PersonCardContent person={data} badge={badge} /></div>;
 }
 
 export function PersonCardContent({ person: data, badge }) {
     const internal = data.staffs?.[0]?.isInternal;
     const prefix = isEnglish() ? 'en/' : '';
-    const name = internal
-        ? `${data.firstName} ${data.lastName}`
-        : `${data.firstName} ${data.lastName} (${(data.affiliations || []).map(affiliation => affiliation.name).join(', ')})`;
-    const icon = <i className="fas fa-id-card fa-fw"></i>;
+    const name = [data.firstName, data.lastName].filter(Boolean).join(' ');
+    const affiliations = (data.affiliations || []).map(affiliation => affiliation.name).filter(Boolean).join(', ');
+    const href = internal ? `/${prefix}scheda-personale/?person_id=${data._id}` : data.personalPage;
 
     return (
-        <div className="col-lg-6 col-12 py-2">
-            <div className="card h-100 m-2 shadow-sm">
-                <div className="card-body">
-                    {internal ? (
-                        <a href={`/${prefix}scheda-personale/?person_id=${data._id}`}>{icon}</a>
-                    ) : data.personalPage ? (
-                        <a href={data.personalPage} target="_blank" rel="noopener noreferrer">{icon}</a>
-                    ) : icon}
-                    <span className="card-title ml-2 h5">
-                        {name}
-                        {badge && <span className="badge badge-sm badge-primary ml-2">{badge}</span>}
-                    </span>
-                    <br />
-                    {data.email && (
-                        <>
-                            <i className="fas fa-at mr-3"></i>
-                            <a href={`mailto:${data.email}`}>{data.email}</a>
-                        </>
-                    )}
-                </div>
+        <article className="dm-person-card">
+            <div className="dm-person-card-heading">
+                <i className="fas fa-id-card fa-fw" aria-hidden="true"></i>
+                <h3 className="dm-person-card-name">
+                    {href ? <a href={href} target={internal ? undefined : '_blank'} rel={internal ? undefined : 'noopener noreferrer'}>{name}</a> : name}
+                    {badge && <> <span className="dm-person-card-role">{badge}</span></>}
+                </h3>
             </div>
-        </div>
+            {affiliations && <p className="dm-person-card-affiliations">
+                <i className="fas fa-university fa-fw" aria-hidden="true"></i>
+                <span>{affiliations}</span>
+            </p>}
+            {data.email && <div className="dm-person-card-contact">
+                <i className="fas fa-at fa-fw" aria-hidden="true"></i>
+                <a href={`mailto:${data.email}`}>{data.email}</a>
+            </div>}
+        </article>
     );
 }

@@ -1,3 +1,91 @@
+.dm-people-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    gap: 1rem;
+}
+
+.dm-people-cards .dm-person-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 0;
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid #dbe4ec;
+    border-left: 3px solid #003c71;
+    border-radius: 0;
+    background-color: transparent;
+    overflow-wrap: anywhere;
+}
+
+.dm-person-card .dm-person-card-heading,
+.dm-person-card .dm-person-card-affiliations,
+.dm-person-card .dm-person-card-contact {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.dm-person-card .dm-person-card-heading > i,
+.dm-person-card .dm-person-card-affiliations > i,
+.dm-person-card .dm-person-card-contact > i {
+    flex-shrink: 0;
+    color: #003c71;
+}
+
+.dm-person-card .dm-person-card-name {
+    min-width: 0;
+    margin: 0;
+    color: #003c71;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.dm-person-card .dm-person-card-name a,
+.dm-person-card .dm-person-card-contact a {
+    min-width: 0;
+    color: #003c71;
+    text-decoration: none;
+}
+
+.dm-person-card .dm-person-card-name a:hover,
+.dm-person-card .dm-person-card-contact a:hover {
+    text-decoration: underline;
+}
+
+.dm-person-card .dm-person-card-role {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #dbe4ec;
+    color: #003c71;
+    font-size: 0.8rem;
+    line-height: 1.4;
+}
+
+.dm-person-card .dm-person-card-affiliations {
+    margin: 0;
+    color: #53616d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.dm-person-card .dm-person-card-contact {
+    margin-top: auto;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 991px) {
+    .dm-people-cards { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .dm-people-cards .dm-person-card:hover { background-color: #f5f8fb; }
+}
+
 .dm-event-list {
     display: grid;
     gap: 1rem;
@@ -121,6 +209,44 @@
     margin: 0 auto;
 }
 
+.dm-person-details-accordions {
+    display: grid;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.dm-person-details-accordions > .c-accordion__item {
+    margin: 0;
+}
+
+.dm-person-details-accordions:empty {
+    display: none;
+}
+
+.styled-table .dm-staff-sort {
+    display: flex;
+    align-items: baseline;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.styled-table .dm-staff-sort:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+}
+
+.styled-table .dm-staff-sort > span {
+    flex-shrink: 0;
+}
+
 .styled-table {
     border-collapse: collapse;
     margin: 20px auto;
@@ -163,6 +289,77 @@
 
 .styled-table tbody tr:last-of-type {
     border-bottom: 2px solid #003c71;
+}
+
+.dm-staff-table-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.dm-staff-table-scroll:focus-visible {
+    outline: 2px solid #003c71;
+    outline-offset: 3px;
+}
+
+.styled-table.dm-staff-table {
+    margin: 0;
+    min-width: 100%;
+    box-shadow: none;
+}
+
+.styled-table.dm-staff-table th,
+.styled-table.dm-staff-table td {
+    padding: 0.85rem 1rem;
+    vertical-align: top;
+    line-height: 1.5;
+}
+
+.styled-table.dm-staff-table tbody tr {
+    border-bottom: 1px solid #e1e7ed;
+    background-color: #fff;
+}
+
+.styled-table.dm-staff-table tbody tr:nth-of-type(even) {
+    background-color: #f7f9fb;
+}
+
+.styled-table.dm-staff-table tbody tr:last-of-type {
+    border-bottom: 2px solid #003c71;
+}
+
+.dm-staff-table [data-column="name"],
+.dm-staff-table [data-column="first_name"],
+.dm-staff-table [data-column="last_name"] {
+    min-width: 10rem;
+}
+
+.dm-staff-table [data-column="qualification"] {
+    min-width: 11rem;
+}
+
+.dm-staff-table [data-column="building"],
+.dm-staff-table [data-column="floor"],
+.dm-staff-table [data-column="office"] {
+    width: 1%;
+    padding-inline: 0.65rem;
+    white-space: nowrap;
+}
+
+.dm-staff-table [data-column="email"] {
+    min-width: 12rem;
+}
+
+.dm-staff-table [data-column="email"] a {
+    display: inline-block;
+    max-width: 18rem;
+    overflow-wrap: anywhere;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .styled-table.dm-staff-table tbody tr:hover {
+        background-color: #eaf2f8;
+    }
 }
 
 .joint-phd-notice {
