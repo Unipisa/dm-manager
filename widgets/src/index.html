@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>DM Widgets gallery</title>
 
     <!-- Here are all the stylesheets from www.dm.unipi.it, for simplicity -->
@@ -28,136 +29,98 @@
         
         </script>
 
+    <link rel="stylesheet" href="./gallery/styles.css" />
+
   </head>
   <body>
-    <div class="container">
+    <div class="container widget-gallery">
 
-    <nav class="px-4 pt-4">
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a class="nav-link active" href="#" id="general-label" data-toggle="tab" 
-                   data-target="#general-tab" type="button" role="tab" aria-controls="general" 
-                   aria-selected="true">General instructions</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#eventlist" id="eventlist-label" data-toggle="tab" 
-                   data-target="#eventlist-tab" type="button" role="tab" aria-controls="eventlist" 
-                   aria-selected="false">EventList</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#seminarlist" id="seminarlist-label" data-toggle="tab" 
-                   data-target="#seminarlist-tab" type="button" role="tab" aria-controls="seminarlist" 
-                   aria-selected="false">SeminarList</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#seminar" id="seminar-label" data-toggle="tab" 
-                   data-target="#seminar-tab" type="button" role="tab" aria-controls="seminar" 
-                   aria-selected="false">Seminar</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#conferencelist" id="conferencelist-label" data-toggle="tab" 
-                   data-target="#conferencelist-tab" type="button" role="tab" aria-controls="conferencelist" 
-                   aria-selected="false">ConferenceList</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#conference" id="conference-label" data-toggle="tab" 
-                 data-target="#conference-tab" type="button" role="tab" aria-controls="conference" 
-                 aria-selected="false">Conference</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="#homeeventlist" id="homeeventlist-label" data-toggle="tab" 
-                 data-target="#homeeventlist-tab" type="button" role="tab" aria-controls="homeeventlist" 
-                 aria-selected="false">HomeEventList</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#homegrantlist" id="homegrantlist-label" data-toggle="tab" 
-               data-target="#homegrantlist-tab" type="button" role="tab" aria-controls="homegrantlist" 
-               aria-selected="false">HomeGrantList</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#homevisitlist" id="homevisitlist-label" data-toggle="tab" 
-               data-target="#homevisitlist-tab" type="button" role="tab" aria-controls="homevisittlist" 
-               aria-selected="false">HomeVisitList</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="#visitlist" id="visitlist-label" data-toggle="tab"
-                 data-target="#visitlist-tab" type="button" role="tab" aria-controls="visitlist"
-                 aria-selected="false">VisitList</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="#stafflist" id="stafflist-label" data-toggle="tab"
-                 data-target="#stafflist-tab" type="button" role="tab" aria-controls="stafflist"
-                 aria-selected="false">StaffList</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="#persondetails" id="persondetails-label" data-toggle="tab" 
-                 data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails" 
-                 aria-selected="false">PersonDetails</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="#personcard" id="personcard-label" data-toggle="tab"
-                 data-target="#personcard-tab" type="button" role="tab" aria-controls="personcard"
-                 aria-selected="false">PersonCard</a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="#groupcards" id="groupcards-label" data-toggle="tab"
-                 data-target="#groupcards-tab" type="button" role="tab" aria-controls="groupcards"
-                 aria-selected="false">GroupCards</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#courselist" id="courselist-label" data-toggle="tab" 
-               data-target="#courselist-tab" type="button" role="tab" aria-controls="courselist" 
-               aria-selected="false">CourseList</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#grant" id="grant-label" data-toggle="tab" 
-               data-target="#grant-tab" type="button" role="tab" aria-controls="grant" 
-               aria-selected="false">Grant</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#grantlist" id="grantlist-label" data-toggle="tab"
-               data-target="#grantlist-tab" type="button" role="tab" aria-controls="grantlist"
-               aria-selected="false">GrantList</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#thesislist" id="thesis-label" data-toggle="tab" 
-               data-target="#thesislist-tab" type="button" role="tab" aria-controls="grant" 
-               aria-selected="false">ThesisList</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#thesistable" id="thesistable-label" data-toggle="tab"
-               data-target="#thesistable-tab" type="button" role="tab" aria-controls="thesistable"
-               aria-selected="false">Thesis table/list</a>
-          </li>
-        </ul>
+    <header class="gallery-header">
+      <h1>Widgets</h1>
+    </header>
+
+    <section class="gallery-instructions" aria-labelledby="instructions-title">
+      <span class="gallery-info-icon" aria-hidden="true">i</span>
+      <div>
+        <h2 id="instructions-title">Development preview</h2>
+        <p>Select a widget to check its rendering with the Department website styles. Previews use the sample parameters configured in gallery/config.js and data from the local backend.</p>
+      </div>
+    </section>
+
+    <nav class="gallery-picker" aria-labelledby="widget-picker-title">
+      <h2 id="widget-picker-title">Choose a widget</h2>
+      <div class="nav gallery-widget-list" role="tablist" aria-label="Widgets">
+        <div class="gallery-widget-group" role="presentation">
+          <h3>Events</h3>
+          <div class="gallery-widget-options" role="presentation">
+            <a class="nav-link active" href="#eventlist" id="eventlist-label" data-toggle="tab" data-target="#eventlist-tab" type="button" role="tab" aria-controls="eventlist-tab" aria-selected="true">EventList</a>
+            <a class="nav-link" href="#seminarlist" id="seminarlist-label" data-toggle="tab" data-target="#seminarlist-tab" type="button" role="tab" aria-controls="seminarlist-tab" aria-selected="false">SeminarList</a>
+            <a class="nav-link" href="#seminar" id="seminar-label" data-toggle="tab" data-target="#seminar-tab" type="button" role="tab" aria-controls="seminar-tab" aria-selected="false">Seminar</a>
+            <a class="nav-link" href="#conferencelist" id="conferencelist-label" data-toggle="tab" data-target="#conferencelist-tab" type="button" role="tab" aria-controls="conferencelist-tab" aria-selected="false">ConferenceList</a>
+            <a class="nav-link" href="#conference" id="conference-label" data-toggle="tab" data-target="#conference-tab" type="button" role="tab" aria-controls="conference-tab" aria-selected="false">Conference</a>
+          </div>
+        </div>
+        <div class="gallery-widget-group" role="presentation">
+          <h3>People &amp; groups</h3>
+          <div class="gallery-widget-options" role="presentation">
+            <a class="nav-link" href="#stafflist" id="stafflist-label" data-toggle="tab" data-target="#stafflist-tab" type="button" role="tab" aria-controls="stafflist-tab" aria-selected="false">StaffList</a>
+            <a class="nav-link" href="#visitlist" id="visitlist-label" data-toggle="tab" data-target="#visitlist-tab" type="button" role="tab" aria-controls="visitlist-tab" aria-selected="false">VisitList</a>
+            <a class="nav-link" href="#persondetails" id="persondetails-label" data-toggle="tab" data-target="#persondetails-tab" type="button" role="tab" aria-controls="persondetails-tab" aria-selected="false">PersonDetails</a>
+            <a class="nav-link" href="#personcard" id="personcard-label" data-toggle="tab" data-target="#personcard-tab" type="button" role="tab" aria-controls="personcard-tab" aria-selected="false">PersonCard</a>
+            <a class="nav-link" href="#groupcards" id="groupcards-label" data-toggle="tab" data-target="#groupcards-tab" type="button" role="tab" aria-controls="groupcards-tab" aria-selected="false">GroupCards</a>
+          </div>
+        </div>
+        <div class="gallery-widget-group" role="presentation">
+          <h3>Teaching</h3>
+          <div class="gallery-widget-options" role="presentation">
+            <a class="nav-link" href="#courselist" id="courselist-label" data-toggle="tab" data-target="#courselist-tab" type="button" role="tab" aria-controls="courselist-tab" aria-selected="false">CourseList</a>
+            <a class="nav-link" href="#thesislist" id="thesislist-label" data-toggle="tab" data-target="#thesislist-tab" type="button" role="tab" aria-controls="thesislist-tab" aria-selected="false">ThesisList</a>
+            <a class="nav-link" href="#thesistable" id="thesistable-label" data-toggle="tab" data-target="#thesistable-tab" type="button" role="tab" aria-controls="thesistable-tab" aria-selected="false">Thesis table/list</a>
+          </div>
+        </div>
+        <div class="gallery-widget-group" role="presentation">
+          <h3>Funding</h3>
+          <div class="gallery-widget-options" role="presentation">
+            <a class="nav-link" href="#grantlist" id="grantlist-label" data-toggle="tab" data-target="#grantlist-tab" type="button" role="tab" aria-controls="grantlist-tab" aria-selected="false">GrantList</a>
+            <a class="nav-link" href="#grant" id="grant-label" data-toggle="tab" data-target="#grant-tab" type="button" role="tab" aria-controls="grant-tab" aria-selected="false">Grant</a>
+          </div>
+        </div>
+        <div class="gallery-widget-group" role="presentation">
+          <h3>Homepage</h3>
+          <div class="gallery-widget-options" role="presentation">
+            <a class="nav-link" href="#homeeventlist" id="homeeventlist-label" data-toggle="tab" data-target="#homeeventlist-tab" type="button" role="tab" aria-controls="homeeventlist-tab" aria-selected="false">HomeEventList</a>
+            <a class="nav-link" href="#homegrantlist" id="homegrantlist-label" data-toggle="tab" data-target="#homegrantlist-tab" type="button" role="tab" aria-controls="homegrantlist-tab" aria-selected="false">HomeGrantList</a>
+            <a class="nav-link" href="#homevisitlist" id="homevisitlist-label" data-toggle="tab" data-target="#homevisitlist-tab" type="button" role="tab" aria-controls="homevisitlist-tab" aria-selected="false">HomeVisitList</a>
+          </div>
+        </div>
+      </div>
     </nav>
 
-    <main class="m-4 mt-2 pt-0 border">
+    <div id="gallery-widget-info-region" role="region" aria-label="Selected widget information"></div>
+
+    <main class="gallery-preview" aria-label="Widget preview">
       <article class="m-0 pt-0">
         <div class="tab-content m-0">
-          <div class="tab-pane fade show active p-3" id="general-tab"><div id="general">
-            <p>Selezionare un Widget in alto per vederne l'anteprima.</p>
-          </div></div>
-          <div class="tab-pane fade p-3" id="eventlist-tab"><div id="eventlist"></div></div>
-          <div class="tab-pane fade p-3" id="seminarlist-tab">
+          <div class="tab-pane fade show active p-3" id="eventlist-tab" role="tabpanel" aria-labelledby="eventlist-label"><div id="eventlist"></div></div>
+          <div class="tab-pane fade p-3" id="seminarlist-tab" role="tabpanel" aria-labelledby="seminarlist-label">
             <div id="seminarlist"></div>
         </div>
-          <div class="tab-pane fade p-3" id="seminar-tab"><div id="seminar"></div></div>
-          <div class="tab-pane fade p-3" id="conferencelist-tab"><div id="conferencelist"></div></div>
-          <div class="tab-pane fade p-3" id="conference-tab"><div id="conference"></div></div>
-          <div class="tab-pane fade p-3" id="homeeventlist-tab"><div id="homeeventlist"></div></div>
-          <div class="tab-pane fade p-3" id="homegrantlist-tab"><div id="homegrantlist"></div></div>
-          <div class="tab-pane fade p-3" id="homevisitlist-tab"><div id="homevisitlist"></div></div>
-          <div class="tab-pane fade p-3" id="visitlist-tab"><div id="visitlist"></div></div>
-          <div class="tab-pane fade p-3" id="stafflist-tab"><div id="stafflist"></div></div>
-          <div class="tab-pane fade p-3" id="persondetails-tab"><div id="persondetails"></div></div>
-          <div class="tab-pane fade p-3" id="personcard-tab"><div class="row" id="personcard"></div></div>
-          <div class="tab-pane fade p-3" id="groupcards-tab"><div id="groupcards"></div></div>
-          <div class="tab-pane fade p-3" id="courselist-tab"><div id="courselist"></div></div>
-          <div class="tab-pane fade p-3" id="grant-tab"><div id="grant"></div></div>
-          <div class="tab-pane fade p-3" id="grantlist-tab"><div id="grantlist"></div></div>
-          <div class="tab-pane fade p-3" id="thesislist-tab"><div id="thesislist"></div></div>
-          <div class="tab-pane fade p-3" id="thesistable-tab">
+          <div class="tab-pane fade p-3" id="seminar-tab" role="tabpanel" aria-labelledby="seminar-label"><div id="seminar"></div></div>
+          <div class="tab-pane fade p-3" id="conferencelist-tab" role="tabpanel" aria-labelledby="conferencelist-label"><div id="conferencelist"></div></div>
+          <div class="tab-pane fade p-3" id="conference-tab" role="tabpanel" aria-labelledby="conference-label"><div id="conference"></div></div>
+          <div class="tab-pane fade p-3" id="homeeventlist-tab" role="tabpanel" aria-labelledby="homeeventlist-label"><div id="homeeventlist"></div></div>
+          <div class="tab-pane fade p-3" id="homegrantlist-tab" role="tabpanel" aria-labelledby="homegrantlist-label"><div id="homegrantlist"></div></div>
+          <div class="tab-pane fade p-3" id="homevisitlist-tab" role="tabpanel" aria-labelledby="homevisitlist-label"><div id="homevisitlist"></div></div>
+          <div class="tab-pane fade p-3" id="visitlist-tab" role="tabpanel" aria-labelledby="visitlist-label"><div id="visitlist"></div></div>
+          <div class="tab-pane fade p-3" id="stafflist-tab" role="tabpanel" aria-labelledby="stafflist-label"><div id="stafflist"></div></div>
+          <div class="tab-pane fade p-3" id="persondetails-tab" role="tabpanel" aria-labelledby="persondetails-label"><div id="persondetails"></div></div>
+          <div class="tab-pane fade p-3" id="personcard-tab" role="tabpanel" aria-labelledby="personcard-label"><div class="row" id="personcard"></div></div>
+          <div class="tab-pane fade p-3" id="groupcards-tab" role="tabpanel" aria-labelledby="groupcards-label"><div id="groupcards"></div></div>
+          <div class="tab-pane fade p-3" id="courselist-tab" role="tabpanel" aria-labelledby="courselist-label"><div id="courselist"></div></div>
+          <div class="tab-pane fade p-3" id="grant-tab" role="tabpanel" aria-labelledby="grant-label"><div id="grant"></div></div>
+          <div class="tab-pane fade p-3" id="grantlist-tab" role="tabpanel" aria-labelledby="grantlist-label"><div id="grantlist"></div></div>
+          <div class="tab-pane fade p-3" id="thesislist-tab" role="tabpanel" aria-labelledby="thesislist-label"><div id="thesislist"></div></div>
+          <div class="tab-pane fade p-3" id="thesistable-tab" role="tabpanel" aria-labelledby="thesistable-label">
             <h5>Table</h5><div id="thesistable"></div>
             <h5>List</h5><div id="thesisplainlist"></div>
           </div>
@@ -169,129 +132,9 @@
 
     <script type="module">
         import { dmwidgets } from './index.js';
+        import { initializeGallery } from './gallery/index.js';
 
-        async function loader() {
-            dmwidgets.localDevelopment = true
-
-            //const seminar_id = (await (await fetch(dmwidgets.getManageURL('public/seminars'))).json()).data[0]._id
-            const seminar_id = "69f1ba20fd916392f8c014b5"
-            const grant_id = "69e46f9584f0900654e893af"
-
-            dmwidgets.loadComponent(document.getElementById("seminar"), "Seminar", {
-                id: seminar_id
-            })
-            // A missing conference must not prevent the other previews from loading.
-            const conferenceTarget = document.getElementById("conference")
-            fetch(dmwidgets.getManageURL('public/conferences', '_limit=1'))
-                .then(response => {
-                    if (!response.ok) throw new Error('Could not load conferences')
-                    return response.json()
-                })
-                .then(({ data }) => {
-                    if (!data?.length) {
-                        conferenceTarget.textContent = 'No conferences available in the local database.'
-                        return
-                    }
-                    dmwidgets.loadComponent(conferenceTarget, "Conference", { id: data[0]._id })
-                })
-                .catch(() => {
-                    conferenceTarget.textContent = 'Could not load conferences. Check that the backend is running on localhost:8000.'
-                })
-            dmwidgets.loadComponent(document.getElementById("eventlist"), "EventList", {
-                //from: '2022-01-01',
-                //_sort: 'startDateTime',
-                _limit: 2
-            })
-            dmwidgets.loadComponent(document.getElementById("seminarlist"), "SeminarList", { 
-                from: '2021-01-01', 
-                _sort: 'startDatetime',
-                _limit: 10
-                // category: '653b5d8d10c0279ad486c807'
-            })
-            dmwidgets.loadComponent(document.getElementById("conferencelist"), "ConferenceList", { 
-                from: '2021-01-01',
-                _limit: 50,
-                is_outreach: true
-                // category: '653b5d8d10c0279ad486c807'
-            })
-            dmwidgets.loadComponent(document.getElementById('homeeventlist'), "HomeEventList", {
-              default_entries: 3,
-              columns_lg: 4,
-              columns: 6,
-              columns_md: 6,
-              show_excerpt: false
-            })
-            dmwidgets.loadComponent(document.getElementById('homegrantlist'), "HomeGrantList", {
-              default_entries: 1,
-            })
-            dmwidgets.loadComponent(document.getElementById('homevisitlist'), "HomeVisitList", {
-              default_entries: 5,
-            })
-            dmwidgets.loadComponent(document.getElementById('visitlist'), "VisitList", {
-                fields: 'person.firstName,person.lastName,affiliations,roomAssignment.room.building,roomAssignment.room.floor,roomAssignment.room.number,startDate,endDate',
-                table: 'First Name,Last Name, Affiliation, Building, Floor, Office, From, To',
-                sort_field: 'person',
-                filter: 'past',
-            })
-            dmwidgets.loadComponent(document.getElementById('persondetails'), "PersonDetails", {
-                person_id: '63822bbf7942943d6350d692',
-            })
-            dmwidgets.loadComponent(document.getElementById('stafflist'), "StaffList", {
-                fields: 'person.firstName,person.lastName,qualification,SSD_name,roomAssignment.room.building,roomAssignment.room.floor,roomAssignment.room.number,person.email',
-                table: 'Nome,Cognome,Qualifica,Gruppo di ricerca,Edificio,Piano,Stanza,Email',
-                tableen: 'First Name,Last Name,Qualification,Research Group,Building,Floor,Office,Email',
-                sort_field: 'person',
-                filter: 'current',
-            })
-            dmwidgets.loadComponent(document.getElementById('personcard'), "PersonCard", {
-                person_id: '63822bbf7942943d6350d692',
-                badge: 'Example badge',
-            })
-            dmwidgets.loadComponent(document.getElementById('groupcards'), "GroupCards", {
-                group_id: '69e873bd1fe35a92793f027c',
-            })
-            dmwidgets.loadComponent(document.getElementById("courselist"), "CourseList", { 
-                from: '2024-01-01',
-                to: '2026-01-01',
-                phd: 'HPSC',
-                show_activation_filter: true
-            })
-            dmwidgets.loadComponent(document.getElementById("grant"), "Grant", {
-                grant_id: grant_id
-            })
-            dmwidgets.loadComponent(document.getElementById('grantlist'), "GrantList", {
-                sort_field: 'startDate',
-                filter: 'current',
-            })
-            dmwidgets.loadComponent(document.getElementById("thesislist"), "ThesisList", {
-                institution: '641b8b0b840928dc5b8da2e3',
-                exclude_qualification: 'Dottorando Esterno'
-            })
-            dmwidgets.loadComponent(document.getElementById('thesistable'), "ThesisList", {
-                fields: 'person.firstName,person.lastName,person.genealogyId,title,advisors,institutions,date',
-                table: 'Nome,Cognome,Genealogia,Titolo,Relatori,Istituzioni,Data',
-                tableen: 'First Name,Last Name,Genealogy,Title,Supervisors,Institutions,Date',
-                sort_field: 'person',
-            })
-            dmwidgets.loadComponent(document.getElementById('thesisplainlist'), "ThesisList", {
-                list_mode: true,
-                sort_field: 'person',
-            })
-        }
-        loader();
-    </script>
-
-    <script>
-        $(function() {
-          $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-              localStorage.setItem('lastTab', $(this).attr('href'));
-          });
-          var lastTab = localStorage.getItem('lastTab');
-          
-          if (lastTab) {
-              $('[href="' + lastTab + '"]').tab('show');
-          }            
-        });
+        initializeGallery(dmwidgets);
     </script>
   </body>
 </html>

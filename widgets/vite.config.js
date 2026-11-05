@@ -79,10 +79,11 @@ function inlineCssAndCopyStatic() {
       fs.copyFileSync(path.resolve(__dirname, 'static/NoImage.png'), path.join(distDir, 'static/NoImage.png'))
 
       const galleryHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8')
-        .replace('<script type="module">', '<script src="./dmwidgets.js"></script>\n    <script>')
-        .replace("import { dmwidgets } from './index.js';\n", '')
+        .replace('<script type="module">', '<script src="./dmwidgets.js"></script>\n    <script type="module">')
+        .replace("import { dmwidgets } from './index.js';", 'const dmwidgets = window.dmwidgets;')
 
       fs.writeFileSync(path.join(distDir, 'index.html'), galleryHtml)
+      fs.cpSync(path.join(rootDir, 'gallery'), path.join(distDir, 'gallery'), { recursive: true })
       await minifyScriptFile(jsPath)
     },
   }
