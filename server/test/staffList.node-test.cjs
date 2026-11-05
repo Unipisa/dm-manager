@@ -24,6 +24,7 @@ let fetchData
 let requestedUrl
 let queryCalls = 0
 let queryKey
+let mountedWidget
 let interactive = false
 let interactiveSort
 const widgetReact = { ...React, useState(initial) {
@@ -39,11 +40,15 @@ function loadWidget(file) {
     const module = { exports: {} }
     const code = transformSync(fs.readFileSync(file, 'utf8'), { loader: 'jsx', format: 'cjs' }).code
     vm.runInNewContext(code, {
-        module, exports: module.exports, document, URLSearchParams, dmwidgets: { localDevelopment: true },
+        module, exports: module.exports, document, window: {}, URLSearchParams, dmwidgets: { localDevelopment: true },
         require(name) {
             if (name.endsWith('.css')) return {}
             if (name === 'react') return widgetReact
-            if (name === 'react-query') return { useQuery(key, fn) { queryCalls++; queryKey = key; fetchData = fn; return queryResult } }
+            if (name === 'react-query') return {
+                useQuery(key, fn) { queryCalls++; queryKey = key; fetchData = fn; return queryResult },
+                QueryClient: class {}, QueryClientProvider: ({ children }) => children,
+            }
+            if (name === 'react-dom/client') return { createRoot: () => ({ render(element) { mountedWidget = element.props.children } }) }
             if (name === 'axios') return { get: async url => { requestedUrl = url; return { data: { data: [] } } } }
             if (name.startsWith('.')) return loadWidget(path.resolve(path.dirname(file), name + '.js'))
             return widgetRequire(name)
@@ -138,6 +143,28 @@ test('separate filters support multiple qualifications, explicit false and limit
     for (const value of [false, 0, '0', 'false']) assert.equal(params({ is_internal: value }).isInternal, 'false')
     assert.equal(params({ is_internal: undefined }).isInternal, undefined)
     assert.deepEqual(params({ columns: 'email', headers: 'Contact' }), params({ columns: 'name' }))
+})
+
+test('the common loader removes shortcode routing metadata for every widget', async () => {
+    const entryPath = path.resolve(__dirname, '../../widgets/src/index.js')
+    const { dmwidgets } = loadWidget(entryPath)
+    const widgetNames = Array.from(fs.readFileSync(entryPath, 'utf8').matchAll(/case '([^']+)':/g), match => match[1])
+    for (const name of widgetNames) {
+        const props = { widget: name, en: true }
+        dmwidgets.loadComponent({}, name, props)
+        assert.equal(mountedWidget.props.widget, undefined, name)
+        assert.equal(mountedWidget.props.en, true, name)
+        assert.equal(props.widget, name, 'the shortcode attributes are not mutated')
+    }
+    queryResult = { data: [staff] }
+    const props = { status: 'current', qualification: 'Dottorando in Matematica', is_internal: '1' }
+    dmwidgets.loadComponent({}, 'StaffList', { widget: 'StaffList', ...props })
+    assert.equal(renderToStaticMarkup(mountedWidget), render(props))
+    await fetchData()
+    assert.ok(!requestedUrl.includes('widget='))
+    assert.ok(requestedUrl.includes('isInternal=true'))
+    dmwidgets.loadComponent({}, 'StaffList', { widget: 'StaffList', qualificaton: 'PO' })
+    assert.ok(renderToStaticMarkup(mountedWidget).includes('Unknown StaffList option'))
 })
 
 test('invalid and removed filter options fail clearly before querying', () => {

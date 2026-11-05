@@ -33,7 +33,8 @@ dmwidgets.getManageURL = (path, query) => {
     return getManageURL(path, query)
 }
 
-dmwidgets.loadComponent = (target, name, props = {}) => {
+// `widget` routes the generic shortcode; components receive only their own options.
+dmwidgets.loadComponent = (target, name, { widget: _widget, ...props } = {}) => {
 
     var element = null
 
