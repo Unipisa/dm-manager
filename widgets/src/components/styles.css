@@ -87,6 +87,222 @@
     .dm-people-cards .dm-person-card:hover { background-color: #f5f8fb; }
 }
 
+.dm-grant-list {
+    display: grid;
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dm-grant-list .dm-grant-panel {
+    min-width: 0;
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid #dbe4ec;
+    border-left: 3px solid #003c71;
+    border-radius: 0;
+    background-color: #fff;
+    overflow-wrap: anywhere;
+}
+
+.dm-grant-list .dm-grant-title {
+    margin: 0 0 0.75rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.dm-grant-list a {
+    color: #003c71;
+    text-decoration: none;
+}
+
+.dm-grant-list a:hover,
+.dm-grant-list a:focus-visible {
+    text-decoration: underline;
+}
+
+.dm-grant-list .dm-grant-type {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0.15rem 0.5rem;
+    background-color: #003c71;
+    color: #fff;
+    font-size: 0.75rem;
+    line-height: 1.4;
+}
+
+.dm-grant-list .dm-grant-period,
+.dm-grant-list .dm-grant-person {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    margin: 0.35rem 0 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.dm-grant-list .dm-grant-period > i,
+.dm-grant-list .dm-grant-person > i {
+    flex-shrink: 0;
+    color: #003c71;
+}
+
+.dm-grant-list .dm-grant-label,
+.dm-grant-list .dm-grant-affiliations {
+    color: #53616d;
+}
+
+.dm-grant-list .dm-grant-period em {
+    font-style: normal;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .dm-grant-list .dm-grant-panel:hover {
+        background-color: #f5f8fb;
+    }
+}
+
+.dm-grant-detail {
+    display: grid;
+    gap: 1.5rem;
+    overflow-wrap: anywhere;
+}
+
+.dm-grant-detail .dm-grant-header {
+    border-top: 4px solid #003c71;
+    padding-top: 1.25rem;
+}
+
+.dm-grant-detail .dm-grant-detail-type {
+    display: inline-block;
+    margin-bottom: 0.65rem;
+    padding: 0.2rem 0.65rem;
+    background-color: #003c71;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.dm-grant-detail .dm-grant-detail-title {
+    margin: 0;
+    color: #003c71;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.3;
+}
+
+.dm-grant-detail .dm-grant-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 2rem;
+    margin: 0;
+    padding: 1.25rem;
+    border: 1px solid #dbe4ec;
+    border-left: 3px solid #003c71;
+}
+
+.dm-grant-detail .dm-grant-fact dt,
+.dm-grant-detail .dm-grant-contact-role {
+    margin: 0 0 0.4rem;
+    color: #53616d;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.dm-grant-detail .dm-grant-fact dt i,
+.dm-grant-detail .dm-grant-contact-role i {
+    color: #003c71;
+}
+
+.dm-grant-detail .dm-grant-fact dd {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.dm-grant-detail a {
+    color: #003c71;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.dm-grant-detail a:hover,
+.dm-grant-detail a:focus-visible {
+    text-decoration-thickness: 2px;
+}
+
+.dm-grant-detail .dm-grant-contacts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 1rem;
+}
+
+.dm-grant-detail .dm-grant-contact {
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid #dbe4ec;
+}
+
+.dm-grant-detail .dm-grant-contact-name {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.dm-grant-detail .dm-grant-contact-name a {
+    text-decoration: none;
+}
+
+.dm-grant-detail .dm-grant-contact-name a:hover,
+.dm-grant-detail .dm-grant-contact-name a:focus-visible {
+    text-decoration: underline;
+}
+
+.dm-grant-detail .dm-grant-contact-affiliations {
+    margin: 0.4rem 0 0;
+    color: #53616d;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.dm-grant-detail .dm-grant-detail-sections {
+    display: grid;
+    gap: 1rem;
+}
+
+.dm-grant-detail .dm-grant-detail-sections:empty {
+    display: none;
+}
+
+.dm-grant-detail .dm-grant-participants {
+    columns: 2 220px;
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.dm-grant-detail .dm-grant-participants li {
+    break-inside: avoid;
+    margin-bottom: 0.35rem;
+}
+
+.dm-grant-detail .dm-grant-description > :first-child {
+    margin-top: 0;
+}
+
+.dm-grant-detail .dm-grant-description > :last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 575px) {
+    .dm-grant-detail .dm-grant-facts {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .dm-event-list {
     display: grid;
     gap: 1rem;

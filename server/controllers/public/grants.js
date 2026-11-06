@@ -120,6 +120,13 @@ async function grantsQuery(req, res) {
                 ...(shortcode ? [{ $project: { _id: 0, isInternal: 1 } }] : []),
             ]
         }},
+        ...(shortcode ? ['pi', 'localCoordinator'].map(field => ({ $lookup: {
+            from: 'institutions',
+            localField: `${field}.affiliations`,
+            foreignField: '_id',
+            as: `${field}.affiliations`,
+            pipeline: [{ $project: { _id: 1, name: 1 } }],
+        } })) : []),
         ...sort_and_limit,
         { $project: {
             _id: 1, 
@@ -131,7 +138,7 @@ async function grantsQuery(req, res) {
                 hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
-                ...(shortcode ? { staffs: '$pi.staff' } : {}),
+                ...(shortcode ? { staffs: '$pi.staff', affiliations: { _id: 1, name: 1 } } : {}),
                 staff: {
                     qualification: 1,
                     isInternal: 1
@@ -142,7 +149,7 @@ async function grantsQuery(req, res) {
                 hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
-                ...(shortcode ? { staffs: '$localCoordinator.staff' } : {}),
+                ...(shortcode ? { staffs: '$localCoordinator.staff', affiliations: { _id: 1, name: 1 } } : {}),
                 staff: {
                     qualification: 1,
                     isInternal: 1

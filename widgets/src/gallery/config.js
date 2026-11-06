@@ -15,21 +15,6 @@ const sortAndLimit = [
     ['_sort', 'API · Field name; prefix with - for descending order.'],
     ['_limit', 'API · Positive integer, maximum number of records per request.'],
 ];
-const tableOptions = [
-    ['fields', 'Comma-separated fields to display, including dotted paths such as person.lastName.'],
-    ['table / tableen', 'Comma-separated column headings in Italian / English.'],
-    ['date_format', 'PHP-style date format, e.g. d.m.Y. People and grant lists use a fixed English date format.'],
-    ['no_data_message / no_data_message_en', 'Empty-result message in Italian / English.'],
-];
-const filterSyntax = [
-    ['filter', 'Comma-separated terms: current, past, perspective, year=YYYY, dateyear=YYYY, or key=value. Terms are combined; later terms overwrite earlier values for the same key.'],
-    ['current / past / perspective', 'Inside filter: current includes today (open date boundaries allowed); past means endDate < today; perspective means startDate > today. For records with startDate/endDate.'],
-    ['year=YYYY / dateyear=YYYY', 'Inside filter: year selects periods overlapping the year; dateyear selects a date within the year. Use year for staff, visits and grants; dateyear for theses.'],
-    ['_search / _limit / _direction', 'Inside filter: _search=text, _limit=N, _direction=1 or -1. Search fields depend on the public route.'],
-    ['date modifiers', 'Date fields accept __lt, __gt, __lte, __gte, __lt_or_null, __gt_or_null, __lte_or_null, __gte_or_null. Values: ISO date or today.'],
-    ['text modifiers', 'Text fields accept __regex (case insensitive), __in (values separated by |), __ne. Boolean fields accept 1, yes, true as true; other values are false.'],
-    ['relation modifiers', 'Relation fields accept a single ID or __ne=ID, including fields holding lists of relations.'],
-];
 // Each entry documents the props accepted by its component, including fixed query
 // behavior where the public route supports filters the widget does not expose.
 export const widgets = [
@@ -162,19 +147,30 @@ export const widgets = [
         notes: 'Always displayed as a table, sorted by surname then first name. Click a heading to sort ascending, then descending. All public data are fetched independently of columns. Profile links use the shared staff eligibility rule. Institutions are displayed in their own column, including joint theses.',
     },
     {
-        id: 'grantlist', component: 'GrantList', props: { sort_field: 'startDate', filter: 'current' },
+        id: 'grantlist', component: 'GrantList', props: { status: 'current' },
         routes: ['public/grants?_format=shortcode'],
         filters: [
-            ['filter fields', 'Inside filter: name, identifier, CUP, projectType, funds, fundingEntity, pi, localCoordinator, members, startDate, endDate, SSD, webSite, budgetAmount, description.'],
-            ['sort_field', 'startDate (default), endDate, name, identifier, CUP, projectType, funds, fundingEntity, pi, localCoordinator, webSite, budgetAmount, description; prefix with - for descending. Sent as _sort.'],
-            ...filterSyntax,
+            ['status', 'all (default), current, past or future; includes open start/end boundaries for current grants.'],
+            ['active_on', 'Grants active on a YYYY-MM-DD date or "today".'],
+            ['year', 'Grants overlapping a four-digit year.'],
+            ['from / to', 'Inclusive overlapping date range (YYYY-MM-DD or "today"). Either boundary may be omitted.'],
+            ['start_from / start_to', 'Inclusive boundaries for the grant start date. May be combined with a period selector.'],
+            ['ssd', 'Exact research area code; matches any SSD on a grant.'],
+            ['limit', 'Maximum number of results. Omit to include all matching grants.'],
         ],
-        options: tableOptions.filter(([key]) => !['fields', 'table / tableen'].includes(key)),
-        notes: 'Search covers name, pi.lastName and localCoordinator.lastName.',
+        options: [
+            ['sort_by', 'start_date (default), end_date or name.'],
+            ['order', 'asc (default) or desc. Applied before limit.'],
+            ['date_style', 'Localized dates: short (default), medium, long or full. Missing dates are omitted.'],
+            ['en', 'Force English labels and dates (boolean). Otherwise follows the page language.'],
+        ],
+        notes: 'Choose one period selector: status (other than all), active_on, year, or from/to. Named filters may be combined. Uses the shared profile eligibility rule and a fixed localized empty message. Legacy filter strings, text/relation modifiers, sort_field, date_format and custom empty messages are not accepted.',
     },
     {
         id: 'grant', component: 'Grant', props: { grant_id: sampleIds.grant },
         routes: ['public/grant/:id'], filters: [['grant_id', 'Required grant ID, inserted into the route. No query filters.']],
+        options: [['en', 'Force English labels and dates (boolean). Otherwise follows the page language.']],
+        notes: 'Internal staff and former faculty (ex Docente) have a department profile link without affiliations. External contacts show their affiliations when available.',
     },
     {
         id: 'homeeventlist', component: 'HomeEventList', props: { default_entries: 3, show_excerpt: false },
