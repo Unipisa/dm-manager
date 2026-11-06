@@ -303,6 +303,117 @@
     }
 }
 
+.dm-course-list .dm-course-intro {
+    margin: 0 0 1rem;
+    line-height: 1.6;
+}
+
+.dm-course-list .dm-course-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.dm-course-list .dm-course-filter .btn {
+    border: 1px solid #003c71;
+    border-radius: 0;
+    background-color: #fff;
+    color: #003c71;
+}
+
+.dm-course-list .dm-course-filter .btn[aria-pressed="true"],
+.dm-course-list .dm-course-filter .btn:hover {
+    background-color: #003c71;
+    color: #fff;
+}
+
+.dm-course-list .dm-course-group {
+    display: grid;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dm-course-list .dm-course-group:last-child {
+    margin-bottom: 0;
+}
+
+.dm-course-list .dm-course-term-heading {
+    margin: 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dbe4ec;
+    color: #003c71;
+    font-size: 1.15rem;
+    line-height: 1.5;
+}
+
+.dm-course-list .dm-course-content {
+    display: grid;
+    gap: 1.25rem;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    overflow-wrap: anywhere;
+}
+
+.dm-course-list .dm-course-section-title {
+    margin: 0 0 0.65rem;
+    color: #003c71;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.dm-course-list .dm-course-lecturers .dm-person-card {
+    padding: 1rem;
+}
+
+.dm-course-list .dm-course-period {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.dm-course-list .dm-course-period > i,
+.dm-course-list .dm-course-lessons i {
+    color: #003c71;
+}
+
+.dm-course-list .dm-course-lessons {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dm-course-list .dm-course-lessons li {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #dbe4ec;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.dm-course-list .dm-course-lesson-date {
+    font-weight: 600;
+}
+
+.dm-course-list .dm-course-description :is(p, li, blockquote) {
+    font-size: inherit;
+    line-height: 1.6;
+}
+
+.dm-course-list .dm-course-description > :last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+    .dm-course-list .dm-course-lessons li {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.35rem;
+    }
+}
+
 .dm-event-list {
     display: grid;
     gap: 1rem;

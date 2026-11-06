@@ -1,4 +1,3 @@
-import { getPersonProfileURL } from '../person-profile';
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
 import Markdown from 'react-markdown'
@@ -8,7 +7,9 @@ import remarkGfm from 'remark-gfm'
 import axios from 'axios'
 import Accordion from './Accordion';
 import { Loading } from './Loading'
-import { formatAffiliations, formatDate, formatTime, getManageURL, getDMURL, isEnglish } from '../utils'
+import { formatDate, formatTime, getManageURL, getDMURL, isEnglish } from '../utils'
+import { PersonCardContent } from './PersonCard';
+import './styles.css';
 
 export function CourseList({ from, to, phd, show_activation_filter = false }) {
     const [confirmedOnly, setConfirmedOnly] = useState(false);
@@ -66,44 +67,15 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
             const lecturerCards = course.lecturers.map(lecturer => {
                 const showAffiliations = lecturer.affiliations && lecturer.affiliations.length > 0 && 
                     !lecturer.affiliations.some(affiliation => affiliation._id === '641b8b0b840928dc5b8da2e3');
-                const formattedAffiliations = showAffiliations ? formatAffiliations(lecturer.affiliations) : '';
-                const profile = getPersonProfileURL(lecturer);
-                
-                return (
-                    <div className="col-lg-6 col-12 py-2" key={lecturer._id}>
-                        <div className="card h-100 m-2 shadow-sm">
-                            <div className="card-body">
-                                {profile ? (
-                                    <a href={profile}>
-                                        <i className="fas fa-id-card fa-fw"></i>
-                                    </a>
-                                ) : lecturer.personalPage ? (
-                                    <a href={lecturer.personalPage} target="_blank" rel="noopener noreferrer">
-                                        <i className="fas fa-id-card fa-fw"></i>
-                                    </a>
-                                ) : (
-                                    <i className="fas fa-id-card fa-fw"></i>
-                                )}
-                                <span className="card-title ml-2 h5">
-                                    {lecturer.firstName} {lecturer.lastName} {formattedAffiliations}
-                                </span>
-                                <br />
-                                {lecturer.email && (
-                                    <>
-                                        <i className="fas fa-at mr-3"></i>
-                                        <a href={`mailto:${lecturer.email}`}>{lecturer.email}</a>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                );
+                return <PersonCardContent key={lecturer._id} person={{
+                    ...lecturer, affiliations: showAffiliations ? lecturer.affiliations : [],
+                }} />;
             });
 
             const lessons = course.lessons && course.lessons.filter(lesson => Object.keys(lesson).length > 0).length > 0 ? (
                 <div>
-                    <h5 className="wp-block-heading"><strong>Scheduled lessons:</strong></h5>
-                    <ul>
+                    <h5 className="dm-course-section-title">Scheduled lessons:</h5>
+                    <ul className="dm-course-lessons">
                         {[...course.lessons].sort((a, b) => new Date(a.date) - new Date(b.date)).map((lesson, index) => {
                             let room = lesson.conferenceRoom || null;
                             if (lesson.conferenceRoom && lesson.conferenceRoomID) {
@@ -115,7 +87,9 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
                             
                             return (
                                 <li key={index}>
-                                    {formatDate(lesson.date, 'en-US')}, {formatTime(lesson.date)} ({lesson.duration} minutes), {room}
+                                    <span className="dm-course-lesson-date"><i className="far fa-calendar-alt fa-fw" aria-hidden="true"></i>{' '}{formatDate(lesson.date, 'en-US')}</span>
+                                    <span><i className="far fa-clock fa-fw" aria-hidden="true"></i>{' '}{formatTime(lesson.date)} ({lesson.duration} minutes)</span>
+                                    {room && <span><i className="fas fa-door-open fa-fw" aria-hidden="true"></i>{' '}{room}</span>}
                                 </li>
                             );
                         })}
@@ -125,30 +99,36 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
 
             return (
                 <Accordion title={course.title} badge={course.courseType} key={course._id}>
-                    <h5 className="wp-block-heading"><strong>{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</strong></h5>
-                    {lecturerCards}
-                    {course.startDate && course.endDate && 
-                    new Date(course.startDate).getTime() !== new Date(course.endDate).getTime() && (
-                    <>
-                        <h5 className="wp-block-heading"><strong>Period:</strong></h5>
-                        <p>From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
-                    </>
-                    )}
-                    {lessons}
-                    <h5 className="wp-block-heading"><strong>Description:</strong></h5>
-                    <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
+                    <div className="dm-course-content">
+                        <section>
+                            <h5 className="dm-course-section-title">{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</h5>
+                            <div className="dm-people-cards dm-course-lecturers">{lecturerCards}</div>
+                        </section>
+                        {course.startDate && course.endDate &&
+                        new Date(course.startDate).getTime() !== new Date(course.endDate).getTime() && (
+                        <section>
+                            <h5 className="dm-course-section-title">Period:</h5>
+                            <p className="dm-course-period"><i className="far fa-calendar-alt fa-fw" aria-hidden="true"></i>{' '}From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
+                        </section>
+                        )}
+                        {lessons}
+                        <section className="dm-course-description">
+                            <h5 className="dm-course-section-title">Description:</h5>
+                            <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
+                        </section>
+                    </div>
                 </Accordion>
             );
         });
     };
 
     return (
-        <>
-            <p>{show_activation_filter
+        <div className="dm-course-list">
+            <p className="dm-course-intro">{show_activation_filter
                 ? `The catalogue of Ph.D. courses for the academic year ${fromYear}-${toYear} is below:`
                 : `The list of Ph.D. courses that will be taught during the academic year ${fromYear}-${toYear} is below:`}</p>
             {show_activation_filter && (
-                <div className="btn-group mb-3" role="group" aria-label="Course activation filter">
+                <div className="dm-course-filter" role="group" aria-label="Course activation filter">
                     <button type="button" className={`btn ${!confirmedOnly ? 'btn-primary' : 'btn-outline-primary'}`}
                         aria-pressed={!confirmedOnly} onClick={() => setConfirmedOnly(false)}>
                         All courses
@@ -163,29 +143,26 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
                 noDateCourses.length + fallCourses.length + springCourses.length === 0 && (
                     <p role="status">No active courses are available for this academic year.</p>
                 )}
-            <div style={{ height: '5px' }} aria-hidden="true" className="wp-block-spacer"></div>
             
             {noDateCourses.length > 0 && (
-            <>
+            <div className="dm-course-group">
                 {renderCourses(noDateCourses)}
-                <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
-            </>
+            </div>
             )}
             
             {fallCourses.length > 0 && (
-            <>
-                <h4 className="wp-block-heading">Fall/Winter Term (starting before January 1st, {toYear})</h4>
+            <section className="dm-course-group">
+                <h4 className="dm-course-term-heading">Fall/Winter Term (starting before January 1st, {toYear})</h4>
                 {renderCourses(fallCourses)}
-                <div style={{ height: '20px' }} aria-hidden="true" className="wp-block-spacer"></div>
-            </>
+            </section>
             )}
             
             {springCourses.length > 0 && (
-            <>
-                <h4 className="wp-block-heading">Winter/Spring Term (starting after January 1st, {toYear})</h4>
+            <section className="dm-course-group">
+                <h4 className="dm-course-term-heading">Winter/Spring Term (starting after January 1st, {toYear})</h4>
                 {renderCourses(springCourses)}
-            </>
+            </section>
             )}
-        </>
+        </div>
         );
 }
