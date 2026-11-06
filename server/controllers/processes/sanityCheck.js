@@ -80,7 +80,7 @@ router.get('/', async (req, res) => {
                     { SSD: "" } // handle legacy data if migration hasn't run yet
                 ],
                 startDate: { $lt: new Date() },
-                qualification: { $ne: 'PTA' },
+                qualification: { $nin: ['PTA', 'Dottorando in HPSC'] },
                 matricola: { $ne: 'a060136'} // handle Jonathan Lindsay Kay (Inglese scientifico)
             }
         }
