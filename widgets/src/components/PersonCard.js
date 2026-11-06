@@ -1,8 +1,9 @@
+import { getPersonProfileURL } from '../person-profile';
 import React from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { Loading } from './Loading';
-import { getManageURL, isEnglish } from '../utils';
+import { getManageURL } from '../utils';
 import './styles.css';
 
 export function PersonCard({ person_id, badge }) {
@@ -30,18 +31,17 @@ export function PersonCard({ person_id, badge }) {
 }
 
 export function PersonCardContent({ person: data, badge }) {
-    const internal = data.staffs?.[0]?.isInternal;
-    const prefix = isEnglish() ? 'en/' : '';
+    const profile = getPersonProfileURL(data);
     const name = [data.firstName, data.lastName].filter(Boolean).join(' ');
     const affiliations = (data.affiliations || []).map(affiliation => affiliation.name).filter(Boolean).join(', ');
-    const href = internal ? `/${prefix}scheda-personale/?person_id=${data._id}` : data.personalPage;
+    const href = profile || data.personalPage;
 
     return (
         <article className="dm-person-card">
             <div className="dm-person-card-heading">
                 <i className="fas fa-id-card fa-fw" aria-hidden="true"></i>
                 <h3 className="dm-person-card-name">
-                    {href ? <a href={href} target={internal ? undefined : '_blank'} rel={internal ? undefined : 'noopener noreferrer'}>{name}</a> : name}
+                    {href ? <a href={href} target={profile ? undefined : '_blank'} rel={profile ? undefined : 'noopener noreferrer'}>{name}</a> : name}
                     {badge && <> <span className="dm-person-card-role">{badge}</span></>}
                 </h3>
             </div>

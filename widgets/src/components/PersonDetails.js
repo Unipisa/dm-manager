@@ -32,13 +32,12 @@ export function PersonDetails({ person_id }) {
     }
 
     const en = isEnglish();
-    
+    const about = en ? data.about_en : data.about_it;
+
     return (
-        <div>
+        <div className="dm-person-details">
             <PersonBlock data={data} en={en}/>
-            {(data.about_en || data.about_it) && (
-                <p className="mb-4">{en ? ` ${data.about_en}` : ` ${data.about_it}`}</p>
-            )}
+            {about && <p className="dm-person-biography">{about}</p>}
             <div className="dm-person-details-accordions">
                 <Duties data={data} en={en}/>
                 <UnimapData data={data} en={en}/>
@@ -47,78 +46,60 @@ export function PersonDetails({ person_id }) {
     );
 }
 
-function PersonBlock({data, en}) {
-    const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2024/07/No-Image-Placeholder.png";
-    const feminine = data.gender === 'Donna';
-    const qualification = (data.staffs || []).map(q => getRoleLabel(q.qualification, en, feminine)).join(', ');
-    // SSD is now an array, so we need to flatten it
-    const researchGroup = [...new Set(data.staffs.flatMap(q => q.SSD || []).filter(ssd => ssd).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ');
-    const roomDetails = (data.roomAssignments || []).map(r => getRoomDetails(r.roomDetails, r.room, en));
+function DetailRow({ icon, children }) {
+    return <div className="dm-person-detail-row">
+        <i className={`${icon} fa-fw`} aria-hidden="true"></i>
+        <div>{children}</div>
+    </div>;
+}
 
-    return (
-        <div className="entry-content box clearfix mb-0">
-            <div className="d-flex flex-wrap align-middle">
-                <div className="mr-4 mb-4">
-                    <img width="280" height="280" src={photoUrl} className="rounded img-fluid" alt="" decoding="async" />
-                </div>
-                <div className="ml-4">
-                    <div className="h2 mb-2">{data.firstName} {data.lastName}</div>
-                    {qualification && <div className="h5 mb-2">{qualification}</div>}
-                    {researchGroup && (
-                        <p className="my-1">
-                            <i className="fas fa-users mr-2"></i>
-                            {en ? `${researchGroup} Research Group` : `Gruppo di Ricerca in ${researchGroup}`}
-                        </p>
-                    )}
-                    {roomDetails && roomDetails.length > 0 && (
-                        <div className="d-flex justify-left">
-                            <div><i className="fas fa-door-open mr-2" aria-hidden="true"></i></div>
-                            <div>
-                                {roomDetails.map((details, index) => (
-                                    <div key={index}>
-                                        <span>{details.buildingName}, {details.floorName}, </span>
-                                        <a href={details.roomLink.url}>{details.roomLink.text}, </a>
-                                        <br />
-                                        <span>{details.roadName}</span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                    {data.email && (
-                        <p className="my-1">
-                            <i className="fas fa-at mr-2"></i>
-                            <a href={`mailto:${data.email}`}>{data.email}</a>
-                        </p>
-                    )}
-                    {data.phone && (
-                        <p className="my-1">
-                            <i className="fas fa-phone mr-2"></i>
-                            <a href={`tel:${data.phone}`}>{data.phone}</a>
-                        </p>
-                    )}
-                    {data.personalPage && (
-                        <p className="my-1">
-                            <i className="fas fa-link mr-2"></i>
-                            <a href={data.personalPage}>{en ? "Personal web page" : "Pagina web personale"}</a>
-                            {!data.cv && <>
-                                <br />
-                                <span className="small text-muted">
-                                    {en ? "(The CV is available on this webpage)" : "(Il CV è disponibile a questa pagina web)"}
-                                </span>
-                            </>}
-                        </p>
-                    )}
-                    {data.cv && (
-                        <p className="my-1">
-                            <i className="fas fa-file-pdf mr-2" aria-hidden="true"></i>
-                            <a href={data.cv} target="_blank" rel="noopener noreferrer">Curriculum vitae (PDF)</a>
-                        </p>
-                    )}
-                </div>
+function PersonBlock({ data, en }) {
+    const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2024/07/No-Image-Placeholder.png";
+    const name = [data.firstName, data.lastName].filter(Boolean).join(' ');
+    const feminine = data.gender === 'Donna';
+    const staffs = data.staffs || [];
+    const qualification = staffs.map(staff => getRoleLabel(staff.qualification, en, feminine)).join(', ');
+    const researchGroup = [...new Set(staffs.flatMap(staff => staff.SSD || []).filter(Boolean).map(ssd => getResearchGroupLabel(ssd, en)))].join(', ');
+    const rooms = (data.roomAssignments || []).filter(assignment => assignment.roomDetails)
+        .map(assignment => getRoomDetails(assignment.roomDetails, assignment.room, en));
+
+    return <div className="dm-person-profile">
+        <div className="dm-person-profile-portrait">
+            <img src={photoUrl} className="dm-person-profile-photo" alt={name} decoding="async" />
+        </div>
+        <div className="dm-person-profile-info">
+            <h2 className="dm-person-profile-name">{name}</h2>
+            {qualification && <p className="dm-person-profile-qualification">{qualification}</p>}
+            <div className="dm-person-profile-details">
+                {researchGroup && <DetailRow icon="fas fa-users">
+                    {en ? `${researchGroup} Research Group` : `Gruppo di Ricerca in ${researchGroup}`}
+                </DetailRow>}
+                {rooms.length > 0 && <DetailRow icon="fas fa-door-open">
+                    <div className="dm-person-rooms">
+                        {rooms.map((room, index) => <div key={index}>
+                            <div>{[room.buildingName, room.floorName].filter(Boolean).join(', ')}, <a href={room.roomLink.url}>{room.roomLink.text}</a></div>
+                            <div className="dm-person-address">{room.roadName}</div>
+                        </div>)}
+                    </div>
+                </DetailRow>}
+                {data.email && <DetailRow icon="fas fa-at">
+                    <a href={`mailto:${data.email}`}>{data.email}</a>
+                </DetailRow>}
+                {data.phone && <DetailRow icon="fas fa-phone">
+                    <a href={`tel:${data.phone}`}>{data.phone}</a>
+                </DetailRow>}
+                {data.personalPage && <DetailRow icon="fas fa-link">
+                    <a href={data.personalPage}>{en ? 'Personal web page' : 'Pagina web personale'}</a>
+                    {!data.cv && <span className="dm-person-detail-note">
+                        {en ? '(The CV is available on this webpage)' : '(Il CV è disponibile a questa pagina web)'}
+                    </span>}
+                </DetailRow>}
+                {data.cv && <DetailRow icon="fas fa-file-pdf">
+                    <a href={data.cv} target="_blank" rel="noopener noreferrer">Curriculum vitae (PDF)</a>
+                </DetailRow>}
             </div>
         </div>
-    );
+    </div>;
 }
 
 function Duties({data, en}) {

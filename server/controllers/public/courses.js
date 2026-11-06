@@ -1,3 +1,4 @@
+const { personProfilePipeline } = require('./person-profile')
 const { duration } = require('moment');
 const EventPhdCourse = require('../../models/EventPhdCourse')
 
@@ -59,12 +60,14 @@ async function coursesQuery(req) {
     const pipeline = [
         { $match: match },
         lookupPipeline('people', 'lecturers', '_id', 'lecturers', [
+            ...personProfilePipeline(),
             lookupPipeline('institutions', 'affiliations', '_id', 'affiliations'),
             lookupPipeline('staffs', '_id', 'person', 'staffs', [
                 { $match: { $expr: { $and: matchActive } } }
             ]),
             projectFields({
                 _id: 1,
+                hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
                 email: 1,

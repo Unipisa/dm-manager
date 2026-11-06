@@ -1,3 +1,4 @@
+const { personProfilePipeline } = require('./person-profile')
 const Controller = require('../Controller')
 const Staff = require('../../models/Staff')
 const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
@@ -12,8 +13,8 @@ controller.searchFields = ['qualification', 'person.lastName', 'person.firstName
 controller.queryPipeline = [
     { $lookup: {
         from: 'people', localField: 'person', foreignField: '_id', as: 'person',
-        pipeline: [{ $project: {
-            firstName: 1, lastName: 1, email: 1, phone: 1, affiliations: 1,
+        pipeline: [...personProfilePipeline(), { $project: {
+            firstName: 1, lastName: 1, email: 1, phone: 1, affiliations: 1, hasPersonProfile: 1,
         } }],
     } },
     { $unwind: { path: '$person', preserveNullAndEmptyArrays: true } },

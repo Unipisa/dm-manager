@@ -1,3 +1,4 @@
+const { personProfilePipeline } = require('./person-profile')
 const Grant = require('../../models/Grant')
 const ObjectId = require('mongoose').Types.ObjectId
 
@@ -12,6 +13,7 @@ async function grantQuery(req) {
             localField: 'pi',
             foreignField: '_id',
             as: 'pi',
+            pipeline: personProfilePipeline(),
         }},
         { $unwind: {
             path: '$pi',
@@ -56,6 +58,7 @@ async function grantQuery(req) {
             localField: 'localCoordinator',
             foreignField: '_id',
             as: 'localCoordinator',
+            pipeline: personProfilePipeline(),
         }},
         { $unwind: {
             path: '$localCoordinator',
@@ -113,6 +116,7 @@ async function grantQuery(req) {
             fundingEntity: 1, 
             pi: {
                 _id: 1,
+                hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
                 affiliations: {
@@ -125,6 +129,7 @@ async function grantQuery(req) {
             },
             localCoordinator: {
                 _id: 1,
+                hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
                 affiliations: {

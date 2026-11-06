@@ -31,7 +31,6 @@ const filterSyntax = [
     ['relation modifiers', 'Relation fields accept a single ID or __ne=ID, including fields holding lists of relations.'],
 ];
 const peopleFields = 'person.firstName,person.lastName';
-const roomFields = 'roomAssignment.room.building,roomAssignment.room.floor,roomAssignment.room.number';
 const thesisTableFilters = [
     ['filter fields', 'Inside filter: person, title, advisors, date, institutions, fileUrl, SSD. Names and capitalization must match the API.'],
     ['sort_field', 'person (default), title, date, fileUrl, SSD; prefix with - for descending. Sent as _sort.'],
@@ -94,7 +93,7 @@ export const widgets = [
             ['limit', 'Maximum number of results, as a positive integer. Omit to include all.'],
         ],
         options: [
-            ['columns', 'Optional array or comma-separated list of visible columns. Defaults to name, qualification, ssd, building, floor, office, email. Also available: first_name, last_name, phone, affiliations, start_date, end_date, is_internal. Names link to the person details, with a person icon.'],
+            ['columns', 'Optional array or comma-separated list of visible columns. Defaults to name, qualification, ssd, office, email. Also available: first_name, last_name, phone, affiliations, start_date, end_date, is_internal. The office column combines building, floor and room, with a map link when available; it sorts by building, floor and room number. A name links to the department profile only when any staff entry has isInternal=true or qualification="ex Docente"; otherwise it is plain text.'],
             ['headers / headers_en', 'Optional headings matching the selected columns, as an array or comma-separated string. Default headings are translated automatically. headers_en overrides headers in English.'],
             ['en', 'Force English headings, dates and labels (boolean). Otherwise follows the page language.'],
             ['date_style', 'Localized date style: short (default), medium, long or full. Missing dates display as blank.'],
@@ -103,19 +102,24 @@ export const widgets = [
     },
     {
         id: 'visitlist', component: 'VisitList',
-        props: {
-            fields: `${peopleFields},affiliations,${roomFields},startDate,endDate`,
-            table: 'First Name,Last Name,Affiliation,Building,Floor,Office,From,To',
-            sort_field: 'person', filter: 'past',
-        },
+        props: { status: 'past' },
         routes: ['public/visit-list'],
         filters: [
-            ['filter fields', 'Inside filter: person, affiliations, startDate, endDate, SSD, publish, collaborationTheme. tags is returned but cannot be filtered.'],
-            ['sort_field', 'person (default), startDate, endDate, SSD, publish, collaborationTheme; prefix with - for descending. Sent as _sort.'],
-            ...filterSyntax,
+            ['status', 'all (default), current, past or future. Current includes open start/end dates. Past means ended before today; future means starts after today.'],
+            ['active_on', 'Visits active on a YYYY-MM-DD date or "today", including open date boundaries.'],
+            ['year', 'Visits overlapping a four-digit year.'],
+            ['from / to', 'Visits overlapping this inclusive date range (YYYY-MM-DD or "today"). Either boundary may be omitted.'],
+            ['start_from / start_to', 'Visit start date must fall within these inclusive boundaries. Either may be omitted. These are start-date filters, unlike the overlapping from/to range.'],
+            ['ssd', 'Exact research area code, e.g. MATH-01/A.'],
+            ['limit', 'Maximum number of results, as a positive integer. Omit to include all.'],
         ],
-        options: tableOptions,
-        notes: 'Search covers person.firstName, person.lastName and affiliations.name.',
+        options: [
+            ['columns', 'Optional array or comma-separated list of visible columns. Defaults to name, affiliations, office, start_date, end_date. Also available: first_name, last_name, email, phone, ssd, current_affiliations, tags, publish, collaboration_theme. affiliations means the affiliation recorded for the visit; current_affiliations means the person’s current affiliations. office combines building, floor and a linked room. Department profile links require an internal staff entry or the qualification "ex Docente".'],
+            ['headers / headers_en', 'Optional headings matching the selected columns, as an array or comma-separated string. Default headings are translated automatically.'],
+            ['en', 'Force English headings, dates and labels (boolean). Otherwise follows the page language.'],
+            ['date_style', 'Localized date style: short (default), medium, long or full. Missing dates display as blank.'],
+        ],
+        notes: 'Uses the same table and date-filter helpers as StaffList. Default order is surname, then first name; click a header to sort ascending/descending. Only the active column shows an arrow. Sorting affects the loaded rows; omit limit to sort all visits. Choose one period selector: status (other than all), active_on, year, or from/to. Start-date boundaries and other named filters may be combined with it. Empty results have a built-in localized message. Tags are display-only. PHP filter expressions, fields/table attributes, text/relation modifiers and dateyear are not accepted.',
     },
     {
         id: 'persondetails', component: 'PersonDetails', props: { person_id: sampleIds.person },
@@ -133,7 +137,7 @@ export const widgets = [
             ['is_internal', 'Group mode only · Local filter: true, 1 or "1" for internal members; false, 0 or "0" for external members; omit to show all. Also applies to chair and deputy.'],
         ],
         options: [['badge', 'Person mode only · Optional text displayed on the card.']],
-        notes: 'Exactly one ID is required. Supplying both IDs, or neither, shows a clear error without requesting data. The PersonCard and GroupCards widget names remain available for existing embeds.',
+        notes: 'Exactly one ID is required. Supplying both IDs, or neither, shows a clear error without requesting data. Department profile links require an internal staff entry or the qualification "ex Docente"; other people use their external personal page when available. The PersonCard and GroupCards widget names remain available for existing embeds.',
     },
     {
         id: 'courselist', component: 'CourseList',

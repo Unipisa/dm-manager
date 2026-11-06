@@ -1,7 +1,8 @@
+import { getPersonProfileURL } from '../person-profile';
 import React from 'react'
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { getManageURL, getDMURL } from '../utils'
+import { getManageURL } from '../utils'
 import { Loading } from './Loading';
 import Accordion from './Accordion';
 import './styles.css';
@@ -93,12 +94,12 @@ function YearlyThesisList({ year, ssd, institution, qualification, exclude_quali
 
 function ThesisTableItem({ thesis }) {
     const supervisors = thesis.advisors.map((advisor, index) => {
-        const isInternal = advisor.staff[0]?.isInternal;
+        const profile = getPersonProfileURL(advisor);
         
         const name = `${advisor.firstName} ${advisor.lastName}`;
         
-        const advisorElement = isInternal ? (
-            <a href={getDMURL(`en/person-details/?person_id=${advisor._id}`)} key={advisor._id}>
+        const advisorElement = profile ? (
+            <a href={profile} key={advisor._id}>
                 {name}
             </a>
         ) : (

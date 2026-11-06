@@ -1,3 +1,4 @@
+import { getPersonProfileURL } from '../person-profile';
 import React from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
@@ -18,15 +19,16 @@ function ThesisCell({ row, field, dateFormat }) {
         return <a href={`tel:${value}`}><i className="fas fa-phone-alt fa-fw"></i>{' '}<span className="d-none d-lg-inline">{value}</span></a>;
     }
     if (field === 'person._id') {
-        return <a href={`/scheda-personale/?person_id=${value ?? ''}`}><i className="fas fa-id-card fa-fw"></i></a>;
+        const profile = getPersonProfileURL(row.person);
+        return profile ? <a href={profile}><i className="fas fa-id-card fa-fw"></i></a> : null;
     }
     if (field === 'advisors') {
         return (value || []).map((advisor, index) => {
-            const internal = Array.isArray(advisor.staffs) && advisor.staffs[0]?.isInternal;
+            const profile = getPersonProfileURL(advisor);
             const name = `${advisor.firstName}  ${advisor.lastName}`;
             return <React.Fragment key={advisor._id || index}>
                 {index > 0 && ' and '}
-                {internal ? <a href={`/en/scheda-personale/?person_id=${advisor._id}`}>{name}</a> : name}
+                {profile ? <a href={profile}>{name}</a> : name}
             </React.Fragment>;
         });
     }

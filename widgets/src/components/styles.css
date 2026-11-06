@@ -209,6 +209,90 @@
     margin: 0 auto;
 }
 
+.dm-person-details .dm-person-profile {
+    display: grid;
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+    align-items: start;
+    gap: 1.25rem;
+}
+
+.dm-person-details .dm-person-profile-portrait {
+    min-width: 0;
+    max-width: 280px;
+}
+
+.dm-person-details .dm-person-profile-photo {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    border-radius: 0;
+}
+
+.dm-person-details .dm-person-profile-info {
+    min-width: 0;
+}
+
+.dm-person-details .dm-person-profile-name {
+    margin: 0 0 0.35rem;
+    color: #003c71;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.2;
+}
+
+.dm-person-details .dm-person-profile-qualification {
+    margin: 0;
+    color: #53616d;
+    font-size: 1.125rem;
+    line-height: 1.4;
+}
+
+.dm-person-details .dm-person-profile-details {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+}
+
+.dm-person-details .dm-person-detail-row {
+    display: grid;
+    grid-template-columns: 1.25rem minmax(0, 1fr);
+    align-items: baseline;
+    gap: 0.5rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.dm-person-details .dm-person-detail-row > i {
+    color: #003c71;
+}
+
+.dm-person-details .dm-person-rooms {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.dm-person-details .dm-person-address,
+.dm-person-details .dm-person-detail-note {
+    display: block;
+    color: #53616d;
+    font-size: 0.9rem;
+}
+
+.dm-person-details .dm-person-biography {
+    max-width: 75ch;
+    margin: 1.25rem 0;
+    font-size: 1rem;
+    line-height: 1.5;
+    white-space: pre-line;
+}
+
+@media (max-width: 767px) {
+    .dm-person-details .dm-person-profile {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+}
+
 .dm-person-details-accordions {
     display: grid;
     gap: 1rem;
@@ -223,7 +307,7 @@
     display: none;
 }
 
-.styled-table .dm-staff-sort {
+.styled-table .dm-people-sort {
     display: flex;
     align-items: baseline;
     justify-content: flex-start;
@@ -238,12 +322,12 @@
     cursor: pointer;
 }
 
-.styled-table .dm-staff-sort:focus-visible {
+.styled-table .dm-people-sort:focus-visible {
     outline: 2px solid currentColor;
     outline-offset: 4px;
 }
 
-.styled-table .dm-staff-sort > span {
+.styled-table .dm-people-sort > span {
     flex-shrink: 0;
 }
 
@@ -291,73 +375,69 @@
     border-bottom: 2px solid #003c71;
 }
 
-.dm-staff-table-scroll {
+.dm-people-table-scroll {
     max-width: 100%;
     overflow-x: auto;
     margin: 1rem 0;
 }
 
-.dm-staff-table-scroll:focus-visible {
+.dm-people-table-scroll:focus-visible {
     outline: 2px solid #003c71;
     outline-offset: 3px;
 }
 
-.styled-table.dm-staff-table {
+.styled-table.dm-people-table {
     margin: 0;
     min-width: 100%;
     box-shadow: none;
 }
 
-.styled-table.dm-staff-table th,
-.styled-table.dm-staff-table td {
+.styled-table.dm-people-table th,
+.styled-table.dm-people-table td {
     padding: 0.85rem 1rem;
     vertical-align: top;
     line-height: 1.5;
 }
 
-.styled-table.dm-staff-table tbody tr {
+.styled-table.dm-people-table tbody tr {
     border-bottom: 1px solid #e1e7ed;
     background-color: #fff;
 }
 
-.styled-table.dm-staff-table tbody tr:nth-of-type(even) {
+.styled-table.dm-people-table tbody tr:nth-of-type(even) {
     background-color: #f7f9fb;
 }
 
-.styled-table.dm-staff-table tbody tr:last-of-type {
+.styled-table.dm-people-table tbody tr:last-of-type {
     border-bottom: 2px solid #003c71;
 }
 
-.dm-staff-table [data-column="name"],
-.dm-staff-table [data-column="first_name"],
-.dm-staff-table [data-column="last_name"] {
+.dm-people-table [data-column="name"],
+.dm-people-table [data-column="first_name"],
+.dm-people-table [data-column="last_name"] {
     min-width: 10rem;
 }
 
-.dm-staff-table [data-column="qualification"] {
+.dm-people-table [data-column="qualification"] {
     min-width: 11rem;
 }
 
-.dm-staff-table [data-column="building"],
-.dm-staff-table [data-column="floor"],
-.dm-staff-table [data-column="office"] {
-    width: 1%;
-    padding-inline: 0.65rem;
-    white-space: nowrap;
-}
-
-.dm-staff-table [data-column="email"] {
+.dm-people-table [data-column="office"] {
     min-width: 12rem;
 }
 
-.dm-staff-table [data-column="email"] a {
+.dm-people-table [data-column="email"] {
+    min-width: 12rem;
+}
+
+.dm-people-table [data-column="email"] a {
     display: inline-block;
     max-width: 18rem;
     overflow-wrap: anywhere;
 }
 
 @media (hover: hover) and (pointer: fine) {
-    .styled-table.dm-staff-table tbody tr:hover {
+    .styled-table.dm-people-table tbody tr:hover {
         background-color: #eaf2f8;
     }
 }

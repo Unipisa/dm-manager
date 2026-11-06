@@ -1,8 +1,9 @@
+import { getPersonProfileURL } from '../person-profile';
 import React from 'react'
 import axios from 'axios'
 import { useQuery } from 'react-query'
 
-import { getManageURL, isEnglish, formatDateInterval, getDMURL } from '../utils';
+import { getManageURL, isEnglish, formatDateInterval } from '../utils';
 import { Loading } from './Loading'
 import Accordion from './Accordion'
 
@@ -71,13 +72,13 @@ export function Grant({ grant_id }) {
 export function KeyPerson({ person, title }) {
     const name = `${person.firstName} ${person.lastName}`;
     const affiliations = person.affiliations?.map(aff => aff.name).join(', ') || '';
-    const isInternal = person?.staff[0]?.isInternal;
+    const profile = getPersonProfileURL(person);
 
     return (
         <>
             {title}:
-            {isInternal ? (
-                <a href={getDMURL("en/person-details/?person_id=" + person._id)}> {name} ({affiliations})</a>
+            {profile ? (
+                <a href={profile}> {name} ({affiliations})</a>
             ) : (
                 <> {name} ({affiliations})</>
             )}

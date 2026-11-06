@@ -1,3 +1,4 @@
+const { personProfilePipeline } = require('./person-profile')
 const Grant = require('../../models/Grant')
 const Controller = require('../Controller')
 
@@ -62,6 +63,7 @@ async function grantsQuery(req, res) {
             localField: 'pi',
             foreignField: '_id',
             as: 'pi',
+            pipeline: personProfilePipeline(),
         }},
         { $unwind: {
             path: '$pi',
@@ -92,6 +94,7 @@ async function grantsQuery(req, res) {
             localField: 'localCoordinator',
             foreignField: '_id',
             as: 'localCoordinator',
+            pipeline: personProfilePipeline(),
         }},
         { $unwind: {
             path: '$localCoordinator',
@@ -125,6 +128,7 @@ async function grantsQuery(req, res) {
             fundingEntity: 1, 
             pi: {
                 _id: 1,
+                hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
                 ...(shortcode ? { staffs: '$pi.staff' } : {}),
@@ -135,6 +139,7 @@ async function grantsQuery(req, res) {
             },
             localCoordinator: {
                 _id: 1,
+                hasPersonProfile: 1,
                 firstName: 1,
                 lastName: 1,
                 ...(shortcode ? { staffs: '$localCoordinator.staff' } : {}),

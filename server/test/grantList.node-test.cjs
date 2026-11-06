@@ -100,12 +100,12 @@ const grant = () => ({
     localCoordinator: { _id: 'external', firstName: 'External', lastName: 'Person', staffs: [{ isInternal: false }, { isInternal: true }] },
 })
 
-test('list preserves classes, project/person links, labels, external emphasis and Italian dates', () => {
+test('list preserves classes, localized project/person links, labels and Italian dates', () => {
     document.documentElement.lang = 'it-IT'
     queryResult = { data: [grant()] }
     const html = render({})
-    for (const text of ['<ul>', 'class="mb-2 currentmath-01/a, math-02/b National"', '/research/grant-details/?grant_id=grant', 'Example project', '(PRIN)', 'Principal Investigator', '/en/scheda-personale/?person_id=internal', 'Coordinator of the Research Unit', '<em>External Person</em>', 'Project period', '15.01.2025', '20.12.2026']) assert.ok(html.includes(text), text)
-    assert.ok(!html.includes('person_id=external'))
+    for (const text of ['<ul>', 'class="mb-2 currentmath-01/a, math-02/b National"', '/research/grant-details/?grant_id=grant', 'Example project', '(PRIN)', 'Principal Investigator', '/scheda-personale/?person_id=internal', 'Coordinator of the Research Unit', '/scheda-personale/?person_id=external', 'Project period', '15.01.2025', '20.12.2026']) assert.ok(html.includes(text), text)
+    assert.ok(html.includes('person_id=external'))
 })
 
 test('same-person coordinator is omitted and a coordinator without a PI is supported', () => {

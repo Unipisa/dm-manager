@@ -2,7 +2,7 @@ import React from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { Loading } from './Loading';
-import { StaffTable, getStaffTableOptions } from './StaffTable';
+import { PeopleTable, getPeopleTableOptions } from './PeopleTable';
 import { getManageURL, isEnglish } from '../utils';
 import { getStaffQuery } from '../staff-query';
 
@@ -10,7 +10,7 @@ export function StaffList(props) {
     let query, tableOptions;
     try {
         query = getStaffQuery(props);
-        tableOptions = getStaffTableOptions(props);
+        tableOptions = getPeopleTableOptions(props);
     } catch (error) {
         return <p className="alert alert-danger" role="alert">StaffList: {error.message}</p>;
     }
@@ -25,5 +25,5 @@ function StaffListData({ query, tableOptions, ...displayOptions }) {
     });
 
     if (isLoading || error) return <Loading widget="Lista del personale" error={error} />;
-    return <StaffTable data={data} {...tableOptions} {...displayOptions} />;
+    return <PeopleTable data={data} {...tableOptions} {...displayOptions} />;
 }

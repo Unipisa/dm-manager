@@ -1,3 +1,4 @@
+import { getPersonProfileURL } from '../person-profile';
 import React from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
@@ -7,11 +8,11 @@ import { getShortcodeQuery, getDottedField } from '../shortcode-utils';
 
 function GrantPerson({ person, title }) {
     if (!person) return null;
-    const internal = Array.isArray(person.staffs) && person.staffs[0]?.isInternal;
+    const profile = getPersonProfileURL(person);
     const name = `${person.firstName} ${person.lastName}`;
     return <p className="mb-0">
-        {title}: {internal
-            ? <a href={`/en/scheda-personale/?person_id=${person._id}`}>{name}</a>
+        {title}: {profile
+            ? <a href={profile}>{name}</a>
             : <em>{name}</em>}
     </p>;
 }

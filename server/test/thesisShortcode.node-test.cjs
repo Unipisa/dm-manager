@@ -90,7 +90,7 @@ test('private-field filters are rejected without a database call', async t => {
 
 const thesis = () => ({
     _id: 'thesis', title: 'A thesis', date: '2025-06-15',
-    person: { _id: 'graduate', firstName: 'Example', lastName: 'Graduate', genealogyId: '123', email: 'example@example.org', phone: '+39000', staff: [] },
+    person: { _id: 'graduate', firstName: 'Example', lastName: 'Graduate', genealogyId: '123', email: 'example@example.org', phone: '+39000', staff: [{isInternal: true}] },
     affiliation: { name: 'Legacy affiliation' }, institutions: [{ name: 'One' }, { name: 'Two' }, {}],
     advisors: [
         { _id: 'internal', firstName: 'Internal', lastName: 'Advisor', staffs: [{ isInternal: true }] },
@@ -103,8 +103,8 @@ test('configurable table preserves genealogy/contact links, advisor rule, and in
     queryResult = { data: [thesis()] }
     document.documentElement.lang = 'en-US'
     const html = render({ fields: 'person.lastName,person.genealogyId,person.email,person.phone,person._id,advisors,institutions', tableen: 'Surname,Genealogy,Email,Phone,Profile,Supervisors,Institutions' })
-    for (const text of ['Surname', 'class="enable-sort"', 'https://www.genealogy.math.ndsu.nodak.edu/id.php?id=123', 'mailto:example@example.org', 'tel:+39000', '/scheda-personale/?person_id=graduate', '/en/scheda-personale/?person_id=internal', 'One, Two']) assert.ok(html.includes(text), text)
-    assert.ok(!html.includes('person_id=external') && !html.includes('person_id=nostaff'))
+    for (const text of ['Surname', 'class="enable-sort"', 'https://www.genealogy.math.ndsu.nodak.edu/id.php?id=123', 'mailto:example@example.org', 'tel:+39000', '/en/scheda-personale/?person_id=graduate', '/en/scheda-personale/?person_id=internal', 'One, Two']) assert.ok(html.includes(text), text)
+    assert.ok(html.includes('person_id=external') && !html.includes('person_id=nostaff'))
 })
 
 test('localized defaults and explicit date formats work in both languages', () => {

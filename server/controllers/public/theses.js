@@ -1,3 +1,4 @@
+const { personProfilePipeline } = require('./person-profile')
 const Thesis = require('../../models/Thesis')
 const Controller = require('../Controller')
 
@@ -40,6 +41,7 @@ async function thesesQuery(req, res) {
             localField: 'person',
             foreignField: '_id',
             as: 'person',
+            pipeline: personProfilePipeline(),
         }},
         { $unwind: {
             path: '$person',
@@ -62,6 +64,7 @@ async function thesesQuery(req, res) {
             foreignField: '_id',
             as: 'advisors',
             pipeline: [
+                ...personProfilePipeline(),
                 {$sort: { 'lastName': 1 }},
                 {$lookup: {
                     from: 'institutions',
@@ -91,6 +94,7 @@ async function thesesQuery(req, res) {
                 }},
                 {$project: {
                     _id: 1,
+                    hasPersonProfile: 1,
                     firstName: 1,
                     lastName: 1,
                     affiliations: {
@@ -125,7 +129,8 @@ async function thesesQuery(req, res) {
             title: 1, 
             person: {
                 _id: 1,
-                firstName: 1,
+                hasPersonProfile: 1,
+                    firstName: 1,
                 lastName: 1,
                 ...(shortcode ? { genealogyId: 1, email: 1, phone: 1 } : {}),
                 staff: {

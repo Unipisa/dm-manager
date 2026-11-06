@@ -32,7 +32,7 @@ const widgetReact = { ...React, useState(initial) {
     interactiveSort ||= initial
     return [interactiveSort, update => { interactiveSort = typeof update === 'function' ? update(interactiveSort) : update }]
 } }
-const document = { documentElement: { lang: 'it-IT' } }
+const document = { documentElement: { lang: 'it-IT' }, cookie: '' }
 const loaded = new Map()
 
 function loadWidget(file) {
@@ -60,8 +60,8 @@ function loadWidget(file) {
 const { StaffList } = loadWidget(path.resolve(__dirname, '../../widgets/src/components/StaffList.js'))
 const { getStaffQuery } = loadWidget(path.resolve(__dirname, '../../widgets/src/staff-query.js'))
 const params = props => Object.fromEntries(new URLSearchParams(getStaffQuery(props)))
-const { StaffTable, getStaffTableOptions } = loadWidget(path.resolve(__dirname, '../../widgets/src/components/StaffTable.js'))
-const { sortStaffRows } = loadWidget(path.resolve(__dirname, '../../widgets/src/staff-table-utils.js'))
+const { PeopleTable: StaffTable, getPeopleTableOptions: getStaffTableOptions } = loadWidget(path.resolve(__dirname, '../../widgets/src/components/PeopleTable.js'))
+const { sortPeopleRows: sortStaffRows } = loadWidget(path.resolve(__dirname, '../../widgets/src/people-table-utils.js'))
 const render = props => renderToStaticMarkup(React.createElement(StaffList, props))
 const response = () => ({ statusCode: 200, status(code) { this.statusCode = code; return this }, send(body) { this.body = body; return this } })
 
@@ -116,7 +116,7 @@ test('existing staff endpoint remains a single-person email lookup', async t => 
 const staff = {
     _id: 'staff', qualification: 'PO', isInternal: true, SSD: ['MATH-01/A', 'MATH-02/B'],
     person: { _id: 'person', firstName: 'Example', lastName: 'Person', email: 'example@example.org', phone: '+39 123', affiliations: [{ name: 'Institution' }] },
-    roomAssignment: { room: { building: 'B', floor: '1', number: '101' } }, startDate: '2025-01-15', endDate: null,
+    roomAssignment: { room: { _id: 'room', building: 'B', floor: '1', number: '101' } }, startDate: '2025-01-15', endDate: null,
 }
 
 test('named date selectors express status, a date, a year or an overlapping range', () => {
@@ -178,7 +178,7 @@ test('invalid and removed filter options fail clearly before querying', () => {
         { is_internal: 'maybe' }, { limit: 0 }, { limit: '1.5' }, { qualification: [] }, { qualification: [1] }, { qualification: 'PO|PA' },
         { person_id: 'id' }, { research_group: 'SSD' }, { search: 'x' }, { empty_message: 'x' },
         { start_from: '2026-05-10', start_to: '2026-05-01' }, { start_from: '2026-99-01' },
-        { columns: 'unknown' }, { columns: 'profile' }, { columns: [] }, { columns: 'name,name' },
+        { columns: 'unknown' }, { columns: 'building' }, { columns: 'floor' }, { columns: 'profile' }, { columns: [] }, { columns: 'name,name' },
         { columns: 'name,email', headers: ['Name'] }, { date_style: 'Y-m-d' },
     ]) {
         queryCalls = 0
@@ -227,7 +227,7 @@ test('dates use localized styles; absent or invalid values stay blank', () => {
     html = render({ columns: 'start_date', date_style: 'long', en: true })
     assert.ok(html.includes('January 15, 2025'))
     queryResult = { data: [{ person: null, startDate: 'not a date', roomAssignment: null }] }
-    html = render({ columns: 'name,email,building,start_date' })
+    html = render({ columns: 'name,email,office,start_date' })
     assert.ok(!html.includes('undefined') && !html.includes('Invalid'))
     assert.equal((html.match(/<td[^>]*><\/td>/g) || []).length, 4)
 })
@@ -301,9 +301,8 @@ test('sorting handles surname defaults, numbers, localized labels, dates and mis
     ]
     const ids = (column, order) => Array.from(sortStaffRows(rows, {column, order}, true), row => row._id)
     assert.deepEqual(Array.from(sortStaffRows(rows), row => row._id), ['a', 'b', 'z'])
-    assert.deepEqual(ids('office', 'asc'), ['b', 'z', 'a'])
-    assert.deepEqual(ids('office', 'desc'), ['a', 'z', 'b'])
-    assert.deepEqual(ids('floor', 'asc'), ['a', 'z', 'b'])
+    assert.deepEqual(ids('office', 'asc'), ['a', 'z', 'b'])
+    assert.deepEqual(ids('office', 'desc'), ['b', 'z', 'a'])
     assert.deepEqual(ids('ssd', 'asc'), ['a', 'z', 'b'])
     assert.deepEqual(ids('start_date', 'asc'), ['a', 'z', 'b'])
     assert.deepEqual(ids('start_date', 'desc'), ['z', 'a', 'b'])
@@ -345,4 +344,33 @@ test('clickable data headers switch ascending/descending locally and expose acce
         assert.equal(nodes(tree).filter(node => node.type === 'button').length, 3, 'all displayed columns are sortable')
         assert.equal(queryCalls, originalCalls, 'sorting makes no new API request')
     } finally { interactive = false }
+})
+
+
+test('office is the sole location column, with localized building/floor and a room map link', () => {
+    const defaults = Array.from(getStaffTableOptions().columns)
+    assert.ok(defaults.includes('office'))
+    assert.ok(!defaults.includes('building') && !defaults.includes('floor'))
+    for (const [en, location, label, route] of [
+        [false, 'Edificio B, Primo piano', 'Stanza 101', '/mappa?sel=room'],
+        [true, 'Building B, First floor', 'Room 101', '/map?sel=room'],
+    ]) {
+        queryResult = { data: [staff] }
+        let html = render({ columns: 'office', en })
+        assert.ok(html.includes(location))
+        assert.ok(html.includes(label))
+        assert.ok(html.includes(route))
+        assert.ok(!html.includes('data-column="building"') && !html.includes('data-column="floor"'))
+        queryResult = { data: [{...staff, roomAssignment: {room: {building: 'B', floor: 0, number: '101'}}}] }
+        html = render({ columns: 'office', en })
+        assert.ok(html.includes(en ? 'Ground floor' : 'Piano terra'))
+        assert.ok(html.includes(label))
+        assert.ok(!html.includes('<a ') && !html.includes('undefined'))
+    }
+    queryResult = { data: [{...staff, roomAssignment: null}] }
+    assert.ok(render({columns: 'office'}).includes('<td data-column="office"></td>'))
+    queryResult = { data: [{...staff, roomAssignment: {room: {building: 'A'}}}] }
+    const partial = render({columns: 'office', en: true})
+    assert.ok(partial.includes('Building A'))
+    assert.ok(!partial.includes('undefined') && !partial.includes('<a '))
 })

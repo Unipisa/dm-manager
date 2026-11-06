@@ -1,3 +1,4 @@
+const { personProfilePipeline } = require('./person-profile')
 const Group = require('../../models/Group')
 const ObjectId = require('mongoose').Types.ObjectId
 
@@ -10,6 +11,7 @@ async function groupQuery(req, res) {
     }
 
     const personPipeline = [
+        ...personProfilePipeline(),
         { $lookup: {
             from: 'institutions',
             localField: 'affiliations',
@@ -31,7 +33,7 @@ async function groupQuery(req, res) {
             ]
         } },
         { $project: {
-            firstName: 1, lastName: 1, email: 1, personalPage: 1,
+            firstName: 1, lastName: 1, email: 1, personalPage: 1, hasPersonProfile: 1,
             affiliations: 1, staffs: 1
         } }
     ];

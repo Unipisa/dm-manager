@@ -1,3 +1,4 @@
+import { getPersonProfileURL } from '../person-profile';
 import React, { useState } from 'react'
 import { useQuery } from 'react-query'
 import Markdown from 'react-markdown'
@@ -66,14 +67,14 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
                 const showAffiliations = lecturer.affiliations && lecturer.affiliations.length > 0 && 
                     !lecturer.affiliations.some(affiliation => affiliation._id === '641b8b0b840928dc5b8da2e3');
                 const formattedAffiliations = showAffiliations ? formatAffiliations(lecturer.affiliations) : '';
-                const hasInternalStaff = lecturer.staffs && lecturer.staffs.some(staff => staff.isInternal === true);
+                const profile = getPersonProfileURL(lecturer);
                 
                 return (
                     <div className="col-lg-6 col-12 py-2" key={lecturer._id}>
                         <div className="card h-100 m-2 shadow-sm">
                             <div className="card-body">
-                                {hasInternalStaff ? (
-                                    <a href={getDMURL(`en/person-details/?person_id=${lecturer._id}`)}>
+                                {profile ? (
+                                    <a href={profile}>
                                         <i className="fas fa-id-card fa-fw"></i>
                                     </a>
                                 ) : lecturer.personalPage ? (
