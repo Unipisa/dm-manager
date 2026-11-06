@@ -269,7 +269,7 @@ export function CourseBody({ course, forbidden, variant }) {
         }
     }
 
-    return <PrefixProvider value="process/courses">
+    return <PrefixProvider value={`process/${variant}courses`}>
         <h1 className="text-primary pb-4">
             { course._id 
                 ? "Modifica corso" 
@@ -420,7 +420,7 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
         })
     }
 
-    return <PrefixProvider value="process/courses">
+    return <PrefixProvider value={`process/${variant}courses`}>
         <Card className="shadow">
             <Card.Header>
                 <div className="d-flex d-row justify-content-between">
@@ -443,10 +443,10 @@ export function CourseDetailsBlock({ onCompleted, data, setData, change, active,
                         <StringInput value={data.title} setValue={setter(setData,'title')}/>
                     </InputRow>
                     <InputRow label="Docente/i" className="my-3">
-                        <SelectPeopleBlock people={data.lecturers || []} setPeople={people => setData(data => ({...data, lecturers: people}))} prefix="process/courses"/>
+                        <SelectPeopleBlock people={data.lecturers || []} setPeople={people => setData(data => ({...data, lecturers: people}))} prefix={`process/${variant}courses`}/>
                     </InputRow>
                     <InputRow label="Referente/i" className="my-3">
-                        <SelectPeopleBlock people={data.coordinators || []} setPeople={people => setData(data => ({...data, coordinators: people}))} prefix="process/courses"/>
+                        <SelectPeopleBlock people={data.coordinators || []} setPeople={people => setData(data => ({...data, coordinators: people}))} prefix={`process/${variant}courses`}/>
                     </InputRow>
                     <InputRow label="Data di inizio" className="my-3">
                         <DateInput value={data.startDate} setValue={setter(setData,'startDate')}/>
