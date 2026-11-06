@@ -122,6 +122,7 @@ export function initializeGallery(dmwidgets) {
 
     let lastTab;
     try { lastTab = localStorage.getItem('lastTab'); } catch { /* Use the default tab. */ }
+    if (lastTab === '#thesistable') lastTab = '#thesislist';
     if (lastTab === '#personcard' || lastTab === '#groupcards') lastTab = '#peoplecards';
     if (lastTab) {
         tabs.filter(function () { return $(this).attr('href') === lastTab; }).tab('show');

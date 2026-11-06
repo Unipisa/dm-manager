@@ -150,9 +150,20 @@ async function thesesQuery(req, res) {
     ]
 
     if (shortcode) {
-        const { _format, ...query } = req.query
+        const { _format, qualification, exclude_qualification, ...query } = req.query
+        const qualificationFilters = []
+        for (const [option, value] of Object.entries({ qualification, exclude_qualification })) {
+            if (value === undefined) continue
+            if (typeof value !== 'string' || value.split(',').some(item => !item.trim())) {
+                return res.status(400).send({ error: `${option} must be a comma-separated list of qualifications.` })
+            }
+            qualificationFilters.push({ $match: {
+                'person.staff.qualification': { [option === 'qualification' ? '$in' : '$nin']: value.split(',').map(item => item.trim()) },
+            } })
+        }
         return shortcodeController.performQuery({ _sort: 'person', ...query }, res, {
-            queryPipeline: pipeline.slice(1),
+            // Filter after staff are joined, before sorting/counting/limiting.
+            queryPipeline: [...pipeline.slice(1), ...qualificationFilters],
         })
     }
 

@@ -54,7 +54,7 @@ function DetailRow({ icon, children }) {
 }
 
 function PersonBlock({ data, en }) {
-    const photoUrl = data.photoUrl || "https://www.dm.unipi.it/wp-content/uploads/2024/07/No-Image-Placeholder.png";
+    const photoUrl = data.photoUrl?.trim();
     const name = [data.firstName, data.lastName].filter(Boolean).join(' ');
     const feminine = data.gender === 'Donna';
     const staffs = data.staffs || [];
@@ -64,9 +64,9 @@ function PersonBlock({ data, en }) {
         .map(assignment => getRoomDetails(assignment.roomDetails, assignment.room, en));
 
     return <div className="dm-person-profile">
-        <div className="dm-person-profile-portrait">
+        {photoUrl && <div className="dm-person-profile-portrait">
             <img src={photoUrl} className="dm-person-profile-photo" alt={name} decoding="async" />
-        </div>
+        </div>}
         <div className="dm-person-profile-info">
             <h2 className="dm-person-profile-name">{name}</h2>
             {qualification && <p className="dm-person-profile-qualification">{qualification}</p>}
@@ -77,7 +77,7 @@ function PersonBlock({ data, en }) {
                 {rooms.length > 0 && <DetailRow icon="fas fa-door-open">
                     <div className="dm-person-rooms">
                         {rooms.map((room, index) => <div key={index}>
-                            <div>{[room.buildingName, room.floorName].filter(Boolean).join(', ')}, <a href={room.roomLink.url}>{room.roomLink.text}</a></div>
+                            <div>{[room.buildingName, room.floorName].filter(Boolean).join(', ')}, <a href={room.roomLink.url} target="_blank" rel="noopener noreferrer">{room.roomLink.text}</a></div>
                             <div className="dm-person-address">{room.roadName}</div>
                         </div>)}
                     </div>
@@ -89,7 +89,7 @@ function PersonBlock({ data, en }) {
                     <a href={`tel:${data.phone}`}>{data.phone}</a>
                 </DetailRow>}
                 {data.personalPage && <DetailRow icon="fas fa-link">
-                    <a href={data.personalPage}>{en ? 'Personal web page' : 'Pagina web personale'}</a>
+                    <a href={data.personalPage} target="_blank" rel="noopener noreferrer">{en ? 'Personal web page' : 'Pagina web personale'}</a>
                     {!data.cv && <span className="dm-person-detail-note">
                         {en ? '(The CV is available on this webpage)' : '(Il CV è disponibile a questa pagina web)'}
                     </span>}

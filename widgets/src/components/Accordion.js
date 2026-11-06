@@ -21,7 +21,7 @@ const Accordion = ({ title, badge, content, markdown = true, initiallyOpen = fal
 
   return (
     <div
-      className={`wp-block-pb-accordion-item c-accordion__item js-accordion-item ${isOpen ? 'is-open' : ''}`}
+      className={`dm-widget-accordion wp-block-pb-accordion-item c-accordion__item js-accordion-item ${isOpen ? 'is-open' : ''}`}
       data-initially-open={initiallyOpen}
       data-click-to-close={clickToClose}
       data-auto-close={autoClose}

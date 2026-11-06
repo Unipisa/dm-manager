@@ -13,7 +13,7 @@ export function validatePeopleOptions(props, extraOptions, widgetName) {
 
 export const hasPeopleValue = value => value !== undefined && value !== null && value !== '';
 
-function date(value, option) {
+export function peopleDate(value, option) {
     if (value === 'today') {
         const now = new Date();
         value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -61,9 +61,9 @@ export function getPeopleQueryParams(props = {}) {
         params.set('startDate__gt', 'today');
     }
 
-    let start = hasPeopleValue(from) ? date(from, 'from') : undefined;
-    let end = hasPeopleValue(to) ? date(to, 'to') : undefined;
-    if (hasPeopleValue(active_on)) start = end = date(active_on, 'active_on');
+    let start = hasPeopleValue(from) ? peopleDate(from, 'from') : undefined;
+    let end = hasPeopleValue(to) ? peopleDate(to, 'to') : undefined;
+    if (hasPeopleValue(active_on)) start = end = peopleDate(active_on, 'active_on');
     if (hasPeopleValue(year)) {
         if (!/^\d{4}$/.test(String(year)) || Number(year) < 1000) throw new Error('year must be a four-digit year.');
         start = `${year}-01-01`;
@@ -74,8 +74,8 @@ export function getPeopleQueryParams(props = {}) {
     if (start) params.set('endDate__gte_or_null', start);
     if (end) params.set('startDate__lte_or_null', end);
 
-    const startFrom = hasPeopleValue(start_from) ? date(start_from, 'start_from') : undefined;
-    const startTo = hasPeopleValue(start_to) ? date(start_to, 'start_to') : undefined;
+    const startFrom = hasPeopleValue(start_from) ? peopleDate(start_from, 'start_from') : undefined;
+    const startTo = hasPeopleValue(start_to) ? peopleDate(start_to, 'start_to') : undefined;
     if (startFrom && startTo && startFrom > startTo) throw new Error('start_from must be on or before start_to.');
     if (startFrom) params.set('startDate__gte', startFrom);
     if (startTo) params.set('startDate__lte', startTo);

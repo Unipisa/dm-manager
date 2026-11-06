@@ -12,11 +12,16 @@ const commonHeadings = {
     start_date: ['Dal', 'From'], end_date: ['Al', 'To'],
 };
 const headingsByKind = {
+    thesis: { name: commonHeadings.name, first_name: commonHeadings.first_name, last_name: commonHeadings.last_name,
+        title: ['Titolo della tesi', 'Thesis title'], advisors: ['Relatori', 'Supervisors'],
+        institutions: ['Istituzioni', 'Institutions'], date: ['Data', 'Date'], ssd: commonHeadings.ssd,
+        genealogy: ['Genealogia', 'Genealogy'], email: commonHeadings.email, phone: commonHeadings.phone, file: ['Tesi', 'Thesis file'] },
     staff: { ...commonHeadings, qualification: ['Qualifica', 'Qualification'], is_internal: ['Interno', 'Internal'] },
     visit: { ...commonHeadings, current_affiliations: ['Affiliazioni attuali', 'Current affiliations'],
         tags: ['Etichette', 'Tags'], publish: ['Pubblica', 'Published'], collaboration_theme: ['Tema della collaborazione', 'Collaboration theme'] },
 };
 const defaultColumns = {
+    thesis: ['name', 'title', 'advisors', 'institutions'],
     staff: ['name', 'qualification', 'ssd', 'office', 'email'],
     visit: ['name', 'affiliations', 'office', 'start_date', 'end_date'],
 };
@@ -60,10 +65,18 @@ function PeopleCell({ row, column, en, dateFormat, kind }) {
         case 'name': {
             return profile ? <a href={profile}><i className="fas fa-id-card fa-fw" aria-hidden="true"></i>{' '}{value}</a> : value;
         }
+        case 'advisors': return (row.advisors || []).map((advisor, index) => {
+            const url = getPersonProfileURL(advisor, en);
+            const name = [advisor.firstName, advisor.lastName].filter(Boolean).join(' ');
+            return <React.Fragment key={advisor._id || index}>{index > 0 && ', '}{url ? <a href={url}>{name}</a> : name}</React.Fragment>;
+        });
+        case 'genealogy': return value ? <a href={`https://www.genealogy.math.ndsu.nodak.edu/id.php?id=${encodeURIComponent(value)}`} aria-label={en ? 'Mathematics Genealogy Project' : 'Progetto di genealogia matematica'}><i className="fas fa-id-card fa-fw" aria-hidden="true"></i></a> : '';
+        case 'file': return /^https?:\/\//i.test(value) ? <a href={value} target="_blank" rel="noopener noreferrer">{en ? 'Thesis' : 'Tesi'}</a> : '';
         case 'email': return value ? <a href={`mailto:${value}`}><i className="far fa-envelope fa-fw" aria-hidden="true"></i>{' '}{value}</a> : '';
         case 'phone': return value ? <a href={`tel:${value}`}><i className="fas fa-phone-alt fa-fw" aria-hidden="true"></i>{' '}{value}</a> : '';
         case 'publish':
         case 'is_internal': return value == null ? '' : (value ? (en ? 'Yes' : 'Sì') : 'No');
+        case 'date':
         case 'start_date':
         case 'end_date': {
             if (!value) return '';
@@ -77,14 +90,17 @@ function PeopleCell({ row, column, en, dateFormat, kind }) {
 export function PeopleTable({ data, columns, headers, headers_en, date_style, en, kind = 'staff' }) {
     const [sort, setSort] = useState({ column: 'last_name', order: 'asc' });
     const visit = kind === 'visit';
+    const thesis = kind === 'thesis';
     const headings = headingsByKind[kind];
-    if (!data?.length) return <p>{visit
+    if (!data?.length) return <p>{thesis
+        ? (en ? 'No theses match these filters.' : 'Nessuna tesi corrisponde a questi filtri.')
+        : visit
         ? (en ? 'No visits match these filters.' : 'Nessuna visita corrisponde a questi filtri.')
         : (en ? 'No staff match these filters.' : 'Nessun membro del personale corrisponde a questi filtri.')}</p>;
 
     const customHeaders = en && headers_en.length ? headers_en : headers;
     const dateFormat = new Intl.DateTimeFormat(en ? 'en-US' : 'it-IT', { dateStyle: date_style });
-    return <div className="dm-people-table-scroll" role="region" aria-label={visit ? (en ? 'Visit list' : 'Lista delle visite') : (en ? 'Staff list' : 'Lista del personale')} tabIndex={0}>
+    return <div className="dm-people-table-scroll" role="region" aria-label={thesis ? (en ? 'Thesis list' : 'Lista delle tesi') : visit ? (en ? 'Visit list' : 'Lista delle visite') : (en ? 'Staff list' : 'Lista del personale')} tabIndex={0}>
     <table className="peopletable styled-table dm-people-table">
         <thead><tr>{columns.map((column, index) => {
             const label = customHeaders[index] || headings[column][en ? 1 : 0];

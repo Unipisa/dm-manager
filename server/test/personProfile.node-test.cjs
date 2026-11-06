@@ -106,7 +106,7 @@ test('all widgets use the same eligibility rule for profile links', () => {
             ['PeopleTable', 'PeopleTable', {data: [{person}], ...getPeopleTableOptions({columns:'name'}, 'visit'), en:false}, undefined],
             ['Grant', 'KeyPerson', {person, title:'PI'}, undefined],
             ['GrantList', 'GrantList', {}, [{_id:'grant',name:'Grant',pi:person,startDate:'2026-01-01',endDate:'2026-12-31'}]],
-            ['ThesisTable', 'ThesisTable', {fields:'advisors'}, [{_id:'thesis',advisors:[person]}]],
+            ['ThesisList', 'ThesisList', {group_by_year:true,columns:'advisors'}, [{_id:'thesis',date:'2026-01-01',advisors:[person]}]],
             ['ThesisList', 'ThesisList', {}, [{_id:'thesis',title:'Thesis',date:'2026-01-01',person:{firstName:'Student',lastName:'Example'},advisors:[person],institutions:[]}]],
             ['CourseList', 'CourseList', {from:'2025-09-01',to:'2026-09-01'}, [{_id:'course',title:'Course',startDate:'2026-01-01',endDate:'2026-12-31',lecturers:[person],lessons:[]}]],
         ]

@@ -79,7 +79,7 @@ test('ssd is the only visit-specific filter; display options do not affect the q
     assert.deepEqual(params({ssd: 'MATH-01/A'}), { _sort: 'person', SSD: 'MATH-01/A' })
     assert.equal(params({}).publish, undefined)
     assert.equal(params({}).collaborationTheme, undefined)
-    assert.deepEqual(params({columns: 'email', headers: 'Contact'}), params({columns: 'name'}))
+    assert.deepEqual(params({columns: 'email', headers: 'Contact', group_by_year:true}), params({columns: 'name'}))
 })
 
 test('the public visit endpoint accepts generated filters and retains its public projection', async t => {
@@ -118,7 +118,7 @@ test('default visit API queries include all periods, while homepage visits keep 
 
 test('invalid, legacy and staff-only options are rejected before any request', () => {
     for (const props of [
-        {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
+        {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
         {dateyear: 2026}, {date_format: 'd.m.Y'}, {no_data_message: 'None'}, {empty_message: 'None'},
         {person_id: 'id'}, {affiliations__ne: 'id'}, {collaborationTheme__regex: 'x'}, {search: 'x'},
         {qualification: 'PO'}, {is_internal: true}, {tags: 'INdAM Visiting Fellow'}, {research_group: 'code'},
@@ -201,4 +201,33 @@ test('empty messages are fixed and localized; loading and errors retain the visi
     assert.ok(render({}).includes('Lista delle visite'))
     queryResult = {error: new Error('Mock error')}
     assert.ok(render({}).includes('Mock error'))
+})
+
+
+test('group_by_year uses visit start years once each, newest first, with undated last', async () => {
+    queryResult = {data: [
+        {...visit, _id:'old', startDate:'2024-12-31', endDate:'2026-01-01'},
+        {...visit, _id:'new', startDate:'2026-01-01'},
+        {...visit, _id:'missing', startDate:null},
+        {...visit, _id:'invalid', startDate:'invalid'},
+        {...visit, _id:'same', startDate:'2026-12-31T23:00:00Z'},
+    ]}
+    const html = render({group_by_year:'true', en:true, columns:'name', headers_en:'Visitor'})
+    assert.equal((html.match(/<table /g) || []).length, 3)
+    assert.ok(html.indexOf('>2026<') < html.indexOf('>2024<'))
+    assert.ok(html.indexOf('>2024<') < html.indexOf('>Undated<'))
+    assert.ok(!html.includes('>2025<'))
+    assert.equal((html.match(/Example Visitor/g) || []).length, 5)
+    assert.equal((html.match(/>Visitor(?: |<)/g) || []).length, 3)
+    for (const props of [{}, {group_by_year:false}, {group_by_year:'false'}, {group_by_year:'0'}]) {
+        const flat = render(props)
+        assert.equal((flat.match(/<table /g) || []).length, 1)
+        assert.ok(!flat.includes('c-accordion__title'))
+    }
+    document.documentElement.lang = 'it-IT'
+    assert.ok(render({group_by_year:1,en:false}).includes('>Senza data<'))
+    await fetchData()
+    assert.ok(!requestedUrl.includes('group_by_year'))
+    queryResult = {data:[]}
+    assert.equal(render({group_by_year:true,en:true}), '<p>No visits match these filters.</p>')
 })

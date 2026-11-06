@@ -59,8 +59,9 @@
     display: inline-block;
     vertical-align: middle;
     padding: 0.15rem 0.5rem;
-    border: 1px solid #dbe4ec;
-    color: #003c71;
+    border: 1px solid #003c71;
+    background-color: #003c71;
+    color: #fff;
     font-size: 0.8rem;
     line-height: 1.4;
 }
@@ -233,6 +234,10 @@
     min-width: 0;
 }
 
+.dm-person-details .dm-person-profile-info:only-child {
+    grid-column: 1 / -1;
+}
+
 .dm-person-details .dm-person-profile-name {
     margin: 0 0 0.35rem;
     color: #003c71;
@@ -291,6 +296,11 @@
         grid-template-columns: minmax(0, 1fr);
         gap: 1rem;
     }
+}
+
+/* Avoid relying on the encoding of the external plugin stylesheet's minus sign. */
+.dm-widget-accordion.is-open > .c-accordion__title::after {
+    content: "\2212";
 }
 
 .dm-person-details-accordions {

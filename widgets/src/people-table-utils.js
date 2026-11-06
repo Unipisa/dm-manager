@@ -17,6 +17,12 @@ export function getPeopleValue(row, column, en, kind = 'staff') {
         case 'name': return [person.firstName, person.lastName].filter(Boolean).join(' ');
         case 'first_name': return person.firstName || '';
         case 'last_name': return person.lastName || '';
+        case 'title': return row.title || '';
+        case 'advisors': return (row.advisors || []).map(advisor => [advisor.firstName, advisor.lastName].filter(Boolean).join(' ')).join(', ');
+        case 'institutions': return (row.institutions || []).map(institution => institution.name).filter(Boolean).join(', ');
+        case 'date': return row.date;
+        case 'genealogy': return person.genealogyId || '';
+        case 'file': return row.fileUrl || '';
         case 'qualification': return row.qualification || '';
         case 'ssd': return (Array.isArray(row.SSD) ? row.SSD : [row.SSD]).filter(Boolean).map(code => getResearchGroupLabel(code, en)).join(', ');
         case 'office': {
@@ -56,7 +62,7 @@ export function sortPeopleRows(rows, { column = 'last_name', order = 'asc' } = {
 
     function value(row) {
         const result = getPeopleValue(row, column, en, kind);
-        if (column === 'start_date' || column === 'end_date') {
+        if (column === 'date' || column === 'start_date' || column === 'end_date') {
             const timestamp = result ? new Date(result).getTime() : NaN;
             return Number.isNaN(timestamp) ? null : timestamp;
         }

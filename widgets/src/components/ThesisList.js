@@ -1,137 +1,30 @@
-import { getPersonProfileURL } from '../person-profile';
-import React from 'react'
+import React from 'react';
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import { getManageURL } from '../utils'
 import { Loading } from './Loading';
-import Accordion from './Accordion';
-import './styles.css';
-import { ThesisTable } from './ThesisTable';
+import { getPeopleTableOptions } from './PeopleTable';
+import { YearGroupedPeopleTable } from './YearGroupedPeopleTable';
+import { getManageURL, isEnglish } from '../utils';
+import { getThesisQuery } from '../thesis-query';
+import { hasPeopleValue, peopleBoolean } from '../people-query';
 
 export function ThesisList(props) {
-    const shortcodeOptions = [
-        'fields', 'table', 'tableen', 'sort_field', 'filter', 'list_mode',
-        'date_format', 'no_data_message', 'no_data_message_en',
-    ];
-    if (shortcodeOptions.some(option => Object.prototype.hasOwnProperty.call(props, option))) {
-        return <ThesisTable {...props} />;
+    let query, tableOptions;
+    try {
+        query = getThesisQuery(props);
+        tableOptions = getPeopleTableOptions(props, 'thesis');
+    } catch (error) {
+        return <p className="alert alert-danger" role="alert">ThesisList: {error.message}</p>;
     }
-    return <YearlyThesisList {...props} />;
+    const grouped = hasPeopleValue(props.group_by_year) && peopleBoolean(props.group_by_year, 'group_by_year') === 'true';
+    return <ThesisListData query={query} tableOptions={tableOptions} en={isEnglish(props.en)} grouped={grouped} />;
 }
 
-function YearlyThesisList({ year, ssd, institution, qualification, exclude_qualification, _sort, _limit }) {
-
-    const filter = { year, ssd, _sort, _limit }
-
-    const { isLoading, error, data } = useQuery([ 'theses', filter ], async () => {
-        const res = await axios.get(getManageURL("public/theses"), { params: filter })
-        return res.data.data
-    })
-
-    if (isLoading || error) {
-        return <Loading widget="Lista delle tesi" error={error}></Loading>
-    }
-
-    let filteredData = data;
-
-    if (institution) {
-        filteredData = filteredData.filter(thesis => 
-            thesis.institutions && thesis.institutions.some(inst => inst._id === institution)
-        );
-    }
-
-    if (qualification) {
-        filteredData = filteredData.filter(thesis => 
-            thesis.person.staff.some(staffItem => staffItem.qualification === qualification)
-        );
-    }
-    
-    if (exclude_qualification) {
-        filteredData = filteredData.filter(thesis => 
-            !thesis.person.staff.some(staffItem => staffItem.qualification === exclude_qualification)
-        );
-    }
-
-    const thesesByYear = filteredData.reduce((acc, thesis) => {
-        const thesisYear = new Date(thesis.date).getFullYear();
-        if (!acc[thesisYear]) {
-            acc[thesisYear] = [];
-        }
-        acc[thesisYear].push(thesis);
-        return acc;
-    }, {});
-
-    Object.keys(thesesByYear).forEach(year => {
-        thesesByYear[year].sort((a, b) => a.person.lastName.localeCompare(b.person.lastName));
+function ThesisListData({ query, tableOptions, en, grouped }) {
+    const { isLoading, error, data } = useQuery(['thesislist', query], async () => {
+        const response = await axios.get(getManageURL('public/theses', query));
+        return response.data.data || [];
     });
-
-    const sortedYears = Object.keys(thesesByYear).sort((a, b) => b - a);
-
-    return (
-        <div>
-            {sortedYears.map(year => (
-                <Accordion title={year} key={year}>
-                    <table className="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Surname</th>
-                                <th>Title of the Thesis</th>
-                                <th>Supervisor(s)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {thesesByYear[year].map((thesis) => (
-                                <ThesisTableItem key={thesis._id} thesis={thesis} />
-                            ))}
-                        </tbody>
-                    </table>
-                </Accordion>
-            ))}
-        </div>
-    )
-}
-
-function ThesisTableItem({ thesis }) {
-    const supervisors = thesis.advisors.map((advisor, index) => {
-        const profile = getPersonProfileURL(advisor);
-        
-        const name = `${advisor.firstName} ${advisor.lastName}`;
-        
-        const advisorElement = profile ? (
-            <a href={profile} key={advisor._id}>
-                {name}
-            </a>
-        ) : (
-            <span key={advisor._id}>{name}</span>
-        );
-
-        return index < thesis.advisors.length - 1 ? 
-            [advisorElement, ', '] : 
-            advisorElement;
-    });
-
-    const hasMultipleInstitutions = thesis.institutions && thesis.institutions.length > 1;
-    
-    const institutionNames = hasMultipleInstitutions 
-        ? thesis.institutions.map(inst => inst.name).join(' and ')
-        : null;
-
-    return (
-        <>
-            <tr>
-                <td>{thesis.person.firstName}</td>
-                <td>{thesis.person.lastName}</td>
-                <td>{thesis.title}{hasMultipleInstitutions && '*'}</td>
-                <td>{supervisors}</td>
-            </tr>
-            {hasMultipleInstitutions && (
-                <tr>
-                    <td colSpan="4" className="joint-phd-notice">
-                        *Joint PhD thesis with {institutionNames}
-                    </td>
-                </tr>
-            )}
-        </>
-    )
+    if (isLoading || error) return <Loading widget="Lista delle tesi" error={error} />;
+    return <YearGroupedPeopleTable data={data} {...tableOptions} en={en} grouped={grouped} dateField="date" />;
 }

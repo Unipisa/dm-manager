@@ -30,14 +30,6 @@ const filterSyntax = [
     ['text modifiers', 'Text fields accept __regex (case insensitive), __in (values separated by |), __ne. Boolean fields accept 1, yes, true as true; other values are false.'],
     ['relation modifiers', 'Relation fields accept a single ID or __ne=ID, including fields holding lists of relations.'],
 ];
-const peopleFields = 'person.firstName,person.lastName';
-const thesisTableFilters = [
-    ['filter fields', 'Inside filter: person, title, advisors, date, institutions, fileUrl, SSD. Names and capitalization must match the API.'],
-    ['sort_field', 'person (default), title, date, fileUrl, SSD; prefix with - for descending. Sent as _sort.'],
-    ...filterSyntax,
-];
-const thesisTableOptions = [...tableOptions, ['list_mode', 'Render a plain list instead of a table. Any truthy value except "0" enables it.']];
-
 // Each entry documents the props accepted by its component, including fixed query
 // behavior where the public route supports filters the widget does not expose.
 export const widgets = [
@@ -117,6 +109,7 @@ export const widgets = [
             ['columns', 'Optional array or comma-separated list of visible columns. Defaults to name, affiliations, office, start_date, end_date. Also available: first_name, last_name, email, phone, ssd, current_affiliations, tags, publish, collaboration_theme. affiliations means the affiliation recorded for the visit; current_affiliations means the person’s current affiliations. office combines building, floor and a linked room. Department profile links require an internal staff entry or the qualification "ex Docente".'],
             ['headers / headers_en', 'Optional headings matching the selected columns, as an array or comma-separated string. Default headings are translated automatically.'],
             ['en', 'Force English headings, dates and labels (boolean). Otherwise follows the page language.'],
+            ['group_by_year', 'Boolean, default false. Tables inside year accordions, grouped by visit start date, newest year first. Missing or invalid start dates appear under Undated. Visits spanning years appear once, under their start year. limit applies across all years.'],
             ['date_style', 'Localized date style: short (default), medium, long or full. Missing dates display as blank.'],
         ],
         notes: 'Uses the same table and date-filter helpers as StaffList. Default order is surname, then first name; click a header to sort ascending/descending. Only the active column shows an arrow. Sorting affects the loaded rows; omit limit to sort all visits. Choose one period selector: status (other than all), active_on, year, or from/to. Start-date boundaries and other named filters may be combined with it. Empty results have a built-in localized message. Tags are display-only. PHP filter expressions, fields/table attributes, text/relation modifiers and dateyear are not accepted.',
@@ -148,28 +141,25 @@ export const widgets = [
     },
     {
         id: 'thesislist', component: 'ThesisList',
-        props: { institution: sampleIds.institution, exclude_qualification: 'Dottorando Esterno' },
-        routes: ['public/theses'],
-        filters: [
-            ['year', 'API · Thesis year (YYYY).'], ['ssd', 'API · Research area code.'], ...sortAndLimit,
-            ['institution', 'Local · Institution ID; matches any institution on the thesis.'],
-            ['qualification', 'Local · Include students with this staff qualification.'],
-            ['exclude_qualification', 'Local · Exclude students with this staff qualification.'],
-        ],
-        notes: 'Default mode groups theses by year. Supplying any table option (including filter or sort_field) switches to the table/list mode documented in the Thesis table/list preview; yearly props then no longer apply.',
-    },
-    {
-        id: 'thesistable', component: 'ThesisList',
-        props: {
-            fields: `${peopleFields},person.genealogyId,title,advisors,institutions,date`,
-            table: 'Nome,Cognome,Genealogia,Titolo,Relatori,Istituzioni,Data',
-            tableen: 'First Name,Last Name,Genealogy,Title,Supervisors,Institutions,Date',
-            sort_field: 'person',
-        },
-        additionalPreviews: [{ target: 'thesisplainlist', props: { list_mode: true, sort_field: 'person' } }],
+        props: { institution: sampleIds.institution, exclude_qualification: 'Dottorando Esterno', group_by_year: true },
         routes: ['public/theses?_format=shortcode'],
-        filters: thesisTableFilters, options: thesisTableOptions,
-        notes: 'Both examples use ThesisList in table/list mode. Search covers title, person.firstName, person.lastName and institutions.name. Date shortcuts using startDate/endDate are not supported here; use dateyear or date modifiers.',
+        filters: [
+            ['year', 'Thesis date within a four-digit year. Alternative to from/to.'],
+            ['from / to', 'Inclusive thesis date range (YYYY-MM-DD or "today"). Either boundary may be omitted.'],
+            ['ssd', 'Research area code.'],
+            ['institution', 'Institution ID; matches any institution on the thesis.'],
+            ['qualification', 'Student doctoral qualification, or comma-separated list/array (matches any).'],
+            ['exclude_qualification', 'Exclude students with any of these doctoral qualifications; accepts a comma-separated list/array.'],
+            ['limit', 'Maximum total results across all years. Omit to include all matching theses.'],
+        ],
+        options: [
+            ['columns', 'Comma-separated list/array: name, first_name, last_name, title, advisors, institutions, date, ssd, genealogy, email, phone, file. Default: name,title,advisors,institutions.'],
+            ['headers / headers_en', 'Optional custom headings in the same order and number as columns. Defaults are localized automatically.'],
+            ['group_by_year', 'Boolean, default false. Show tables inside year accordions, newest year first; undated theses appear last.'],
+            ['date_style', 'short (default), medium, long or full.'],
+            ['en', 'Force English labels (boolean).'],
+        ],
+        notes: 'Always displayed as a table, sorted by surname then first name. Click a heading to sort ascending, then descending. All public data are fetched independently of columns. Profile links use the shared staff eligibility rule. Institutions are displayed in their own column, including joint theses.',
     },
     {
         id: 'grantlist', component: 'GrantList', props: { sort_field: 'startDate', filter: 'current' },
