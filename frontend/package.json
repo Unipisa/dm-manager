@@ -1,5 +1,6 @@
 {
   "name": "dm-manager",
+  "license": "GPL-3.0-or-later",
   "version": "1.13.5",
   "type": "module",
   "private": true,

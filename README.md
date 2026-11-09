@@ -196,3 +196,20 @@ an existing item
 ---
 
 Per dettagli su un modello o controller specifico, consultare i file nella cartella `server/models` o `server/controllers`.
+
+
+## License
+
+SPDX-License-Identifier: GPL-3.0-or-later
+
+dm-manager is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+dm-manager is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+See [LICENSE](LICENSE) for the full license text. Third-party dependencies
+retain their respective licenses.

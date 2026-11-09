@@ -2,7 +2,7 @@
   "name": "dm-manager",
   "version": "1.13.5",
   "description": "",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "author": "",
   "type": "commonjs",
   "main": "server.js",

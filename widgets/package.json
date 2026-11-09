@@ -10,7 +10,7 @@
     "build": "vite build"
   },
   "author": "Leonardo Robol <leonardo.robol@unipi.it>",
-  "license": "MIT",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
   },
   "browserslist": [
