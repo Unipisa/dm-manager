@@ -11,6 +11,8 @@ controller.fields = Object.fromEntries([
     'person', 'affiliations', 'startDate', 'endDate', 'SSD', 'tags',
     'publish', 'collaborationTheme', 'grants',
 ].map(field => [field, Visit._schema_info.properties[field]]))
+// Match visits associated with any of the supplied grant IDs.
+controller.fields.grants = { ...controller.fields.grants, match_ids: true }
 controller.searchFields = ['person.lastName', 'person.firstName', 'affiliations.name']
 controller.queryPipeline = [
     { $lookup: {

@@ -87,7 +87,7 @@ export const widgets = [
             ['year', 'Visits overlapping a four-digit year.'],
             ['from / to', 'Visits overlapping this inclusive date range (YYYY-MM-DD or "today"). Either boundary may be omitted.'],
             ['start_from / start_to', 'Visit start date must fall within these inclusive boundaries. Either may be omitted. These are start-date filters, unlike the overlapping from/to range.'],
-            ['grant_id', 'Grant ID; include visits funded by that grant. May be combined with the date and SSD filters.'],
+            ['grants', 'Grant ID or comma-separated list/array of grant IDs; include visits funded by any of them. May be combined with date and SSD filters.'],
             ['ssd', 'Exact research area code, e.g. MATH-01/A.'],
             ['limit', 'Maximum number of results, as a positive integer. Omit to include all.'],
         ],

@@ -77,7 +77,7 @@ test('explicit date filters have identical semantics in StaffList and VisitList'
 
 test('SSD and grant are explicit visit filters; display options do not affect the query', () => {
     assert.deepEqual(params({ssd: 'MATH-01/A'}), { _sort: 'person', SSD: 'MATH-01/A' })
-    assert.equal(params({grant_id:'641b8b0b840928dc5b8da2e3'}).grants, '641b8b0b840928dc5b8da2e3')
+    assert.equal(params({grants:'641b8b0b840928dc5b8da2e3'}).grants, '641b8b0b840928dc5b8da2e3')
     assert.equal(params({}).publish, undefined)
     assert.equal(params({}).collaborationTheme, undefined)
     assert.deepEqual(params({columns: 'email', headers: 'Contact', group_by_year:true}), params({columns: 'name'}))
@@ -87,14 +87,14 @@ test('the public visit endpoint accepts generated filters and retains its public
     let pipeline
     t.mock.method(Visit, 'aggregate', async stages => { pipeline = stages; return [] })
     const res = response()
-    await visitListQuery({query: params({status: 'current', ssd: 'MATH-01/A', grant_id:'641b8b0b840928dc5b8da2e3'})}, res)
+    await visitListQuery({query: params({status: 'current', ssd: 'MATH-01/A', grants:'641b8b0b840928dc5b8da2e3'})}, res)
     assert.equal(res.statusCode, 200)
     const matches = pipeline.filter(stage => stage.$match).map(stage => stage.$match)
     assert.ok(matches.some(match => match.$or?.some(condition => condition.startDate?.$lte instanceof Date)))
     assert.ok(matches.some(match => match.$or?.some(condition => condition.endDate?.$gte instanceof Date)))
     assert.ok(!matches.some(match => 'publish' in match))
     assert.ok(matches.some(match => match.SSD === 'MATH-01/A'))
-    assert.ok(matches.some(match => match.grants?.toString() === '641b8b0b840928dc5b8da2e3'))
+    assert.ok(matches.some(match => match.grants?.$in?.[0]?.toString() === '641b8b0b840928dc5b8da2e3'))
     assert.ok(!matches.some(match => 'collaborationTheme' in match))
     assert.deepEqual(pipeline.find(stage => stage.$sort).$sort, {'person.lastName': 1, 'person.firstName': 1})
     const projection = pipeline.find(stage => stage.$project).$project
@@ -120,7 +120,7 @@ test('default visit API queries include all periods, while homepage visits keep 
 
 test('invalid, legacy and staff-only options are rejected before any request', () => {
     for (const props of [
-        {grant_id:'invalid'}, {grant_id:[]}, {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
+        {grant_id:'641b8b0b840928dc5b8da2e3'}, {grants:'invalid'}, {grants:[]}, {grants:['641b8b0b840928dc5b8da2e3','invalid']}, {grants:'641b8b0b840928dc5b8da2e3,'}, {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
         {dateyear: 2026}, {date_format: 'd.m.Y'}, {no_data_message: 'None'}, {empty_message: 'None'},
         {person_id: 'id'}, {affiliations__ne: 'id'}, {collaborationTheme__regex: 'x'}, {search: 'x'},
         {qualification: 'PO'}, {is_internal: true}, {tags: 'INdAM Visiting Fellow'}, {research_group: 'code'},
@@ -232,4 +232,21 @@ test('group_by_year uses visit start years once each, newest first, with undated
     assert.ok(!requestedUrl.includes('group_by_year'))
     queryResult = {data:[]}
     assert.equal(render({group_by_year:true,en:true}), '<p>No visits match these filters.</p>')
+})
+
+
+test('grants accepts arrays and comma-separated IDs, normalizes duplicates, and matches any grant', async t => {
+    const first = '641b8b0b840928dc5b8da2e3'
+    const second = '641b8b0b840928dc5b8da2e4'
+    const expected = `${first},${second}`
+    assert.equal(params({grants:` ${first.toUpperCase()}, ${second},${first} `}).grants,expected)
+    assert.equal(params({grants:[first,` ${second} `,first]}).grants,expected)
+    let pipeline
+    t.mock.method(Visit,'aggregate',async stages => {pipeline = stages; return []})
+    const res = response()
+    await visitListQuery({query:params({grants:[first,second],status:'past'})},res)
+    assert.equal(res.statusCode,200)
+    const match = pipeline.find(stage => stage.$match?.grants).$match.grants
+    assert.deepEqual(match.$in.map(id => id.toString()),[first,second])
+    assert.ok(!pipeline.at(-1).$project?.grants)
 })
