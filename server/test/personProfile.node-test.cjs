@@ -148,3 +148,27 @@ test('list excerpts hide embedded flyers while individual event pages retain the
     const detail = renderToStaticMarkup(React.createElement(EventDescription,{},description))
     assert.ok(detail.includes('<img') && detail.includes('https://example.org/flyer.png'))
 })
+
+
+test('seminar and conference lists support optional start-year accordions', () => {
+    for (const [component,dateField,type] of [['SeminarList','startDatetime','seminar'],['ConferenceList','startDate','conference']]) {
+        const base = {title:'Example event',startDatetime:'2024-01-01T10:00:00Z',duration:60,
+            startDate:'2024-01-01',endDate:'2026-01-01',description:'Description',abstract:'Abstract'}
+        queryData = [
+            {...base,_id:'old',[dateField]:'2024-01-01'},
+            {...base,_id:'new',[dateField]:'2026-01-01'},
+            {...base,_id:'missing',[dateField]:null},
+            {...base,_id:'invalid',[dateField]:'invalid'},
+        ]
+        const render = props => renderToStaticMarkup(React.createElement(widget(component,component),props))
+        const html = render({group_by_year:'true',en:true})
+        assert.equal((html.match(/class="dm-event-list"/g) || []).length,3,component)
+        assert.ok(html.indexOf('>2026<') < html.indexOf('>2024<'),component)
+        assert.ok(html.indexOf('>2024<') < html.indexOf('>Undated<'),component)
+        assert.equal((html.match(/Example event/g) || []).length,4,component)
+        for (const flag of [undefined,false,'false','0']) assert.ok(!render({group_by_year:flag}).includes('c-accordion__title'),component)
+        assert.ok(render({group_by_year:'yes'}).includes('role="alert"'))
+        queryData = []
+        assert.ok(!render({group_by_year:true}).includes('c-accordion__title'))
+    }
+})

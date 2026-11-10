@@ -174,7 +174,7 @@ test('legacy options, modifiers and invalid named values fail before requesting 
         {date_format:'Y-m-d'},{no_data_message:'None'},{no_data_message_en:'None'},{empty_message:'None'},
         {name__regex:'x'},{pi__ne:'id'},{dateyear:2025},{search:'x'},{columns:'name'},
         {status:'current',year:2025},{from:'2025-02-30'},{from:'2026-01-01',to:'2025-01-01'},
-        {limit:0},{sort_by:'description'},{order:'up'},{date_style:'invalid'},
+        {group_by_year:'yes'},{limit:0},{sort_by:'description'},{order:'up'},{date_style:'invalid'},
         {funds:'National'},{project_type:'PRIN'},{funding_entity:'Entity'},{name:'Name'},{identifier:'ID'},{cup:'CUP'},
         {pi_id:'641b8b0b840928dc5b8da2e3'},{local_coordinator_id:'641b8b0b840928dc5b8da2e3'},{member_id:'641b8b0b840928dc5b8da2e3'},
         {sort_by:'funds'},{sort_by:'project_type'},{sort_by:'funding_entity'},{ssd:[]},
@@ -286,4 +286,26 @@ test('detail labels and open-ended dates are localized without displaying invali
     assert.ok(html.includes('Until December 20, 2026'))
     queryResult = {data:{...grant(),startDate:'invalid',endDate:null}}
     assert.ok(!renderDetail({en:true}).includes('Project period'))
+})
+
+
+test('grant lists optionally group by start year, keeping undated last and the query unchanged', async () => {
+    queryResult = {data:[
+        {...grant(),_id:'old',startDate:'2024-01-01',endDate:'2026-01-01'},
+        {...grant(),_id:'new',startDate:'2026-01-01'},
+        {...grant(),_id:'undated',startDate:null},
+        {...grant(),_id:'invalid',startDate:'invalid'},
+    ]}
+    const html = render({group_by_year:'true',en:true})
+    assert.equal((html.match(/class="dm-grant-list"/g) || []).length,3)
+    assert.ok(html.indexOf('>2026<') < html.indexOf('>2024<'))
+    assert.ok(html.indexOf('>2024<') < html.indexOf('>Undated<'))
+    assert.equal((html.match(/Example project/g) || []).length,4)
+    for (const flag of [undefined,false,'false','0']) assert.ok(!render({group_by_year:flag}).includes('c-accordion__title'))
+    render({group_by_year:true,status:'past',limit:5})
+    await fetchData()
+    assert.ok(!requestedUrl.includes('group_by_year') && requestedUrl.includes('_limit=5'))
+    assert.equal(getGrantQuery({group_by_year:true,status:'past'}),getGrantQuery({status:'past'}))
+    queryResult = {data:[]}
+    assert.equal(render({group_by_year:true,en:true}),'<p>No grants match these filters.</p>')
 })

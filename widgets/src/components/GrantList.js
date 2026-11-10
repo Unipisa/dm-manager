@@ -5,6 +5,7 @@ import axios from 'axios';
 import { Loading } from './Loading';
 import { getManageURL, isEnglish } from '../utils';
 import { getGrantQuery } from '../grant-query';
+import { YearGroupedContent } from './YearGroupedContent';
 import './styles.css';
 
 function GrantPerson({ person, title, en }) {
@@ -31,10 +32,10 @@ export function GrantList(props) {
     } catch (error) {
         return <p className="alert alert-danger" role="alert">GrantList: {error.message}</p>;
     }
-    return <GrantListData query={query} en={isEnglish(props.en)} dateStyle={props.date_style || 'short'} />;
+    return <GrantListData query={query} en={isEnglish(props.en)} dateStyle={props.date_style || 'short'} grouped={props.group_by_year} />;
 }
 
-function GrantListData({ query, en, dateStyle }) {
+function GrantListData({ query, en, dateStyle, grouped }) {
     const { isLoading, error, data } = useQuery(['grantlist', query], async () => {
         const res = await axios.get(getManageURL('public/grants', query));
         return res.data.data || [];
@@ -49,7 +50,7 @@ function GrantListData({ query, en, dateStyle }) {
         return Number.isNaN(date.getTime()) ? '' : dateFormat.format(date);
     };
 
-    return <ul className="dm-grant-list" role="list">{data.map((grant, index) => {
+    const renderGrants = grants => <ul className="dm-grant-list" role="list">{grants.map((grant, index) => {
         const start = formatDate(grant.startDate);
         const end = formatDate(grant.endDate);
         const ssds = Array.isArray(grant.SSD) ? grant.SSD : [grant.SSD].filter(Boolean);
@@ -74,4 +75,7 @@ function GrantListData({ query, en, dateStyle }) {
             )}
         </li>;
     })}</ul>;
+    return <YearGroupedContent data={data} grouped={grouped} dateField="startDate" en={en}>
+        {renderGrants}
+    </YearGroupedContent>;
 }

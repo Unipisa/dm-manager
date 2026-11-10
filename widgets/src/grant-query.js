@@ -1,4 +1,4 @@
-import { getPeopleQueryParams, setPeopleText } from './people-query';
+import { getPeopleQueryParams, setPeopleText, hasPeopleValue, peopleBoolean } from './people-query';
 
 const sortFields = {
     start_date: 'startDate', end_date: 'endDate', name: 'name',
@@ -6,7 +6,7 @@ const sortFields = {
 const options = new Set([
     'status', 'active_on', 'year', 'from', 'to', 'start_from', 'start_to', 'limit',
     'ssd',
-    'sort_by', 'order', 'en', 'date_style',
+    'sort_by', 'order', 'en', 'date_style', 'group_by_year',
 ]);
 
 export function getGrantQuery(props = {}) {
@@ -17,6 +17,7 @@ export function getGrantQuery(props = {}) {
     if (!Object.hasOwn(sortFields, sort_by)) throw new Error(`sort_by must be one of: ${Object.keys(sortFields).join(', ')}.`);
     if (!['asc', 'desc'].includes(order)) throw new Error('order must be asc or desc.');
     if (!['short', 'medium', 'long', 'full'].includes(date_style)) throw new Error('date_style must be short, medium, long or full.');
+    if (hasPeopleValue(props.group_by_year)) peopleBoolean(props.group_by_year, 'group_by_year');
 
     // Reuse the same period, open-date and limit semantics as StaffList/VisitList.
     const params = getPeopleQueryParams(props);

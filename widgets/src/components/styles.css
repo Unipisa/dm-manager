@@ -1,3 +1,8 @@
+.dm-year-groups {
+    display: grid;
+    gap: 1rem;
+}
+
 .dm-widget-badge {
     display: inline-block;
     flex-shrink: 0;

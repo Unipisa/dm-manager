@@ -33,7 +33,8 @@ export const widgets = [
         props: { from: '2021-01-01', _sort: 'startDatetime', _limit: 10, en: true },
         routes: ['public/seminars'],
         filters: [...dateRange, ['category', 'API · Seminar category ID.'], ['grant', 'API · Grant ID.'], ...sortAndLimit],
-        options: [['en', 'Force English labels (boolean).']],
+        options: [['en', 'Force English labels (boolean).'],
+            ['group_by_year', 'Boolean, default false. Group by start year in accordions, newest year first; undated items last. _limit applies across all years.']],
         notes: 'The route also accepts externalid, but SeminarList does not expose it as a prop.',
     },
     {
@@ -46,7 +47,8 @@ export const widgets = [
         routes: ['public/conferences'],
         filters: [...dateRange, ['grants', 'API · Grant ID.'], ['ssd', 'API · Research area code (case-sensitive value).'],
             ['is_outreach', 'API · true or false; omit to include both.'], ...sortAndLimit],
-        options: [['en', 'Force English labels (boolean).']],
+        options: [['en', 'Force English labels (boolean).'],
+            ['group_by_year', 'Boolean, default false. Group by start year in accordions, newest year first; undated items last. _limit applies across all years.']],
     },
     {
         id: 'conference', component: 'Conference', props: {},
@@ -160,6 +162,7 @@ export const widgets = [
             ['limit', 'Maximum number of results. Omit to include all matching grants.'],
         ],
         options: [
+            ['group_by_year', 'Boolean, default false. Group by start year in accordions, newest year first; undated grants last. limit applies across all years.'],
             ['sort_by', 'start_date (default), end_date or name.'],
             ['order', 'asc (default) or desc. Applied before limit.'],
             ['date_style', 'Localized dates: short (default), medium, long or full. Missing dates are omitted.'],
