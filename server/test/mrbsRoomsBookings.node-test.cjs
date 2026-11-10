@@ -38,21 +38,20 @@ test('availability proxy preserves valid room lists, including no available room
     }
 })
 
-test('availability proxy rejects PHP errors and other invalid responses with 502', async () => {
+test('availability proxy preserves upstream errors for inspection in the Network tab', async () => {
     const phpError = "<br /><b>Parse error</b>: Unclosed '{' in /var/www/html/api.php"
     for (const payload of [phpError, null, {}, { error: 'Unavailable' }]) {
         const res = await queryRooms(payload)
-        assert.equal(res.statusCode, 502)
-        assert.match(res.body.error, /Rooms returned an invalid availability response/)
-        assert.ok(!JSON.stringify(res.body).includes('/var/www/'))
+        assert.equal(res.statusCode, 200)
+        assert.equal(res.body, payload)
     }
 })
 
-test('frontend reports the proxy error and keeps availability failures distinct from conflicts', async t => {
-    const res = await queryRooms('<b>Parse error</b>')
+test('frontend rejects invalid payloads before filtering and preserves the availability error state', async t => {
+    let payload
     t.mock.method(globalThis, 'fetch', async () => ({
-        status: res.statusCode,
-        json: async () => res.body
+        status: 200,
+        json: async () => payload
     }))
     const apiUrl = pathToFileURL(path.resolve(__dirname, '../../frontend/src/api.js')).href
     const filename = path.resolve(__dirname, '../../frontend/src/processes/RoomsBookings.jsx')
@@ -61,8 +60,14 @@ test('frontend reports the proxy error and keeps availability failures distinct 
         `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`
     )
     t.mock.method(console, 'error', () => {})
-    await assert.rejects(queryAvailableRooms(new Date(100000), new Date(200000), 'seminars'),
-        /Service unavailable: Rooms returned an invalid availability response/)
+    for (payload of ['<b>Parse error</b>', null, {}, { error: 'Unavailable' }]) {
+        await assert.rejects(queryAvailableRooms(new Date(100000), new Date(200000), 'seminars'),
+            /Check the mrbsRoomsBookings response in the Network tab/)
+    }
+    for (payload of [[], [{ id: 33, area_id: 4, name: 'Test room' }]]) {
+        assert.equal(await queryAvailableRooms(new Date(100000), new Date(200000), 'seminars'), payload)
+    }
+    payload = '<b>Parse error</b>'
     const result = await handleRoomBooking({
         conferenceRoom: { mrbsRoomID: 33, name: 'Test room' },
         startDatetime: new Date(100000), duration: 60

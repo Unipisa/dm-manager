@@ -15,10 +15,6 @@ async function api_fetch(url, options) {
         const data = await response.json()
         throw new Error(`Not found: ${data.error}`)
     }
-    if (response.status === 502) {
-        const data = await response.json()
-        throw new Error(`Service unavailable: ${data.error}`)
-    }
     if (response.status !== 200) throw new Error("server error")
     const data = await response.json()
     // console.log(`fetching ${url} done, data: ${JSON.stringify(data)}`)

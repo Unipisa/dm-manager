@@ -30,6 +30,11 @@ export const queryAvailableRooms = async (startTime, endTime, process) => {
       end_time: end
     })
 
+    // Keep the upstream response visible in Network, but never filter an invalid payload.
+    if (!Array.isArray(response)) {
+      throw new Error('Rooms returned an invalid availability response. Check the mrbsRoomsBookings response in the Network tab for details.')
+    }
+
     return response
   } catch (error) {
     console.error('Error querying available rooms:', error)

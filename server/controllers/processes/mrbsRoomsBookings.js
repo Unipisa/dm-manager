@@ -66,14 +66,6 @@ module.exports = (router) => {
                     return res.status(400).json({ error: 'Invalid action' })
             }
 
-            // Rooms can return an HTML error page with HTTP 200 (e.g. a PHP parse error).
-            // Availability consumers require an array, so reject invalid upstream responses.
-            if (action === 'query' && !Array.isArray(response.data)) {
-                return res.status(502).json({
-                    error: 'Rooms returned an invalid availability response. Please contact the Rooms administrator.'
-                })
-            }
-
             res.json(response.data)
         } catch (error) {
             console.error('MRBS API Error:', error)
