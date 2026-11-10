@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { Button, Nav, Tab } from 'react-bootstrap';
 import { useQuery } from 'react-query';
 import axios from 'axios';
-import Markdown from 'react-markdown';
-import rehypeKatex from 'rehype-katex';
-import remarkMath from 'remark-math';
-import remarkGfm from 'remark-gfm';
+import { MarkdownExcerpt } from './MarkdownExcerpt';
 import { Loading } from './Loading';
 import {
   formatDateInterval,
@@ -89,7 +86,7 @@ export function HomeEventList({ default_entries = 3, show_excerpt = true, en = f
     const showButton = numberOfEntries <= seminar_list.length + conference_list.length;
 
     return (
-        <div className="">
+        <div className="dm-home-event-list">
           <Tab.Container id="left-tabs-example" defaultActiveKey="all">
             <Nav variant="pills" className="flex-row d-flex justify-content-center">
               <Nav.Item>
@@ -214,9 +211,7 @@ function EventBox({ event, show_excerpt, en }) {
         <div className={`subtitle_style ${event.type === 'seminar' ? 'fa fa-tags' : event.type === 'conference' ? 'fa fa-link' : ''}`}> {tags}</div>
         { show_excerpt && 
           <div className="excerpt_style">
-            <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
-                {truncateTextByWords(event.abstract ? event.abstract : event.description, 30)}
-            </Markdown>
+            <MarkdownExcerpt>{event.abstract || event.description}</MarkdownExcerpt>
           </div>
         }
     </div>

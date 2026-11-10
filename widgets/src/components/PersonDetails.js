@@ -37,7 +37,10 @@ export function PersonDetails({ person_id }) {
     return (
         <div className="dm-person-details">
             <PersonBlock data={data} en={en}/>
-            {about && <p className="dm-person-biography">{about}</p>}
+            {about && <section className="dm-person-biography-section" aria-label={en ? 'About' : 'Profilo'}>
+                <h3 className="dm-person-biography-title">{en ? 'About' : 'Profilo'}</h3>
+                <p className="dm-person-biography">{about}</p>
+            </section>}
             <div className="dm-person-details-accordions">
                 <Duties data={data} en={en}/>
                 <UnimapData data={data} en={en}/>

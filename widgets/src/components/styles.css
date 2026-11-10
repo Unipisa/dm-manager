@@ -444,6 +444,11 @@
     line-height: 1.5;
 }
 
+.dm-course-list .dm-course-lecturers {
+    grid-auto-rows: auto;
+    align-items: start;
+}
+
 .dm-course-list .dm-course-lecturers .dm-person-card {
     padding: 1rem;
 }
@@ -692,11 +697,25 @@
     font-size: 0.9rem;
 }
 
+.dm-person-details .dm-person-biography-section {
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid #dbe4ec;
+}
+
+.dm-person-details .dm-person-biography-title {
+    margin: 0 0 0.75rem;
+    color: #003c71;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
 .dm-person-details .dm-person-biography {
     max-width: none;
-    margin: 1.25rem 0;
+    margin: 0;
     font-size: 1rem;
-    line-height: 1.5;
+    line-height: 1.6;
     white-space: pre-line;
 }
 
@@ -972,7 +991,6 @@
 .excerpt_style {
     color: #000000;
     font-size: 1rem;
-    overflow: hidden;
 
     @media (max-width: 768px) {
         font-size: 0.875rem;
@@ -980,6 +998,13 @@
     @media (max-width: 440px) {
         display: none;
     }
+}
+
+.dm-markdown-excerpt > p {
+    margin: 0;
+    font-size: inherit;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
 }
 
 .load-button {

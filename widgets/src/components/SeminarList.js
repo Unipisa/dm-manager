@@ -6,8 +6,8 @@ import { Loading } from './Loading'
 import { EventListContent } from './EventListContent'
 import { YearGroupedContent } from './YearGroupedContent'
 
-export function SeminarList({ from, to, category, grant, _sort, _limit, en = false, group_by_year = false }) {
-    const filter = { from, to, category, grant, _sort, _limit }
+export function SeminarList({ from, to, category, grants, _sort, _limit, en = false, group_by_year = false }) {
+    const filter = { from, to, category, grants, _sort, _limit }
     const { isLoading, error, data } = useQuery(['seminars', filter], async () => {
         const response = await axios.get(getManageURL('public/seminars'), { params: filter })
         return response.data?.data || []

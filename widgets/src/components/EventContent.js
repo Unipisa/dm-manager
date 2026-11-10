@@ -3,7 +3,8 @@ import Markdown from 'react-markdown'
 import rehypeKatex from 'rehype-katex'
 import remarkMath from 'remark-math'
 import remarkGfm from 'remark-gfm'
-import { getDMURL, isEnglish, truncateTextByWords } from '../utils'
+import { getDMURL, isEnglish } from '../utils'
+import { MarkdownExcerpt } from './MarkdownExcerpt'
 
 // Shared presentation for event lists and individual event pages.
 export function EventHeading({ title, href, typeLabel }) {
@@ -38,12 +39,11 @@ export function getEventRoom({ room, institution, en }) {
 
 export function EventDescription({ children, excerpt = false }) {
     if (excerpt && !children) return null
+    if (excerpt) return <div className="dm-event-list-excerpt"><MarkdownExcerpt maxWords={35}>{children}</MarkdownExcerpt></div>
 
-    const content = <Markdown components={excerpt ? { img: () => null } : undefined} remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
-        {excerpt ? truncateTextByWords(children, 35) : children}
+    return <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
+        {children}
     </Markdown>
-
-    return excerpt ? <div className="dm-event-list-excerpt">{content}</div> : content
 }
 
 export function EventFlyer({ url, title }) {

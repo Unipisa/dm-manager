@@ -8,13 +8,12 @@ import { EventListContent } from './EventListContent'
 export function EventList({ from, to, grants, _limit, en = false }) {
     const filter = { from, to, grants, _limit }
     const { isLoading, error, data } = useQuery(['events', filter], async () => {
-        // The two public APIs use different names for the same grant filter.
         const [conferences, seminars] = await Promise.all([
             axios.get(getManageURL('public/conferences'), {
                 params: { ...filter, _sort: 'startDate' },
             }),
             axios.get(getManageURL('public/seminars'), {
-                params: { from, to, grant: grants, _limit, _sort: 'startDatetime' },
+                params: { from, to, grants, _limit, _sort: 'startDatetime' },
             }),
         ])
 
