@@ -87,8 +87,8 @@ function PeopleCell({ row, column, en, dateFormat, kind }) {
     }
 }
 
-export function PeopleTable({ data, columns, headers, headers_en, date_style, en, kind = 'staff' }) {
-    const [sort, setSort] = useState({ column: 'last_name', order: 'asc' });
+export function PeopleTable({ data, columns, headers, headers_en, date_style, en, kind = 'staff', initialSort = { column: 'last_name', order: 'asc' } }) {
+    const [sort, setSort] = useState(initialSort);
     const visit = kind === 'visit';
     const thesis = kind === 'thesis';
     const headings = headingsByKind[kind];

@@ -1,8 +1,9 @@
 const { personProfilePipeline } = require('./person-profile')
 const { duration } = require('moment');
 const EventPhdCourse = require('../../models/EventPhdCourse')
+const { ObjectId } = require('mongoose').Types
 
-async function coursesQuery(req) {
+async function coursesQuery(req, { id } = {}) {
     var from = undefined;
     switch (req.query.from) {
         case 'now':
@@ -28,6 +29,7 @@ async function coursesQuery(req) {
     }
 
     var match = {}
+    if (id) match._id = new ObjectId(id)
 
     if (from !== undefined) {
         match["endDate"] = { "$gte": from }

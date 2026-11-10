@@ -120,7 +120,7 @@ test('default visit API queries include all periods, while homepage visits keep 
 
 test('invalid, legacy and staff-only options are rejected before any request', () => {
     for (const props of [
-        {grant_id:'641b8b0b840928dc5b8da2e3'}, {grants:'invalid'}, {grants:[]}, {grants:['641b8b0b840928dc5b8da2e3','invalid']}, {grants:'641b8b0b840928dc5b8da2e3,'}, {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
+        {grant_id:'641b8b0b840928dc5b8da2e3'}, {grants:'invalid'}, {grants:[]}, {grants:['641b8b0b840928dc5b8da2e3','invalid']}, {grants:'641b8b0b840928dc5b8da2e3,'}, {sort_by:'office'}, {order:'invalid'}, {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
         {dateyear: 2026}, {date_format: 'd.m.Y'}, {no_data_message: 'None'}, {empty_message: 'None'},
         {person_id: 'id'}, {affiliations__ne: 'id'}, {collaborationTheme__regex: 'x'}, {search: 'x'},
         {qualification: 'PO'}, {is_internal: true}, {tags: 'INdAM Visiting Fellow'}, {research_group: 'code'},
@@ -249,4 +249,27 @@ test('grants accepts arrays and comma-separated IDs, normalizes duplicates, and 
     const match = pipeline.find(stage => stage.$match?.grants).$match.grants
     assert.deepEqual(match.$in.map(id => id.toString()),[first,second])
     assert.ok(!pipeline.at(-1).$project?.grants)
+})
+
+
+test('visit start-date ordering applies before limiting and initializes the visible table sort', async t => {
+    let pipeline
+    t.mock.method(Visit,'aggregate',async stages => {pipeline=stages; return []})
+    const res = response()
+    await visitListQuery({query:params({sort_by:'start_date',order:'desc',limit:2})},res)
+    assert.equal(res.statusCode,200)
+    assert.deepEqual(pipeline.find(stage => stage.$sort).$sort,{startDate:-1})
+    assert.equal(pipeline.find(stage => stage.$facet).$facet.limiting.at(-1).$limit,2)
+    assert.equal(params({sort_by:'end_date',order:'asc'})._sort,'endDate')
+    queryResult = {data:[
+        {...visit,_id:'older',person:{firstName:'Alpha',lastName:'Alpha'},startDate:'2026-01-01'},
+        {...visit,_id:'newer',person:{firstName:'Zulu',lastName:'Zulu'},startDate:'2026-02-01'},
+    ]}
+    for (const group_by_year of [false,true]) {
+        const html = render({sort_by:'start_date',order:'desc',group_by_year})
+        assert.ok(html.indexOf('Zulu Zulu') < html.indexOf('Alpha Alpha'))
+        assert.ok(html.includes('data-column="start_date" aria-sort="descending"'))
+        const ascending = render({sort_by:'start_date',order:'asc',group_by_year})
+        assert.ok(ascending.indexOf('Alpha Alpha') < ascending.indexOf('Zulu Zulu'))
+    }
 })

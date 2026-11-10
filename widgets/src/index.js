@@ -16,6 +16,7 @@ import { PersonCard } from './components/PersonCard';
 import { GroupCards } from './components/GroupCards';
 import { PeopleCards } from './components/PeopleCards';
 import { CourseList } from './components/CourseList';
+import { Course } from './components/Course';
 import { Grant } from './components/Grant';
 import { GrantList } from './components/GrantList';
 import { ThesisList } from './components/ThesisList';
@@ -83,6 +84,9 @@ dmwidgets.loadComponent = (target, name, { widget: _widget, ...props } = {}) => 
             break;
         case 'CourseList':
             element = <CourseList {...props}></CourseList>
+            break;
+        case 'Course':
+            element = <Course {...props} />
             break;
         case 'Grant':
             element = <Grant {...props}></Grant>

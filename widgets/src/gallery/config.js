@@ -5,6 +5,7 @@ const sampleIds = {
     person: '63822bbf7942943d6350d692',
     group: '69e873bd1fe35a92793f027c',
     institution: '641b8b0b840928dc5b8da2e3',
+    course: '671c9d6262fb414b8902eee1',
 };
 
 const dateRange = [
@@ -94,6 +95,7 @@ export const widgets = [
             ['limit', 'Maximum number of results, as a positive integer. Omit to include all.'],
         ],
         options: [
+            ['sort_by / order', 'Initial order: name (default, surname then first name), start_date (From) or end_date (To); order is asc (default) or desc. Applied before limit and within year groups. Header clicks still sort locally.'],
             ['columns', 'Optional array or comma-separated list of visible columns. Defaults to name, affiliations, office, start_date, end_date. Also available: first_name, last_name, email, phone, ssd, current_affiliations, tags, publish, collaboration_theme. affiliations means the affiliation recorded for the visit; current_affiliations means the person’s current affiliations. office combines building, floor and a linked room. Department profile links require an internal staff entry or the qualification "ex Docente".'],
             ['headers / headers_en', 'Optional headings matching the selected columns, as an array or comma-separated string. Default headings are translated automatically.'],
             ['en', 'Force English headings, dates and labels (boolean). Otherwise follows the page language.'],
@@ -126,6 +128,14 @@ export const widgets = [
         routes: ['public/courses'],
         filters: [...dateRange, ['phd', 'API · PhD programme, e.g. HPSC.'],
             ['show_activation_filter', 'Local · Show the All / Confirmed control (boolean, default false). Confirmed checks activationStatus=confirmed.']],
+    },
+    {
+        id: 'course', component: 'Course', props: { phd_course_id: sampleIds.course },
+        lookup: { route: 'public/courses', query: '', prop: 'phd_course_id' },
+        routes: ['public/course/:id'],
+        filters: [['phd_course_id', 'Course ID. Uses the phd_course_id page query parameter if this prop is omitted.']],
+        options: [['en', 'Force English labels (boolean). Otherwise follows the page language.']],
+        notes: 'Lecturer cards use the shared profile-link rules. Lessons are sorted chronologically and displayed in Europe/Rome time, including daylight saving. The gallery selects the first available course; set phd_course_id here for a specific preview.',
     },
     {
         id: 'thesislist', component: 'ThesisList',

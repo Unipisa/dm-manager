@@ -17,14 +17,15 @@ export function VisitList(props) {
         return <p className="alert alert-danger" role="alert">VisitList: {error.message}</p>;
     }
     const grouped = hasPeopleValue(props.group_by_year) && peopleBoolean(props.group_by_year, 'group_by_year') === 'true';
-    return <VisitListData query={query} tableOptions={tableOptions} en={isEnglish(props.en)} grouped={grouped} />;
+    const initialSort = { column: !props.sort_by || props.sort_by === 'name' ? 'last_name' : props.sort_by, order: props.order || 'asc' };
+    return <VisitListData query={query} tableOptions={tableOptions} en={isEnglish(props.en)} grouped={grouped} initialSort={initialSort} />;
 }
 
-function VisitListData({ query, tableOptions, en, grouped }) {
+function VisitListData({ query, tableOptions, en, grouped, initialSort }) {
     const { isLoading, error, data } = useQuery(['visitlist', query], async () => {
         const response = await axios.get(getManageURL('public/visit-list', query));
         return response.data.data || [];
     });
     if (isLoading || error) return <Loading widget="Lista delle visite" error={error} />;
-    return <YearGroupedPeopleTable data={data} {...tableOptions} en={en} grouped={grouped} dateField="startDate" />;
+    return <YearGroupedPeopleTable key={`${initialSort.column}:${initialSort.order}`} data={data} {...tableOptions} en={en} grouped={grouped} dateField="startDate" initialSort={initialSort} />;
 }

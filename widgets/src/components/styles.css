@@ -105,7 +105,7 @@
 }
 
 .dm-person-card .dm-person-card-contact {
-    margin-top: auto;
+    margin-top: 0;
     font-size: 0.95rem;
     line-height: 1.5;
 }
@@ -335,6 +335,58 @@
 .dm-course-list .dm-course-intro {
     margin: 0 0 1rem;
     line-height: 1.6;
+}
+
+.dm-course-detail .dm-course-detail-header {
+    padding: 1.25rem 0;
+    border-top: 4px solid #003c71;
+}
+
+.dm-course-detail .dm-course-detail-title {
+    margin: 0;
+    color: #003c71;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    line-height: 1.3;
+}
+
+.dm-course-detail .dm-course-facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 1.25rem 2rem;
+    margin: 0 0 1.75rem;
+    padding: 1.25rem;
+    border: 1px solid #dbe4ec;
+    border-left: 3px solid #003c71;
+}
+
+.dm-course-detail .dm-course-facts dt {
+    margin: 0 0 0.4rem;
+    color: #53616d;
+    font-size: 0.9rem;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+.dm-course-detail .dm-course-facts dt i {
+    color: #003c71;
+}
+
+.dm-course-detail .dm-course-facts dd {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.dm-course-list.dm-course-detail .dm-course-content {
+    gap: 1.75rem;
+    padding: 0;
+}
+
+.dm-course-list.dm-course-detail .dm-course-section-title {
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dbe4ec;
+    font-size: 1.25rem;
 }
 
 .dm-course-list .dm-course-filter {
@@ -641,7 +693,7 @@
 }
 
 .dm-person-details .dm-person-biography {
-    max-width: 75ch;
+    max-width: none;
     margin: 1.25rem 0;
     font-size: 1rem;
     line-height: 1.5;
