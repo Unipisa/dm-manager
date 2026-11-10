@@ -30,8 +30,8 @@ export function PersonCard({ person_id, badge }) {
     return <div className="dm-people-cards"><PersonCardContent person={data} badge={badge} /></div>;
 }
 
-export function PersonCardContent({ person: data, badge }) {
-    const profile = getPersonProfileURL(data);
+export function PersonCardContent({ person: data, badge, en }) {
+    const profile = getPersonProfileURL(data, en);
     const name = [data.firstName, data.lastName].filter(Boolean).join(' ');
     const affiliations = (data.affiliations || []).map(affiliation => affiliation.name).filter(Boolean).join(', ');
     const href = profile || data.personalPage;

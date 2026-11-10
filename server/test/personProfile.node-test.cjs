@@ -76,7 +76,7 @@ function walk(value) {
 }
 for (const [endpoint, model, count] of [
     ['person', 'Person', 1], ['group', 'Group', 3], ['courses', 'EventPhdCourse', 1],
-    ['staff-list', 'Staff', 1], ['visit-list', 'Visit', 1], ['grant', 'Grant', 2],
+    ['staff-list', 'Staff', 1], ['visit-list', 'Visit', 1], ['grant', 'Grant', 3],
     ['grants', 'Grant', 2], ['theses', 'Thesis', 2],
 ]) {
     test(`public/${endpoint} provides profile eligibility wherever it returns people`, async t => {
@@ -127,4 +127,24 @@ test('ineligible cards retain external personal-page links; former faculty use t
     html = renderToStaticMarkup(React.createElement(Component, {person:{...person,staffs:[{qualification:'ex Docente',isInternal:false}]}}))
     assert.ok(html.includes('href="/scheda-personale/?person_id=person"'))
     assert.ok(!html.includes('target="_blank"'))
+})
+
+test('course badges precede titles and section headings have no trailing colons', () => {
+    const course = {_id:'course',title:'Example course',courseType:'PhD',startDate:'2026-01-01',endDate:'2026-02-01',
+        lecturers:[],lessons:[{date:'2026-01-10T10:00:00Z',duration:60}],description:'Course description'}
+    queryData = [course]
+    const html = renderToStaticMarkup(React.createElement(widget('CourseList','CourseList'), {from:'2025-09-01',to:'2026-09-01'}))
+    assert.ok(html.indexOf('>PhD</span>') < html.indexOf('>Example course</span>'))
+    for (const label of ['Lecturers','Scheduled lessons','Period','Description']) {
+        assert.ok(html.includes(`dm-course-section-title">${label}</h5>`),label)
+    }
+})
+
+test('list excerpts hide embedded flyers while individual event pages retain them', () => {
+    const {EventDescription} = loadWidget(path.resolve(__dirname,'../../widgets/src/components/EventContent.js'))
+    const description = 'Event description. ![Flyer](https://example.org/flyer.png)'
+    const list = renderToStaticMarkup(React.createElement(EventDescription,{excerpt:true},description))
+    assert.ok(list.includes('Event description') && !list.includes('<img'))
+    const detail = renderToStaticMarkup(React.createElement(EventDescription,{},description))
+    assert.ok(detail.includes('<img') && detail.includes('https://example.org/flyer.png'))
 })

@@ -55,9 +55,9 @@ function GrantListData({ query, en, dateStyle }) {
         const ssds = Array.isArray(grant.SSD) ? grant.SSD : [grant.SSD].filter(Boolean);
         return <li key={grant._id || index} className={`dm-grant-panel current${ssds.join(', ').toLowerCase()} ${grant.funds || ''}`}>
             <h3 className="dm-grant-title">
-                <a href={`/research/grant-details/?grant_id=${grant._id}`}>
-                    {grant.name}
-                    {grant.projectType && <> <span className="dm-grant-type">{grant.projectType}</span></>}
+                <a className="dm-heading-with-badge" href={`/research/grant-details/?grant_id=${grant._id}`}>
+                    {grant.projectType && <span className="dm-grant-type dm-widget-badge">{grant.projectType}</span>}
+                    <span className="dm-heading-text">{grant.name}</span>
                 </a>
             </h3>
             {(start || end) && <p className="dm-grant-period">

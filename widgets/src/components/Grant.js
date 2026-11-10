@@ -4,7 +4,7 @@ import axios from 'axios';
 import { useQuery } from 'react-query';
 import { getManageURL, isEnglish } from '../utils';
 import { Loading } from './Loading';
-import Accordion from './Accordion';
+import { PersonCardContent } from './PersonCard';
 import Markdown from 'react-markdown';
 import rehypeKatex from 'rehype-katex';
 import remarkMath from 'remark-math';
@@ -59,16 +59,20 @@ export function Grant({ grant_id, en: english }) {
             {coordinator && <KeyPerson person={coordinator} title={en ? 'Local Coordinator' : 'Coordinatore locale'} en={en} />}
         </section>}
         <div className="dm-grant-detail-sections">
-            {data.members?.length > 0 && <Accordion title={en ? 'Participants' : 'Partecipanti'} markdown={false}>
-                <ul className="dm-grant-participants">{data.members.map((person, index) =>
-                    <li key={person._id || index}>{[person.firstName, person.lastName].filter(Boolean).join(' ')}</li>
-                )}</ul>
-            </Accordion>}
-            {data.description && <Accordion title={en ? 'Description' : 'Descrizione'} markdown={false}>
+            {data.description && <section>
+                <h3 className="dm-grant-section-title">{en ? 'Description' : 'Descrizione'}</h3>
                 <div className="dm-grant-description"><Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
                     {data.description}
                 </Markdown></div>
-            </Accordion>}
+            </section>}
+            {data.members?.length > 0 && <section>
+                <h3 className="dm-grant-section-title">{en ? 'Participants' : 'Partecipanti'}</h3>
+                <div className="dm-people-cards">{data.members.map((person, index) =>
+                    <PersonCardContent key={person._id || index} en={en} person={{
+                        ...person, affiliations: hasPersonProfile(person) ? [] : person.affiliations,
+                    }} />
+                )}</div>
+            </section>}
         </div>
     </article>;
 }

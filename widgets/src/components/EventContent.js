@@ -7,9 +7,9 @@ import { getDMURL, isEnglish, truncateTextByWords } from '../utils'
 
 // Shared presentation for event lists and individual event pages.
 export function EventHeading({ title, href, typeLabel }) {
-    return <h3 className="title entry-title">
-        {typeLabel && <><span className="dm-event-list-type">{typeLabel}</span> </>}
-        {href !== undefined ? <a href={href}>{title}</a> : title}
+    return <h3 className={`title entry-title${typeLabel ? ' dm-heading-with-badge' : ''}`}>
+        {typeLabel && <span className="dm-event-list-type dm-widget-badge">{typeLabel}</span>}
+        <span className="dm-heading-text">{href !== undefined ? <a href={href}>{title}</a> : title}</span>
     </h3>
 }
 
@@ -39,7 +39,7 @@ export function getEventRoom({ room, institution, en }) {
 export function EventDescription({ children, excerpt = false }) {
     if (excerpt && !children) return null
 
-    const content = <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
+    const content = <Markdown components={excerpt ? { img: () => null } : undefined} remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>
         {excerpt ? truncateTextByWords(children, 35) : children}
     </Markdown>
 

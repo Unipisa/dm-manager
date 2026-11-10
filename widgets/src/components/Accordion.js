@@ -1,7 +1,7 @@
 import React, { useState, useId } from 'react';
 import './styles.css';
 
-const Accordion = ({ title, badge, content, markdown = true, initiallyOpen = false, clickToClose = true, autoClose = true, scroll = false, scrollOffset = 0, children }) => {
+const Accordion = ({ title, badge, badgePosition = 'right', content, markdown = true, initiallyOpen = false, clickToClose = true, autoClose = true, scroll = false, scrollOffset = 0, children }) => {
   const acId = useId();
   const atId = useId();
   const markdownClass = markdown ? 'markdown-compile' : '';
@@ -37,8 +37,11 @@ const Accordion = ({ title, badge, content, markdown = true, initiallyOpen = fal
         aria-expanded={isOpen}
         onClick={toggleAccordion}
       >
-        <span className="me-auto">{title}</span>
-        {badge && <span className="badge badge-primary ms-2">{badge}</span>}
+        <span className={badgePosition === 'left' ? 'dm-heading-with-badge' : 'me-auto'}>
+          {badge && badgePosition === 'left' && <span className="dm-widget-badge">{badge}</span>}
+          <span className="dm-heading-text">{title}</span>
+        </span>
+        {badge && badgePosition !== 'left' && <span className="badge badge-primary ms-2 dm-widget-badge">{badge}</span>}
       </h4>
       <div
         id={acId}

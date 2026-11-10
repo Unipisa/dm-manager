@@ -75,8 +75,9 @@ test('explicit date filters have identical semantics in StaffList and VisitList'
     assert.equal(params({start_from: '2025-11-01'}).startDate__gte, '2025-11-01')
 })
 
-test('ssd is the only visit-specific filter; display options do not affect the query', () => {
+test('SSD and grant are explicit visit filters; display options do not affect the query', () => {
     assert.deepEqual(params({ssd: 'MATH-01/A'}), { _sort: 'person', SSD: 'MATH-01/A' })
+    assert.equal(params({grant_id:'641b8b0b840928dc5b8da2e3'}).grants, '641b8b0b840928dc5b8da2e3')
     assert.equal(params({}).publish, undefined)
     assert.equal(params({}).collaborationTheme, undefined)
     assert.deepEqual(params({columns: 'email', headers: 'Contact', group_by_year:true}), params({columns: 'name'}))
@@ -86,13 +87,14 @@ test('the public visit endpoint accepts generated filters and retains its public
     let pipeline
     t.mock.method(Visit, 'aggregate', async stages => { pipeline = stages; return [] })
     const res = response()
-    await visitListQuery({query: params({status: 'current', ssd: 'MATH-01/A'})}, res)
+    await visitListQuery({query: params({status: 'current', ssd: 'MATH-01/A', grant_id:'641b8b0b840928dc5b8da2e3'})}, res)
     assert.equal(res.statusCode, 200)
     const matches = pipeline.filter(stage => stage.$match).map(stage => stage.$match)
     assert.ok(matches.some(match => match.$or?.some(condition => condition.startDate?.$lte instanceof Date)))
     assert.ok(matches.some(match => match.$or?.some(condition => condition.endDate?.$gte instanceof Date)))
     assert.ok(!matches.some(match => 'publish' in match))
     assert.ok(matches.some(match => match.SSD === 'MATH-01/A'))
+    assert.ok(matches.some(match => match.grants?.toString() === '641b8b0b840928dc5b8da2e3'))
     assert.ok(!matches.some(match => 'collaborationTheme' in match))
     assert.deepEqual(pipeline.find(stage => stage.$sort).$sort, {'person.lastName': 1, 'person.firstName': 1})
     const projection = pipeline.find(stage => stage.$project).$project
@@ -118,7 +120,7 @@ test('default visit API queries include all periods, while homepage visits keep 
 
 test('invalid, legacy and staff-only options are rejected before any request', () => {
     for (const props of [
-        {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
+        {grant_id:'invalid'}, {grant_id:[]}, {group_by_year:'yes'}, {filter: 'current'}, {fields: 'person.lastName'}, {table: 'Name'}, {tableen: 'Name'}, {sort_field: 'person'},
         {dateyear: 2026}, {date_format: 'd.m.Y'}, {no_data_message: 'None'}, {empty_message: 'None'},
         {person_id: 'id'}, {affiliations__ne: 'id'}, {collaborationTheme__regex: 'x'}, {search: 'x'},
         {qualification: 'PO'}, {is_internal: true}, {tags: 'INdAM Visiting Fellow'}, {research_group: 'code'},

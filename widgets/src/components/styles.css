@@ -1,3 +1,29 @@
+.dm-widget-badge {
+    display: inline-block;
+    flex-shrink: 0;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid #003c71;
+    border-radius: 0;
+    background-color: #003c71;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    vertical-align: middle;
+}
+
+.dm-heading-with-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.dm-heading-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
 .dm-people-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -278,15 +304,13 @@
     display: none;
 }
 
-.dm-grant-detail .dm-grant-participants {
-    columns: 2 220px;
-    margin: 0;
-    padding-left: 1.25rem;
-}
-
-.dm-grant-detail .dm-grant-participants li {
-    break-inside: avoid;
-    margin-bottom: 0.35rem;
+.dm-grant-detail .dm-grant-section-title {
+    margin: 0 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dbe4ec;
+    color: #003c71;
+    font-size: 1.25rem;
+    line-height: 1.4;
 }
 
 .dm-grant-detail .dm-grant-description > :first-child {
@@ -358,7 +382,7 @@
 .dm-course-list .dm-course-section-title {
     margin: 0 0 0.65rem;
     color: #003c71;
-    font-size: 1rem;
+    font-size: 1.15rem;
     font-weight: 600;
     line-height: 1.5;
 }
@@ -447,8 +471,9 @@
     display: inline-block;
     vertical-align: middle;
     padding: 0.15rem 0.5rem;
-    border: 1px solid #dbe4ec;
-    color: #003c71;
+    border: 1px solid #003c71;
+    background-color: #003c71;
+    color: #fff;
     font-size: 0.75rem;
     font-weight: 600;
     line-height: 1.4;

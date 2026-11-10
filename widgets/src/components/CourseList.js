@@ -74,7 +74,7 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
 
             const lessons = course.lessons && course.lessons.filter(lesson => Object.keys(lesson).length > 0).length > 0 ? (
                 <div>
-                    <h5 className="dm-course-section-title">Scheduled lessons:</h5>
+                    <h5 className="dm-course-section-title">Scheduled lessons</h5>
                     <ul className="dm-course-lessons">
                         {[...course.lessons].sort((a, b) => new Date(a.date) - new Date(b.date)).map((lesson, index) => {
                             let room = lesson.conferenceRoom || null;
@@ -98,22 +98,22 @@ export function CourseList({ from, to, phd, show_activation_filter = false }) {
             ) : null;
 
             return (
-                <Accordion title={course.title} badge={course.courseType} key={course._id}>
+                <Accordion title={course.title} badge={course.courseType} badgePosition="left" key={course._id}>
                     <div className="dm-course-content">
                         <section>
-                            <h5 className="dm-course-section-title">{course.lecturers.length === 1 ? 'Lecturer:' : 'Lecturers:'}</h5>
+                            <h5 className="dm-course-section-title">{course.lecturers.length === 1 ? 'Lecturer' : 'Lecturers'}</h5>
                             <div className="dm-people-cards dm-course-lecturers">{lecturerCards}</div>
                         </section>
                         {course.startDate && course.endDate &&
                         new Date(course.startDate).getTime() !== new Date(course.endDate).getTime() && (
                         <section>
-                            <h5 className="dm-course-section-title">Period:</h5>
+                            <h5 className="dm-course-section-title">Period</h5>
                             <p className="dm-course-period"><i className="far fa-calendar-alt fa-fw" aria-hidden="true"></i>{' '}From {formatDate(course.startDate, 'en-US')} to {formatDate(course.endDate, 'en-US')}</p>
                         </section>
                         )}
                         {lessons}
                         <section className="dm-course-description">
-                            <h5 className="dm-course-section-title">Description:</h5>
+                            <h5 className="dm-course-section-title">Description</h5>
                             <Markdown remarkPlugins={[remarkMath, remarkGfm]} rehypePlugins={[rehypeKatex]}>{course.description}</Markdown>
                         </section>
                     </div>

@@ -9,7 +9,7 @@ controller.Model = Visit
 controller.path = 'public/visit-list'
 controller.fields = Object.fromEntries([
     'person', 'affiliations', 'startDate', 'endDate', 'SSD', 'tags',
-    'publish', 'collaborationTheme',
+    'publish', 'collaborationTheme', 'grants',
 ].map(field => [field, Visit._schema_info.properties[field]]))
 controller.searchFields = ['person.lastName', 'person.firstName', 'affiliations.name']
 controller.queryPipeline = [

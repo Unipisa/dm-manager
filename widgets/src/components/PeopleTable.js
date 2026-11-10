@@ -68,7 +68,7 @@ function PeopleCell({ row, column, en, dateFormat, kind }) {
         case 'advisors': return (row.advisors || []).map((advisor, index) => {
             const url = getPersonProfileURL(advisor, en);
             const name = [advisor.firstName, advisor.lastName].filter(Boolean).join(' ');
-            return <React.Fragment key={advisor._id || index}>{index > 0 && ', '}{url ? <a href={url}>{name}</a> : name}</React.Fragment>;
+            return <React.Fragment key={advisor._id || index}>{index > 0 && ', '}{url ? <a href={url}><i className="fas fa-id-card fa-fw" aria-hidden="true"></i>{' '}{name}</a> : name}</React.Fragment>;
         });
         case 'genealogy': return value ? <a href={`https://www.genealogy.math.ndsu.nodak.edu/id.php?id=${encodeURIComponent(value)}`} aria-label={en ? 'Mathematics Genealogy Project' : 'Progetto di genealogia matematica'}><i className="fas fa-id-card fa-fw" aria-hidden="true"></i></a> : '';
         case 'file': return /^https?:\/\//i.test(value) ? <a href={value} target="_blank" rel="noopener noreferrer">{en ? 'Thesis' : 'Tesi'}</a> : '';

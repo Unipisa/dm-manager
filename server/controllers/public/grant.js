@@ -103,6 +103,17 @@ async function grantQuery(req) {
             localField: 'members',
             foreignField: '_id',
             as: 'members',
+            pipeline: [
+                ...personProfilePipeline(),
+                { $lookup: {
+                    from: 'institutions', localField: 'affiliations', foreignField: '_id', as: 'affiliations',
+                    pipeline: [{ $project: { _id: 1, name: 1 } }],
+                } },
+                { $project: {
+                    firstName: 1, lastName: 1, hasPersonProfile: 1,
+                    email: 1, personalPage: 1, affiliations: 1,
+                } },
+            ],
         }},
         { $addFields: { 
             members: { 
@@ -142,8 +153,12 @@ async function grantQuery(req) {
             },
             members: {
                 _id: 1,
+                hasPersonProfile: 1,
                 firstName: 1,
-                lastName: 1
+                lastName: 1,
+                email: 1,
+                personalPage: 1,
+                affiliations: { _id: 1, name: 1 },
             },
             startDate: 1, 
             endDate: 1, 

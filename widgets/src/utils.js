@@ -205,7 +205,7 @@ export function getRoomDetails(room, id, en) {
         roadName = 'Largo Bruno Pontecorvo, 5';
         break;
       case 'X':
-        buildingName = 'ex DMA';
+        buildingName = 'Ex DMA';
         roadName = 'Via Buonarroti, 1/c';
         break;
       default:

@@ -105,6 +105,7 @@ test('configurable table preserves genealogy/contact links, profile eligibility 
     const html = render({ en:true, columns:'name,genealogy,email,phone,advisors,institutions', headers_en:'Student,Genealogy,Email,Phone,Supervisors,Institutions' })
     for (const text of ['Student', 'aria-sort="ascending"', 'https://www.genealogy.math.ndsu.nodak.edu/id.php?id=123', 'mailto:example@example.org', 'tel:+39000', '/en/scheda-personale/?person_id=graduate', '/en/scheda-personale/?person_id=internal', 'One, Two']) assert.ok(html.includes(text), text)
     assert.ok(html.includes('person_id=external') && !html.includes('person_id=nostaff'))
+    assert.ok(html.includes('href="/en/scheda-personale/?person_id=internal"><i class="fas fa-id-card fa-fw"'))
     assert.equal((html.match(/aria-hidden="true">↑/g) || []).length, 1)
 })
 

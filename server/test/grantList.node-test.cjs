@@ -111,7 +111,7 @@ test('list preserves classes, localized project/person links, labels and Italian
     document.documentElement.lang = 'it-IT'
     queryResult = { data: [grant()] }
     const html = render({})
-    for (const text of ['class="dm-grant-list" role="list"', 'class="dm-grant-panel currentmath-01/a, math-02/b National"', '/research/grant-details/?grant_id=grant', 'Example project', 'class="dm-grant-type">PRIN</span>', 'Principal Investigator', '/scheda-personale/?person_id=internal', 'Coordinatore dell’unità di ricerca', '/scheda-personale/?person_id=external', 'Periodo del progetto', new Intl.DateTimeFormat('it-IT',{dateStyle:'short'}).format(new Date('2025-01-15')), new Intl.DateTimeFormat('it-IT',{dateStyle:'short'}).format(new Date('2026-12-20'))]) assert.ok(html.includes(text), text)
+    for (const text of ['class="dm-grant-list" role="list"', 'class="dm-grant-panel currentmath-01/a, math-02/b National"', '/research/grant-details/?grant_id=grant', 'Example project', 'class="dm-grant-type dm-widget-badge">PRIN</span>', 'Principal Investigator', '/scheda-personale/?person_id=internal', 'Coordinatore dell’unità di ricerca', '/scheda-personale/?person_id=external', 'Periodo del progetto', new Intl.DateTimeFormat('it-IT',{dateStyle:'short'}).format(new Date('2025-01-15')), new Intl.DateTimeFormat('it-IT',{dateStyle:'short'}).format(new Date('2026-12-20'))]) assert.ok(html.includes(text), text)
     assert.ok(html.includes('person_id=external'))
 })
 
@@ -235,14 +235,16 @@ test('affiliations are shown only for investigators and coordinators without a d
 
 test('grant details retain all project information in the new facts/contact layout', () => {
     const row = {...grant(),fundingEntity:'Funding body',budgetAmount:'€100,000',webSite:'https://example.org/project',
-        description:'Project **description** with $x^2$.',members:[{_id:'member',firstName:'Member',lastName:'Name'}]}
+        description:'Project **description** with $x^2$.',members:[{_id:'member',firstName:'Member',lastName:'Name',hasPersonProfile:true,email:'member@example.org',affiliations:[{name:'Hidden institution'}]}]}
     queryResult = {data:row}
     const html = renderDetail({en:true})
     for (const text of ['dm-grant-detail','Example project','PRIN','Funded by','Funding body','January 15, 2025',
         'December 20, 2026','€100,000','href="https://example.org/project" target="_blank" rel="noopener noreferrer"',
-        'Principal Investigator','Local Coordinator','Internal Person','External Person','Participants','Member Name',
-        'Description','<strong>description</strong>','katex','dm-widget-accordion']) assert.ok(html.includes(text),text)
+        'Principal Investigator','Local Coordinator','Internal Person','External Person','Participants','Member Name','/en/scheda-personale/?person_id=member','mailto:member@example.org',
+        'Description','<strong>description</strong>','katex','dm-people-cards']) assert.ok(html.includes(text),text)
     assert.equal((html.match(/dm-grant-contact-name/g) || []).length,2)
+    assert.ok(!html.includes('c-accordion__title'))
+    assert.ok(html.indexOf('dm-grant-type') < html.indexOf('Example project'))
 })
 
 test('internal staff and former faculty have recognizable profile links without affiliations', () => {
