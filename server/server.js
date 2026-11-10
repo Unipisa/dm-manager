@@ -143,6 +143,7 @@ function setup_routes(app) {
               add_role('/process/my/visits')
           }
           if (['PO', 'PA', 'RIC', 'RTDb', 'RTDa', 'RTT',
+            'Dottorando in Matematica', 'Dottorando in HPSC',
             'PTA', 'Assegnista', 'Tecnologo', 'Titolare di contratto di ricerca', 'Titolare di incarico post-doc', 'Titolare di incarico di ricerca', 'Titolare di borsa di ricerca',
             ].includes(staff.qualification)) {
               add_role('/process/my/courses')
