@@ -68,7 +68,8 @@ module.exports = (router) => {
 
             res.json(response.data)
         } catch (error) {
-            console.error('MRBS API Error:', error)
+            // Axios errors contain request headers, including the API bearer token.
+            console.error('MRBS API Error:', error.message)
             if (error.response?.status === 404) {
                 res.status(404).json({ error: 'Resource not found' })
             } else {

@@ -10,6 +10,12 @@ export const getBookingDetails = async (bookingId, process) => {
       action: 'details',
       id: bookingId
     })
+    if (!response || !Number.isFinite(Number(response.start_time)) ||
+        !Number.isFinite(Number(response.end_time)) ||
+        Number(response.end_time) <= Number(response.start_time) ||
+        !(Number(response.room_id) > 0)) {
+      throw new Error('Rooms returned invalid booking details. Check the mrbsRoomsBookings response in the Network tab for details.')
+    }
     return response
   } catch (error) {
     if (error.response?.status === 404) {
@@ -80,10 +86,10 @@ export const checkRoomAvailability = async (mrbsRoomId, startTime, endTime, proc
     // area_id 4 = Sala Riunioni, Aula Seminari Ex-Albergo, Aula Seminari, Sala Riunioni Piano Terra, Saletta Riunioni
     // area_id 8 = Aula Magna
     const availableRooms = allAvailableRooms.filter(room =>
-      (room.area_id === 4 || room.area_id === 8) && room.id !== 48
+      (Number(room.area_id) === 4 || Number(room.area_id) === 8) && Number(room.id) !== 48
     )
 
-    const isRoomAvailable = availableRooms.some(room => room.id === mrbsRoomId)
+    const isRoomAvailable = availableRooms.some(room => Number(room.id) === Number(mrbsRoomId))
 
     return {
       available: isRoomAvailable,
@@ -153,7 +159,7 @@ export const handleRoomBooking = async (eventData, process) => {
   const formatTime = (date) => date.toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
   const formatDate = (date) => date.toLocaleDateString('it-IT')
 
-  const requiresApproval = conferenceRoom.mrbsRoomID === 33
+  const requiresApproval = Number(conferenceRoom.mrbsRoomID) === 33
 
   // ------------------------------------------------------------------
   // 1. Fetch existing booking (if any)
@@ -161,22 +167,21 @@ export const handleRoomBooking = async (eventData, process) => {
   let existingBooking = null
   let hasBookingChanged = false
 
-  if (mrbsBookingID) {
-    try {
+  try {
+    if (!Number.isFinite(startTime.getTime()) || !Number.isFinite(endTime.getTime()) || endTime <= startTime) {
+      throw new Error('Invalid booking time interval')
+    }
+    if (mrbsBookingID) {
       const bookingResponse = await getBookingDetails(mrbsBookingID, process)
       if (bookingResponse) {
         existingBooking = bookingResponse
         hasBookingChanged =
           Math.floor(startTime.getTime() / 1000) !== parseInt(existingBooking.start_time) ||
           Math.floor(endTime.getTime() / 1000) !== parseInt(existingBooking.end_time) ||
-          (!!title && existingBooking.name !== title)
+          (!!title && existingBooking.name !== title) ||
+          Number(existingBooking.room_id) !== Number(conferenceRoom.mrbsRoomID)
       }
-    } catch (error) {
-      console.warn('Could not retrieve existing booking details:', error)
     }
-  }
-
-  try {
     // ------------------------------------------------------------------
     // 2. Determine which intervals actually need an availability check.
     //    For a brand-new booking the full window is checked.
@@ -185,7 +190,7 @@ export const handleRoomBooking = async (eventData, process) => {
     let intervalsToCheck = []
     let skipCheck = false
 
-    if (existingBooking) {
+    if (existingBooking && Number(existingBooking.room_id) === Number(conferenceRoom.mrbsRoomID)) {
       const oldStart = new Date(existingBooking.start_time * 1000)
       const oldEnd   = new Date(existingBooking.end_time   * 1000)
 

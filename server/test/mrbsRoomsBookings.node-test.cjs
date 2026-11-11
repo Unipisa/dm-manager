@@ -53,12 +53,7 @@ test('frontend rejects invalid payloads before filtering and preserves the avail
         status: 200,
         json: async () => payload
     }))
-    const apiUrl = pathToFileURL(path.resolve(__dirname, '../../frontend/src/api.js')).href
-    const filename = path.resolve(__dirname, '../../frontend/src/processes/RoomsBookings.jsx')
-    const source = fs.readFileSync(filename, 'utf8').replace("'../api'", JSON.stringify(apiUrl))
-    const { queryAvailableRooms, handleRoomBooking } = await import(
-        `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`
-    )
+    const { queryAvailableRooms, handleRoomBooking } = await loadBookings()
     t.mock.method(console, 'error', () => {})
     for (payload of ['<b>Parse error</b>', null, {}, { error: 'Unavailable' }]) {
         await assert.rejects(queryAvailableRooms(new Date(100000), new Date(200000), 'seminars'),
@@ -74,4 +69,62 @@ test('frontend rejects invalid payloads before filtering and preserves the avail
     }, 'seminars')
     assert.equal(result.type, 'error')
     assert.match(result.error.message, /Rooms returned an invalid availability response/)
+})
+
+async function loadBookings() {
+    const apiUrl = pathToFileURL(path.resolve(__dirname, '../../frontend/src/api.js')).href
+    const filename = path.resolve(__dirname, '../../frontend/src/processes/RoomsBookings.jsx')
+    const source = fs.readFileSync(filename, 'utf8').replace("'../api'", JSON.stringify(apiUrl))
+    return import(
+        `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`
+    )
+}
+
+test('switching rooms checks the full interval, including unchanged times', async t => {
+    const requests = []
+    t.mock.method(globalThis, 'fetch', async (url, options) => {
+        const request = JSON.parse(options.body)
+        requests.push(request)
+        return { status: 200, json: async () => request.action === 'details'
+            ? { room_id: 10, start_time: 100, end_time: 200, name: 'Test' } : [] }
+    })
+    const { handleRoomBooking } = await loadBookings()
+    const result = await handleRoomBooking({
+        conferenceRoom: { mrbsRoomID: 49, name: 'Other room' },
+        mrbsBookingID: 1, startDatetime: new Date(100000), duration: 100 / 60, title: 'Test'
+    }, 'seminars')
+    assert.equal(result.type, 'unavailable')
+    assert.equal(requests[1].action, 'query')
+    assert.equal(requests[1].start_time, 100)
+    assert.equal(requests[1].end_time, 200)
+})
+
+test('missing bookings are distinguished from service failures and malformed details', async t => {
+    let status = 404
+    let details = { error: 'Not found' }
+    t.mock.method(console, 'error', () => {})
+    t.mock.method(globalThis, 'fetch', async (url, options) => {
+        const { action } = JSON.parse(options.body)
+        return { status: action === 'details' ? status : 200,
+            json: async () => action === 'details' ? details : [] }
+    })
+    const { getBookingDetails, handleRoomBooking } = await loadBookings()
+    assert.equal(await getBookingDetails(1, 'seminars'), null)
+    const event = { conferenceRoom: { mrbsRoomID: 10 }, mrbsBookingID: 1,
+        startDatetime: new Date(100000), duration: 60 }
+    assert.equal((await handleRoomBooking(event, 'seminars')).type, 'unavailable')
+    status = 500
+    assert.equal((await handleRoomBooking(event, 'seminars')).type, 'error')
+    status = 200
+    details = '<b>PHP warning</b>'
+    assert.equal((await handleRoomBooking(event, 'seminars')).type, 'error')
+})
+
+test('availability accepts numeric string IDs and still excludes room 48', async t => {
+    t.mock.method(globalThis, 'fetch', async () => ({ status: 200,
+        json: async () => [{ id: '10', area_id: '4' }, { id: '48', area_id: '4' }] }))
+    const { checkRoomAvailability } = await loadBookings()
+    const result = await checkRoomAvailability(10, new Date(100000), new Date(200000), 'seminars')
+    assert.equal(result.available, true)
+    assert.equal(result.availableRooms.length, 1)
 })
