@@ -167,7 +167,7 @@ test('qualification filters run before limits and do not change profile eligibil
 
 test('invalid and legacy options fail clearly without fetching', () => {
     for (const props of [
-        {fields:'title'},{filter:'dateyear=2025'},{table:'Title'},{sort_field:'person'},
+        {exclude_institution:'invalid'},{exclude_institution:[]},{sort_by:'office'},{order:'invalid'},{fields:'title'},{filter:'dateyear=2025'},{table:'Title'},{sort_field:'person'},
         {list_mode:true},{dateyear:2025},{_limit:10},{year:2025,from:'2025-01-01'},
         {from:'2025-02-30'},{from:'2026-01-01',to:'2025-01-01'},
         {group_by_year:'yes'},{limit:0},{qualification:[]},{year:'202'},
@@ -205,4 +205,34 @@ test('fixed empty messages, loading and errors use widget conventions', () => {
     assert.ok(render({}).includes('Caricamento'))
     queryResult = { error: new Error('Mock error') }
     assert.ok(render({}).includes('Mock error'))
+})
+
+
+test('institution exclusion and date ordering are applied by the API before limiting', async t => {
+    let pipeline
+    t.mock.method(Thesis,'aggregate',async stages => {pipeline=stages;return []})
+    const excluded='641b8b0b840928dc5b8da2e3'
+    const query=Object.fromEntries(new URLSearchParams(getThesisQuery({exclude_institution:excluded,sort_by:'date',order:'desc',limit:5})))
+    assert.equal(query.institutions__ne,excluded)
+    assert.equal(query._sort,'-date')
+    const res=response()
+    await thesesQuery({query},res)
+    assert.equal(res.statusCode,200)
+    assert.equal(pipeline.find(stage => stage.$match?.institutions).$match.institutions.$ne.toString(),excluded)
+    assert.deepEqual(pipeline.find(stage => stage.$sort).$sort,{date:-1})
+    assert.equal(pipeline.find(stage => stage.$facet).$facet.limiting.at(-1).$limit,5)
+})
+
+test('configured thesis date order initializes flat and grouped tables and their active header', () => {
+    queryResult={data:[
+        {...thesis(),_id:'old',date:'2026-01-01',person:{firstName:'Alpha',lastName:'Alpha'}},
+        {...thesis(),_id:'new',date:'2026-06-01',person:{firstName:'Zulu',lastName:'Zulu'}},
+    ]}
+    for (const group_by_year of [false,true]) {
+        let html=render({columns:'name,date',sort_by:'date',order:'desc',group_by_year})
+        assert.ok(html.indexOf('Zulu Zulu') < html.indexOf('Alpha Alpha'))
+        assert.ok(html.includes('data-column="date" aria-sort="descending"'))
+        html=render({columns:'name,date',sort_by:'date',order:'asc',group_by_year})
+        assert.ok(html.indexOf('Alpha Alpha') < html.indexOf('Zulu Zulu'))
+    }
 })

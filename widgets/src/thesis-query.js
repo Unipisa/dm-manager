@@ -1,15 +1,18 @@
 import { hasPeopleValue, peopleDate, peopleBoolean, setPeopleText } from './people-query';
 
 const options = new Set([
-    'year', 'from', 'to', 'ssd', 'institution', 'qualification', 'exclude_qualification',
-    'limit', 'columns', 'headers', 'headers_en', 'en', 'date_style', 'group_by_year',
+    'year', 'from', 'to', 'ssd', 'institution', 'exclude_institution', 'qualification', 'exclude_qualification',
+    'limit', 'columns', 'headers', 'headers_en', 'en', 'date_style', 'group_by_year', 'sort_by', 'order',
 ]);
 
 export function getThesisQuery(props = {}) {
     for (const option of Object.keys(props)) {
         if (!options.has(option)) throw new Error(`Unknown ThesisList option "${option}". Use named filters and columns/headers.`);
     }
-    const params = new URLSearchParams({ _format: 'shortcode', _sort: 'person' });
+    const { sort_by = 'name', order = 'asc' } = props;
+    if (!['name', 'date'].includes(sort_by)) throw new Error('sort_by must be name or date.');
+    if (!['asc', 'desc'].includes(order)) throw new Error('order must be asc or desc.');
+    const params = new URLSearchParams({ _format: 'shortcode', _sort: `${order === 'desc' ? '-' : ''}${sort_by === 'date' ? 'date' : 'person'}` });
     let from = hasPeopleValue(props.from) ? peopleDate(props.from, 'from') : undefined;
     let to = hasPeopleValue(props.to) ? peopleDate(props.to, 'to') : undefined;
     if (hasPeopleValue(props.year)) {
@@ -28,6 +31,12 @@ export function getThesisQuery(props = {}) {
     }
     setPeopleText(params, 'SSD', props.ssd, 'ssd');
     setPeopleText(params, 'institutions', props.institution, 'institution');
+    if (hasPeopleValue(props.exclude_institution)) {
+        if (typeof props.exclude_institution !== 'string' || !/^[a-f\d]{24}$/i.test(props.exclude_institution)) {
+            throw new Error('exclude_institution must be a valid institution ID.');
+        }
+        params.set('institutions__ne', props.exclude_institution);
+    }
     for (const option of ['qualification', 'exclude_qualification']) {
         if (!hasPeopleValue(props[option])) continue;
         const values = typeof props[option] === 'string' ? props[option].split(',') : props[option];

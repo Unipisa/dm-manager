@@ -17,14 +17,15 @@ export function ThesisList(props) {
         return <p className="alert alert-danger" role="alert">ThesisList: {error.message}</p>;
     }
     const grouped = hasPeopleValue(props.group_by_year) && peopleBoolean(props.group_by_year, 'group_by_year') === 'true';
-    return <ThesisListData query={query} tableOptions={tableOptions} en={isEnglish(props.en)} grouped={grouped} />;
+    const initialSort = { column: props.sort_by === 'date' ? 'date' : 'last_name', order: props.order || 'asc' };
+    return <ThesisListData query={query} tableOptions={tableOptions} en={isEnglish(props.en)} grouped={grouped} initialSort={initialSort} />;
 }
 
-function ThesisListData({ query, tableOptions, en, grouped }) {
+function ThesisListData({ query, tableOptions, en, grouped, initialSort }) {
     const { isLoading, error, data } = useQuery(['thesislist', query], async () => {
         const response = await axios.get(getManageURL('public/theses', query));
         return response.data.data || [];
     });
     if (isLoading || error) return <Loading widget="Lista delle tesi" error={error} />;
-    return <YearGroupedPeopleTable data={data} {...tableOptions} en={en} grouped={grouped} dateField="date" />;
+    return <YearGroupedPeopleTable key={`${initialSort.column}:${initialSort.order}`} data={data} {...tableOptions} en={en} grouped={grouped} dateField="date" initialSort={initialSort} />;
 }

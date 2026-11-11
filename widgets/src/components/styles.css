@@ -32,7 +32,8 @@
 .dm-people-cards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-auto-rows: 1fr;
+    grid-auto-rows: auto;
+    align-items: start;
     gap: 1rem;
 }
 
@@ -442,11 +443,6 @@
     font-size: 1.15rem;
     font-weight: 600;
     line-height: 1.5;
-}
-
-.dm-course-list .dm-course-lecturers {
-    grid-auto-rows: auto;
-    align-items: start;
 }
 
 .dm-course-list .dm-course-lecturers .dm-person-card {
