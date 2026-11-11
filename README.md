@@ -61,6 +61,17 @@ To build the embeddable widgets, run `npm --prefix widgets run build` from the
 repository root. The generated bundle is `widgets/public/dmwidgets.js`, with a
 gallery page at `widgets/public/index.html`. Use `npm start` for local previews.
 
+Admins can also open **Widgets** in the main app's top menu at `/widgets`.
+This embeds the same gallery in an iframe, preserving its department website
+styles, controls, and links. Build it once with `npm --prefix widgets run build`
+before opening it locally; rebuild after changing widget or gallery sources.
+The separate widgets development server is not needed for the in-app gallery.
+
+The `make server` target also packages the gallery into `server/widgets-gallery/`
+for deployment. Its HTML, scripts, and styles are served through an admin-only
+endpoint under `/api/v0/widgets-gallery/`. The existing public embed bundle at
+`/static/dmwidgets.js` and its build remain unchanged.
+
 ## deployment
 
 Build

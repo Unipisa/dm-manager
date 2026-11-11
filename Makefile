@@ -8,6 +8,8 @@ server: frontend widgets
 	cp -dprv frontend/public/* ./server/public/
 	mkdir -p server/public/static
 	cp -dprv widgets/public/dmwidgets.js server/public/static
+	mkdir -p server/widgets-gallery
+	cp -dprv widgets/public/. server/widgets-gallery/
 
 frontend:
 	npm --prefix frontend ci --omit=dev

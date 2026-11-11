@@ -88,8 +88,11 @@ export default function Header() {
         <NavDropdown.Item as={NavLink} to="/log">Logs</NavDropdown.Item>
         <NavDropdown.Item as={NavLink} to="/process/sanityCheck">Controlli di consistenza</NavDropdown.Item>
       </NavDropdown>
-      <NavLink to="/form" className="nav-link">
+      <NavLink to="/form" className="nav-link px-2">
         Moduli
+      </NavLink>
+      <NavLink to="/widgets" className="nav-link px-2">
+        Widgets
       </NavLink>
     </>
   }

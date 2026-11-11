@@ -16,6 +16,7 @@ import Home from './pages/Home'
 import Profile from './pages/Profile'
 import LoginPage from './pages/LoginPage'
 import Map from './pages/Map'
+import WidgetsGallery from './pages/WidgetsGallery'
 import Models from './models/Models'
 import { Container } from 'react-bootstrap'
 import {QueryClient, QueryClientProvider } from 'react-query'
@@ -106,6 +107,7 @@ function Internal() {
           {engine.loggedIn && <>
             <Route path="/" element={<Home />} />
             <Route path="/profile" element={<Profile />} />
+            {engine.user.roles.includes('admin') && <Route path="/widgets" element={<WidgetsGallery />} />}
 
             <Route path="/process/seminars" element={<ManageSeminars/>}/>
             <Route path="/process/seminars/add" element={<AddSeminar/>}/>

@@ -26,6 +26,8 @@ const unimapQuery = require('./controllers/public/unimap.js')
 
 const router = express.Router()
 
+router.use('/widgets-gallery', require('./controllers/widgetsGallery'))
+
 let paths = []
 let ModelSchemas = {}
 

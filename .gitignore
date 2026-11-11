@@ -7,6 +7,7 @@ server/public/assets
 server/public/index.html
 server/public/dmwidgets.js
 server/public/static
+server/widgets-gallery
 
 frontend/public
 widgets/public
