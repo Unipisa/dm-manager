@@ -15,7 +15,6 @@ const valid_mimetypes = [
 class UploadController {
 
     register(router) {
-        router.get('/upload', (req, res) => res.send({ config })),
         router.get('/upload/:id', (req, res) => this.getFile(req, res, req.params.id))
         router.post('/upload', (req, res) => this.postFile(req, res))
         return []
