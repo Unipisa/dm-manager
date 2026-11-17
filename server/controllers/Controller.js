@@ -36,6 +36,9 @@ class Controller {
         // roles which can make a simple search on this model
         this.searchRoles = ['admin', 'supervisor']
 
+        // Override for models whose creation must not inherit search permissions.
+        this.createRoles = null
+
         // the mongoose Model of the managed objects
         this.Model = Model
 
@@ -665,8 +668,8 @@ class Controller {
                 (req, res) => this.index(req, res)),
 
             this.register_path(router, 'put', `/${this.path}`, 
-                this.managerRoles.concat(this.searchRoles), 
-                // searchRoles can create new objects, to enable
+                this.createRoles ?? this.managerRoles.concat(this.searchRoles),
+                // By default, searchRoles can create new objects, to enable
                 // related object-managers to create references
                 // to this object (as in ObjectInput)
                 (req, res) => this.put(req, res)),

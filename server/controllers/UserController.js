@@ -1,12 +1,41 @@
 const User = require('../models/User')
 const Controller = require('./Controller')
 
+const writableFields = ['firstName', 'lastName', 'email', 'username', 'roles', 'person']
+
+function validateUserPayload(req, res) {
+    const body = req.body
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+        res.status(400).send({ error: 'Expected a user object' })
+        return false
+    }
+    if (Object.hasOwn(body, 'hash') || Object.hasOwn(body, 'salt')) {
+        res.status(400).send({ error: 'Use the password endpoint to change credentials' })
+        return false
+    }
+    req.body = Object.fromEntries(writableFields
+        .filter(field => Object.hasOwn(body, field))
+        .map(field => [field, body[field]]))
+    return true
+}
+
 class UserController extends Controller {
     constructor() {
         super(User)
         this.path = 'user'
+        this.createRoles = this.managerRoles
         this.fields.lastName.match_regex = true
         this.searchFields = [ 'username', 'email', 'firstName', 'lastName', 'roles' ]
+    }
+
+    async put(req, res) {
+        if (!validateUserPayload(req, res)) return
+        return super.put(req, res)
+    }
+
+    async patch(req, res, id) {
+        if (!validateUserPayload(req, res)) return
+        return super.patch(req, res, id)
     }
 
     register(router) {
