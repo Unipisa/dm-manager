@@ -12,7 +12,7 @@ class VisitController extends Controller {
 
         // inserisce tutte le assegnazioni
         // stanze
-        this.queryPipeline.push(...RoomAssignment.personRoomAssignmentPipeline())
+        this.queryPipeline.push(...RoomAssignment.personPeriodRoomAssignmentPipeline())
         this.indexPipeline = [
             {
                 $lookup: {
@@ -41,7 +41,7 @@ class VisitController extends Controller {
                 pipeline:[{$project:{name : 1}}]
                 }
             },
-            ...RoomAssignment.personRoomAssignmentPipeline()
+            ...RoomAssignment.personPeriodRoomAssignmentPipeline()
         ]
     }
 }

@@ -12,7 +12,7 @@ class StaffController extends Controller {
 
         // inserisce tutte le assegnazioni
         // stanze
-        this.queryPipeline.push(...RoomAssignment.personRoomAssignmentPipeline())
+        this.queryPipeline.push(...RoomAssignment.personPeriodRoomAssignmentPipeline())
 //        this.indexPipeline = [
 //            {
 //                $lookup: {

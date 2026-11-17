@@ -1,7 +1,7 @@
 const { personProfilePipeline } = require('./person-profile')
 const Controller = require('../Controller')
 const Staff = require('../../models/Staff')
-const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
+const { personPeriodRoomAssignmentPipeline } = require('../../models/RoomAssignment')
 
 const controller = new Controller()
 controller.Model = Staff
@@ -18,7 +18,7 @@ controller.queryPipeline = [
         } }],
     } },
     { $unwind: { path: '$person', preserveNullAndEmptyArrays: true } },
-    ...personRoomAssignmentPipeline(),
+    ...personPeriodRoomAssignmentPipeline(),
     { $lookup: {
         from: 'institutions', localField: 'person.affiliations', foreignField: '_id', as: 'person.affiliations',
         pipeline: [{ $project: { name: 1 } }],

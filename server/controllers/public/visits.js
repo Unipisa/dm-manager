@@ -1,5 +1,5 @@
 const Visit = require('../../models/Visit')
-const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
+const { personPeriodRoomAssignmentPipeline } = require('../../models/RoomAssignment')
 
 const { createSortAndLimitFilters } = require('./common-filters')
 
@@ -92,7 +92,7 @@ async function visitsQuery(req) {
             path: '$person',
             preserveNullAndEmptyArrays: true
         }},
-        ...personRoomAssignmentPipeline(),
+        ...personPeriodRoomAssignmentPipeline(),
         {$lookup: {
             from: 'institutions',
             localField: 'person.affiliations',

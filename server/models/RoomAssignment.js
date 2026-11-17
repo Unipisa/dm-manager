@@ -43,7 +43,7 @@ Room.relatedModels.push({
     field: 'room',
 })
 
-RoomAssignment.personRoomAssignmentPipeline = (startDate = '$startDate', endDate = '$endDate') => ([
+RoomAssignment.personRoomAssignmentPipeline = (startDate = '$startDate', endDate = '$endDate', sort = { endDate: 1 }) => ([
     {$lookup: {
         from: "roomassignments",
         let: { start: startDate, end: endDate },
@@ -86,9 +86,8 @@ RoomAssignment.personRoomAssignmentPipeline = (startDate = '$startDate', endDate
                 path: "$room",
                 preserveNullAndEmptyArrays: true
             }},
-            // ordina per data finale...
-            // l'ultima assegnazione dovrebbe essere quella attuale
-            {$sort: {"endDate": 1}},
+            // The last result is selected below; callers can choose its ordering.
+            {$sort: sort},
         ]
     }},
     { $addFields: {
@@ -100,6 +99,37 @@ RoomAssignment.personRoomAssignmentPipeline = (startDate = '$startDate', endDate
         }
     }}
 ])
+
+// Keep every assignment overlapping the record's period for management views.
+// Select one room at today's date, or at the nearest boundary for past/future records.
+RoomAssignment.personPeriodRoomAssignmentPipeline = (startDate = '$startDate', endDate = '$endDate') => {
+    const [assignmentsLookup] = RoomAssignment.personRoomAssignmentPipeline(startDate, endDate, { startDate: 1, _id: 1 })
+    const referenceDate = { $switch: {
+        branches: [
+            { case: { $and: [
+                { $ne: [{ $ifNull: [startDate, null] }, null] },
+                { $gt: [startDate, '$$NOW'] },
+            ] }, then: startDate },
+            { case: { $and: [
+                { $ne: [{ $ifNull: [endDate, null] }, null] },
+                { $lt: [endDate, '$$NOW'] },
+            ] }, then: endDate },
+        ],
+        default: '$$NOW',
+    } }
+    return [assignmentsLookup, { $addFields: {
+        roomAssignment: { $let: {
+            vars: { at: referenceDate },
+            in: { $ifNull: [{ $arrayElemAt: [{ $filter: {
+                input: '$roomAssignments', as: 'assignment',
+                cond: { $and: [
+                    { $lte: [{ $ifNull: ['$$assignment.startDate', '$$at'] }, '$$at'] },
+                    { $gte: [{ $ifNull: ['$$assignment.endDate', '$$at'] }, '$$at'] },
+                ] },
+            } }, -1] }, null] },
+        } },
+    } }]
+}
 
 RoomAssignment.roomRoomAssignmentPipeline = (startDate = '$startDate', endDate = '$endDate') => ([
     {$lookup: {

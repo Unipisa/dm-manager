@@ -1,7 +1,7 @@
 const { personProfilePipeline } = require('./person-profile')
 const Controller = require('../Controller')
 const Visit = require('../../models/Visit')
-const { personRoomAssignmentPipeline } = require('../../models/RoomAssignment')
+const { personPeriodRoomAssignmentPipeline } = require('../../models/RoomAssignment')
 
 // Reuse the legacy visit query syntax, exposing only the public table fields.
 const controller = new Controller()
@@ -22,7 +22,7 @@ controller.queryPipeline = [
         } }],
     } },
     { $unwind: { path: '$person', preserveNullAndEmptyArrays: true } },
-    ...personRoomAssignmentPipeline(),
+    ...personPeriodRoomAssignmentPipeline(),
     ...['affiliations', 'person.affiliations'].map(field => ({ $lookup: {
         from: 'institutions', localField: field, foreignField: '_id', as: field,
         pipeline: [{ $project: { name: 1 } }],
