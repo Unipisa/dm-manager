@@ -2,11 +2,34 @@ name: Docker Image CI
 
 on:
   push:
+  pull_request:
 
 jobs:
 
-  build:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 26
+        cache: npm
+        cache-dependency-path: |
+          server/package-lock.json
+          widgets/package-lock.json
+    - name: Install backend dependencies
+      run: npm --prefix server ci
+    - name: Install widget dependencies
+      run: npm --prefix widgets ci
+    - name: Build widgets and gallery
+      run: npm --prefix widgets run build
+    - name: Run regression tests
+      run: npm --prefix server test
 
+  build:
+    needs: test
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:

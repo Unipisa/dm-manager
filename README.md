@@ -72,6 +72,32 @@ for deployment. Its HTML, scripts, and styles are served through an admin-only
 endpoint under `/api/v0/widgets-gallery/`. The existing public embed bundle at
 `/static/dmwidgets.js` and its build remain unchanged.
 
+## Regression tests
+
+Run the existing Node.js regression suite from the repository root:
+
+```sh
+npm --prefix server ci
+npm --prefix widgets ci
+npm --prefix widgets run build
+npm --prefix server test
+```
+
+Use Node.js 26, as in CI and the Docker image. The suite selects
+`server/test/*.node-test.cjs` and uses Node's built-in test runner. It needs no
+MongoDB instance or credentials: database and upstream HTTP calls are mocked.
+The gallery tests start an isolated HTTP server on a random loopback port and
+require the widgets build. Some tests also render widget sources using their
+installed dependencies.
+
+The optional MRBS PHP endpoint test is reported as skipped when
+`integrations/mrbs/api.php` or the PHP CLI is unavailable.
+The older Jest files (`*.test.js`) are not included in this command; some require
+a dedicated test database and drop its contents during setup.
+
+GitHub Actions runs this suite on pushes and pull requests. Docker publication
+on pushes waits for the tests to pass.
+
 ## deployment
 
 Build

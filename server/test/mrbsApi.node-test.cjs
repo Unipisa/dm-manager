@@ -7,10 +7,12 @@ const { spawnSync } = require('node:child_process')
 
 // Run the real PHP endpoint against in-memory MRBS doubles. No network or database.
 test('PHP API returns clean JSON and validates requests with simulated MRBS helpers', t => {
+    const apiPath = path.resolve(__dirname, '../../integrations/mrbs/api.php')
+    if (!fs.existsSync(apiPath)) return t.skip('Optional integrations/mrbs/api.php is not present in this checkout')
     if (spawnSync('php', ['-v']).error) return t.skip('PHP CLI is unavailable')
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mrbs-api-'))
     t.after(() => fs.rmSync(dir, { recursive: true, force: true }))
-    fs.copyFileSync(path.resolve(__dirname, '../../integrations/mrbs/api.php'), path.join(dir, 'api.php'))
+    fs.copyFileSync(apiPath, path.join(dir, 'api.php'))
     fs.writeFileSync(path.join(dir, 'defaultincludes.inc'), '<?php namespace MRBS;')
     fs.writeFileSync(path.join(dir, 'mrbs_sql.inc'), `<?php
 namespace MRBS;

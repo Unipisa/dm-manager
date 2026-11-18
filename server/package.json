@@ -10,7 +10,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test test/*.node-test.cjs",
     "start": "node run-server.js",
     "server": "node run-server.js",
     "worker": "node worker.js"
