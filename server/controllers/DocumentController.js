@@ -34,8 +34,9 @@ class DocumentController extends Controller {
             return true
         }
 
-        // Allow admin access, and owner access
-        if (req.roles?.includes('admin') || (document.owners || []).some(ownerId => ownerId._id.equals(req.user._id))) {
+        // Owners reference Person records, not User records.
+        const personId = req.user?.person?._id
+        if (req.roles?.includes('admin') || (personId && (document.owners || []).some(ownerId => ownerId._id.equals(personId)))) {
             return true
         }
 
