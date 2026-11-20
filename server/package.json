@@ -13,7 +13,8 @@
     "test": "node --test test/*.node-test.cjs",
     "start": "node run-server.js",
     "server": "node run-server.js",
-    "worker": "node worker.js"
+    "worker": "node worker.js",
+    "command": "node command.js"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^7.2.0",

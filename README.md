@@ -38,8 +38,10 @@ For security reasons if you don't set the variable `SESSION_SECRET` the session 
 
 You can use the `command` module to clear session or show migrations. Check the usage with:
 ```
-npm run command
+npm --prefix server run command
 ```
+
+Pass the command after `--`, e.g. `npm --prefix server run command -- show-migrations`.
 
 ## Widgets gallery
 
@@ -190,12 +192,14 @@ an existing item
 
 ## Avvio e sviluppo
 
-1. Installa le dipendenze: `npm ci`
+1. Installa le dipendenze: `npm --prefix server ci` e `npm --prefix frontend ci`
 2. Avvia MongoDB (es: `docker-compose up -d`)
 3. Crea l’utente admin (se necessario) impostando `ADMIN_USER` e `ADMIN_PASSWORD`
-4. Avvia backend: `npm run server`
-5. Avvia frontend: `npm start`
-6. (Opzionale) Avvia worker: `npm run worker`
+4. Avvia backend: `npm --prefix server start`
+5. Avvia frontend: `npm --prefix frontend start`
+6. (Opzionale) Avvia worker: `npm --prefix server run worker`
+
+In alternativa i passi 2, 4 e 5 sono eseguiti insieme da `./dev.sh`.
 
 ## API
 
