@@ -132,6 +132,8 @@ session (stored in MongoDB) → passport (local password + optional UniPi OAuth2
   fields are added automatically from the schema.
 - Whitelist writable fields when a model contains sensitive data (see
   `UserController.validateUserPayload`).
+- These controllers are meant for the admin frontend only: do not make new
+  external clients depend on them (see "Planned restructuring" below).
 
 ### Processes (`server/controllers/processes/`)
 
@@ -189,6 +191,62 @@ fields that are meant to be public; some support `_format=shortcode`,
 - `.js` files contain JSX. CSS is inlined into the bundle at build time.
 - Widgets only call `/api/v0/public/*`. Keep the bundle self-contained: it is
   embedded in external pages (`/static/dmwidgets.js`).
+
+## Planned restructuring
+
+### Move external clients off the generic CRUD
+
+The application started as a collection of models, each with read/write
+permissions, served by the generic CRUD controllers. It then turned out that
+permissions are better given per process (`/process/...`), with data scoped
+to the task. The generic CRUD remains, and external clients still use some
+of it. This is a liability:
+
+- **Permissions cover a whole model, not a need.** A token that can read
+  `/staff` reads every staff record, current and past, with `matricola`,
+  `notes` and the linked person, while listsync only needs some emails. Roles
+  are so coarse that tokens tend to get `admin`. The `supervisor` role ("read
+  any model") exposed password hashes until the user pipeline excluded them.
+- **The response is the database schema.** Renaming a field or changing an
+  automatic `$lookup` silently changes the API seen by external clients
+  (hence inconsistencies such as `roomAssignment` vs `roomAssignments`, or
+  `chair` populated by `/group/:id` but not by `/group`).
+- **The query language becomes public API.** Clients build Mongo-like filters
+  (`qualification__in=...`, `startDate__lt_or_null=today`, `notes__regex=...`)
+  that must keep working, and regex filters on fields one cannot read leak
+  their content.
+
+**Target:** external clients use only dedicated endpoints with an explicit
+contract: anonymous `/api/v0/public/*` endpoints for public data, or
+processes for authenticated tasks. Each one whitelists its filterable fields
+and ends with an explicit `$project` of what it returns. The model to follow
+is `controllers/public/staff-list.js`: it reuses `performQuery`, so the same
+filter syntax, on six fields only, and projects only public fields.
+The generic CRUD then serves only the admin frontend, and can later be
+restricted to sessions (no bearer tokens) or replaced by processes.
+
+**Remaining external uses** (from the published WordPress pages, November
+2026; see `server/test/contracts/`):
+
+| Generic endpoint | Client | Replacement |
+|---|---|---|
+| `GET /staff` | WordPress `[staff_manager]` (6 pages) | widget `StaffList` (`public/staff-list`) |
+| `GET /staff` | listsync (`collaboratori`) | `public/staff-list?qualification=Collaboratore&...`, no token |
+| `GET /visit` | WordPress `[visit_manager]` (3 pages, `year` + `grants`) | widget `VisitList` (`public/visit-list`) |
+| `GET /group/:id` | WordPress `[dm_manager_group_cards]` (34 pages) | widget `PeopleCards group_id=...` (`public/group/:id`) |
+| `GET /person/:id` | WordPress `[dm_manager_person_card]` (11 pages) | widget `PeopleCards person_id=...` (`public/person/:id`) |
+| `GET /event-phd-course/:id` | WordPress `[phd_course_detail]` (`/phd-hpsc/`) | widget `Course` (`public/course/:id`) |
+| `GET`, `PUT /document` | `tools/upload-documents.js` | a document import process, or keep with the `document-manager` token |
+
+Once the WordPress shortcodes are replaced in the pages, the theme no longer
+needs `DM_MANAGER_TOKEN`, and the unused shortcodes can be removed from it.
+
+**Rules while this is in progress:**
+- Do not add new external uses of the generic CRUD; add or extend a
+  `public/*` endpoint (or a process) with a whitelist and a `$project`.
+- When a client moves to a dedicated endpoint, update its contract file in
+  the same change, and remove contracts of endpoints no client uses any more.
+- Give tokens the minimal roles listed in their contract files, never `admin`.
 
 ## Conventions
 
