@@ -241,6 +241,35 @@ restricted to sessions (no bearer tokens) or replaced by processes.
 Once the WordPress shortcodes are replaced in the pages, the theme no longer
 needs `DM_MANAGER_TOKEN`, and the unused shortcodes can be removed from it.
 
+**Status (November 2026)** — next steps, in order:
+1. WordPress pages: Unipisa/dm-wordpress#5 (English staff list), #6 (funded
+   activities), #7 (group and person cards), #8 (PhD HPSC course page). The
+   replacements are covered by the widget contracts.
+2. listsync: switch its `collaboratori` source to
+   `public/staff-list?qualification=Collaboratore&startDate__lte_or_null=today&endDate__gte_or_null=today`
+   and drop its `api_key` (both URLs are in `contracts/listsync.cjs`). Its
+   production `config.ini` is not versioned (github.com/paolini/listsync).
+   **listsync does not validate responses**: an error response makes it
+   crash (no list is synced), while a successful response that is empty or
+   lacks `data[].person.email` unsubscribes every member of the list. Check
+   any change of URL, token or response shape by hand.
+3. Theme cleanup and removal of `DM_MANAGER_TOKEN`: Unipisa/dm-wordpress#9.
+4. Then delete the WordPress and listsync tokens, remove the contracts of the
+   replaced shortcodes and of the old listsync URL, and give the remaining
+   tokens the minimal roles of their contract files.
+
+**Refreshing the client inventory.** The contracts reflect what was found in
+November 2026; repeat the checks before removing an endpoint:
+- WordPress is a **multisite** network (`/`, `/didattica/`, `/research/`,
+  `/phd/`, `/phd-hpsc/`, ...): search the published content of every site,
+  e.g. with a PHP script in the web container that loads `wp-load.php` (set
+  `$_SERVER['HTTP_HOST']` first), loops over `get_sites()` with
+  `switch_to_blog()`, and matches the dm-manager shortcodes in `post_content`.
+- The access log (Apache "combined" format, on the container stdout) has the
+  user agent: grouping non-`public/` `/api/v0` requests by user agent and
+  path shows which token clients are still active (`python-requests` for
+  listsync, PHP for WordPress, `node` for tools/upload-documents.js).
+
 **Rules while this is in progress:**
 - Do not add new external uses of the generic CRUD; add or extend a
   `public/*` endpoint (or a process) with a whitelist and a `$project`.

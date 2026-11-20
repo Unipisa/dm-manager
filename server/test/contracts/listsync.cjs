@@ -2,8 +2,9 @@
 // config.ini is a json module reading data.person.email from a URL, sending
 // its api_key (if set) as a bearer token.
 //
-// listsync does not check the HTTP status: an error response yields no
-// emails, and the mailing list would be emptied.
+// listsync does not validate the response: an error makes it crash, while a
+// successful response that is empty or lacks data[].person.email removes
+// every member from the mailing list. Keep this shape stable.
 
 const assert = require('node:assert/strict')
 
