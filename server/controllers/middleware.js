@@ -44,7 +44,7 @@ const requirePathPermissions = async (req, res, next) => {
 
 const hasSomeRole = (req, ...roles) => {
     if (!req.roles) return false
-    if (roles.includes('@any-logged-user')) return true
+    if (roles.includes('@any-logged-user') && req.user) return true
     return roles.some(role => req.roles.includes(role))
 }
 

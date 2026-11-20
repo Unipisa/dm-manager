@@ -1,5 +1,6 @@
-// Password hashes are never returned by the API, and tokens can only be
-// created with roles the creator holds. Runs the real application against an
+// Password hashes are never returned by the API, tokens can only be
+// created with roles the creator holds, and files can only be uploaded by
+// logged-in users or document tokens. Runs the real application against an
 // in-memory MongoDB (see test/support/contractServer.cjs).
 
 const assert = require('node:assert/strict')
@@ -116,5 +117,45 @@ describe('token creation', () => {
     test('requires a logged-in user, not a bearer token', async () => {
         const res = await api.request('PUT', '/api/v0/token', { roles: ['admin'], body: { name: 'via token', roles: [] } })
         assert.equal(res.status, 401)
+    })
+})
+
+describe('file upload', () => {
+    const Upload = () => require('../models/Upload')
+    const fs = require('node:fs')
+    const pdf = { data: Buffer.from('%PDF-1.4\n%%EOF\n').toString('base64'), mimetype: 'application/pdf' }
+
+    async function attempt(options, filename) {
+        const before = fs.readdirSync(api.uploadDirectory).length
+        const res = await api.request('POST', '/api/v0/upload', { ...options, body: { ...pdf, filename } })
+        const stored = await Upload().countDocuments({ filename })
+        const written = fs.readdirSync(api.uploadDirectory).length - before
+        return { res, stored, written }
+    }
+
+    test('is refused to anonymous clients, storing nothing', async () => {
+        const { res, stored, written } = await attempt({}, 'anonymous.pdf')
+        assert.equal(res.status, 401, res.text)
+        assert.equal(stored, 0)
+        assert.equal(written, 0)
+    })
+
+    test('is refused to tokens without a document role', async () => {
+        for (const roles of [['room-manager'], ['/process/planimetrie']]) {
+            const { res, stored, written } = await attempt({ roles }, `token-${roles[0]}.pdf`)
+            assert.equal(res.status, 403, `${roles} -> ${res.status}`)
+            assert.equal(stored, 0)
+            assert.equal(written, 0)
+        }
+    })
+
+    test('is allowed to any logged-in user and to document tokens', async () => {
+        const cookie = await api.loginAs('form-user', [])
+        for (const [options, filename] of [[{ cookie }, 'form.pdf'], [{ roles: ['document-manager'] }, 'tool.pdf'], [{ roles: ['admin'] }, 'admin.pdf']]) {
+            const { res, stored, written } = await attempt(options, filename)
+            assert.equal(res.status, 200, `${filename} -> ${res.status} ${res.text}`)
+            assert.equal(stored, 1)
+            assert.equal(written, 1)
+        }
     })
 })

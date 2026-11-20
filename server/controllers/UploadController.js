@@ -4,6 +4,17 @@ const fs = require('fs/promises');
 const Document = require('../models/Document')
 const DocumentController = require('./DocumentController');
 const { createdBy } = require('../models/Model');
+const { hasSomeRole } = require('./middleware');
+
+// Logged-in users upload attachments from the application forms; bearer
+// tokens (e.g. tools/upload-documents.js) need a document management role.
+function requireUploader(req, res, next) {
+    if (req.user || hasSomeRole(req, 'admin', 'document-manager')) return next()
+    if (req.roles?.length) {
+        return res.status(403).send({ error: "some role in [admin, document-manager] required to upload files" })
+    }
+    res.status(401).send({ error: "not logged in" })
+}
 
 const valid_mimetypes = [
     'text/plain', 
@@ -16,7 +27,7 @@ class UploadController {
 
     register(router) {
         router.get('/upload/:id', (req, res) => this.getFile(req, res, req.params.id))
-        router.post('/upload', (req, res) => this.postFile(req, res))
+        router.post('/upload', requireUploader, (req, res) => this.postFile(req, res))
         return []
     }
 
