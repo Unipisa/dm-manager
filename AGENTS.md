@@ -63,7 +63,11 @@ npm --prefix server test         # node --test server/test/*.node-test.cjs
     external client (WordPress theme, widgets, dm-calendar, dm-monitor,
     dm-planimetrie, listsync, tools/upload-documents.js), the **minimal token
     roles** it needs, and the response fields it reads. Every protected
-    contract is also checked to be denied without those roles.
+    contract is also checked to be denied without those roles. The widget
+    contracts render the real widgets (`server/test/support/widgetHarness.cjs`)
+    with the shortcode attributes used in the published pages, so their
+    requests are built by the widget code. The WordPress contracts list only
+    the shortcodes actually published on the site.
 - **Never break a client contract.** When refactoring or removing endpoints
   (the generic CRUD controllers in particular), the contract tests must keep
   passing; change a contract only together with the client that uses it.

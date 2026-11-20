@@ -2,158 +2,84 @@
 // DM_MANAGER_TOKEN bearer token:
 //   dm_manager_get($model, $sort, $filter) -> GET <model>?_sort=..&<filters>, expects {data: [...]}
 //   dm_manager_get_by_id($model, $id)      -> GET <model>/<id>, expects the bare document
-// See inc/dm-manager/api.php for how shortcode filters become query params
-// ("current", "past", "perspective", "year=Y", "dateyear=Y", key=value).
-// The newsletter (page-notiziario.php) calls public endpoints directly.
+// inc/dm-manager/api.php turns shortcode filters into query params
+// ("current" -> startDate__lte_or_null=today&endDate__gte_or_null=today,
+// "year=Y" -> startDate__lte_or_null=Y-12-31&endDate__gte_or_null=Y-01-01).
+//
+// Only the shortcodes found in the published pages of all the network sites
+// (November 2026) are listed, with their actual attributes. The widgets
+// ([dm_manager_widget]), [event_calendar] and [planimetrie] have their own
+// contract files.
 
 const assert = require('node:assert/strict')
 const { expectPaths, byId, expectIds } = require('../support/contractAssertions.cjs')
 const { isoDay } = require('../support/contractFixtures.cjs')
 
-// Minimal roles of the WordPress token: read access to these models only.
+// Minimal roles of the WordPress token.
 const ROLES = [
-    'visit-supervisor', 'staff-supervisor', 'thesis-supervisor', 'grant-supervisor',
-    'group-supervisor', 'person-supervisor', 'event-phd-course-supervisor',
+    'staff-supervisor', 'visit-supervisor', 'group-supervisor', 'person-supervisor', 'event-phd-course-supervisor',
 ]
 
 const CURRENT = 'startDate__lte_or_null=today&endDate__gte_or_null=today'
-const ACTIVE = 'endDate__gte_or_null=today&startDate__lte_or_null=today'
+
+// [staff_manager sort_field="person" filter="qualification__in=...,isInternal=1, current"]
+// fields: person.firstName, person.lastName, person.email, person.phone, person._id, qualification
+const staffManager = (label, qualifications, expected) => ({
+    name: `[staff_manager] ${label}`,
+    path: () => `/api/v0/staff?_sort=person&qualification__in=${encodeURIComponent(qualifications)}&isInternal=1&${CURRENT}`,
+    check(body, fx) {
+        expectIds(body.data, expected(fx))
+        for (const staff of body.data) {
+            expectPaths(staff, ['qualification', 'person._id', 'person.firstName', 'person.lastName', 'person.email'])
+        }
+    },
+})
 
 const contracts = [
-    // [visit_manager] / [dm_manager]
+    staffManager('faculty', 'PO|PA|RTDa|RTDb|RTT|RIC', fx => [fx.staff.alice]),
+    staffManager('collaborators', 'Collaboratore', fx => [fx.staff.bruno]),
+    staffManager('PhD students', 'Dottorando in Matematica|Dottorando in HPSC', fx => [fx.staff.elena]),
+    staffManager('research staff (none)', 'Assegnista|Tecnologo|Titolare di borsa di ricerca|Titolare di contratto di ricerca|Titolare di incarico post-doc|Titolare di incarico di ricerca', () => []),
+
+    // [visit_manager fields="person.firstName,person.lastName,affiliations,startDate,endDate"
+    //   sort_field="person" filter="year=Y,grants=ID"]
     {
-        name: '[visit_manager filter=current]',
-        path: () => `/api/v0/visit?_sort=person&${CURRENT}`,
-        check(body, fx) {
-            expectIds(body.data, [fx.visits.current])
-            expectPaths(body.data[0], ['startDate', 'endDate', 'person._id', 'person.firstName',
-                'person.lastName', 'affiliations[].name'])
-        },
-    },
-    {
-        name: '[visit_manager filter=past]',
-        path: () => '/api/v0/visit?_sort=person&endDate__lt=today',
-        check: (body, fx) => expectIds(body.data, [fx.visits.past]),
-    },
-    {
-        name: '[visit_manager filter=perspective]',
-        path: () => '/api/v0/visit?_sort=person&startDate__gt=today',
-        check: (body, fx) => expectIds(body.data, [fx.visits.future]),
-    },
-    {
-        name: '[visit_manager filter=year=Y]',
+        name: '[visit_manager] visits funded by a grant in a year',
         path: fx => {
             const year = fx.visits.current.startDate.getFullYear()
-            return `/api/v0/visit?_sort=person&startDate__lte_or_null=${year}-12-31&endDate__gte_or_null=${year}-01-01`
-        },
-        check: (body, fx) => assert.ok(body.data.some(v => String(v._id) === String(fx.visits.current._id))),
-    },
-    // [dm_manager_thesis]
-    {
-        name: '[dm_manager_thesis filter=dateyear=Y]',
-        path: fx => {
-            const year = fx.thesis.date.getFullYear()
-            return `/api/v0/thesis?_sort=person&date__lte=${year}-12-31&date__gte=${year}-01-01`
+            return `/api/v0/visit?_sort=person&startDate__lte_or_null=${year}-12-31&endDate__gte_or_null=${year}-01-01&grants=${fx.grant._id}`
         },
         check(body, fx) {
-            expectPaths(byId(body.data, fx.thesis), [
-                'title', 'date', 'person._id', 'person.firstName', 'person.lastName',
-                'advisors[]._id', 'advisors[].firstName', 'advisors[].lastName', 'advisors[].staffs[].isInternal',
-                'institutions[].name',
-            ])
+            const visit = byId(body.data, fx.visits.current)
+            expectPaths(visit, ['startDate', 'endDate', 'person.firstName', 'person.lastName', 'affiliations[].name'])
         },
     },
-    // [staff_manager]
+
+    // [dm_manager_group_cards group_id=ID] (34 pages)
     {
-        name: '[staff_manager filter=current]',
-        path: () => `/api/v0/staff?_sort=person&${CURRENT}`,
-        check(body, fx) {
-            expectIds(body.data, [fx.staff.alice, fx.staff.bruno, fx.staff.elena])
-            expectPaths(byId(body.data, fx.staff.alice), [
-                'qualification', 'SSD', 'person._id', 'person.firstName', 'person.lastName', 'person.email',
-            ])
-        },
-    },
-    {
-        name: '[staff_manager filter=qualification=PO]',
-        path: () => `/api/v0/staff?_sort=person&qualification=PO&${CURRENT}`,
-        check: (body, fx) => expectIds(body.data, [fx.staff.alice]),
-    },
-    // [grant_manager] and [grant_manager_details]
-    {
-        name: '[grant_manager]',
-        path: () => `/api/v0/grant?_sort=startDate&${CURRENT}`,
-        check(body, fx) {
-            const grant = byId(body.data, fx.grant)
-            expectPaths(grant, ['_id', 'name', 'projectType', 'funds', 'startDate', 'endDate',
-                'pi._id', 'pi.firstName', 'pi.lastName', 'pi.staffs[].isInternal',
-                'localCoordinator._id', 'localCoordinator.lastName'])
-            assert.ok(Array.isArray(grant.SSD), 'SSD is an array (imploded by the theme)')
-        },
-    },
-    {
-        name: '[grant_manager_details grant_id=ID]',
-        path: fx => `/api/v0/grant/${fx.grant._id}`,
-        check(body, fx) {
-            assert.equal(String(body._id), String(fx.grant._id), 'bare document expected')
-            expectPaths(body, ['name', 'projectType', 'fundingEntity', 'startDate', 'endDate', 'budgetAmount',
-                'webSite', 'description', 'pi.firstName', 'pi.affiliations[].name', 'pi.staffs',
-                'localCoordinator.lastName', 'members[].firstName', 'members[].lastName', 'members[].affiliations[].name'])
-        },
-    },
-    // [dm_manager_group] and [dm_manager_group_cards]
-    {
-        name: '[dm_manager_group group_id=ID]',
+        name: '[dm_manager_group_cards group_id=ID]',
         path: fx => `/api/v0/group/${fx.council._id}`,
         check(body, fx) {
             assert.equal(String(body._id), String(fx.council._id), 'bare document expected')
             expectPaths(body, ['members[]._id', 'members[].firstName', 'members[].lastName', 'members[].email',
                 'members[].affiliations[].name', 'members[].staffs[].isInternal',
-                'chair.firstName', 'chair.lastName', 'chair_title', 'vice.lastName', 'vice_title'])
+                'chair._id', 'chair.firstName', 'chair.lastName', 'chair_title', 'vice._id', 'vice.lastName', 'vice_title'])
         },
     },
-    // [dm_manager_person_details] and [dm_manager_person_card]
+
+    // [dm_manager_person_card person_id=ID] (11 pages)
     {
-        name: '[dm_manager_person_details]: person',
+        name: '[dm_manager_person_card person_id=ID]',
         path: fx => `/api/v0/person/${fx.people.alice._id}`,
         check(body, fx) {
             assert.equal(String(body._id), String(fx.people.alice._id), 'bare document expected')
-            expectPaths(body, ['firstName', 'lastName', 'gender', 'email', 'orcid',
-                'affiliations[].name', 'staffs[].qualification', 'staffs[].isInternal'])
+            expectPaths(body, ['firstName', 'lastName', 'email', 'affiliations[].name', 'staffs[].isInternal'])
         },
     },
+
+    // [phd_course_detail] on /phd-hpsc/, course id from ?phd_course_id=
     {
-        name: '[dm_manager_person_details]: current staff record with office',
-        path: fx => `/api/v0/staff?_sort=-endDate&person=${fx.people.alice._id}&${ACTIVE}`,
-        check(body, fx) {
-            expectIds(body.data, [fx.staff.alice])
-            expectPaths(body.data[0], ['matricola', 'roomAssignments[].room._id', 'roomAssignments[].room.building',
-                'roomAssignments[].room.floor', 'roomAssignments[].room.number'])
-        },
-    },
-    ...['members', 'chair', 'vice'].map(role => ({
-        name: `[dm_manager_person_details]: groups where the person is ${role}`,
-        path: fx => `/api/v0/group?_sort=name&${role}=${fx.people[role === 'vice' ? 'bruno' : 'alice']._id}&${ACTIVE}`,
-        // people.php reads $group['chair']['_id'] and ['vice']['_id'], but the
-        // group index only populates members: chair and vice are plain ids,
-        // which is a fatal TypeError on PHP 8.
-        todo: 'group index does not populate chair and vice',
-        check(body, fx) {
-            expectIds(body.data, [fx.council])
-            expectPaths(body.data[0], ['_id', 'name', 'members[]', 'chair._id', 'vice._id', 'chair_title', 'vice_title'])
-        },
-    })),
-    ...['pi', 'localCoordinator', 'members'].map(role => ({
-        name: `[dm_manager_person_details]: current grants where the person is ${role}`,
-        path: fx => `/api/v0/grant?_sort=-endDate&${role}=${fx.people.alice._id}&endDate__gte=today&startDate__lte=today`,
-        check(body, fx) {
-            expectIds(body.data, [fx.grant])
-            expectPaths(body.data[0], ['_id', 'name', 'projectType', 'startDate', 'endDate', 'pi.firstName', 'pi.lastName'])
-        },
-    })),
-    // [phd_course_detail]
-    {
-        name: '[phd_course_detail phd_course_id=ID]',
+        name: '[phd_course_detail]',
         path: fx => `/api/v0/event-phd-course/${fx.course._id}`,
         check(body, fx) {
             assert.equal(String(body._id), String(fx.course._id), 'bare document expected')
@@ -161,7 +87,8 @@ const contracts = [
                 'lessons[].date', 'lessons[].duration', 'lessons[].conferenceRoom.name'])
         },
     },
-    // page-notiziario.php (anonymous, server side)
+
+    // page-notiziario.php (newsletter page template, anonymous, server side)
     {
         name: 'newsletter: seminars of the next two weeks',
         roles: null,
