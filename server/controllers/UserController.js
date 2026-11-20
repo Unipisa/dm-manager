@@ -26,6 +26,12 @@ class UserController extends Controller {
         this.createRoles = this.managerRoles
         this.fields.lastName.match_regex = true
         this.searchFields = [ 'username', 'email', 'firstName', 'lastName', 'roles' ]
+
+        // Aggregations ignore the "select: false" of the password fields
+        // added by passport-local-mongoose: never return them. Every read
+        // endpoint (index, search, get) runs this pipeline.
+        this.queryPipeline.push({ $project: { hash: 0, salt: 0 } })
+        if (this.indexPipeline.length) this.indexPipeline.push({ $project: { hash: 0, salt: 0 } })
     }
 
     async put(req, res) {
