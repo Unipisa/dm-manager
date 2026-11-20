@@ -39,5 +39,13 @@
     "react-bootstrap-icons": "^1.11.6",
     "react-bootstrap-typeahead": "^6.4.1",
     "react-router": "^7.17.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^11.3.0"
+  },
+  "config": {
+    "mongodbMemoryServer": {
+      "version": "6.0.20"
+    }
   }
 }

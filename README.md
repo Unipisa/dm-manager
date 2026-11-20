@@ -87,7 +87,14 @@ npm --prefix server test
 
 Use Node.js 26, as in CI and the Docker image. The suite selects
 `server/test/*.node-test.cjs` and uses Node's built-in test runner. It needs no
-MongoDB instance or credentials: database and upstream HTTP calls are mocked.
+MongoDB instance or credentials: unit tests mock database and upstream HTTP
+calls, while the client contract tests (`server/test/clientContracts.node-test.cjs`)
+start an in-memory MongoDB through `mongodb-memory-server`. The MongoDB binary
+is downloaded on the first run (about 70 MB, cached in `~/.cache/mongodb-binaries`).
+
+The contract tests describe what external clients of the API rely on: the
+WordPress theme, the widgets, dm-calendar, dm-monitor, dm-planimetrie, listsync
+and `tools/upload-documents.js`. See `server/test/contracts/`.
 The gallery tests start an isolated HTTP server on a random loopback port and
 require the widgets build. Some tests also render widget sources using their
 installed dependencies.

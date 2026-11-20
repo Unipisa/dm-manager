@@ -48,11 +48,27 @@ npm --prefix widgets run build   # the widgets-gallery tests need the build
 npm --prefix server test         # node --test server/test/*.node-test.cjs
 ```
 
-- Tests use Node's built-in runner (`node:test`, `node:assert/strict`), live in
-  `server/test/*.node-test.cjs`, and **must not need MongoDB, credentials or
-  network**: mock Mongoose model methods with `t.mock.method(Model, 'method', ...)`
-  and mock upstream HTTP calls. See `server/test/requestRoles.node-test.cjs` and
-  `server/test/userCreationAuthorization.node-test.cjs` for the style.
+- Tests use Node's built-in runner (`node:test`, `node:assert/strict`) and live
+  in `server/test/*.node-test.cjs`. They need no external MongoDB, credentials
+  or network. There are two kinds:
+  - **Unit tests**: mock Mongoose model methods with
+    `t.mock.method(Model, 'method', ...)` and upstream HTTP calls. See
+    `server/test/requestRoles.node-test.cjs` and
+    `server/test/userCreationAuthorization.node-test.cjs` for the style.
+  - **Client contract tests** (`server/test/clientContracts.node-test.cjs`):
+    the real app (`createApp`) runs against an in-memory MongoDB
+    (`mongodb-memory-server`, version pinned in `server/package.json` to match
+    `docker-compose.yml`), seeded by `server/test/support/contractFixtures.cjs`.
+    Each file in `server/test/contracts/` lists the exact requests of one
+    external client (WordPress theme, widgets, dm-calendar, dm-monitor,
+    dm-planimetrie, listsync, tools/upload-documents.js), the **minimal token
+    roles** it needs, and the response fields it reads. Every protected
+    contract is also checked to be denied without those roles.
+- **Never break a client contract.** When refactoring or removing endpoints
+  (the generic CRUD controllers in particular), the contract tests must keep
+  passing; change a contract only together with the client that uses it.
+  When a client starts using a new endpoint or field, add it to its contract.
+  Known incompatibilities are marked `todo` in the contract files.
 - New tests go in a new `*.node-test.cjs` file so they are picked up automatically.
 - The older Jest files (`server/test/*.test.js`) are legacy: they are not run by
   `npm test` and some **drop the test database**. Do not run or extend them.

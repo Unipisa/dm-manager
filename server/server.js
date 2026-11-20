@@ -56,7 +56,7 @@ function setup_routes(app) {
     }))
   
   // Use the standard access log format of Apache, for compatibility
-  app.use(morgan('combined'))
+  if (process.env.NODE_ENV !== 'test') app.use(morgan('combined'))
   
   const test_filename = `${config.STATIC_FILES_PATH}/manifest.json`
   if (!fs.existsSync(test_filename)) {

@@ -18,6 +18,11 @@ jobs:
         cache-dependency-path: |
           server/package-lock.json
           widgets/package-lock.json
+    - name: Cache MongoDB binary for contract tests
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/mongodb-binaries
+        key: mongodb-binaries-${{ runner.os }}-${{ hashFiles('server/package.json') }}
     - name: Install backend dependencies
       run: npm --prefix server ci
     - name: Install widget dependencies
