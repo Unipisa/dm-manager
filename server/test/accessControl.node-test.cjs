@@ -159,3 +159,57 @@ describe('file upload', () => {
         }
     })
 })
+
+describe('token listing and deletion', () => {
+    const Token = () => require('../models/Token')
+
+    async function createToken(cookie, name, roles) {
+        const res = await api.request('PUT', '/api/v0/token', { cookie, body: { name, roles } })
+        assert.equal(res.status, 200, res.text)
+        return Token().findOne({ name })
+    }
+
+    test('users see the secrets of their own tokens only', async () => {
+        const owner = await api.loginAs('list-owner', ['room-manager'])
+        const supervisor = await api.loginAs('list-supervisor', ['supervisor', 'room-manager'])
+        const mine = await createToken(owner, 'owner token', ['room-manager'])
+        const theirs = await createToken(supervisor, 'supervisor token', ['room-manager'])
+
+        const listed = await api.request('GET', '/api/v0/token', { cookie: owner })
+        assert.equal(listed.status, 200, listed.text)
+        assert.deepEqual(listed.body.data.map(token => token.name), ['owner token'])
+        assert.equal(listed.body.data[0].token, mine.token)
+
+        // supervisors list every token, but only their own secrets
+        const all = await api.request('GET', '/api/v0/token', { cookie: supervisor })
+        const byName = Object.fromEntries(all.body.data.map(token => [token.name, token.token]))
+        assert.equal(byName['supervisor token'], theirs.token)
+        assert.equal(byName['owner token'], '*HIDDEN*')
+    })
+
+    test('users can delete their own tokens, not the tokens of others', async () => {
+        const owner = await api.loginAs('delete-owner', ['room-manager'])
+        const other = await api.loginAs('delete-other', ['room-manager'])
+        const token = await createToken(owner, 'to delete', ['room-manager'])
+
+        const refused = await api.request('DELETE', `/api/v0/token/${token._id}`, { cookie: other })
+        assert.equal(refused.status, 404, refused.text)
+        assert.ok(await Token().findById(token._id), 'token deleted by another user')
+
+        const deleted = await api.request('DELETE', `/api/v0/token/${token._id}`, { cookie: owner })
+        assert.equal(deleted.status, 200, deleted.text)
+        assert.equal(await Token().findById(token._id), null)
+    })
+
+    test('admins see every secret and can delete any token', async () => {
+        const owner = await api.loginAs('admin-target', ['room-manager'])
+        const admin = await api.loginAs('token-admin-2', ['admin'])
+        const token = await createToken(owner, 'admin visible', ['room-manager'])
+
+        const all = await api.request('GET', '/api/v0/token', { cookie: admin })
+        assert.equal(all.body.data.find(t => t.name === 'admin visible').token, token.token)
+
+        const deleted = await api.request('DELETE', `/api/v0/token/${token._id}`, { cookie: admin })
+        assert.equal(deleted.status, 200, deleted.text)
+    })
+})

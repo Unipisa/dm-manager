@@ -2,6 +2,13 @@ const Token = require('../models/Token')
 const Controller = require('./Controller')
 const { hasSomeRole, requireSomeRole, requireUser } = require('./middleware')
 
+// createdBy is an ObjectId, or the User document when populated: compare ids
+// by value (ObjectId instances are never === to each other).
+function isOwner(token, user) {
+    const creator = token.createdBy?._id ?? token.createdBy
+    return Boolean(creator && user?._id && String(creator) === String(user._id))
+}
+
 class TokenController extends Controller {
     constructor() {
         super(Token)
@@ -44,7 +51,7 @@ class TokenController extends Controller {
             if (!hasSomeRole(req, 'admin')) {
                 // togli il secret dai token di cui non sei proprietario
                 data = data.map(token => {
-                    if (token.createdBy !== req.user._id) {
+                    if (!isOwner(token, req.user)) {
                         token.token = '*HIDDEN*'
                     }
                     return token
@@ -58,7 +65,7 @@ class TokenController extends Controller {
             requireUser, 
             async (req, res) => {
                 let token = await this.Model.findById(req.params.id)
-                if (token && (hasSomeRole(req, 'admin') || token.createdBy === req.user._id)) {
+                if (token && (hasSomeRole(req, 'admin') || isOwner(token, req.user))) {
                     return this.delete(req,res,req.params.id)
                 } else {
                     res.status(404)
