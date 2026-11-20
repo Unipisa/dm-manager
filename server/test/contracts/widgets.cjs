@@ -57,6 +57,27 @@ const contracts = [
         () => ({ qualification: 'Dottorando in Matematica', is_internal: '1', start_from: isoDay(-500), start_to: isoDay() }),
         () => ['Neri']),
 
+    // English "Staff List" page (/en/staff-list/): replacements for its six
+    // [staff_manager] tables, mirroring the Italian page, which uses these widgets.
+    widget('StaffList', 'Staff List page: faculty',
+        () => ({ qualification: 'PO,PA,RTDa,RTDb,RTT,RIC', is_internal: 'true', status: 'current', columns: 'name,qualification,email,office', headers: 'Name,Position,Email,Office' }),
+        () => ['Rossi', 'alice@example.test'], () => ['Bianchi']),
+    widget('StaffList', 'Staff List page: emeriti',
+        () => ({ qualification: 'Professore Emerito', is_internal: 'true', status: 'current', columns: 'name,email,office', headers: 'Name,Email,Office' }),
+        () => [], () => ['Rossi']),
+    widget('StaffList', 'Staff List page: research staff',
+        () => ({ qualification: 'Assegnista,Tecnologo,Titolare di borsa di ricerca,Titolare di contratto di ricerca,Titolare di incarico post-doc,Titolare di incarico di ricerca', is_internal: 'true', status: 'current', columns: 'name,email,office', headers: 'Name,Email,Office' }),
+        () => [], () => ['Rossi']),
+    widget('StaffList', 'Staff List page: PhD students',
+        () => ({ qualification: 'Dottorando in Matematica,Dottorando in HPSC', is_internal: 'true', status: 'current', columns: 'name,email,office', headers: 'Name,Email,Office' }),
+        () => ['Neri', 'elena@example.test'], () => ['Rossi']),
+    widget('StaffList', 'Staff List page: collaborators',
+        () => ({ qualification: 'Collaboratore', is_internal: 'true', status: 'current', columns: 'name,email', headers: 'Name,Email' }),
+        () => ['Bianchi'], () => ['Verdi']),
+    widget('StaffList', 'Staff List page: technical and administrative staff',
+        () => ({ qualification: 'PTA', is_internal: 'true', status: 'current', columns: 'name,email,phone,office', headers: 'Name,Email,Phone,Office' }),
+        () => [], () => ['Rossi']),
+
     // VisitList
     widget('VisitList', 'current visits of an SSD',
         () => ({ status: 'current', sort_by: 'name', order: 'asc', ssd: 'MATH-02/A' }),
@@ -64,6 +85,11 @@ const contracts = [
     widget('VisitList', 'past visits grouped by year',
         () => ({ status: 'past', sort_by: 'start_date', order: 'desc', group_by_year: '1' }),
         () => ['Ivanov']),
+    // "Funded activities" page: replacement for its [visit_manager] tables.
+    widget('VisitList', 'Funded activities page: visits funded by a grant in a year',
+        fx => ({ grants: id(fx.grant), year: String(fx.visits.current.startDate.getFullYear()),
+            columns: 'first_name,last_name,affiliations,start_date,end_date', headers: 'Nome,Cognome,Affiliazione,Da,A' }),
+        () => ['Dmitri', 'Ivanov', 'Example University', 'Affiliazione']),
     widget('VisitList', 'visits funded by a grant, grouped by year',
         fx => ({ grants: id(fx.grant), group_by_year: '1' }),
         () => ['Ivanov']),
